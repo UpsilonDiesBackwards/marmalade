@@ -18,7 +18,7 @@ enum EntityFlags {
 
 struct Transform {
     glm::vec2 pos = {0.0f, 0.0f};
-    glm::vec2 eulerRot = {0.0f, 0.0f};
+    float rotation = 0.0f;
     glm::vec2 scale = {1.0f, 1.0f};
 
     glm::mat4 modelMatrix = glm::mat4(1.0f);
@@ -39,8 +39,8 @@ public:
     glm::vec2 getPosition();
     void setPosition(glm::vec2 newPos);
 
-    glm::vec2 getEulerRot();
-    void setEulerRot(glm::vec2 newRot);
+    float getRotation();
+    void setRotation(float newRot);
 
     glm::vec2 getScale();
     void setScale(glm::vec2 newScale);

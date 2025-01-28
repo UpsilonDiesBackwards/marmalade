@@ -85,8 +85,8 @@ void SceneHierarchy::Show() {
             if (ImGui::InputFloat2("Position", glm::value_ptr(entity->transform.pos))) {
                 entity->setPosition(glm::vec2(entity->transform.pos[0], entity->transform.pos[1]));
             }
-            if (ImGui::InputFloat2("Rotation", &entity->transform.eulerRot[0])) {
-                entity->setEulerRot(glm::vec2(entity->transform.eulerRot[0], entity->transform.eulerRot[1]));
+            if (ImGui::SliderFloat("Rotation", &entity->transform.rotation, 0, 360)) {
+                entity->setRotation((entity->transform.rotation));
             }
             if (ImGui::InputFloat2("Scale", &entity->transform.scale[0])) {
                 entity->setScale(glm::vec2(entity->transform.scale[0], entity->transform.scale[1]));
