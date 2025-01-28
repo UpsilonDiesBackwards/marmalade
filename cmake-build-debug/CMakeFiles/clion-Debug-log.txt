@@ -1,7 +1,0 @@
-/home/tayler/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/home/tayler/.local/share/JetBrains/Toolbox/apps/clion/bin/ninja/linux/x64/ninja -G Ninja -S /home/tayler/projects/marmalade -B /home/tayler/projects/marmalade/cmake-build-debug
--- Including Wayland support
--- Including X11 support
--- Using the multi-header code from /home/tayler/projects/marmalade/vendor/json/include/
--- Configuring done (0.1s)
--- Generating done (0.0s)
--- Build files have been written to: /home/tayler/projects/marmalade/cmake-build-debug
