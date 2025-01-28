@@ -17,8 +17,8 @@ void Camera::Move(float xOffset, float yOffset) {
 
 void Camera::Zoom(float amount) {
     zoom += amount * Application::GetInstance().profiler.GetDeltaTime();
-    if (zoom < -100.0f) zoom = -100.0f;
-    if (zoom > 100.0f) zoom = 100.0f;
+    if (zoom <= 0.02f) zoom = 0.02f;
+    if (zoom > 200.0f) zoom = 200.0f;
 }
 
 void Camera::UpdateViewport(float newWidth, float newHeight) {
