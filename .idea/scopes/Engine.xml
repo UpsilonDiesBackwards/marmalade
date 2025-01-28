@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Engine" pattern="file[marmalade]:*/&amp;&amp;!file[marmalade]:.idea//*&amp;&amp;!file[marmalade]:vendor//*" />
+</component>

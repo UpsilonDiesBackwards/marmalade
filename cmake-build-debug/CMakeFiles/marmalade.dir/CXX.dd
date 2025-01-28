@@ -1,0 +1,57 @@
+ninja_dyndep_version = 1.0
+build CMakeFiles/marmalade.dir/vendor/imgui/imgui.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/vendor/imgui/imgui_demo.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/vendor/imgui/imgui_draw.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/vendor/imgui/imgui_tables.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/vendor/imgui/imgui_widgets.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/vendor/imgui/backends/imgui_impl_glfw.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/vendor/imgui/backends/imgui_impl_opengl3.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/vendor/imguifiledialog/ImGuiFileDialog.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/gui/imgui/editor.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/gui/imgui/editorviews.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/gui/imgui/editorviewstatusbar.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/gui/imgui/sceneheirarchy.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/gui/imgui/topbar.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/gui/editview.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/gui/framebuffer.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/gui/gameview.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/gui/stylemanager.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/application/application.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/application/profiler.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/archetypes/camera.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/archetypes/entity.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/graphics/renderable.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/graphics/shader.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/io/input.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/io/inputmanager.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/scene/scene.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/scene/scenemanager.cpp.o: dyndep
+
+build CMakeFiles/marmalade.dir/src/main.cpp.o: dyndep
+

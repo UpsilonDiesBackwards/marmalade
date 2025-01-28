@@ -1,0 +1,11 @@
+{
+"rules": [
+{
+"primary-output": "CMakeFiles/marmalade.dir/src/gui/imgui/editorviewstatusbar.cpp.o",
+"requires": [
+]
+}
+],
+"version": 0,
+"revision": 0
+}
