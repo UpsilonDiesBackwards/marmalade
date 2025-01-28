@@ -47,9 +47,10 @@ void Application::Initialise() {
     ImGui_ImplOpenGL3_Init("#version 430");
 
     // Load ImGui custom style
-    styleManager.LoadStyle("../res/config/style.txt");
+    styleManager.LoadStyle("../res/config/editorstyle.txt");
 
     ImGuiIO& io = ImGui::GetIO();
+    io.IniFilename = "../res/config/imgui.ini";
     io.ConfigWindowsMoveFromTitleBarOnly = true;
     io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable;
     ImFont* font = io.Fonts->AddFontFromFileTTF("../res/fonts/monofur/monof55.ttf", 16);
