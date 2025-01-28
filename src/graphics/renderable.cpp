@@ -8,7 +8,7 @@
 #include "../../include/graphics/shader.h"
 #include "../application/application.h"
 
-float rectVertices[] = {
+float vertices[] = {
         // Positions       // Texture Coords
         -0.5f,  0.5f, 0.0f,  0.0f, 1.0f,  // Top-left corner
         0.5f,  0.5f, 0.0f,  1.0f, 1.0f,  // Top-right corner
@@ -16,7 +16,7 @@ float rectVertices[] = {
         -0.5f, -0.5f, 0.0f,  0.0f, 0.0f   // Bottom-left corner
 };
 
-int rectIndices[] = {
+int indices[] = {
         0, 1, 3,
         1, 2, 3
 };
@@ -32,11 +32,11 @@ void Renderable::Initialise() {
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(rectVertices), rectVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rectIndices), rectIndices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
@@ -67,7 +67,7 @@ void Renderable::Draw(glm::mat4 modelMatrix) {
     shaderProgram.SetMat4("model", modelMatrix);
 
 
-    glDrawElements(GL_TRIANGLES, sizeof(rectIndices)/4, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, sizeof(indices)/4, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 }
 
