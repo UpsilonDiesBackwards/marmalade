@@ -9,13 +9,13 @@
 
 class Renderable {
 public:
-    Renderable(uint VAO, uint VBO, uint EBO, uint texture);
+    Renderable(unsigned int VAO, unsigned int VBO, unsigned int EBO, unsigned int texture);
     void Initialise(); // Buffer Setup
     void Draw(glm::mat4 modelMatrix);
 private:
-    uint VAO, VBO, EBO;
+    unsigned int VAO, VBO, EBO;
     Shader shaderProgram;
-    uint texture;
+    unsigned int texture;
     glm::mat4 projectionMatrix;
 };
 

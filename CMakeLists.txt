@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(vendor/glfw)
 add_subdirectory(vendor/json)
+add_subdirectory(vendor/glm)
 
 find_package(OpenGL REQUIRED)
 
@@ -56,11 +57,11 @@ add_executable(marmalade vendor/glad/src/glad.c ${IMGUI_SRC} vendor/imguifiledia
 file(COPY vendor/imgui/misc/fonts/ProggyClean.ttf DESTINATION ${CMAKE_BINARY_DIR}/resources/fonts)
 file(COPY vendor/imgui/misc/fonts/Roboto-Medium.ttf DESTINATION ${CMAKE_BINARY_DIR}/resources/fonts)
 
-target_link_libraries(marmalade PRIVATE glfw OpenGL::GL ${OPENGL_gl_LIBRARY} nlohmann_json::nlohmann_json)
+target_link_libraries(marmalade PRIVATE glfw OpenGL::GL ${OPENGL_gl_LIBRARY} nlohmann_json::nlohmann_json glm::glm)
 
 if (WIN32)
     target_link_libraries(marmalade PRIVATE Shcore.lib ws2_32.lib)
 endif ()
 
-target_include_directories(marmalade PRIVATE vendor/glad/include vendor/glfw-3.4/include vendor/imgui vendor/imguifiledialog)
+target_include_directories(marmalade PRIVATE vendor/glad/include vendor/glfw-3.4/include vendor/imgui vendor/imguifiledialog glm)
 target_link_directories(marmalade PRIVATE vendor/nativefiledialog/lib)
