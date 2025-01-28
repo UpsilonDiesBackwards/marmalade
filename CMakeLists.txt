@@ -49,7 +49,9 @@ list(APPEND ENGINE_SRC src/application/application.cpp src/application/applicati
 add_executable(marmalade vendor/glad/src/glad.c ${IMGUI_SRC} vendor/imguifiledialog/ImGuiFileDialog.cpp
         ${ENGINE_API}
         ${ENGINE_SRC}
-        src/main.cpp)
+        src/main.cpp
+        src/graphics/texture.cpp
+        include/graphics/texture.h)
 
 file(COPY vendor/imgui/misc/fonts/ProggyClean.ttf DESTINATION ${CMAKE_BINARY_DIR}/resources/fonts)
 file(COPY vendor/imgui/misc/fonts/Roboto-Medium.ttf DESTINATION ${CMAKE_BINARY_DIR}/resources/fonts)
