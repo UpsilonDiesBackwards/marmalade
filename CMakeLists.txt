@@ -1,13 +1,39 @@
 cmake_minimum_required(VERSION 3.28)
 project(marmalade)
+include(ExternalProject)
 
 set(CMAKE_CXX_STANDARD 20)
+
+set(LUA_VERSION "lua-5.4.7")
+# Lua libraries, if on Windows
+set(LUA_SRC_DIR "../lua/src/lua")
+set(LUA_LIB "../lua/lib/Lua.lib")
 
 add_subdirectory(vendor/glfw)
 add_subdirectory(vendor/json)
 add_subdirectory(vendor/glm)
 
 find_package(OpenGL REQUIRED)
+
+if (NOT WIN32)
+    # If we're not on Windows, lua can be compiled automatically
+    ExternalProject_Add(lua
+            PREFIX ${CMAKE_BINARY_DIR}/${LUA_VERSION}
+            URL "https://www.lua.org/ftp/${LUA_VERSION}.tar.gz"
+            CONFIGURE_COMMAND ""
+            BUILD_COMMAND make generic
+            BUILD_ALWAYS true
+            BUILD_IN_SOURCE true
+            INSTALL_COMMAND ""
+    )
+
+    ExternalProject_Get_Property(lua BINARY_DIR)
+    set(LUA_INCLUDE_DIR ${BINARY_DIR}/src)
+    set(LUA_LIBRARIES ${BINARY_DIR}/src/liblua.a)
+else ()
+    set(LUA_INCLUDE_DIR ${LUA_SRC_DIR})
+    set(LUA_LIBRARIES ${LUA_LIB})
+endif ()
 
 file(GLOB IMGUI_SRC "vendor/imgui/*.h" "vendor/imgui/*.cpp")
 list(APPEND IMGUI_SRC vendor/imgui/backends/imgui_impl_glfw.h vendor/imgui/backends/imgui_impl_glfw.cpp vendor/imgui/backends/imgui_impl_opengl3.h vendor/imgui/backends/imgui_impl_opengl3.cpp)
@@ -54,14 +80,18 @@ add_executable(marmalade vendor/glad/src/glad.c ${IMGUI_SRC} vendor/imguifiledia
         src/graphics/texture.cpp
         include/graphics/texture.h)
 
+if (NOT WIN32)
+    add_dependencies(marmalade lua)
+endif ()
+
 file(COPY vendor/imgui/misc/fonts/ProggyClean.ttf DESTINATION ${CMAKE_BINARY_DIR}/resources/fonts)
 file(COPY vendor/imgui/misc/fonts/Roboto-Medium.ttf DESTINATION ${CMAKE_BINARY_DIR}/resources/fonts)
 
-target_link_libraries(marmalade PRIVATE glfw OpenGL::GL ${OPENGL_gl_LIBRARY} nlohmann_json::nlohmann_json glm::glm)
+target_link_libraries(marmalade PRIVATE glfw OpenGL::GL ${OPENGL_gl_LIBRARY} nlohmann_json::nlohmann_json glm::glm ${LUA_LIBRARIES})
 
 if (WIN32)
     target_link_libraries(marmalade PRIVATE Shcore.lib ws2_32.lib)
 endif ()
 
-target_include_directories(marmalade PRIVATE vendor/glad/include vendor/glfw-3.4/include vendor/imgui vendor/imguifiledialog glm)
-target_link_directories(marmalade PRIVATE vendor/nativefiledialog/lib)
+target_include_directories(marmalade PRIVATE vendor/glad/include vendor/glfw-3.4/include vendor/imgui vendor/imguifiledialog glm ${LUA_INCLUDE_DIR} vendor/luaaa)
+target_link_directories(marmalade PRIVATE vendor/nativefiledialog/lib vendor/luaaa)

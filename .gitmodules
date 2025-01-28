@@ -14,3 +14,6 @@
 [submodule "vendor/glm"]
 	path = vendor/glm
 	url = git@github.com:g-truc/glm.git
+[submodule "vendor/luaaa"]
+	path = vendor/luaaa
+	url = git@github.com:gengyong/luaaa.git
