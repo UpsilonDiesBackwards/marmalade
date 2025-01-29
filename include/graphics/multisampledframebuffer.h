@@ -1,12 +1,11 @@
 
-#ifndef ENGINE_FRAMEBUFFER_H
-#define ENGINE_FRAMEBUFFER_H
+#ifndef ENGINE_MULTISAMPLEDFRAMEBUFFER_H
+#define ENGINE_MULTISAMPLEDFRAMEBUFFER_H
 
-
-class Framebuffer {
+class MultiSampledFramebuffer {
 public:
-    Framebuffer();
-    ~Framebuffer();
+    MultiSampledFramebuffer();
+    ~MultiSampledFramebuffer();
 
     void Bind();
     void Unbind();
@@ -15,14 +14,12 @@ public:
     void Resolve();
 
     unsigned int GetTexture() const;
-    unsigned int GetResolvedTexture() const;
     unsigned int GetFBO() const;
-    unsigned int GetResolvedFBO() const;
 
     int width = 1920;
     int height = 1080;
 
-    int sampleCount = 16; // MSAA sample count. not a const cause we want this to be editable by user
+    int sampleCount = 16; // MSAA sample count. not a const because we want this to be editable by user
 private:
     unsigned int fbo, resolvedFBO;
     unsigned int texture, resolvedTexture;
@@ -31,5 +28,4 @@ private:
     void Initialize();
 };
 
-
-#endif //ENGINE_FRAMEBUFFER_H
+#endif //ENGINE_MULTISAMPLEDFRAMEBUFFER_H

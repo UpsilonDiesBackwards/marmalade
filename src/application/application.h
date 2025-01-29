@@ -3,7 +3,7 @@
 
 #include "GLFW/glfw3.h"
 #include "../../include/archetypes/entity.h"
-#include "../gui/framebuffer.h"
+#include "../../include/graphics/multisampledframebuffer.h"
 #include "../gui/gameview.h"
 #include "../gui/stylemanager.h"
 #include "../gui/editview.h"
@@ -45,7 +45,7 @@ public:
     PlayState playState = PlayState::Stop;
     EditorMode editorMode = EditorMode::EDIT;
 
-    Framebuffer* framebuffer;
+    MultiSampledFramebuffer* framebuffer;
 
     Editor* editorGUI;
 

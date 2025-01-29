@@ -43,7 +43,7 @@ void EditView::Render() {
     Application::GetInstance().framebuffer->Unbind();
 
     Application::GetInstance().framebuffer->Resolve();
-    ImTextureID imTexture = Application::GetInstance().framebuffer->GetResolvedTexture();
+    ImTextureID imTexture = Application::GetInstance().framebuffer->GetTexture();
 
     ImDrawList* drawlist = ImGui::GetWindowDrawList();
 

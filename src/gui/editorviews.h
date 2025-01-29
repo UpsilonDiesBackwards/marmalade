@@ -2,7 +2,7 @@
 #ifndef ENGINE_EDITORVIEWS_H
 #define ENGINE_EDITORVIEWS_H
 
-#include "framebuffer.h"
+#include "../../include/graphics/multisampledframebuffer.h"
 
 class EditorViews {
 public:

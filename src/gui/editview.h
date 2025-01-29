@@ -3,7 +3,7 @@
 #define ENGINE_EDITVIEW_H
 
 
-#include "framebuffer.h"
+#include "../../include/graphics/multisampledframebuffer.h"
 #include "imgui.h"
 
 class EditView {
@@ -16,7 +16,7 @@ public:
 
     void RunInput();
 private:
-    Framebuffer framebuffer;
+    MultiSampledFramebuffer framebuffer;
     int width, height;
     ImVec2 imageMin, imageMax;
 };

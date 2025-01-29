@@ -57,8 +57,8 @@ list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
         src/gui/editorviews.h
         src/gui/editview.cpp
         src/gui/editview.h
-        src/gui/framebuffer.cpp
-        src/gui/framebuffer.h
+        src/graphics/multisampledframebuffer.cpp
+        include/graphics/multisampledframebuffer.h
         src/gui/gameview.cpp
         src/gui/gameview.h
         src/gui/imgui
@@ -78,7 +78,9 @@ add_executable(marmalade vendor/glad/src/glad.c ${IMGUI_SRC} vendor/imguifiledia
         ${ENGINE_SRC}
         src/main.cpp
         src/graphics/texture.cpp
-        include/graphics/texture.h)
+        include/graphics/texture.h
+        src/graphics/framebuffer.cpp
+        include/graphics/framebuffer.h)
 
 if (NOT WIN32)
     add_dependencies(marmalade lua)

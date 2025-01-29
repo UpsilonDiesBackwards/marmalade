@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include "../gui/framebuffer.h"
+#include "../../include/graphics/multisampledframebuffer.h"
 #include "glad/glad.h"
 
 /*
@@ -10,11 +10,11 @@
  * to resolve a multisampled framebuffer back into a regular framebuffer, and then blit it so it can be rendered.
  */
 
-Framebuffer::Framebuffer() {
+MultiSampledFramebuffer::MultiSampledFramebuffer() {
     Initialize();
 }
 
-Framebuffer::~Framebuffer() {
+MultiSampledFramebuffer::~MultiSampledFramebuffer() {
     glDeleteFramebuffers(1, &fbo);
     glDeleteFramebuffers(1, &resolvedFBO);
     glDeleteTextures(1, &texture);
@@ -23,7 +23,7 @@ Framebuffer::~Framebuffer() {
 }
 
 
-void Framebuffer::Initialize() {
+void MultiSampledFramebuffer::Initialize() {
     glGenFramebuffers(1, &fbo); // Create frame buffer
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
@@ -58,20 +58,20 @@ void Framebuffer::Initialize() {
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, resolvedTexture, 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cout << "ERROR: Framebuffer is not complete!" << std::endl;
+        std::cout << "ERROR: MultiSampledFramebuffer is not complete!" << std::endl;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Framebuffer::Bind() {
+void MultiSampledFramebuffer::Bind() {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 }
 
-void Framebuffer::Unbind() {
+void MultiSampledFramebuffer::Unbind() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Framebuffer::Resolve() {
+void MultiSampledFramebuffer::Resolve() {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, resolvedFBO);
 
@@ -80,7 +80,7 @@ void Framebuffer::Resolve() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Framebuffer::Resize(int newW, int newH) {
+void MultiSampledFramebuffer::Resize(int newW, int newH) {
     width = newW;
     height = newH;
 
@@ -88,23 +88,14 @@ void Framebuffer::Resize(int newW, int newH) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
     glRenderbufferStorageMultisample(GL_RENDERBUFFER, sampleCount, GL_DEPTH24_STENCIL8, width, height);
 }
 
-unsigned int Framebuffer::GetTexture() const {
-    return texture;
-}
-
-unsigned int Framebuffer::GetFBO() const {
-    return fbo;
-}
-
-unsigned int Framebuffer::GetResolvedTexture() const {
+unsigned int MultiSampledFramebuffer::GetTexture() const {
     return resolvedTexture;
 }
 
-unsigned int Framebuffer::GetResolvedFBO() const {
+unsigned int MultiSampledFramebuffer::GetFBO() const {
     return resolvedFBO;
 }
