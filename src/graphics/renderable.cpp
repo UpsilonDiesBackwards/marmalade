@@ -50,12 +50,13 @@ void Renderable::Initialise() {
 }
 
 void Renderable::Draw(glm::mat4 modelMatrix) {
-    Initialise();
-
     shaderProgram.Use();
 
     glBindVertexArray(VAO);
 
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    shaderProgram.SetInt("texture0", 0);
 
     shaderProgram.SetMat4("projection",Application::GetInstance().camera->GetProjection());
 
@@ -65,7 +66,6 @@ void Renderable::Draw(glm::mat4 modelMatrix) {
 
     shaderProgram.SetMat4("view", view_mat);
     shaderProgram.SetMat4("model", modelMatrix);
-
 
     glDrawElements(GL_TRIANGLES, sizeof(indices)/4, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);

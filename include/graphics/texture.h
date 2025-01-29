@@ -3,8 +3,12 @@
 #define MARMALADE_TEXTURE_H
 
 
-class texture {
+#include <string>
+#include "glad/glad.h"
 
+class Texture {
+public:
+    static GLuint LoadTexture(const std::string &filePath);
 };
 
 

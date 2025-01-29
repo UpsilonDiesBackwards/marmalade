@@ -17,3 +17,6 @@
 [submodule "vendor/luaaa"]
 	path = vendor/luaaa
 	url = git@github.com:gengyong/luaaa.git
+[submodule "vendor/stb"]
+	path = vendor/stb
+	url = git@github.com:nothings/stb

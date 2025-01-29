@@ -1,16 +1,9 @@
 #version 430 core
 layout (location = 0) out vec4 FragColor;
+layout (location = 1) in vec2 TexCoord;
+
+uniform sampler2D texture0;
 
 void main() {
-    FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    FragColor = texture(texture0, TexCoord);
 }
-
-//#version 430 core
-//layout (location = 0) in vec2 TexCoord;
-//layout (location = 1) out vec4 FragColor;
-//
-//uniform sampler2D texture1;
-//
-//void main() {
-//    FragColor = texture(texture1, TexCoord);
-//}

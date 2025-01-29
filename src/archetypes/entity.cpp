@@ -4,9 +4,10 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 #include "../../include/archetypes/entity.h"
+#include "../../include/graphics/texture.h"
 
 Entity::Entity(const std::string &name, EntityFlags flags, Transform transform)
-    : name(name), flags(flags), transform(transform), renderable(0,0,0,0) {
+    : name(name), flags(flags), transform(transform), renderable(0,0,0, Texture::LoadTexture("")) {
 
     renderable.Initialise();
 
