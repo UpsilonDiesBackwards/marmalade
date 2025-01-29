@@ -42,8 +42,7 @@ void SceneHierarchy::Show() {
 
             if (!name.empty()) {
                 Transform defaultTransform;
-                Entity newEntity(newNameBuffer, EntityFlags::RENDERABLE, defaultTransform);
-                currentScene->AddEntity(std::shared_ptr<Entity>(&newEntity));
+                currentScene->AddEntity(std::make_shared<Entity>(newNameBuffer, EntityFlags::RENDERABLE, defaultTransform));
 
                 showCreateEntityPopup = false;
             } else { ImGui::Text("Invalid entity name."); }
