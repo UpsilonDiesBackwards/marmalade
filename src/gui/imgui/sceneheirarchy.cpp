@@ -10,6 +10,8 @@ void SceneHierarchy::Show() {
     Application& app = Application::GetInstance();
     auto currentScene = app.sceneManager.GetCurrentScene();
 
+    ImGui::SetNextWindowPos(ImVec2(220, 112), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(443, 760), ImGuiCond_FirstUseEver);
     ImGui::Begin("Heirarchy", nullptr);
 
     // Create a new entity

@@ -7,6 +7,8 @@
 void EditorViews::Show() {
     Application& application = Application::GetInstance();
 
+    ImGui::SetNextWindowPos(ImVec2(763, 107), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(1011, 749), ImGuiCond_FirstUseEver);
     ImGui::Begin("Editor", nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse);
     if (ImGui::BeginTabBar("Views")) {
         ImGui::SameLine(ImGui::GetContentRegionAvail().x - 40);

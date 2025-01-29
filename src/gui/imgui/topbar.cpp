@@ -61,6 +61,8 @@ void TopBar::Show() {
     }
 
     if (showStyleEditor) {
+        ImGui::SetNextWindowPos(ImVec2(86, 53), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(388, 976), ImGuiCond_FirstUseEver);
         ImGui::Begin("Style Editor", &showStyleEditor);
         ImGui::ShowStyleEditor();
         ImGui::End();
