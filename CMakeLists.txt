@@ -39,7 +39,8 @@ file(GLOB IMGUI_SRC "vendor/imgui/*.h" "vendor/imgui/*.cpp")
 list(APPEND IMGUI_SRC vendor/imgui/backends/imgui_impl_glfw.h vendor/imgui/backends/imgui_impl_glfw.cpp vendor/imgui/backends/imgui_impl_opengl3.h vendor/imgui/backends/imgui_impl_opengl3.cpp)
 
 list(APPEND ENGINE_API include/archetypes/camera.h include/archetypes/entity.h
-        include/graphics/renderable.h include/graphics/shader.h
+        include/graphics/renderable.h include/graphics/shader.h include/graphics/texture.h
+        include/graphics/framebuffer.h include/graphics/multisampledframebuffer.h
         include/io/input.h include/io/inputmanager.h
         include/scene/scene.h include/scene/scenemanager.h
 )
@@ -58,7 +59,6 @@ list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
         src/gui/editview.cpp
         src/gui/editview.h
         src/graphics/multisampledframebuffer.cpp
-        include/graphics/multisampledframebuffer.h
         src/gui/gameview.cpp
         src/gui/gameview.h
         src/gui/imgui
@@ -68,7 +68,7 @@ list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
 
 list(APPEND ENGINE_SRC src/application/application.cpp src/application/application.h src/application/profiler.cpp src/application/profiler.h
         src/archetypes/camera.cpp src/archetypes/entity.cpp
-        src/graphics/renderable.cpp src/graphics/shader.cpp
+        src/graphics/renderable.cpp src/graphics/shader.cpp src/graphics/texture.cpp src/graphics/framebuffer.cpp
         src/io/input.cpp src/io/inputmanager.cpp
         src/scene/scene.cpp src/scene/scenemanager.cpp
 )
@@ -77,10 +77,7 @@ add_executable(marmalade vendor/glad/src/glad.c ${IMGUI_SRC} vendor/imguifiledia
         ${ENGINE_API}
         ${ENGINE_SRC}
         src/main.cpp
-        src/graphics/texture.cpp
-        include/graphics/texture.h
-        src/graphics/framebuffer.cpp
-        include/graphics/framebuffer.h)
+)
 
 if (NOT WIN32)
     add_dependencies(marmalade lua)
