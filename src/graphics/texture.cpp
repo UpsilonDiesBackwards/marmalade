@@ -2,7 +2,7 @@
 #include <iostream>
 #include "../../include/graphics/texture.h"
 #define STB_IMAGE_IMPLEMENTATION
-#include "../../vendor/stb/stb_image.h"
+#include <stb/stb_image.h>
 
 GLuint Texture::LoadTexture(const std::string &filePath) {
     GLuint texture;
