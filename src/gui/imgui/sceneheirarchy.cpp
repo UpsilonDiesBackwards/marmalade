@@ -153,7 +153,6 @@ void SceneHierarchy::Show() {
                     }
                 }
             }
-
             ImGui::TreePop();
         }
         ImGui::PopID();

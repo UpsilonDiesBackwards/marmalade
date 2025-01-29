@@ -1,7 +1,7 @@
 #include "application/application.h"
 
 int main() {
-    Application& application = Application::GetInstance(1920, 1080, "Engine Test");
+    Application& application = Application::GetInstance(1920, 1080, "Marmalade Engine");
     application.Initialise();
 
     while (!glfwWindowShouldClose(application.getWindow())) {

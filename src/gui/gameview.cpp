@@ -16,40 +16,50 @@ GameView::GameView(int width, int height) {
 }
 
 void GameView::Render() {
-    Application::GetInstance().framebuffer->Bind();
+    Application& app = Application::GetInstance();
 
-    float aRatio = static_cast<float>(width) / static_cast<float>(height);
+    app.framebuffer->Bind();
 
-    glViewport(0, 0, width, height);
-    glClearColor(0.49f, 0.73f, 0.70f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(0.18f, 0.21f, 0.23f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // RENDER IN THE GAME VIEW
-    for (const std::shared_ptr<Entity> entity : Application::GetInstance().sceneManager.GetCurrentScene()->GetEntities()) {
+    ImVec2 size = ImGui::GetContentRegionAvail();
+    int newWidth = static_cast<int>(size.x);
+    int newHeight = static_cast<int>(size.y);
+
+    if (newWidth > 0 && newHeight > 0 && (newWidth != framebuffer.width || newHeight != framebuffer.height)) {
+        framebuffer.Resize(newWidth, newHeight);
+        app.camera->UpdateViewport(newWidth, newHeight);
+        glViewport(0, 0, newWidth, newHeight);
+    }
+
+    // Render Space
+    for (const auto& entity : app.sceneManager.GetCurrentScene()->GetEntities()) {
         entity->Render();
     }
 
     Application::GetInstance().framebuffer->Unbind();
 
-    ImVec2 winSize = ImGui::GetContentRegionAvail();
-    float wRatio = winSize.x / winSize.y;
+    if (app.editorMode == EditorMode::EDIT) {
 
-    if (winSize.x != width || winSize.y != height) {
-        width = static_cast<int>(winSize.x);
-        height = static_cast<int>(winSize.y);
-        Resize(width, height);
     }
 
-    // Retain Aspect Ratio
-    if (wRatio > aRatio) {
-        width = static_cast<int>(winSize.y * aRatio);
-        height = static_cast<int>(winSize.y);
-    } else {
-        width = static_cast<int>(winSize.x);
-        height = static_cast<int>(winSize.x / aRatio);
-    }
+    Application::GetInstance().framebuffer->Resolve();
+    ImTextureID imTexture = Application::GetInstance().framebuffer->GetResolvedTexture();
 
-    ImGui::Image(Application::GetInstance().framebuffer->GetTexture(), ImVec2(winSize.x, winSize.y), ImVec2(0, 1), ImVec2(1, 0));
+    ImDrawList* drawlist = ImGui::GetWindowDrawList();
+
+    ImVec2 windowPos = ImGui::GetCursorScreenPos();
+    ImVec2 windowSize = ImGui::GetContentRegionAvail();
+
+    drawlist->AddImage(imTexture,
+                       ImVec2(windowPos.x, windowPos.y),
+                       ImVec2(windowPos.x + windowSize.x, windowPos.y + windowSize.y),
+                       ImVec2(0, 1), ImVec2(1, 0));
+
+    imageMin = ImGui::GetWindowPos();
+    imageMax = ImVec2(imageMin.x + windowSize.x, imageMin.y + windowSize.y);
 }
 
 void GameView::Resize(int width, int height) {
@@ -57,4 +67,7 @@ void GameView::Resize(int width, int height) {
     this->height = height;
 
     Application::GetInstance().framebuffer->Resize(width, height);
+}
+
+void GameView::RunInput() {
 }

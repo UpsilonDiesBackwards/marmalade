@@ -30,6 +30,7 @@ void Application::Initialise() {
         glfwTerminate();
         return;
     } else std::cout << "Window Created" << std::endl;
+    glfwWindowHint(GLFW_SAMPLES, 4);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
@@ -55,7 +56,8 @@ void Application::Initialise() {
     io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable;
     ImFont* font = io.Fonts->AddFontFromFileTTF("../res/fonts/monofur/monof55.ttf", 16);
 
-//    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
 
     gameView = new GameView(width, height);
     editView = new EditView(width, height);
@@ -80,7 +82,14 @@ void Application::Run() {
     ImGui::NewFrame();
 
     // TODO: EDITOR STUFF
-//    ImGui::ShowStyleEditor();
+
+    if (editorMode == EditorMode::EDIT) {
+        editView->RunInput();
+    }
+
+    if (editorMode == EditorMode::GAME) {
+        gameView->RunInput();
+    }
 
     input.Update();
 

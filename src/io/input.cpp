@@ -52,3 +52,15 @@ void Input::Update() {
 void Input::BindScroll(std::function<void(double, double)> action) {
     scrollAction = action;
 }
+
+void Input::UnbindKey(int key, KeyEventType eventType) {
+    keyBinds.erase({key, eventType});
+}
+
+void Input::UnbindMouseButton(int button, MouseEventType eventType) {
+    mouseButtonBinds.erase({button, eventType});
+}
+
+void Input::UnbindScroll() {
+    scrollAction = nullptr;
+}

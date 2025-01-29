@@ -28,10 +28,12 @@ public:
     Input(InputManager *inputManager);
 
     void BindKey(int key, KeyEventType eventType, std::function<void()> action);
-
     void BindMouseButton(int button, MouseEventType eventType, std::function<void()> action);
-
     void BindScroll(std::function<void(double, double)> action);
+
+    void UnbindKey(int key, KeyEventType eventType);
+    void UnbindMouseButton(int button, MouseEventType eventType);
+    void UnbindScroll();
 
     void Update();
 

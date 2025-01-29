@@ -4,6 +4,7 @@
 
 
 #include "framebuffer.h"
+#include "imgui.h"
 
 class GameView {
 public:
@@ -12,9 +13,12 @@ public:
 
     void Render();
     void Resize(int width, int height);
+
+    void RunInput();
 private:
-    Framebuffer* framebuffer;
+    Framebuffer framebuffer;
     int width, height;
+    ImVec2 imageMin, imageMax;
 };
 
 
