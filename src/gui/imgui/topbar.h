@@ -8,10 +8,14 @@
 
 #include "../../gui/stylemanager.h"
 #include "../../application/profiler.h"
+#include "packagemanager.h"
 
 class TopBar {
 public:
     void Show();
+private:
+    bool showPackageManager = false;
+    PackageManager packageManager;
 };
 
 

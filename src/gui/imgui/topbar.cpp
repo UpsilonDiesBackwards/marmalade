@@ -38,6 +38,10 @@ void TopBar::Show() {
         }
 
         if (ImGui::BeginMenu("Window")) {
+            if (ImGui::MenuItem("Package Manager")) {
+                showPackageManager = true;
+            }
+
             if (ImGui::MenuItem("Save Layout")) {
                 Application::GetInstance().styleManager.SaveStyle();
 
@@ -74,6 +78,10 @@ void TopBar::Show() {
 
     if (showSceneOpenPopUp) {
         ImGui::OpenPopup("Open Scene");
+    }
+
+    if (showPackageManager) {
+        packageManager.Show();
     }
 
     if (ImGui::BeginPopupModal("New Scene", &showSceneCreationPopUp, ImGuiWindowFlags_AlwaysAutoResize)) {

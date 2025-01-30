@@ -64,6 +64,8 @@ list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
         src/gui/imgui
         src/gui/stylemanager.cpp
         src/gui/stylemanager.h
+        src/gui/imgui/packagemanager.cpp
+        src/gui/imgui/packagemanager.h
 )
 
 list(APPEND ENGINE_SRC src/application/application.cpp src/application/application.h src/application/profiler.cpp src/application/profiler.h
