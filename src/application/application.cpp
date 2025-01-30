@@ -52,7 +52,7 @@ void Application::Initialise() {
 
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigWindowsMoveFromTitleBarOnly = true;
-    io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
     ImFont* font = io.Fonts->AddFontFromFileTTF("../res/fonts/monofur/monof55.ttf", 16);
 
     glEnable(GL_DEPTH_TEST);
@@ -98,6 +98,16 @@ void Application::Run() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwPollEvents();
+
+    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        GLFWwindow* backupContext = glfwGetCurrentContext();
+
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+
+        glfwMakeContextCurrent(backupContext);
+    }
+
     glfwSwapBuffers(window);
 }
 
