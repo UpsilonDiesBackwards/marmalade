@@ -3,6 +3,8 @@
 #include "../../gui/stylemanager.h"
 #include "../../application/application.h"
 
+#include <IconsCodicons.h>
+
 void TopBar::Show() {
     static bool showStyleEditor = false;
     static bool showSceneCreationPopUp = false;
@@ -11,17 +13,17 @@ void TopBar::Show() {
 
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("New Project")) {
+            if (ImGui::MenuItem(ICON_CI_ADD " New Project")) {
             }
-            if (ImGui::MenuItem("Open Project")) {
+            if (ImGui::MenuItem(ICON_CI_FOLDER_OPENED " Open Project")) {
             }
-            if (ImGui::MenuItem("New Scene")) {
+            if (ImGui::MenuItem(ICON_CI_SCREEN_FULL " New Scene")) {
                 showSceneCreationPopUp = true;
             }
-            if (ImGui::MenuItem("Open Scene")) {
+            if (ImGui::MenuItem(ICON_CI_OPEN_PREVIEW " Open Scene")) {
                 showSceneOpenPopUp = true;
             }
-            if (ImGui::MenuItem("Quit")) {
+            if (ImGui::MenuItem(ICON_CI_CLOSE_ALL " Quit")) {
                 glfwSetWindowShouldClose(Application::GetInstance().getWindow(), true);
             }
             ImGui::EndMenu();
@@ -31,18 +33,18 @@ void TopBar::Show() {
         }
 
         if (ImGui::BeginMenu("Settings")) {
-            if (ImGui::MenuItem("Style Editor")) {
+            if (ImGui::MenuItem(ICON_CI_EDIT " Style Editor")) {
                 showStyleEditor = !showStyleEditor;
             }
             ImGui::EndMenu();
         }
 
         if (ImGui::BeginMenu("Window")) {
-            if (ImGui::MenuItem("Package Manager")) {
+            if (ImGui::MenuItem(ICON_CI_PACKAGE " Package Manager")) {
                 showPackageManager = true;
             }
 
-            if (ImGui::MenuItem("Save Layout")) {
+            if (ImGui::MenuItem(ICON_CI_SAVE " Save Layout")) {
                 Application::GetInstance().styleManager.SaveStyle();
 
                 ImGui::OpenPopup("LayoutSavePopup");

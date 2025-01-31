@@ -91,6 +91,7 @@ endif ()
 
 file(COPY vendor/imgui/misc/fonts/ProggyClean.ttf DESTINATION ${CMAKE_BINARY_DIR}/resources/fonts)
 file(COPY vendor/imgui/misc/fonts/Roboto-Medium.ttf DESTINATION ${CMAKE_BINARY_DIR}/resources/fonts)
+file(COPY res/fonts/codicon.ttf DESTINATION ${CMAKE_BINARY_DIR})
 
 target_link_libraries(marmalade PRIVATE glfw OpenGL::GL ${OPENGL_gl_LIBRARY} nlohmann_json::nlohmann_json glm::glm ${LUA_LIBRARIES} libgit2package)
 
@@ -98,5 +99,5 @@ if (WIN32)
     target_link_libraries(marmalade PRIVATE Shcore.lib ws2_32.lib)
 endif ()
 
-target_include_directories(marmalade PRIVATE vendor/glad/include vendor/glfw-3.4/include vendor/imgui vendor/imguifiledialog glm ${LUA_INCLUDE_DIR} vendor/luaaa vendor/stb vendor/libgit2/include)
+target_include_directories(marmalade PRIVATE vendor/glad/include vendor/glfw-3.4/include vendor/imgui vendor/imguifiledialog glm ${LUA_INCLUDE_DIR} vendor/luaaa vendor/stb vendor/libgit2/include vendor/iconfontcppheaders)
 target_link_directories(marmalade PRIVATE vendor/nativefiledialog/lib vendor/luaaa)

@@ -23,3 +23,6 @@
 [submodule "vendor/libgit2"]
 	path = vendor/libgit2
 	url = git@github.com:libgit2/libgit2.git
+[submodule "vendor/iconfontcppheaders"]
+	path = vendor/iconfontcppheaders
+	url = git@github.com:juliettef/IconFontCppHeaders.git

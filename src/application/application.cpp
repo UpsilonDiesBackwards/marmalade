@@ -5,6 +5,8 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 
+#include <IconsCodicons.h>
+
 Application::Application(int width, int height, const char *title) :
     window(nullptr), width(width), height(height), title(title), inputManager(InputManager::GetInstance()),
     input(&inputManager), camera(new Camera(1920, 1080, 1.0f)) {
@@ -54,6 +56,16 @@ void Application::Initialise() {
     io.ConfigWindowsMoveFromTitleBarOnly = true;
     io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
     ImFont* font = io.Fonts->AddFontFromFileTTF("../res/fonts/monofur/monof55.ttf", 16);
+
+    static const ImWchar icons_ranges[] = {ICON_MIN_CI, ICON_MAX_16_CI, 0};
+
+    ImFontConfig icons_config;
+    icons_config.MergeMode = true;
+    icons_config.PixelSnapH = true;
+    float font_size = 16.0f;
+    icons_config.GlyphMinAdvanceX = font_size;
+    icons_config.GlyphOffset.y = 3.0f;
+    io.Fonts->AddFontFromFileTTF(FONT_ICON_FILE_NAME_CI, font_size, &icons_config, icons_ranges);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
