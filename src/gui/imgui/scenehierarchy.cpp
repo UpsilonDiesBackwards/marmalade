@@ -171,7 +171,7 @@ void SceneHierarchy::Show() {
 
             ImGui::Separator();
 
-            ImGui::Image(ImTextureID(entity->renderable.GetTexture()), ImVec2(128, 128));
+            ImGui::Image(ImTextureID(entity->renderable.GetTexture()), ImVec2(256, 256));
 
             ImGui::TreePop();
         }
