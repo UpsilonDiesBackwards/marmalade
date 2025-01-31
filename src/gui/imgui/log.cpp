@@ -10,6 +10,7 @@ void Log::Show() {
 
     static const ImVec4 COLOR_YELLOW(1.0f, 1.0f, 0.0f, 1.0f);
     static const ImVec4 COLOR_RED(1.0f, 0.0f, 0.0f, 1.0f);
+    static const ImVec4 COLOR_GRAY(0.6f, 0.6f, 0.6f, 1.0f);
 
     ImGui::Begin(ICON_CI_FILE_TEXT " Engine Log", &showLog);
     {
@@ -20,6 +21,8 @@ void Log::Show() {
                     ImGui::TextColored(COLOR_YELLOW, "%s", line.second.c_str());
                 } else if ((line.first == spdlog::level::err || line.first == spdlog::level::critical) && coloredText) {
                     ImGui::TextColored(COLOR_RED, "%s", line.second.c_str());
+                } else if (line.first == spdlog::level::debug && coloredText) {
+                    ImGui::TextColored(COLOR_GRAY, "%s", line.second.c_str());
                 } else {
                     ImGui::TextUnformatted(line.second.c_str());
                 }
