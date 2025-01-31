@@ -12,19 +12,28 @@ enum PackageManagerTab {
     PackageManagerTab_Available
 };
 
+std::string ItemId(const char *id, PackageManagerTab tab) {
+    std::stringstream item_id;
+    item_id << "id" << tab;
+    return item_id.str();
+}
+
 void DrawLeftPane(PackageManagerTab tab) {
     ImVec2 area = ImGui::GetContentRegionAvail();
 
-    static const char* items[] = { "Package 1", "Package 2", "Package 3", "Package 4", "Package 5" };
-    static bool selected[IM_ARRAYSIZE(items)] = { false };
+    static char search_str[256] = {0};
 
-    std::stringstream list_id;
-    list_id << "##PackageManagerList" << tab;
+    ImGui::SetNextItemWidth(area.x);
 
-    if (ImGui::BeginListBox(list_id.str().c_str(), area))
-    {
-        for (int i = 0; i < IM_ARRAYSIZE(items); i++)
-        {
+    ImGui::InputTextWithHint(ItemId("##PackageManagerSearch", tab).c_str(), ICON_CI_SEARCH " Search", search_str, 256);
+    float search_bar_height = ImGui::GetItemRectSize().y;
+
+    static const char* items[] = {"Package 1", "Package 2", "Package 3", "Package 4", "Package 5"};
+    static bool selected[IM_ARRAYSIZE(items)] = {false};
+
+    ImVec2 listbox_area = ImVec2(area.x, area.y - search_bar_height - ImGui::GetStyle().ItemSpacing.y);
+    if (ImGui::BeginListBox(ItemId("##PackageManagerList", tab).c_str(), listbox_area)) {
+        for (int i = 0; i < IM_ARRAYSIZE(items); i++) {
             ImGui::PushID(i);
             ImGui::Checkbox(items[i], &selected[i]);
             ImGui::PopID();
@@ -56,14 +65,12 @@ void DrawSplit(PackageManagerTab tab, float bottom_bar_height) {
     ImGui::SameLine(0.0f, 0.0f);
     ImGui::InvisibleButton("##PackageManagerSplitter", ImVec2(8.0f, area.y - bottom_bar_height), ImGuiButtonFlags_None);
 
-    if (ImGui::IsItemHovered())
-    {
+    if (ImGui::IsItemHovered()) {
         ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
     }
 
     // Handle resizing
-    if (ImGui::IsItemActive())
-    {
+    if (ImGui::IsItemActive()) {
         ImGuiIO &io = ImGui::GetIO();
         split_ratio += io.MouseDelta.x / area.x;
         split_ratio = ImClamp(split_ratio, min_size / area.x, 1.0f - min_size / area.x);
@@ -93,7 +100,7 @@ void PackageManager::Show(bool* p_open) {
     const float BOTTOM_BAR_HEIGHT = 22.0f;
 
     ImGui::Begin("Package Manager", p_open, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
-    if (ImGui::BeginTabBar("PackageManagerTabs") ) {
+    if (ImGui::BeginTabBar("PackageManagerTabs")) {
         if (ImGui::BeginTabItem("All")) {
             DrawSplit(PackageManagerTab_All, BOTTOM_BAR_HEIGHT);
             ImGui::EndTabItem();
