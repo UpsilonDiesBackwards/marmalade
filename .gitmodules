@@ -26,3 +26,6 @@
 [submodule "vendor/iconfontcppheaders"]
 	path = vendor/iconfontcppheaders
 	url = git@github.com:juliettef/IconFontCppHeaders.git
+[submodule "vendor/spdlog"]
+	path = vendor/spdlog
+	url = git@github.com:gabime/spdlog.git

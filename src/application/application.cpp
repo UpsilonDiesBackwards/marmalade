@@ -1,9 +1,20 @@
-#include <iostream>
-#include "glad/glad.h"
+#include <glad/glad.h>
+
 #include "application.h"
+
 #include <imgui.h>
+#include <imgui_internal.h>// Only for docking API
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
+
+#include <IconsCodicons.h>
+
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
+
+#include <iostream>
+#include <fstream>
 
 #include <IconsCodicons.h>
 
@@ -21,7 +32,21 @@ Application::~Application() {
 }
 
 void Application::Initialise() {
-    if (!glfwInit()) { // Initialise GLFW
+    auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("engine-log.txt", true);
+    guiSink = std::make_shared<GuiLogSink>();
+
+    logger = std::make_shared<spdlog::logger>("EngineLogger",
+                                              spdlog::sinks_init_list{consoleSink, fileSink, guiSink});
+    spdlog::register_logger(logger);
+    spdlog::set_default_logger(logger);
+    spdlog::set_level(spdlog::level::debug);
+
+    std::ifstream imguiIni("imgui.ini");
+    firstRun = !imguiIni.good();
+    imguiIni.close();
+
+    if (!glfwInit()) {// Initialise GLFW
         std::cerr << "Failed to Initialise GLFW!" << std::endl;
         return;
     } else std::cout << "GLFW Initialised" << std::endl;
@@ -92,6 +117,8 @@ void Application::Run() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
+    SetupDocking();
+
     if (editorMode == EditorMode::EDIT) {
         editView->RunInput();
     }
@@ -119,6 +146,30 @@ void Application::Run() {
     }
 
     glfwSwapBuffers(window);
+
+    firstLoop = false;
+}
+
+void Application::SetupDocking() const {
+    if (firstRun && firstLoop) {
+        ImVec2 logPos = ImVec2(180, 720);
+        ImVec2 logSize = ImVec2(1600, 320);
+        ImVec2 logCenter{logPos.x + logSize.x * 0.5f, logPos.y + logSize.y * 0.5f};
+
+        ImGuiID dockerId = ImGui::GetID("LogDock");
+        ImGui::DockBuilderRemoveNode(dockerId);
+        ImGui::DockBuilderAddNode(dockerId);
+
+        ImVec2 nodePos{logCenter.x - logSize.x * 0.5f, logCenter.y - logSize.y * 0.5f};
+
+        ImGui::DockBuilderSetNodeSize(dockerId, logSize);
+        ImGui::DockBuilderSetNodePos(dockerId, nodePos);
+
+        ImGui::DockBuilderDockWindow(ICON_CI_FILE_TEXT " Engine Log", dockerId);
+        ImGui::DockBuilderDockWindow(ICON_CI_FILE_TEXT " Game Log", dockerId);
+
+        ImGui::DockBuilderFinish(dockerId);
+    }
 }
 
 void Application::Terminate() {

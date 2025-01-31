@@ -5,6 +5,7 @@
 #include "../../gui/stylemanager.h"
 #include "../../application/profiler.h"
 #include "packagemanager.h"
+#include "log.h"
 
 class TopBar {
 public:
@@ -12,6 +13,8 @@ public:
 private:
     bool showPackageManager = false;
     PackageManager packageManager;
+    bool showDebugWindow = false;
+    Log log;
 };
 
 

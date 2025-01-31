@@ -15,6 +15,9 @@
 #include "../gui/editorviews.h"
 #include "../../include/scene/scenemanager.h"
 #include "../gui/imgui/editor.h"
+#include "guilogsink.h"
+
+#include <spdlog/spdlog.h>
 
 enum PlayState {
     Play, Stop,
@@ -37,6 +40,7 @@ public:
 
     void Initialise();
     void Run();
+    void SetupDocking() const;
     void Terminate();
 
     GLFWwindow* getWindow();
@@ -61,11 +65,19 @@ public:
     StyleManager styleManager;
 
     Profiler profiler;
+
+    std::shared_ptr<GuiLogSink> guiSink;
+
 private:
     Application(int width, int height, const char* title);
 
     GLFWwindow* window;
     int width, height;
     const char* title;
+
+    bool firstRun{false};
+    bool firstLoop{true};
+
+    std::shared_ptr<spdlog::logger> logger;
 };
 #endif //ENGINE_APPLICATION_H

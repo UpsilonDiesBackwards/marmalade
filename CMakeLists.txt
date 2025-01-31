@@ -4,11 +4,17 @@ include(ExternalProject)
 
 set(CMAKE_CXX_STANDARD 20)
 
+if (MSVC)
+    add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+    add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+endif ()
+
 set(LUA_VERSION "lua-5.4.7")
 # Lua libraries, if on Windows
 set(LUA_SRC_DIR "../lua/src/lua")
 set(LUA_LIB "../lua/lib/Lua.lib")
 
+add_subdirectory(vendor/spdlog)
 add_subdirectory(vendor/glfw)
 add_subdirectory(vendor/json)
 add_subdirectory(vendor/glm)
@@ -70,6 +76,10 @@ list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
         src/gui/stylemanager.h
         src/gui/imgui/packagemanager.cpp
         src/gui/imgui/packagemanager.h
+        src/application/guilogsink.cpp
+        src/application/guilogsink.h
+        src/gui/imgui/log.cpp
+        src/gui/imgui/log.h
 )
 
 list(APPEND ENGINE_SRC src/application/application.cpp src/application/application.h src/application/profiler.cpp src/application/profiler.h
@@ -99,5 +109,5 @@ if (WIN32)
     target_link_libraries(marmalade PRIVATE Shcore.lib ws2_32.lib)
 endif ()
 
-target_include_directories(marmalade PRIVATE vendor/glad/include vendor/glfw-3.4/include vendor/imgui vendor/imguifiledialog glm ${LUA_INCLUDE_DIR} vendor/luaaa vendor/stb vendor/libgit2/include vendor/iconfontcppheaders)
+target_include_directories(marmalade PRIVATE vendor/glad/include vendor/glfw-3.4/include vendor/imgui vendor/imguifiledialog glm ${LUA_INCLUDE_DIR} vendor/luaaa vendor/stb vendor/libgit2/include vendor/iconfontcppheaders vendor/spdlog/include)
 target_link_directories(marmalade PRIVATE vendor/nativefiledialog/lib vendor/luaaa)

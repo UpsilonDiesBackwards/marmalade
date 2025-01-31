@@ -1,4 +1,6 @@
 #include "../../gui/imgui/topbar.h"
+#include "../../application/application.h"
+#include "../../gui/stylemanager.h"
 #include <imgui.h>
 #include "../../gui/stylemanager.h"
 #include "../../application/application.h"
@@ -42,6 +44,10 @@ void TopBar::Show() {
         if (ImGui::BeginMenu("Window")) {
             if (ImGui::MenuItem(ICON_CI_PACKAGE " Package Manager")) {
                 showPackageManager = true;
+            }
+
+            if (ImGui::MenuItem(ICON_CI_FILE_TEXT " Log")) {
+                log.showLog = !log.showLog;
             }
 
             if (ImGui::MenuItem(ICON_CI_SAVE " Save Layout")) {
