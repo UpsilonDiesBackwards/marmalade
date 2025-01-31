@@ -23,7 +23,7 @@ int indices[] = {
 
 Renderable::Renderable(GLuint VAO, GLuint VBO, GLuint EBO, GLuint texture) : VAO(VAO), VBO(VBO), EBO(EBO),
                         texture(texture),
-                        shaderProgram(Shader("../res/shaders/shader.vert", "../res/shaders/shader.frag")) {
+                        shaderProgram(Shader("res/shaders/shader.vert", "res/shaders/shader.frag")) {
 }
 
 void Renderable::Initialise() {

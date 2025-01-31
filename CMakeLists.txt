@@ -91,7 +91,7 @@ endif ()
 
 file(COPY vendor/imgui/misc/fonts/ProggyClean.ttf DESTINATION ${CMAKE_BINARY_DIR}/resources/fonts)
 file(COPY vendor/imgui/misc/fonts/Roboto-Medium.ttf DESTINATION ${CMAKE_BINARY_DIR}/resources/fonts)
-file(COPY res/fonts/codicon.ttf DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY res DESTINATION ${CMAKE_BINARY_DIR})
 
 target_link_libraries(marmalade PRIVATE glfw OpenGL::GL ${OPENGL_gl_LIBRARY} nlohmann_json::nlohmann_json glm::glm ${LUA_LIBRARIES} libgit2package)
 

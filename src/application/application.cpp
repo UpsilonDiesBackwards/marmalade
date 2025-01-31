@@ -50,12 +50,12 @@ void Application::Initialise() {
     ImGui_ImplOpenGL3_Init("#version 430");
 
     // Load ImGui custom style
-    styleManager.LoadStyle("../res/config/editorstyle.txt");
+    styleManager.LoadStyle("res/config/editorstyle.txt");
 
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigWindowsMoveFromTitleBarOnly = true;
     io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
-    ImFont* font = io.Fonts->AddFontFromFileTTF("../res/fonts/monofur/monof55.ttf", 16);
+    ImFont *font = io.Fonts->AddFontFromFileTTF("res/fonts/monofur/monof55.ttf", 16);
 
     static const ImWchar icons_ranges[] = {ICON_MIN_CI, ICON_MAX_16_CI, 0};
 
@@ -65,7 +65,7 @@ void Application::Initialise() {
     float font_size = 16.0f;
     icons_config.GlyphMinAdvanceX = font_size;
     icons_config.GlyphOffset.y = 3.0f;
-    io.Fonts->AddFontFromFileTTF(FONT_ICON_FILE_NAME_CI, font_size, &icons_config, icons_ranges);
+    io.Fonts->AddFontFromFileTTF("res/fonts/codicon.ttf", font_size, &icons_config, icons_ranges);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);

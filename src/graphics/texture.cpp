@@ -20,7 +20,7 @@ GLuint Texture::LoadTexture(const std::string &filePath) {
 
     unsigned char *data;
     if (filePath == "") { // if not file path is defined, use default fallback texture
-        data = stbi_load("../res/textures/UVFallback.png", &width, &height, &channels, 0);
+        data = stbi_load("res/textures/UVFallback.png", &width, &height, &channels, 0);
     } else { // if path is defined then use the given path
         data = stbi_load(filePath.c_str(), &width, &height, &channels, 0);
     }
