@@ -80,8 +80,6 @@ void Application::Run() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    // TODO: EDITOR STUFF
-
     if (editorMode == EditorMode::EDIT) {
         editView->RunInput();
     }

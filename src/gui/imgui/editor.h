@@ -4,13 +4,13 @@
 
 #include "topbar.h"
 #include "editorviews.h"
-#include "sceneheirarchy.h"
+#include "scenehierarchy.h"
 
 class Editor {
 public:
     TopBar topBar;
     EditorViews editorViews;
-    SceneHierarchy sceneHeirarchy;
+    SceneHierarchy sceneHierarchy;
 
     // If `true` then ui element will be opened on startup
     bool showEditorViews = true;

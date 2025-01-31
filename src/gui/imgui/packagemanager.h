@@ -5,7 +5,7 @@
 
 class PackageManager {
 public:
-    void Show();
+    void Show(bool* p_open);
 };
 
 

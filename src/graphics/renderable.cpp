@@ -71,3 +71,7 @@ void Renderable::Draw(glm::mat4 modelMatrix) {
     glBindVertexArray(0);
 }
 
+unsigned int Renderable::GetTexture() {
+    return texture;
+}
+

@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <iostream>
 #include "../../include/scene/scene.h"
 
 Scene::Scene(const std::string &name) : name(name) {

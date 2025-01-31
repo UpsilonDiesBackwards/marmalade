@@ -51,8 +51,8 @@ list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
         src/gui/imgui/editorviews.h
         src/gui/imgui/editorviewstatusbar.cpp
         src/gui/imgui/editorviewstatusbar.h
-        src/gui/imgui/sceneheirarchy.cpp
-        src/gui/imgui/sceneheirarchy.h
+        src/gui/imgui/scenehierarchy.cpp
+        src/gui/imgui/scenehierarchy.h
         src/gui/imgui/topbar.cpp
         src/gui/imgui/topbar.h
         src/gui/editorviews.h

@@ -10,6 +10,6 @@ void Editor::Render() {
     }
 
     if (showSceneHeirarchy) {
-        sceneHeirarchy.Show();
+        sceneHierarchy.Show();
     }
 }

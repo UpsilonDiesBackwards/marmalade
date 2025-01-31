@@ -81,7 +81,7 @@ void TopBar::Show() {
     }
 
     if (showPackageManager) {
-        packageManager.Show();
+        packageManager.Show(&showPackageManager);
     }
 
     if (ImGui::BeginPopupModal("New Scene", &showSceneCreationPopUp, ImGuiWindowFlags_AlwaysAutoResize)) {
