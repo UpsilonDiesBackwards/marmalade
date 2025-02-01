@@ -60,8 +60,17 @@ void TopBar::Show() {
                 ImGui::Text("Saved editor layout");
                 ImGui::EndPopup();
             }
+
+            if (ImGui::MenuItem(ICON_CI_DEBUG " ImGui Demo")) {
+                showDebugWindow = !showDebugWindow;
+            }
+
             ImGui::EndMenu();
         }
+
+        log.Show();
+
+        if (showDebugWindow) ImGui::ShowDemoWindow();
 
         float alignRight = ImGui::GetWindowWidth() - 170;
         ImGui::SameLine(alignRight);
