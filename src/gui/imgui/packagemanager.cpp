@@ -1,6 +1,7 @@
 #include "packagemanager.h"
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <IconsCodicons.h>
 
 #include <git2.h>
 #include <iostream>

@@ -17,5 +17,4 @@ private:
     Log log;
 };
 
-
 #endif //ENGINE_TOPBAR_H

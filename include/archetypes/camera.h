@@ -8,6 +8,7 @@
 #include <glm/detail/type_vec1.hpp>
 #include <glm/fwd.hpp>
 #include <glm/detail/type_vec2.hpp>
+#include "glm/detail/type_mat4x4.hpp"
 
 class Camera {
 public:

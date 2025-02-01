@@ -11,7 +11,7 @@
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 
 #include <iostream>
 #include <fstream>
@@ -32,15 +32,7 @@ Application::~Application() {
 }
 
 void Application::Initialise() {
-    auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("engine-log.txt", true);
-    guiSink = std::make_shared<GuiLogSink>();
-
-    logger = std::make_shared<spdlog::logger>("EngineLogger",
-                                              spdlog::sinks_init_list{consoleSink, fileSink, guiSink});
-    spdlog::register_logger(logger);
-    spdlog::set_default_logger(logger);
-    spdlog::set_level(spdlog::level::debug);
+    SetupLogger();
 
     std::ifstream imguiIni("imgui.ini");
     firstRun = !imguiIni.good();
@@ -187,4 +179,20 @@ GLFWwindow *Application::getWindow() {
 
 Camera *Application::getCamera() {
     return camera;
+}
+void Application::SetupLogger() {
+    auto maxSize = 1048576 * maxLogSizeMB;
+    auto maxFiles = maxLogFiles;
+
+    auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    auto fileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
+            "engine-log.txt", maxSize, maxFiles);
+
+    guiSink = std::make_shared<GuiLogSink>();
+
+    logger = std::make_shared<spdlog::logger>("EngineLogger",
+                                              spdlog::sinks_init_list{consoleSink, fileSink, guiSink});
+    spdlog::register_logger(logger);
+    spdlog::set_default_logger(logger);
+    spdlog::set_level(spdlog::level::debug);
 }

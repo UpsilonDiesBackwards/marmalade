@@ -41,6 +41,7 @@ public:
     void Initialise();
     void Run();
     void SetupDocking() const;
+    void SetupLogger();
     void Terminate();
 
     GLFWwindow* getWindow();
@@ -77,6 +78,9 @@ private:
 
     bool firstRun{false};
     bool firstLoop{true};
+
+    int maxLogSizeMB = 16;
+    int maxLogFiles = 3;
 
     std::shared_ptr<spdlog::logger> logger;
 };
