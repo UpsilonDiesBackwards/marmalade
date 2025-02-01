@@ -32,7 +32,7 @@ public:
     Transform transform;
 
     Entity* parent = nullptr;
-    std::vector<std::unique_ptr<Entity>>* children;
+    std::shared_ptr<std::vector<std::unique_ptr<Entity>>> children;
 
     Entity(const std::string& name, EntityFlags flags, Transform transform);
 
@@ -48,7 +48,10 @@ public:
     void UpdateModelMatrix();
 
     template<typename... TArgs>
-    void addChild(const TArgs&... args);
+    void addChild(const TArgs &... args) {
+        children->emplace_back(std::make_unique<Entity>(args...));
+        children->back()->parent = this;
+    }
 
     void Render();
 };

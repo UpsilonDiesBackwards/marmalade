@@ -7,7 +7,8 @@
 #include "../../include/graphics/texture.h"
 
 Entity::Entity(const std::string &name, EntityFlags flags, Transform transform)
-    : name(name), flags(flags), transform(transform), renderable(0,0,0, Texture::LoadTexture("")) {
+    : name(name), flags(flags), transform(transform), renderable(0,0,0, Texture::LoadTexture("")),
+      children(std::make_shared<std::vector<std::unique_ptr<Entity>>>()) { // Lord forgive me for the c h i l d
 
     renderable.Initialise();
 
@@ -54,10 +55,4 @@ void Entity::UpdateModelMatrix() {
     transform.modelMatrix = glm::rotate(transform.modelMatrix, glm::radians(transform.rotation),
                                         glm::vec3(0.0f, 0.0f, 1.0f));
     transform.modelMatrix = glm::scale(transform.modelMatrix, glm::vec3(transform.scale, 1.0f));
-}
-
-template<typename... TArgs>
-void Entity::addChild(const TArgs &... args) {
-    children->emplace_back(std::make_unique<Entity>(args...));
-    children->back()->parent = this;
 }
