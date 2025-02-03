@@ -4,7 +4,8 @@
 #include "../window.h"
 
 #include <string>
-
+#include <mutex>
+#include <utility>
 
 namespace Marmalade::GUI {
 
@@ -18,10 +19,16 @@ namespace Marmalade::GUI {
     public:
         void Draw() override;
 
+        inline void SetProgressText(std::string text) {
+            _progressText = std::move(text);
+        }
+
     private:
-        float progress{0};
-        bool progressIndeterminate{false};
-        std::string progressText{};
+        std::atomic<bool> _dbOperationRunning{false};
+
+        float _progress{0};
+        bool _progressIndeterminate{false};
+        std::string _progressText{};
 
         void drawLeftPane(PackageManagerTab tab);
         void drawRightPane(PackageManagerTab tab);
@@ -29,7 +36,13 @@ namespace Marmalade::GUI {
         void drawBottomBar(float height);
 
         std::string itemId(const char* id, PackageManagerTab tab);
-        void clone_repo();
+
+        void handleGitError(const std::string &operation);
+        void updateLocalDatabase();
+        void cloneRepo();
+        void pullRepo();
+        void buildIndex();
+        void deleteLocalDatabase();
     };
 }
 
