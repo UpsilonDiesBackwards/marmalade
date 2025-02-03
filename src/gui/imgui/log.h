@@ -1,5 +1,5 @@
-#ifndef ENGINE_LOG_H
-#define ENGINE_LOG_H
+#ifndef MARMALADE_GUI_LOG_H
+#define MARMALADE_GUI_LOG_H
 
 #include "../window.h"
 
@@ -16,6 +16,5 @@ namespace Marmalade::GUI {
         bool autoScroll = true;
     };
 }
-
 
 #endif

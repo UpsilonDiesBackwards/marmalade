@@ -1,11 +1,11 @@
-#include "../../gui/imgui/topbar.h"
+#include "topbar.h"
 #include "../../application/application.h"
-#include "../../gui/stylemanager.h"
+
 #include <imgui.h>
 
 #include <IconsCodicons.h>
 
-void TopBar::Show() {
+void Marmalade::GUI::TopBar::Show() {
     static bool showStyleEditor = false;
     static bool showSceneCreationPopUp = false;
     static char sceneNameBuffer[32] = "";
@@ -62,7 +62,7 @@ void TopBar::Show() {
             if (ImGui::MenuItem(ICON_CI_DEBUG " ImGui Demo")) {
                 showDebugWindow = !showDebugWindow;
             }
-            
+
             ImGui::EndMenu();
         }
 
@@ -93,7 +93,7 @@ void TopBar::Show() {
         ImGui::OpenPopup("Open Scene");
     }
 
-    for (const auto& window : windows) {
+    for (const auto& window: windows) {
         window->Show();
     }
 
@@ -119,7 +119,9 @@ void TopBar::Show() {
                 memset(sceneNameBuffer, 0, sizeof(sceneNameBuffer));
 
                 showSceneCreationPopUp = false;
-            } else { ImGui::Text("Invalid scene name."); }
+            } else {
+                ImGui::Text("Invalid scene name.");
+            }
         }
 
         ImGui::EndPopup();
@@ -143,7 +145,9 @@ void TopBar::Show() {
 
                 memset(sceneNameBuffer, 0, sizeof(sceneNameBuffer));
                 showSceneOpenPopUp = false;
-            } else { ImGui::Text("Empty or invalid scene name."); }
+            } else {
+                ImGui::Text("Empty or invalid scene name.");
+            }
         }
 
         ImGui::EndPopup();

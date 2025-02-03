@@ -2,8 +2,9 @@
 
 #include "../../application/application.h"
 
-#include <IconsCodicons.h>
 #include <imgui.h>
+
+#include <IconsCodicons.h>
 
 void Marmalade::GUI::Log::Draw() {
     static const ImVec4 COLOR_YELLOW(1.0f, 1.0f, 0.0f, 1.0f);

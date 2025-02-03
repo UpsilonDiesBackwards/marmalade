@@ -8,7 +8,7 @@
 
 class Editor {
 public:
-    TopBar topBar;
+    Marmalade::GUI::TopBar topBar;
     EditorViews editorViews;
     SceneHierarchy sceneHierarchy;
 
