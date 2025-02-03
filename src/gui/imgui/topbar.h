@@ -6,15 +6,24 @@
 #include "../../application/profiler.h"
 #include "packagemanager.h"
 #include "log.h"
+#include "../window.h"
+
+#include <vector>
 
 class TopBar {
 public:
+    inline TopBar() {
+        windows.push_back(&packageManager);
+        windows.push_back(&log);
+    }
+
     void Show();
 private:
-    bool showPackageManager = false;
-    PackageManager packageManager;
+    Marmalade::GUI::PackageManager packageManager{};
+    Marmalade::GUI::Log log{true};
     bool showDebugWindow = false;
-    Log log;
+
+    std::vector<Marmalade::GUI::Window*> windows{};
 };
 
 #endif //ENGINE_TOPBAR_H

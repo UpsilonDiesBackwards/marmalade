@@ -1,16 +1,21 @@
 #ifndef ENGINE_LOG_H
 #define ENGINE_LOG_H
 
+#include "../window.h"
 
-class Log {
-public:
-    void Show();
+namespace Marmalade::GUI {
 
-    bool showLog = true;
-private:
-    bool coloredText = true;
-    bool autoScroll = true;
-};
+    class Log : public Window {
+    public:
+        explicit Log(bool visible) : Window(visible) {};
+
+        void Draw() override;
+
+    private:
+        bool coloredText = true;
+        bool autoScroll = true;
+    };
+}
 
 
 #endif

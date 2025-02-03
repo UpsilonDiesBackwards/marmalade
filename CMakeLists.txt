@@ -80,6 +80,7 @@ list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
         src/application/guilogsink.h
         src/gui/imgui/log.cpp
         src/gui/imgui/log.h
+        src/gui/window.h
 )
 
 list(APPEND ENGINE_SRC src/application/application.cpp src/application/application.h src/application/profiler.cpp src/application/profiler.h

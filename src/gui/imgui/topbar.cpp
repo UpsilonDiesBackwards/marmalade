@@ -2,8 +2,6 @@
 #include "../../application/application.h"
 #include "../../gui/stylemanager.h"
 #include <imgui.h>
-#include "../../gui/stylemanager.h"
-#include "../../application/application.h"
 
 #include <IconsCodicons.h>
 
@@ -43,11 +41,11 @@ void TopBar::Show() {
 
         if (ImGui::BeginMenu("Window")) {
             if (ImGui::MenuItem(ICON_CI_PACKAGE " Package Manager")) {
-                showPackageManager = true;
+                packageManager.ToggleWindow();
             }
 
             if (ImGui::MenuItem(ICON_CI_FILE_TEXT " Log")) {
-                log.showLog = !log.showLog;
+                log.ToggleWindow();
             }
 
             if (ImGui::MenuItem(ICON_CI_SAVE " Save Layout")) {
@@ -64,11 +62,9 @@ void TopBar::Show() {
             if (ImGui::MenuItem(ICON_CI_DEBUG " ImGui Demo")) {
                 showDebugWindow = !showDebugWindow;
             }
-
+            
             ImGui::EndMenu();
         }
-
-        log.Show();
 
         if (showDebugWindow) ImGui::ShowDemoWindow();
 
@@ -97,8 +93,8 @@ void TopBar::Show() {
         ImGui::OpenPopup("Open Scene");
     }
 
-    if (showPackageManager) {
-        packageManager.Show(&showPackageManager);
+    for (const auto& window : windows) {
+        window->Show();
     }
 
     if (ImGui::BeginPopupModal("New Scene", &showSceneCreationPopUp, ImGuiWindowFlags_AlwaysAutoResize)) {

@@ -5,14 +5,12 @@
 #include <IconsCodicons.h>
 #include <imgui.h>
 
-void Log::Show() {
-    if (!showLog) return;
-
+void Marmalade::GUI::Log::Draw() {
     static const ImVec4 COLOR_YELLOW(1.0f, 1.0f, 0.0f, 1.0f);
     static const ImVec4 COLOR_RED(1.0f, 0.0f, 0.0f, 1.0f);
     static const ImVec4 COLOR_GRAY(0.6f, 0.6f, 0.6f, 1.0f);
 
-    ImGui::Begin(ICON_CI_FILE_TEXT " Engine Log", &showLog);
+    ImGui::Begin(ICON_CI_FILE_TEXT " Engine Log", &visible);
     {
         if (ImGui::BeginChild("CommandLineScrollingRegion", ImVec2(ImGui::GetWindowWidth(),
                                                                    ImGui::GetWindowHeight() - 60))) {
@@ -51,7 +49,7 @@ void Log::Show() {
         ImGui::End();
     }
 
-    ImGui::Begin(ICON_CI_FILE_TEXT " Game Log", &showLog);
+    ImGui::Begin(ICON_CI_FILE_TEXT " Game Log", &visible);
     {
         ImGui::End();
     }
