@@ -83,6 +83,8 @@ list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
         src/gui/window.h
         src/gui/imgui/projectwizard.cpp
         src/gui/imgui/projectwizard.h
+        src/gui/imgui/settings.cpp
+        src/gui/imgui/settings.h
 )
 
 list(APPEND ENGINE_SRC src/application/application.cpp src/application/application.h src/application/profiler.cpp src/application/profiler.h

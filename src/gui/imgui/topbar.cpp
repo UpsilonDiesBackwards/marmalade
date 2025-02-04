@@ -37,6 +37,10 @@ void Marmalade::GUI::TopBar::Show() {
             if (ImGui::MenuItem(ICON_CI_EDIT " Style Editor")) {
                 showStyleEditor = !showStyleEditor;
             }
+
+            if (ImGui::MenuItem(ICON_CI_SETTINGS_GEAR " Settings")) {
+                settings.ToggleWindow();
+            }
             ImGui::EndMenu();
         }
 
