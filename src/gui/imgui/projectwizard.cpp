@@ -39,6 +39,9 @@ void Marmalade::GUI::ProjectWizard::Draw() {
 
     ImGui::SameLine();
 
+    ImGui::SetNextWindowPos(ImVec2(960, 540), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(720, 480), ImGuiCond_FirstUseEver);
+
     if (ImGui::Button(ICON_CI_FOLDER)) { // Create the ImGui File Dialog config and open it
         IGFD::FileDialogConfig config;
         config.path = ".";
