@@ -16,6 +16,7 @@
 #include "../../include/scene/scenemanager.h"
 #include "../gui/imgui/editor.h"
 #include "guilogsink.h"
+#include "project.h"
 
 #include <spdlog/spdlog.h>
 
@@ -69,6 +70,8 @@ public:
 
     std::shared_ptr<GuiLogSink> guiSink;
 
+    void SetCurrentProject(Project project);
+    Project GetCurrentProject();
 private:
     Application(int width, int height, const char* title);
 
@@ -83,5 +86,7 @@ private:
     int maxLogFiles = 3;
 
     std::shared_ptr<spdlog::logger> logger;
+
+    Project currentProject;
 };
 #endif //ENGINE_APPLICATION_H

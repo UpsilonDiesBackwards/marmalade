@@ -81,6 +81,8 @@ list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
         src/gui/imgui/log.cpp
         src/gui/imgui/log.h
         src/gui/window.h
+        src/gui/imgui/projectwizard.cpp
+        src/gui/imgui/projectwizard.h
 )
 
 list(APPEND ENGINE_SRC src/application/application.cpp src/application/application.h src/application/profiler.cpp src/application/profiler.h
@@ -88,6 +90,8 @@ list(APPEND ENGINE_SRC src/application/application.cpp src/application/applicati
         src/graphics/renderable.cpp src/graphics/shader.cpp src/graphics/texture.cpp src/graphics/framebuffer.cpp
         src/io/input.cpp src/io/inputmanager.cpp
         src/scene/scene.cpp src/scene/scenemanager.cpp
+        src/application/project.cpp
+        src/application/project.h
 )
 
 add_executable(marmalade vendor/glad/src/glad.c ${IMGUI_SRC} vendor/imguifiledialog/ImGuiFileDialog.cpp

@@ -6,6 +6,7 @@
 #include <string>
 #include <mutex>
 #include <utility>
+#include <atomic>
 
 namespace Marmalade::GUI {
 

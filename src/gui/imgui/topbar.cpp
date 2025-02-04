@@ -14,6 +14,7 @@ void Marmalade::GUI::TopBar::Show() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem(ICON_CI_ADD " New Project")) {
+                projectWizard.ToggleWindow();
             }
             if (ImGui::MenuItem(ICON_CI_FOLDER_OPENED " Open Project")) {
             }

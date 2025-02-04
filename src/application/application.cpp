@@ -20,7 +20,7 @@
 
 Application::Application(int width, int height, const char *title) :
     window(nullptr), width(width), height(height), title(title), inputManager(InputManager::GetInstance()),
-    input(&inputManager), camera(new Camera(1920, 1080, 1.0f)) {
+    input(&inputManager), camera(new Camera(1920, 1080, 1.0f)), currentProject("Default Project") {
 
     sceneManager = SceneManager();
     profiler = Profiler();
@@ -195,4 +195,16 @@ void Application::SetupLogger() {
     spdlog::register_logger(logger);
     spdlog::set_default_logger(logger);
     spdlog::set_level(spdlog::level::debug);
+}
+
+void Application::SetCurrentProject(Project project) { // Change the current projects and update the window title to inc project name
+    currentProject = project;
+
+    std::string windowTitle = std::string(title) + " // " + currentProject.name;
+
+    glfwSetWindowTitle(window, windowTitle.c_str());
+}
+
+Project Application::GetCurrentProject() {
+    return currentProject;
 }
