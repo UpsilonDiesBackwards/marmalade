@@ -10,7 +10,24 @@ public:
     std::string name;
     std::string filePath; // Where the project is stored / the working directory
 
-    Project(std::string name);
+    bool createdWithGit = false;
+
+    Project(std::string name, std::string filePath, bool createdWithGit);
+
+private:
+    std::vector<std::string> baseDirectories = { // Directories auto-created when the project is made
+            "assets",
+            "packages",
+    };
+
+    std::vector<std::string> baseFiles = { // Files auto-created when the project is made
+            "project.marmalade",
+            ".gitignore",
+            "settings.marm",
+            "package-settings.marm"
+    };
+
+    void CreateProjectDirectories(bool git);
 };
 
 

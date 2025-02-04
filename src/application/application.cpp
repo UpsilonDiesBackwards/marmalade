@@ -22,7 +22,7 @@
 
 Application::Application(int width, int height, const char *title) :
     window(nullptr), width(width), height(height), title(title), inputManager(InputManager::GetInstance()),
-    input(&inputManager), camera(new Camera(1920, 1080, 1.0f)), currentProject("Default Project") {
+    input(&inputManager), camera(new Camera(1920, 1080, 1.0f)), currentProject("Default Project", "", false) {
 
     sceneManager = SceneManager();
     profiler = Profiler();

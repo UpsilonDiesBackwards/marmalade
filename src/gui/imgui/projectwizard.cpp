@@ -93,7 +93,7 @@ void Marmalade::GUI::ProjectWizard::CreateProject() {
         spdlog::info("Creating project: {}. Using Git: {}", projectName, initGitRepository);
 
         // TODO: Project setup
-        Project project(projectName);
+        Project project(projectName, projectPath, initGitRepository);
 
         Application::GetInstance().SetCurrentProject(project);
 
