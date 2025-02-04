@@ -70,8 +70,8 @@ public:
 
     std::shared_ptr<GuiLogSink> guiSink;
 
-    void SetCurrentProject(Project project);
-    Project GetCurrentProject();
+    void SetCurrentProject(std::unique_ptr<Project> project);
+    Project* GetCurrentProject();
 private:
     Application(int width, int height, const char* title);
 
@@ -87,6 +87,6 @@ private:
 
     std::shared_ptr<spdlog::logger> logger;
 
-    Project currentProject;
+    std::unique_ptr<Project> currentProject;
 };
 #endif //ENGINE_APPLICATION_H
