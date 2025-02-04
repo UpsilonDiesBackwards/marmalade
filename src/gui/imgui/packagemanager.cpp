@@ -1,7 +1,5 @@
 #include "packagemanager.h"
 
-#include "../../application/config.h"
-
 #include <sstream>
 #include <thread>
 #include <filesystem>
@@ -18,11 +16,114 @@
 
 #include <nlohmann/json.hpp>
 
-#define REMOTE_REPO_PATH "https://github.com/UpsilonDiesBackwards/marmalade-pkgs.git"
 #define LOCAL_REPO_PATH "local-repo"
 #define INDEX_FILENAME "index.json"
 
 using namespace Marmalade::GUI;
+
+void PackageManagerOptions::Draw() {
+    ImGui::Begin(ICON_CI_SETTINGS_GEAR " Package Manager Settings", &visible);
+
+    if (ImGui::Button("Add")) {
+        _isEditing = true;
+        _currentRepo = nullptr;
+    }
+
+    ImGui::SameLine();
+    auto cursor_pos = ImGui::GetCursorPos();
+    ImGui::NewLine();
+
+    if (ImGui::BeginTable("PackageManagerReposTable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("URL", ImGuiTableColumnFlags_WidthStretch);
+
+        ImGui::TableHeadersRow();
+
+        int i = 0;
+        for (const auto& repo: Marmalade::Config::engineConfig.Repos) {
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            bool is_selected = (_selectedRow == i);
+            if (ImGui::Selectable(repo.Name.c_str(), is_selected, ImGuiSelectableFlags_SpanAllColumns)) {
+                _selectedRow = (is_selected ? -1 : i);
+            }
+            ImGui::TableNextColumn();
+            ImGui::Text("%s", repo.GitUrl.c_str());
+
+            i++;
+        }
+
+        ImGui::EndTable();
+    }
+
+    if (_selectedRow > -1) {
+        Marmalade::Repository& sel_item = Marmalade::Config::engineConfig.Repos[_selectedRow];
+
+        ImGui::SetCursorPos(cursor_pos);
+
+        if (ImGui::Button("Edit")) {
+            _isEditing = true;
+            _currentRepo = &sel_item;
+            std::strncpy(_tempName, _currentRepo->Name.c_str(), sizeof(_tempName) - 1);
+            std::strncpy(_tempGitUrl, _currentRepo->GitUrl.c_str(), sizeof(_tempGitUrl) - 1);
+            _tempDepth = _currentRepo->Depth;
+        }
+        ImGui::SameLine();
+
+        if (ImGui::Button("Remove")) {
+            Config::engineConfig.Repos.erase(std::remove_if(Config::engineConfig.Repos.begin(), Config::engineConfig.Repos.end(),
+                                                                       [&sel_item](const Repository &repo) {
+                                                                           return sel_item.Name == repo.Name;
+                                                                       }), Config::engineConfig.Repos.end());
+            Config::SaveEngineConfig();
+            _selectedRow = -1;
+        }
+    }
+
+    if (_isEditing) {
+        ImGui::OpenPopup("Edit Repository##PackageManagerReposEdit");
+    }
+
+    if (ImGui::BeginPopupModal("Edit Repository##PackageManagerReposEdit")) {
+        bool creating = _currentRepo == nullptr;
+
+        ImGui::InputText("Name", _tempName, 256);
+        ImGui::InputText("Git URL", _tempGitUrl, 256);
+        ImGui::InputInt("Depth", &_tempDepth);
+
+        if (ImGui::Button("Cancel")) {
+            _isEditing = false;
+            memset(_tempName, 0, 256);
+            memset(_tempGitUrl, 0, 256);
+            _tempDepth = 0;
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Save")) {
+            _isEditing = false;
+
+            if (creating) {
+                Marmalade::Config::engineConfig.Repos.push_back(Repository{_tempName, _tempGitUrl, _tempDepth});
+            } else {
+                _currentRepo->Name = _tempName;
+                _currentRepo->GitUrl = _tempGitUrl;
+                _currentRepo->Depth = _tempDepth;
+            }
+
+            Marmalade::Config::SaveEngineConfig();
+            memset(_tempName, 0, 256);
+            memset(_tempGitUrl, 0, 256);
+            _tempDepth = 0;
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    ImGui::End();
+}
 
 void PackageManager::Draw() {
     const float BOTTOM_BAR_HEIGHT = 22.0f;
@@ -64,8 +165,8 @@ void PackageManager::drawLeftPane(PackageManagerTab tab) {
     std::unordered_map<std::string, Package> packages{};
     if (!query.empty()) {
         if (_keywordIndex.count(query)) {
-            for (auto pkg : _keywordIndex[query]) {
-                packages[pkg->name] = *pkg;
+            for (auto pkg: _keywordIndex[query]) {
+                packages[pkg->Name] = *pkg;
             }
         }
     } else {
@@ -76,8 +177,8 @@ void PackageManager::drawLeftPane(PackageManagerTab tab) {
     if (ImGui::BeginListBox(itemId("##PackageManagerList", tab).c_str(), listbox_area)) {
         for (const auto& pkg: packages) {
             ImGui::PushID(pkg.first.c_str());
-            ImGui::Text(pkg.first.c_str());
-            ImGui::Text(pkg.second.author.c_str());
+            ImGui::Text("%s - %s", pkg.first.c_str(), pkg.second.Repo.c_str());
+            ImGui::Text(pkg.second.Author[0].c_str());
             // ImGui::Checkbox();
             ImGui::PopID();
             ImGui::Separator();
@@ -142,6 +243,13 @@ void PackageManager::drawBottomBar(float height) {
         deleteLocalDatabase();
     }
 
+    ImGui::SameLine();
+    if (ImGui::Button("Options")) {
+        _options.ToggleWindow();
+    }
+
+    _options.Show();
+
     ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImGui::GetStyleColorVec4(ImGuiCol_Button));
     ImGui::SameLine();
     ImGui::ProgressBar(_progressIndeterminate ? ImGui::GetTime() * -0.25f : _progress, ImVec2(200.0f, 0.0f), _progressText.c_str());
@@ -197,20 +305,22 @@ void PackageManager::updateLocalDatabase() {
         return;
     }
 
-    if (std::filesystem::exists(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH)) {
-        pullRepo();
-    } else {
-        cloneRepo();
-    }
+    for (const auto& repo: Marmalade::Config::engineConfig.Repos) {
+        if (std::filesystem::exists(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / repo.Name)) {
+            pullRepo(repo);
+        } else {
+            cloneRepo(repo);
+        }
 
-    buildIndex();
+        buildIndex(repo);
+    }
 
     _progressIndeterminate = false;
     _progressText = "";
     _dbOperationRunning = false;
 }
 
-void PackageManager::cloneRepo() {
+void PackageManager::cloneRepo(const Repository& config_repo) {
     git_libgit2_init();
 
     _progressIndeterminate = true;
@@ -225,9 +335,9 @@ void PackageManager::cloneRepo() {
     clone_opts.fetch_opts.callbacks.payload = this;
     clone_opts.fetch_opts.callbacks.sideband_progress = sideband_progress;
     clone_opts.fetch_opts.callbacks.transfer_progress = &fetch_progress;
-    clone_opts.fetch_opts.depth = 1;
+    clone_opts.fetch_opts.depth = config_repo.Depth;
 
-    int error = git_clone(&cloned_repo, REMOTE_REPO_PATH, (Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH).string().c_str(), &clone_opts);
+    int error = git_clone(&cloned_repo, config_repo.GitUrl.c_str(), (Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.Name).string().c_str(), &clone_opts);
     if (error != 0) {
         handleGitError("clone");
         return;
@@ -236,19 +346,19 @@ void PackageManager::cloneRepo() {
     git_repository_free(cloned_repo);
 }
 
-void PackageManager::pullRepo() {
+void PackageManager::pullRepo(const Repository& config_repo) {
     git_libgit2_init();
 
-    spdlog::info("Beginning pull");
+    spdlog::info("Beginning pull for {}", config_repo.Name);
 
     // Delete index first
-    if (std::filesystem::remove(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / INDEX_FILENAME)) {
+    if (std::filesystem::remove(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.Name / INDEX_FILENAME)) {
         spdlog::info("Index deleted successfully.");
     }
 
     spdlog::debug("Opening local repository");
     git_repository* repo = nullptr;
-    int error = git_repository_open(&repo, (Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH).string().c_str());
+    int error = git_repository_open(&repo, (Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.Name).string().c_str());
     if (error != 0) {
         handleGitError("open");
         return;
@@ -314,15 +424,15 @@ void PackageManager::pullRepo() {
     spdlog::info("Pull complete");
 }
 
-void PackageManager::buildIndex() {
-    spdlog::info("Building index...");
+void PackageManager::buildIndex(const Repository& config_repo) {
+    spdlog::info("Building index for {}...", config_repo.Name);
 
     nlohmann::json indexJson;
 
     _packagesByName.clear();
     _keywordIndex.clear();
 
-    for (const auto& letterDir: std::filesystem::directory_iterator(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH)) {
+    for (const auto& letterDir: std::filesystem::directory_iterator(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.Name)) {
         if (!std::filesystem::is_directory(letterDir)) continue;
         if (letterDir.path().filename().string() == ".git") continue;
 
@@ -332,7 +442,7 @@ void PackageManager::buildIndex() {
             if (!std::filesystem::is_directory(packageDir)) continue;
             spdlog::debug("Found package: {}", packageDir.path().filename().string());
 
-            std::string packageJsonPath = packageDir.path().string() + "/package.json";
+            std::filesystem::path packageJsonPath = packageDir.path() / "package.json";
             if (!std::filesystem::exists(packageJsonPath)) continue;
 
             try {
@@ -345,21 +455,21 @@ void PackageManager::buildIndex() {
                     indexJson[packageName] = packageData;
                 }
 
-                Package package{packageData["name"], packageData["authors"][0], packageData["keywords"]};
+                Package package{packageData["name"], config_repo.Name, packageData["authors"], packageData["keywords"]};
 
-                _packagesByName[package.name] = package;
-                for (const std::string& keyword: package.keywords) {
-                    _keywordIndex[keyword].push_back(&_packagesByName[package.name]);
+                _packagesByName[package.Name] = package;
+                for (const std::string& keyword: package.Keywords) {
+                    _keywordIndex[keyword].push_back(&_packagesByName[package.Name]);
                 }
 
             } catch (const std::exception& e) {
-                spdlog::error("Error reading {}: {}", packageJsonPath, e.what());
+                spdlog::error("Error reading {}: {}", packageJsonPath.string(), e.what());
             }
         }
     }
 
     // Write index.json
-    std::ofstream outFile(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / INDEX_FILENAME);
+    std::ofstream outFile(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.Name / INDEX_FILENAME);
     outFile << indexJson.dump(4);
 
     spdlog::info("Index built successfully.");
