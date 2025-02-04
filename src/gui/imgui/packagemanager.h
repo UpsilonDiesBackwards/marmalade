@@ -7,6 +7,8 @@
 #include <mutex>
 #include <utility>
 #include <atomic>
+#include <vector>
+#include <unordered_map>
 
 namespace Marmalade::GUI {
 
@@ -18,6 +20,15 @@ namespace Marmalade::GUI {
 
     class PackageManager : public Window {
     public:
+        struct Package {
+            std::string name{};
+            std::string author{};
+            std::vector<std::string> keywords{};
+
+            Package() = default;
+            Package(std::string name, std::string author, const std::vector<std::string>& keywords) : name(std::move(name)), author(std::move(author)), keywords(keywords) {}
+        };
+
         void Draw() override;
 
         inline void SetProgressText(std::string text) {
@@ -31,6 +42,9 @@ namespace Marmalade::GUI {
         bool _progressIndeterminate{false};
         std::string _progressText{};
 
+        std::unordered_map<std::string, Package> _packagesByName{};
+        std::unordered_map<std::string, std::vector<const Package*>> _keywordIndex{};
+
         void drawLeftPane(PackageManagerTab tab);
         void drawRightPane(PackageManagerTab tab);
         void drawSplit(PackageManagerTab tab, float bottom_bar_height);
@@ -38,7 +52,7 @@ namespace Marmalade::GUI {
 
         std::string itemId(const char* id, PackageManagerTab tab);
 
-        void handleGitError(const std::string &operation);
+        void handleGitError(const std::string& operation);
         void updateLocalDatabase();
         void cloneRepo();
         void pullRepo();

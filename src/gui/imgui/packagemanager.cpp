@@ -60,15 +60,27 @@ void PackageManager::drawLeftPane(PackageManagerTab tab) {
     ImGui::InputTextWithHint(itemId("##PackageManagerSearch", tab).c_str(), ICON_CI_SEARCH " Search", search_str, 256);
     float search_bar_height = ImGui::GetItemRectSize().y;
 
-    static const char* items[] = {"Package 1", "Package 2", "Package 3", "Package 4", "Package 5"};
-    static bool selected[IM_ARRAYSIZE(items)] = {false};
+    std::string query = search_str;
+    std::unordered_map<std::string, Package> packages{};
+    if (!query.empty()) {
+        if (_keywordIndex.count(query)) {
+            for (auto pkg : _keywordIndex[query]) {
+                packages[pkg->name] = *pkg;
+            }
+        }
+    } else {
+        packages = _packagesByName;
+    }
 
     ImVec2 listbox_area = ImVec2(area.x, area.y - search_bar_height - ImGui::GetStyle().ItemSpacing.y);
     if (ImGui::BeginListBox(itemId("##PackageManagerList", tab).c_str(), listbox_area)) {
-        for (int i = 0; i < IM_ARRAYSIZE(items); i++) {
-            ImGui::PushID(i);
-            ImGui::Checkbox(items[i], &selected[i]);
+        for (const auto& pkg: packages) {
+            ImGui::PushID(pkg.first.c_str());
+            ImGui::Text(pkg.first.c_str());
+            ImGui::Text(pkg.second.author.c_str());
+            // ImGui::Checkbox();
             ImGui::PopID();
+            ImGui::Separator();
         }
         ImGui::EndListBox();
     }
@@ -307,6 +319,9 @@ void PackageManager::buildIndex() {
 
     nlohmann::json indexJson;
 
+    _packagesByName.clear();
+    _keywordIndex.clear();
+
     for (const auto& letterDir: std::filesystem::directory_iterator(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH)) {
         if (!std::filesystem::is_directory(letterDir)) continue;
         if (letterDir.path().filename().string() == ".git") continue;
@@ -328,6 +343,13 @@ void PackageManager::buildIndex() {
                 if (packageData.contains("name")) {
                     std::string packageName = packageData["name"];
                     indexJson[packageName] = packageData;
+                }
+
+                Package package{packageData["name"], packageData["authors"][0], packageData["keywords"]};
+
+                _packagesByName[package.name] = package;
+                for (const std::string& keyword: package.keywords) {
+                    _keywordIndex[keyword].push_back(&_packagesByName[package.name]);
                 }
 
             } catch (const std::exception& e) {
