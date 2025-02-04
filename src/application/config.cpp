@@ -1,6 +1,7 @@
 #include "config.h"
 
 #include <iostream>
+#include <fstream>
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -8,6 +9,8 @@
 #endif
 
 #define APP_NAME "marmalade-engine"
+
+Marmalade::EngineConfig Marmalade::Config::engineConfig{};
 
 std::filesystem::path Marmalade::Config::_configDir{};
 
@@ -46,4 +49,25 @@ void Marmalade::Config::SetConfigDirectory(bool sameDirConfig) {
 
 std::filesystem::path Marmalade::Config::GetConfigDirectory() {
     return _configDir;
+}
+
+void Marmalade::Config::LoadEngineConfig() {
+    std::ifstream i(_configDir / "settings.json");
+    if (i.fail()) {
+        // File doesn't exist
+        engineConfig = {};
+        SaveEngineConfig();
+        return;
+    }
+
+    auto data = nlohmann::json::parse(i);
+    engineConfig = data.template get<EngineConfig>();
+    i.close();
+}
+
+void Marmalade::Config::SaveEngineConfig() {
+    std::ofstream o(_configDir / "settings.json");
+    nlohmann::json new_config = engineConfig;
+    o << new_config;
+    o.close();
 }

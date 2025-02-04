@@ -73,8 +73,11 @@ void Application::Initialise() {
 
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigWindowsMoveFromTitleBarOnly = true;
-    io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
-    ImFont *font = io.Fonts->AddFontFromFileTTF("res/fonts/monofur/monof55.ttf", 16);
+    io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable;
+    if (Marmalade::Config::engineConfig.Viewports) {
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    }
+    ImFont* font = io.Fonts->AddFontFromFileTTF("res/fonts/monofur/monof55.ttf", 16);
 
     static const ImWchar icons_ranges[] = {ICON_MIN_CI, ICON_MAX_16_CI, 0};
 

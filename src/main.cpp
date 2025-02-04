@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
     }
 
     Marmalade::Config::SetConfigDirectory(sameDirConfig);
-    std::cout << Marmalade::Config::GetConfigDirectory() << std::endl;
+    Marmalade::Config::LoadEngineConfig();
 
     Application& application = Application::GetInstance(1920, 1080, "Marmalade Engine");
     application.Initialise();
