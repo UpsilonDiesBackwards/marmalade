@@ -2,6 +2,8 @@
 
 #include "application.h"
 
+#include "config.h"
+
 #include <imgui.h>
 #include <imgui_internal.h>// Only for docking API
 #include <backends/imgui_impl_glfw.h>
@@ -185,8 +187,9 @@ void Application::SetupLogger() {
     auto maxFiles = maxLogFiles;
 
     auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    auto engineLogPath = Marmalade::Config::GetConfigDirectory() / "engine-log.txt";
     auto fileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-            "engine-log.txt", maxSize, maxFiles);
+            engineLogPath.string(), maxSize, maxFiles);
 
     guiSink = std::make_shared<GuiLogSink>();
 

@@ -92,6 +92,8 @@ list(APPEND ENGINE_SRC src/application/application.cpp src/application/applicati
         src/scene/scene.cpp src/scene/scenemanager.cpp
         src/application/project.cpp
         src/application/project.h
+        src/application/config.cpp
+        src/application/config.h
 )
 
 add_executable(marmalade vendor/glad/src/glad.c ${IMGUI_SRC} vendor/imguifiledialog/ImGuiFileDialog.cpp

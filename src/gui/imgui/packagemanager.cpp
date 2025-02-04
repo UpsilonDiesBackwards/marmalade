@@ -1,5 +1,7 @@
 #include "packagemanager.h"
 
+#include "../../application/config.h"
+
 #include <sstream>
 #include <thread>
 #include <filesystem>
@@ -18,7 +20,7 @@
 
 #define REMOTE_REPO_PATH "https://github.com/UpsilonDiesBackwards/marmalade-pkgs.git"
 #define LOCAL_REPO_PATH "local-repo"
-#define INDEX_PATH "local-repo/index.json"
+#define INDEX_FILENAME "index.json"
 
 using namespace Marmalade::GUI;
 
@@ -183,7 +185,7 @@ void PackageManager::updateLocalDatabase() {
         return;
     }
 
-    if (std::filesystem::exists(LOCAL_REPO_PATH)) {
+    if (std::filesystem::exists(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH)) {
         pullRepo();
     } else {
         cloneRepo();
@@ -213,7 +215,7 @@ void PackageManager::cloneRepo() {
     clone_opts.fetch_opts.callbacks.transfer_progress = &fetch_progress;
     clone_opts.fetch_opts.depth = 1;
 
-    int error = git_clone(&cloned_repo, REMOTE_REPO_PATH, LOCAL_REPO_PATH, &clone_opts);
+    int error = git_clone(&cloned_repo, REMOTE_REPO_PATH, (Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH).string().c_str(), &clone_opts);
     if (error != 0) {
         handleGitError("clone");
         return;
@@ -228,13 +230,13 @@ void PackageManager::pullRepo() {
     spdlog::info("Beginning pull");
 
     // Delete index first
-    if (std::filesystem::remove(INDEX_PATH)) {
+    if (std::filesystem::remove(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / INDEX_FILENAME)) {
         spdlog::info("Index deleted successfully.");
     }
 
     spdlog::debug("Opening local repository");
     git_repository* repo = nullptr;
-    int error = git_repository_open(&repo, LOCAL_REPO_PATH);
+    int error = git_repository_open(&repo, (Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH).string().c_str());
     if (error != 0) {
         handleGitError("open");
         return;
@@ -304,14 +306,14 @@ void PackageManager::buildIndex() {
     spdlog::info("Building index...");
 
     nlohmann::json indexJson;
-    
-    for (const auto& letterDir : std::filesystem::directory_iterator(LOCAL_REPO_PATH)) {
+
+    for (const auto& letterDir: std::filesystem::directory_iterator(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH)) {
         if (!std::filesystem::is_directory(letterDir)) continue;
         if (letterDir.path().filename().string() == ".git") continue;
 
         spdlog::debug("Scanning directory: {}", letterDir.path().filename().string());
 
-        for (const auto& packageDir : std::filesystem::directory_iterator(letterDir)) {
+        for (const auto& packageDir: std::filesystem::directory_iterator(letterDir)) {
             if (!std::filesystem::is_directory(packageDir)) continue;
             spdlog::debug("Found package: {}", packageDir.path().filename().string());
 
@@ -335,16 +337,16 @@ void PackageManager::buildIndex() {
     }
 
     // Write index.json
-    std::ofstream outFile(INDEX_PATH);
+    std::ofstream outFile(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / INDEX_FILENAME);
     outFile << indexJson.dump(4);
 
     spdlog::info("Index built successfully.");
 }
 
 void PackageManager::deleteLocalDatabase() {
-    if (std::filesystem::exists(LOCAL_REPO_PATH)) {
+    if (std::filesystem::exists(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH)) {
         try {
-            std::filesystem::remove_all(LOCAL_REPO_PATH);
+            std::filesystem::remove_all(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH);
             spdlog::info("Successfully deleted local database");
         } catch (const std::filesystem::filesystem_error& e) {
             spdlog::error("Failed to delete local database: {}", e.what());
