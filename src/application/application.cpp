@@ -203,14 +203,14 @@ void Application::SetupLogger() {
     spdlog::set_level(spdlog::level::debug);
 }
 
-void Application::SetCurrentProject(Project project) { // Change the current projects and update the window title to inc project name
-    currentProject = project;
+void Application::SetCurrentProject(std::unique_ptr<Project> project) { // Change the current projects and update the window title to inc project name
+    currentProject = std::move(project);
 
-    std::string windowTitle = std::string(title) + " // " + currentProject.name;
+    std::string windowTitle = std::string(title) + " // " + currentProject->name;
 
     glfwSetWindowTitle(window, windowTitle.c_str());
 }
 
-Project Application::GetCurrentProject() {
-    return currentProject;
+Project* Application::GetCurrentProject() {
+    return currentProject.get();
 }

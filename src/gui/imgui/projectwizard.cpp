@@ -12,6 +12,7 @@
 #include <IconsCodicons.h>
 #include <git2/repository.h>
 #include <git2/global.h>
+#include <git2/remote.h>
 
 bool directoryExists = false;
 
@@ -21,6 +22,12 @@ void Marmalade::GUI::ProjectWizard::Draw() {
 
     char projectNameC[256];
     std::strcpy(projectNameC, projectName.c_str());
+
+    char gitRemoteNameC[256];
+    std::strcpy(gitRemoteNameC, gitSettings.remoteName.c_str());
+
+    char gitRemotePathC[256];
+    std::strcpy(gitRemotePathC, gitSettings.remoteURL.c_str());
 
     ImGui::Begin(ICON_CI_FILE_TEXT " New Project", &visible, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -62,14 +69,36 @@ void Marmalade::GUI::ProjectWizard::Draw() {
                            "Invalid File Path!");
     }
 
-    if (ImGui::Checkbox("Initialise Git", &initGitRepository)) { };
-
-    ImGui::SameLine();
-
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 125.0f);
 
     if (ImGui::Button("Create Project")) {
         CreateProject();
+    }
+
+    if (ImGui::Checkbox("Initialise Git", &gitSettings.initGitRepository)) { };
+
+    if (gitSettings.initGitRepository) {
+        ImGui::Separator();
+
+        if (ImGui::Checkbox("Use recommended .gitignore", &gitSettings.useDefaultGitIgnore));
+
+        if (ImGui::InputText("Remote Name##", gitRemoteNameC, sizeof(gitRemoteNameC))) {
+            gitSettings.remoteName = gitRemoteNameC;
+        }
+
+        if (ImGui::InputText("Remote URL##", gitRemotePathC, sizeof(gitRemotePathC))) {
+            gitSettings.remoteURL = gitRemotePathC;
+        }
+    }
+
+    if (strlen(gitRemoteNameC) == 0 && gitSettings.initGitRepository) { // If the git remote name is empty, return a warning
+        ImGui::TextColored(ImVec4(0.85f, 0.73f, 0.49f, 1.0f),
+                           "Empty Remote Name, will default to 'main'");
+    }
+
+    if (strlen(gitRemotePathC) == 0 && gitSettings.initGitRepository) { // If the git remote url is empty, return a warning
+        ImGui::TextColored(ImVec4(0.85f, 0.73f, 0.49f, 1.0f),
+                           "Empty remote URL, this will require manual setup!");
     }
 
     if (directoryExists) { // If the desired directory already exists, return an error
@@ -90,13 +119,13 @@ void Marmalade::GUI::ProjectWizard::CreateProject() {
     } else { directoryExists = false; }
 
     if (std::filesystem::create_directory(projectPath)) { // Create the project directory
-        spdlog::info("Creating project: {}. Using Git: {}", projectName, initGitRepository);
+        spdlog::info("Creating project: {}. Using Git: {}", projectName, gitSettings.initGitRepository);
 
         // TODO: Project setup
 
-        Application::GetInstance().SetCurrentProject(std::make_unique<Project>(projectPath, projectPath.string(), initGitRepository));
+        Application::GetInstance().SetCurrentProject(std::make_unique<Project>(projectName, projectPath.string(), gitSettings));
 
-        if (initGitRepository) { // If desired then initialise a git repo at the project directory
+        if (gitSettings.initGitRepository) { // If desired then initialise a git repo at the project directory
             InitialiseGitRepository(projectPath.string().c_str());
         }
 
@@ -109,13 +138,50 @@ void Marmalade::GUI::ProjectWizard::InitialiseGitRepository(const char* repoPath
     git_libgit2_init();
 
     int error;
-    git_repository *repo = NULL;
     git_repository_init_options options = GIT_REPOSITORY_INIT_OPTIONS_INIT;
 
     options.flags |= GIT_REPOSITORY_INIT_MKPATH;
     options.description = "Marmalade Project"; // Repo description, perhaps this should be user defined?
 
-    error = git_repository_init_ext(&repo, repoPath, &options); // Create the repo
+    error = git_repository_init_ext(&gitSettings.repo, repoPath, &options); // Create the repo
+
+    if (gitSettings.useDefaultGitIgnore) { // Use .gitignore template or not
+        std::filesystem::path targetIgnorePath = std::filesystem::path(projectFilePath) / projectName / ".gitignore";
+
+        std::ifstream templIgnore("../resources/templates/gitignore"); // Template ignore
+        std::ofstream targetIgnore(targetIgnorePath);
+
+        if (templIgnore.is_open() && targetIgnore.is_open()) { // If both files are open ...
+            std::string line;
+
+            while (std::getline(templIgnore, line)) { // ... copy each line to the target .gitignore
+                targetIgnore << line << "\n";
+            }
+
+            templIgnore.close();
+            targetIgnore.close();
+        } else {
+            spdlog::error("Failed copying .gitignore contents!");
+        }
+    }
+
+    if (!gitSettings.remoteURL.length() == 0) {
+        SetGitRemoteURL(gitSettings);
+    }
+
+    // TODO: Git error handling
+
+    git_libgit2_shutdown();
+}
+
+void Marmalade::GUI::ProjectWizard::SetGitRemoteURL(GitSettings git) {
+    git_libgit2_init();
+
+    int error;
+    error = git_remote_set_url(git.repo, git.remoteName.c_str(), git.remoteURL.c_str());
+
+    spdlog::error("Git error: {}", error);
+
 
     // TODO: Git error handling
 

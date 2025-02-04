@@ -4,15 +4,16 @@
 
 #include <string>
 #include "../../include/scene/scenemanager.h"
+#include "../gui/imgui/projectwizard.h"
 
 class Project {
 public:
     std::string name;
     std::string filePath; // Where the project is stored / the working directory
 
-    bool createdWithGit = false;
+    GitSettings gitSettings;
 
-    Project(std::string name, std::string filePath, bool createdWithGit);
+    Project(std::string name, std::string filePath, GitSettings gitSettings);
 
 private:
     std::vector<std::string> baseDirectories = { // Directories auto-created when the project is made
@@ -27,7 +28,7 @@ private:
             "package-settings.marm"
     };
 
-    void CreateProjectDirectories(bool git);
+    void CreateProjectDirectories(GitSettings gitSettings);
 };
 
 

@@ -7,15 +7,8 @@
 
 namespace Marmalade {
 
-    struct Repository {
-        std::string Name;
-        std::string GitUrl{};
-        int Depth{1};// Local repos do not work with shallow clone
-    };
-
     struct EngineConfig {
         bool Viewports{true};
-        std::vector<Repository> Repos{};
     };
 
     class Config {
@@ -32,9 +25,7 @@ namespace Marmalade {
         static std::filesystem::path _configDir;
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::Repository, Name, GitUrl, Depth);
-
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, Viewports, Repos);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, Viewports);
 }
 
 #endif
