@@ -16,7 +16,7 @@ void Project::CreateProjectDirectories(bool git) {
             if (!std::filesystem::exists(path)) {
                 std::filesystem::create_directories(path);
             } else {
-                spdlog::error("Error creating directory '{}', already exists!", path.c_str());
+                spdlog::error("Error creating directory '{}', already exists!", path.string().c_str());
             }
         } catch (const std::exception& e) {
             spdlog::error("Error creating directory '{}'", e.what());
