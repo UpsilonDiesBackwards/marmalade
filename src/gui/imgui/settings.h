@@ -7,6 +7,9 @@ namespace Marmalade::GUI {
     class Settings : public Window {
     public:
         void Draw() override;
+    private:
+        void requiresRestartWarning();
+        static bool getLogLevels(void* data, int idx, const char** outText);
     };
 }
 

@@ -185,6 +185,7 @@ GLFWwindow *Application::getWindow() {
 Camera *Application::getCamera() {
     return camera;
 }
+
 void Application::SetupLogger() {
     auto maxSize = 1048576 * maxLogSizeMB;
     auto maxFiles = maxLogFiles;
@@ -200,7 +201,7 @@ void Application::SetupLogger() {
                                               spdlog::sinks_init_list{consoleSink, fileSink, guiSink});
     spdlog::register_logger(logger);
     spdlog::set_default_logger(logger);
-    spdlog::set_level(spdlog::level::debug);
+    spdlog::set_level(Marmalade::Config::engineConfig.LogLevel);
 }
 
 void Application::SetCurrentProject(std::unique_ptr<Project> project) { // Change the current projects and update the window title to inc project name
