@@ -72,9 +72,10 @@ void PackageManagerOptions::Draw() {
 
         if (ImGui::Button("Remove")) {
             Config::engineConfig.Repos.erase(std::remove_if(Config::engineConfig.Repos.begin(), Config::engineConfig.Repos.end(),
-                                                                       [&sel_item](const Repository &repo) {
-                                                                           return sel_item.Name == repo.Name;
-                                                                       }), Config::engineConfig.Repos.end());
+                                                            [&sel_item](const Repository& repo) {
+                                                                return sel_item.Name == repo.Name;
+                                                            }),
+                                             Config::engineConfig.Repos.end());
             Config::SaveEngineConfig();
             _selectedRow = -1;
         }
@@ -164,9 +165,20 @@ void PackageManager::drawLeftPane(PackageManagerTab tab) {
     std::string query = search_str;
     std::unordered_map<std::string, Package> packages{};
     if (!query.empty()) {
-        if (_keywordIndex.count(query)) {
-            for (auto pkg: _keywordIndex[query]) {
-                packages[pkg->Name] = *pkg;
+        // Split query
+        std::istringstream queryStream(query);
+        std::vector<std::string> queryKeywords{};
+        std::string keyword;
+
+        while (queryStream >> keyword) queryKeywords.push_back(keyword);
+
+        for (const auto& queryKw: queryKeywords) {
+            for (const auto& [key, pkgs]: _keywordIndex) {
+                if (key.find(queryKw) != std::string::npos) {
+                    for (const auto &pkg : pkgs) {
+                        packages[pkg->Name] = *pkg;
+                    }
+                }
             }
         }
     } else {
@@ -305,14 +317,19 @@ void PackageManager::updateLocalDatabase() {
         return;
     }
 
+    _packagesByName.clear();
+    _keywordIndex.clear();
+
     for (const auto& repo: Marmalade::Config::engineConfig.Repos) {
+        bool no_err{false};
+
         if (std::filesystem::exists(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / repo.Name)) {
-            pullRepo(repo);
+            no_err = pullRepo(repo);
         } else {
-            cloneRepo(repo);
+            no_err = cloneRepo(repo);
         }
 
-        buildIndex(repo);
+        if (no_err) buildIndex(repo);
     }
 
     _progressIndeterminate = false;
@@ -320,7 +337,7 @@ void PackageManager::updateLocalDatabase() {
     _dbOperationRunning = false;
 }
 
-void PackageManager::cloneRepo(const Repository& config_repo) {
+bool PackageManager::cloneRepo(const Repository& config_repo) {
     git_libgit2_init();
 
     _progressIndeterminate = true;
@@ -340,13 +357,15 @@ void PackageManager::cloneRepo(const Repository& config_repo) {
     int error = git_clone(&cloned_repo, config_repo.GitUrl.c_str(), (Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.Name).string().c_str(), &clone_opts);
     if (error != 0) {
         handleGitError("clone");
-        return;
+        return false;
     }
 
     git_repository_free(cloned_repo);
+
+    return true;
 }
 
-void PackageManager::pullRepo(const Repository& config_repo) {
+bool PackageManager::pullRepo(const Repository& config_repo) {
     git_libgit2_init();
 
     spdlog::info("Beginning pull for {}", config_repo.Name);
@@ -361,7 +380,7 @@ void PackageManager::pullRepo(const Repository& config_repo) {
     int error = git_repository_open(&repo, (Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.Name).string().c_str());
     if (error != 0) {
         handleGitError("open");
-        return;
+        return false;
     }
 
     spdlog::debug("Looking up remote: origin");
@@ -370,7 +389,7 @@ void PackageManager::pullRepo(const Repository& config_repo) {
     if (error != 0) {
         handleGitError("remote_lookup");
         git_repository_free(repo);
-        return;
+        return false;
     }
 
     spdlog::debug("Fetching from remote");
@@ -379,7 +398,7 @@ void PackageManager::pullRepo(const Repository& config_repo) {
         handleGitError("fetch");
         git_remote_free(remote);
         git_repository_free(repo);
-        return;
+        return false;
     }
 
     spdlog::debug("Retrieving current branch");
@@ -389,7 +408,7 @@ void PackageManager::pullRepo(const Repository& config_repo) {
         handleGitError("head");
         git_remote_free(remote);
         git_repository_free(repo);
-        return;
+        return false;
     }
 
     spdlog::debug("Looking up current branch");
@@ -400,7 +419,7 @@ void PackageManager::pullRepo(const Repository& config_repo) {
         git_reference_free(head);
         git_remote_free(remote);
         git_repository_free(repo);
-        return;
+        return false;
     }
 
     spdlog::debug("Retrieving latest upstream reference");
@@ -412,7 +431,7 @@ void PackageManager::pullRepo(const Repository& config_repo) {
         git_reference_free(head);
         git_remote_free(remote);
         git_repository_free(repo);
-        return;
+        return false;
     }
 
     git_reference_free(upstream);
@@ -422,15 +441,13 @@ void PackageManager::pullRepo(const Repository& config_repo) {
     git_repository_free(repo);
 
     spdlog::info("Pull complete");
+    return true;
 }
 
 void PackageManager::buildIndex(const Repository& config_repo) {
     spdlog::info("Building index for {}...", config_repo.Name);
 
     nlohmann::json indexJson;
-
-    _packagesByName.clear();
-    _keywordIndex.clear();
 
     for (const auto& letterDir: std::filesystem::directory_iterator(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.Name)) {
         if (!std::filesystem::is_directory(letterDir)) continue;

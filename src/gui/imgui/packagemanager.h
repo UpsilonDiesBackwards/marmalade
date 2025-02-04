@@ -72,8 +72,8 @@ namespace Marmalade::GUI {
 
         void handleGitError(const std::string& operation);
         void updateLocalDatabase();
-        void cloneRepo(const Marmalade::Repository &config_repo);
-        void pullRepo(const Marmalade::Repository &config_repo);
+        bool cloneRepo(const Marmalade::Repository &config_repo);
+        bool pullRepo(const Marmalade::Repository &config_repo);
         void buildIndex(const Marmalade::Repository &config_repo);
         void deleteLocalDatabase();
     };
