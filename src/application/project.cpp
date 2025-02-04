@@ -31,6 +31,11 @@ void Project::CreateProjectDirectories(GitSettings gitSettings) {
             continue; // Git has not been enabled, skipping .gitignore
         }
 
+        if (path == std::filesystem::path(filePath) / "README.md" && !gitSettings.createREADME) { // Create / Skip README.md
+            spdlog::warn("Project created without README.md");
+            continue; // README.md creation has not been enabled, skipping README.md
+        }
+
         try {
             std::ofstream createdFile(path);
             if (!createdFile) {

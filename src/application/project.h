@@ -24,6 +24,7 @@ private:
     std::vector<std::string> baseFiles = { // Files auto-created when the project is made
             "project.marmalade",
             ".gitignore",
+            "README.md",
             "settings.marm",
             "package-settings.marm"
     };

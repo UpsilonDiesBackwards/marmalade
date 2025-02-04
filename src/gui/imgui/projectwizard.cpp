@@ -13,6 +13,7 @@
 #include <git2/repository.h>
 #include <git2/global.h>
 #include <git2/remote.h>
+#include <git2/errors.h>
 
 bool directoryExists = false;
 
@@ -28,6 +29,9 @@ void Marmalade::GUI::ProjectWizard::Draw() {
 
     char gitRemotePathC[256];
     std::strcpy(gitRemotePathC, gitSettings.remoteURL.c_str());
+
+    char readMEC[2048];
+    std::strcpy(readMEC, gitSettings.readmeText.c_str());
 
     ImGui::Begin(ICON_CI_FILE_TEXT " New Project", &visible, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -75,25 +79,33 @@ void Marmalade::GUI::ProjectWizard::Draw() {
         CreateProject();
     }
 
-    if (ImGui::Checkbox("Initialise Git", &gitSettings.initGitRepository)) { };
+    if (ImGui::Checkbox("Initialise Git Repository", &gitSettings.initGitRepository)) { }
 
     if (gitSettings.initGitRepository) {
         ImGui::Separator();
 
-        if (ImGui::Checkbox("Use recommended .gitignore", &gitSettings.useDefaultGitIgnore));
+        if (ImGui::Checkbox("Use recommended .gitignore", &gitSettings.useDefaultGitIgnore)) { }
 
-        if (ImGui::InputText("Remote Name##", gitRemoteNameC, sizeof(gitRemoteNameC))) {
+        if (ImGui::InputText("Remote Name##", gitRemoteNameC, IM_ARRAYSIZE(gitRemoteNameC))) {
             gitSettings.remoteName = gitRemoteNameC;
         }
 
-        if (ImGui::InputText("Remote URL##", gitRemotePathC, sizeof(gitRemotePathC))) {
+        if (ImGui::InputText("Remote URL##", gitRemotePathC, IM_ARRAYSIZE(gitRemotePathC))) {
             gitSettings.remoteURL = gitRemotePathC;
+        }
+
+        if (ImGui::Checkbox("Create README.md", &gitSettings.createREADME)) { }
+
+        if (gitSettings.createREADME) {
+            if (ImGui::InputTextMultiline("##README", readMEC, IM_ARRAYSIZE(readMEC), ImVec2(400, 200))) {
+                gitSettings.readmeText = readMEC;
+            }
         }
     }
 
     if (strlen(gitRemoteNameC) == 0 && gitSettings.initGitRepository) { // If the git remote name is empty, return a warning
         ImGui::TextColored(ImVec4(0.85f, 0.73f, 0.49f, 1.0f),
-                           "Empty Remote Name, will default to 'main'");
+                           "Empty Remote Name, will default to 'origin'");
     }
 
     if (strlen(gitRemotePathC) == 0 && gitSettings.initGitRepository) { // If the git remote url is empty, return a warning
@@ -121,8 +133,7 @@ void Marmalade::GUI::ProjectWizard::CreateProject() {
     if (std::filesystem::create_directory(projectPath)) { // Create the project directory
         spdlog::info("Creating project: {}. Using Git: {}", projectName, gitSettings.initGitRepository);
 
-        // TODO: Project setup
-
+        // Create the project and set it to the current project
         Application::GetInstance().SetCurrentProject(std::make_unique<Project>(projectName, projectPath.string(), gitSettings));
 
         if (gitSettings.initGitRepository) { // If desired then initialise a git repo at the project directory
@@ -144,6 +155,9 @@ void Marmalade::GUI::ProjectWizard::InitialiseGitRepository(const char* repoPath
     options.description = "Marmalade Project"; // Repo description, perhaps this should be user defined?
 
     error = git_repository_init_ext(&gitSettings.repo, repoPath, &options); // Create the repo
+    if (error != 0) {
+        spdlog::error("Failed to initialise git repository: {}", git_error_last()->message);
+    }
 
     if (gitSettings.useDefaultGitIgnore) { // Use .gitignore template or not
         std::filesystem::path targetIgnorePath = std::filesystem::path(projectFilePath) / projectName / ".gitignore";
@@ -165,25 +179,45 @@ void Marmalade::GUI::ProjectWizard::InitialiseGitRepository(const char* repoPath
         }
     }
 
+    if (gitSettings.createREADME) { // If README.md creation is enabled ...
+        std::filesystem::path targetREADMEPath = std::filesystem::path(projectFilePath) / projectName / "README.md"; // ... get it ...
+
+        std::ofstream targetREADME(targetREADMEPath);
+
+        if (targetREADME.is_open()) { // ... then write in the contents
+            targetREADME << gitSettings.readmeText;
+
+            targetREADME.close();
+        }
+    }
+
     if (!gitSettings.remoteURL.length() == 0) {
         SetGitRemoteURL(gitSettings);
     }
-
-    // TODO: Git error handling
 
     git_libgit2_shutdown();
 }
 
 void Marmalade::GUI::ProjectWizard::SetGitRemoteURL(GitSettings git) {
+    std::filesystem::path repoFilePath = std::filesystem::path(projectFilePath) / projectName;
+
     git_libgit2_init();
 
     int error;
-    error = git_remote_set_url(git.repo, git.remoteName.c_str(), git.remoteURL.c_str());
+    error = git_repository_open(&git.repo, repoFilePath.c_str()); // Open the git repository
+    if (error != 0) {
+        spdlog::error("Failed to open repository: {}", git_error_last()->message);
+    }
 
-    spdlog::error("Git error: {}", error);
+    if (!strlen(git.remoteName.c_str()) == 0) { // Check if user has defined a custom remoteName
+        error = git_remote_set_url(git.repo, git.remoteName.c_str(), git.remoteURL.c_str()); // If so, use that
+    } else {
+        error = git_remote_set_url(git.repo, "origin", git.remoteURL.c_str()); // If not, default to 'origin'
+    }
 
-
-    // TODO: Git error handling
+    if (error != 0) {
+        spdlog::error("Failed to set remote URL: {}", git_error_last()->message);
+    }
 
     git_libgit2_shutdown();
 }

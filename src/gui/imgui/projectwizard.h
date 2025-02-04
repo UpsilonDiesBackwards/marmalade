@@ -11,9 +11,11 @@ struct GitSettings {
 
     bool initGitRepository{false};
     bool useDefaultGitIgnore{true};
+    bool createREADME{false};
 
     std::string remoteName = "";
     std::string remoteURL = "";
+    std::string readmeText = "";
 };
 
 namespace Marmalade::GUI {

@@ -20,6 +20,7 @@ add_subdirectory(vendor/json)
 add_subdirectory(vendor/glm)
 
 set(USE_NSEC OFF)
+set(USE_SSH ON)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 add_subdirectory(vendor/libgit2)
 
