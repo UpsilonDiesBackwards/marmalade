@@ -34,24 +34,16 @@ void Marmalade::GUI::TopBar::Show() {
         }
 
         if (ImGui::BeginMenu("Settings")) {
-            if (ImGui::MenuItem(ICON_CI_EDIT " Style Editor")) {
-                showStyleEditor = !showStyleEditor;
-            }
+            ImGui::MenuItem(ICON_CI_EDIT " Style Editor", nullptr, &showStyleEditor);
+            ImGui::MenuItem(ICON_CI_SETTINGS_GEAR " Settings", nullptr, &settings.visible);
 
-            if (ImGui::MenuItem(ICON_CI_SETTINGS_GEAR " Settings")) {
-                settings.ToggleWindow();
-            }
             ImGui::EndMenu();
         }
 
         if (ImGui::BeginMenu("Window")) {
-            if (ImGui::MenuItem(ICON_CI_PACKAGE " Package Manager")) {
-                packageManager.ToggleWindow();
-            }
+            ImGui::MenuItem(ICON_CI_PACKAGE " Package Manager", nullptr, &packageManager.visible);
 
-            if (ImGui::MenuItem(ICON_CI_FILE_TEXT " Log")) {
-                log.ToggleWindow();
-            }
+            ImGui::MenuItem(ICON_CI_FILE_TEXT " Log", nullptr, &log.visible);
 
             if (ImGui::MenuItem(ICON_CI_SAVE " Save Layout")) {
                 Application::GetInstance().styleManager.SaveStyle();
