@@ -31,7 +31,7 @@ public:
     Renderable renderable;
     Transform transform;
 
-    Entity* parent;
+    Entity* parent{nullptr};
     std::vector<std::unique_ptr<Entity>> children;
 
     Entity(const std::string& name, EntityFlags flags, Transform transform);
