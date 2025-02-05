@@ -5,10 +5,10 @@
 #include <glm/gtx/string_cast.hpp>
 #include "../../include/archetypes/entity.h"
 #include "../../include/graphics/texture.h"
+#include "spdlog/spdlog.h"
 
 Entity::Entity(const std::string &name, EntityFlags flags, Transform transform)
-    : name(name), flags(flags), transform(transform), renderable(0,0,0, Texture::LoadTexture("")),
-      children(std::make_shared<std::vector<std::unique_ptr<Entity>>>()) { // Lord forgive me for the c h i l d
+    : name(name), flags(flags), transform(transform), renderable(0,0,0, Texture::LoadTexture("")) {
 
     renderable.Initialise();
 
@@ -18,6 +18,10 @@ Entity::Entity(const std::string &name, EntityFlags flags, Transform transform)
 void Entity::Render() {
     if (RENDERABLE) {
         renderable.Draw(transform.modelMatrix);
+    }
+
+    for (auto &child : children) {
+        child->Render();
     }
 }
 
@@ -55,4 +59,22 @@ void Entity::UpdateModelMatrix() {
     transform.modelMatrix = glm::rotate(transform.modelMatrix, glm::radians(transform.rotation),
                                         glm::vec3(0.0f, 0.0f, 1.0f));
     transform.modelMatrix = glm::scale(transform.modelMatrix, glm::vec3(transform.scale, 1.0f));
+
+    if (parent) {
+        transform.modelMatrix = parent->transform.modelMatrix * transform.modelMatrix;
+    }
+}
+void Entity::AddChild(std::unique_ptr<Entity> child) {
+    child->parent = this;
+    children.push_back(std::move(child));
+
+    spdlog::info("child: {}", this->children[0]->name);
+}
+
+bool Entity::HasParent() const {
+    return parent != nullptr;
+}
+
+void Entity::SetParent(Entity* newParent) {
+    parent = newParent;
 }

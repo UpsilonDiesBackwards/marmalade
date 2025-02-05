@@ -5,6 +5,15 @@
 #include "../../application/application.h"
 #include <imgui.h>
 
+// Window / Popup control
+bool isCreatingEntity = false;
+bool isCreatingEntityChild = false;
+bool isRenamingEntity = false;
+bool isDeletingEntity = false;
+
+static char newName[128] = ""; // New name to rename entity to
+static int renameIndex = -1; // Index of entity to rename
+
 void SceneHierarchy::Show() {
     Application& app = Application::GetInstance();
     auto currentScene = app.sceneManager.GetCurrentScene();
@@ -13,16 +22,15 @@ void SceneHierarchy::Show() {
     ImGui::SetNextWindowPos(ImVec2(220, 112), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(475, 760), ImGuiCond_FirstUseEver);
 
-    // Window / Popup control
-    bool isCreatingEntity = false;
-    bool isCreatingEntityChild = false;
-    bool isRenamingEntity = false;
-    bool isDeletingEntity = false;
-
-    static char newName[128] = ""; // New name to rename entity to
-    static int renameIndex = -1; // Index of entity to rename
-
     ImGui::Begin("Hierarchy", nullptr);
+
+    for (size_t i = 0; i < entities.size(); ++i) {
+        auto &entity = entities[i];
+
+        if (!entity->HasParent()) {
+            DisplayEntityNode(entity.get(), i);
+        }
+    }
 
     if (ImGui::BeginPopupContextWindow("GenericContextMenu", ImGuiPopupFlags_MouseButtonRight)) {
         if (ImGui::MenuItem("Create Entity")) {
@@ -33,9 +41,9 @@ void SceneHierarchy::Show() {
 
     // Entity create
 
-    if (isCreatingEntity) { ImGui::OpenPopup("Create Entity##"); }
+    if (isCreatingEntity) { ImGui::OpenPopup("Create Entity##unique"); }
 
-    if (ImGui::BeginPopupModal("Create Entity##", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::BeginPopupModal("Create Entity##unique", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::InputText("Name", newName, IM_ARRAYSIZE(newName));
 
         if (ImGui::Button("Cancel")) {
@@ -66,16 +74,6 @@ void SceneHierarchy::Show() {
         nodeLabel += "##" + std::to_string(i);
 
         if (ImGui::TreeNode(nodeLabel.c_str())) {
-            if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right)) { // Right-click to open entity context menu
-                ImGui::OpenPopup("EntityRMBContextMenu");
-            }
-
-            // Entity right mouse button context menu
-            if (ImGui::BeginPopup("EntityRMBContextMenu")) {
-                if (ImGui::MenuItem("Create Child Entity")) {
-                    isCreatingEntityChild = true;
-                }
-
                 if (ImGui::MenuItem("Rename")) {
                     renameIndex = i;
                     strncpy(newName, entity->name.c_str(), sizeof(newName));
@@ -185,11 +183,59 @@ void SceneHierarchy::Show() {
             ImGui::Separator();
 
             ImGui::Image(ImTextureID(entity->renderable.GetTexture()), ImVec2(256, 256));
-
-            ImGui::TreePop();
         }
+        ImGui::End();
     }
-    ImGui::End();
+
+void SceneHierarchy::DisplayEntityNode(Entity* entity, int index) {
+    std::string nodeLabel = entity->name.empty() ? "Unnamed Entity" : entity->name;
+    nodeLabel += "##" + std::to_string(reinterpret_cast<uintptr_t>(entity));
+
+    if (ImGui::TreeNode(nodeLabel.c_str())) {
+        if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {// Right-click to open entity context menu
+            ImGui::OpenPopup(("EntityRMBContextMenu##" + std::to_string(index)).c_str());
+        }
+
+        // Entity right mouse button context menu
+        if (ImGui::BeginPopup(("EntityRMBContextMenu##" + std::to_string(index)).c_str())) {
+            if (ImGui::MenuItem("Create Child Entity")) {
+                isCreatingEntityChild = true;
+            }
+            ImGui::EndPopup();
+        }
+
+        if (isCreatingEntityChild) { ImGui::OpenPopup(("Create Child##" + std::to_string(index)).c_str()); }
+
+        if (ImGui::BeginPopupModal(("Create Child##" + std::to_string(index)).c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::InputText("Name", newName, IM_ARRAYSIZE(newName));
+
+            if (ImGui::Button("Cancel")) {
+                memset(newName, 0, sizeof(newName));
+                isCreatingEntity = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Create")) {
+                CreateEntity(newName, entity);
+                memset(newName, 0, sizeof(newName));
+                isCreatingEntity = false;
+                ImGui::CloseCurrentPopup();
+            }
+
+            if (strlen(newName) == 0) {
+                ImGui::TextColored(ImVec4(0.90f, 0.49f, 0.50f, 1.0f),
+                                   "Invalid name! Name cannot be empty.");
+            }
+
+            ImGui::EndPopup();
+        }
+
+        for (size_t i = 0; i < entity->children.size(); ++i) {
+            DisplayEntityNode(entity->children[i].get(), i);
+        }
+
+        ImGui::TreePop();
+    }
 }
 
 void SceneHierarchy::CreateEntity(const std::string &name, Entity *parentEntity) {
@@ -199,13 +245,12 @@ void SceneHierarchy::CreateEntity(const std::string &name, Entity *parentEntity)
     auto currentScene = app.sceneManager.GetCurrentScene();
 
     if (!name.empty()) {
-        Transform transform;
-        std::shared_ptr<Entity> entity = std::make_shared<Entity>(name, EntityFlags::RENDERABLE, transform);
+        auto newEntity = std::make_unique<Entity>(name, EntityFlags::NONE, Transform());
 
         if (parentEntity) {
-            parentEntity->addChild(*entity);
+            parentEntity->AddChild(std::move(newEntity));
         } else {
-            currentScene->AddEntity(entity);
+            Application::GetInstance().sceneManager.GetCurrentScene()->AddEntity(std::move(newEntity));
         }
     }
 }

@@ -120,7 +120,6 @@ void Marmalade::GUI::TopBar::Show() {
                 ImGui::Text("Invalid scene name.");
             }
         }
-
         ImGui::EndPopup();
     }
 

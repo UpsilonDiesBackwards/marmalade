@@ -7,6 +7,7 @@ class SceneHierarchy {
 public:
     void Show();
 private:
+    void DisplayEntityNode(Entity* entity, int index);
     void CreateEntity(const std::string &name, Entity *parent = nullptr);
 };
 
