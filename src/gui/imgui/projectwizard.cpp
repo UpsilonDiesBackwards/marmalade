@@ -204,7 +204,7 @@ void Marmalade::GUI::ProjectWizard::SetGitRemoteURL(GitSettings git) {
     git_libgit2_init();
 
     int error;
-    error = git_repository_open(&git.repo, repoFilePath.c_str()); // Open the git repository
+    error = git_repository_open(&git.repo, repoFilePath.string().c_str()); // Open the git repository
     if (error != 0) {
         spdlog::error("Failed to open repository: {}", git_error_last()->message);
     }
