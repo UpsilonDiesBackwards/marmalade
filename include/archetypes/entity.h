@@ -48,6 +48,8 @@ public:
     void UpdateModelMatrix();
 
     void AddChild(std::unique_ptr<Entity> child);
+    void RemoveChild(Entity* child);
+
     bool HasParent() const;
     void SetParent(Entity* newParent);
 

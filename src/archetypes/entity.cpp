@@ -71,6 +71,17 @@ void Entity::AddChild(std::unique_ptr<Entity> child) {
     spdlog::info("child: {}", this->children[0]->name);
 }
 
+void Entity::RemoveChild(Entity* target) {
+    auto i = std::remove_if(children.begin(), children.end(),
+                            [target](const std::unique_ptr<Entity>& child) {
+                                return child.get() == target;
+                            });
+
+    if (i != children.end()) {
+        children.erase(i, children.end());
+    }
+}
+
 bool Entity::HasParent() const {
     return parent != nullptr;
 }

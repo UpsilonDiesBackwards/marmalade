@@ -190,8 +190,7 @@ void SceneHierarchy::showDeletePopup() {
         ImGui::SameLine();
         if (ImGui::Button("Confirm")) {
             if (_selected->parent) {
-                // If child entity
-                // TODO: Delete from parent
+                _selected->parent->RemoveChild(_selected);
             } else {
                 Application::GetInstance().sceneManager.GetCurrentScene()->RemoveEntity(_selected);
             }
