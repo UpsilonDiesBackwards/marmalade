@@ -56,6 +56,7 @@ void Marmalade::Config::LoadEngineConfig() {
     if (i.fail()) {
         // File doesn't exist
         engineConfig = {};
+        engineConfig.Repos.push_back(Repository{"default", "https://github.com/UpsilonDiesBackwards/marmalade-pkgs.git", 1});
         SaveEngineConfig();
         return;
     }
@@ -68,6 +69,6 @@ void Marmalade::Config::LoadEngineConfig() {
 void Marmalade::Config::SaveEngineConfig() {
     std::ofstream o(_configDir / "settings.json");
     nlohmann::json new_config = engineConfig;
-    o << new_config;
+    o << new_config.dump(2);
     o.close();
 }

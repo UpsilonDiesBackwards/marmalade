@@ -88,6 +88,7 @@ list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
         src/gui/imgui/settings.h
         src/gui/imgui/details.cpp
         src/gui/imgui/details.h
+        src/gui/components/tableview.h
 )
 
 list(APPEND ENGINE_SRC src/application/application.cpp src/application/application.h src/application/profiler.cpp src/application/profiler.h

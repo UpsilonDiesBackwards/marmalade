@@ -3,6 +3,7 @@
 
 #include "../window.h"
 #include "../../application/config.h"
+#include "../components/tableview.h"
 
 #include <string>
 #include <mutex>
@@ -10,6 +11,8 @@
 #include <atomic>
 #include <vector>
 #include <unordered_map>
+
+#include <nlohmann/json.hpp>
 
 namespace Marmalade::GUI {
 
@@ -19,30 +22,42 @@ namespace Marmalade::GUI {
         PackageManagerTab_AVAILABLE
     };
 
+    class RepositoriesTableView : public Components::TableView<Repository> {
+    public:
+        RepositoriesTableView() : TableView<Repository>(Config::engineConfig.Repos, {Components::TableViewColumn("Name"), Components::TableViewColumn("URL")},
+                                                        "PackageManagerRepositoryTable", "Edit Repository", "Remove Repository") {};
+
+        std::vector<std::string> RenderItem(const Repository& item) override;
+
+        void PrepareEdit(const Repository& item) override;
+        bool DrawEditDialog(Repository* item) override;
+        void ResetEdit() override;
+
+        RemoveDialogResult DrawRemoveDialog(Repository* item) override;
+
+    private:
+        char _tempName[256]{0};
+        char _tempGitUrl[256]{0};
+        int _tempDepth{0};
+    };
+
     class PackageManagerOptions : public Window {
     public:
         void Draw() override;
     private:
-        int _selectedRow{-1};
-        bool _isEditing{false};
-
-        Marmalade::Repository* _currentRepo{nullptr};
-        char _tempName[256] = {0};
-        char _tempGitUrl[256] = {0};
-        int _tempDepth{0};
+        RepositoriesTableView _tableView{};
     };
 
     class PackageManager : public Window {
     public:
-
         struct Package {
             std::string Name{};
             std::string Repo{};
-            std::vector<std::string> Author{};
+            std::vector<std::string> Authors{};
             std::vector<std::string> Keywords{};
 
             Package() = default;
-            Package(std::string name, std::string repo, std::vector<std::string> author, const std::vector<std::string>& keywords) : Name(std::move(name)), Repo(std::move(repo)), Author(std::move(author)), Keywords(keywords) {}
+            Package(std::string name, std::string repo, std::vector<std::string> authors, const std::vector<std::string>& keywords) : Name(std::move(name)), Repo(std::move(repo)), Authors(std::move(authors)), Keywords(keywords) {}
         };
 
         void Draw() override;
@@ -72,11 +87,13 @@ namespace Marmalade::GUI {
 
         void handleGitError(const std::string& operation);
         void updateLocalDatabase();
-        bool cloneRepo(const Marmalade::Repository &config_repo);
-        bool pullRepo(const Marmalade::Repository &config_repo);
-        void buildIndex(const Marmalade::Repository &config_repo);
+        bool cloneRepo(const Marmalade::Repository& config_repo);
+        bool pullRepo(const Marmalade::Repository& config_repo);
+        void buildIndex(const Marmalade::Repository& config_repo);
         void deleteLocalDatabase();
     };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::GUI::PackageManager::Package, Name, Repo, Authors, Keywords);
 }
 
 

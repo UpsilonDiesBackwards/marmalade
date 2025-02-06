@@ -14,114 +14,87 @@
 
 #include <spdlog/spdlog.h>
 
-#include <nlohmann/json.hpp>
-
 #define LOCAL_REPO_PATH "local-repo"
 #define INDEX_FILENAME "index.json"
 
 using namespace Marmalade::GUI;
 
-void PackageManagerOptions::Draw() {
-    ImGui::Begin(ICON_CI_SETTINGS_GEAR " Package Manager Settings", &visible);
+#pragma region Table view
 
-    if (ImGui::Button("Add")) {
-        _isEditing = true;
-        _currentRepo = nullptr;
+std::vector<std::string> RepositoriesTableView::RenderItem(const Marmalade::Repository& item) {
+    return {item.Name, item.GitUrl};
+}
+
+void RepositoriesTableView::PrepareEdit(const Marmalade::Repository& item) {
+    std::strncpy(_tempName, item.Name.c_str(), sizeof(_tempName) - 1);
+    std::strncpy(_tempGitUrl, item.GitUrl.c_str(), sizeof(_tempGitUrl) - 1);
+    _tempDepth = item.Depth;
+}
+
+bool RepositoriesTableView::DrawEditDialog(Marmalade::Repository* item) {
+    ImGui::InputText("Name", _tempName, 256);
+    ImGui::InputText("Git URL", _tempGitUrl, 256);
+    ImGui::InputInt("Depth", &_tempDepth);
+
+    if (ImGui::Button("Cancel")) {
+        return true;
     }
 
     ImGui::SameLine();
-    auto cursor_pos = ImGui::GetCursorPos();
-    ImGui::NewLine();
 
-    if (ImGui::BeginTable("PackageManagerReposTable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
-        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
-        ImGui::TableSetupColumn("URL", ImGuiTableColumnFlags_WidthStretch);
-
-        ImGui::TableHeadersRow();
-
-        int i = 0;
-        for (const auto& repo: Marmalade::Config::engineConfig.Repos) {
-            ImGui::TableNextRow();
-            ImGui::TableNextColumn();
-            bool is_selected = (_selectedRow == i);
-            if (ImGui::Selectable(repo.Name.c_str(), is_selected, ImGuiSelectableFlags_SpanAllColumns)) {
-                _selectedRow = (is_selected ? -1 : i);
-            }
-            ImGui::TableNextColumn();
-            ImGui::Text("%s", repo.GitUrl.c_str());
-
-            i++;
+    if (ImGui::Button("Save")) {
+        if (item == nullptr) {
+            // Create
+            items.push_back(Repository{_tempName, _tempGitUrl, _tempDepth});
+        } else {
+            item->Name = _tempName;
+            item->GitUrl = _tempGitUrl;
+            item->Depth = _tempDepth;
         }
 
-        ImGui::EndTable();
+        Marmalade::Config::SaveEngineConfig();
+
+        return true;
     }
 
-    if (_selectedRow > -1) {
-        Marmalade::Repository& sel_item = Marmalade::Config::engineConfig.Repos[_selectedRow];
+    return false;
+}
 
-        ImGui::SetCursorPos(cursor_pos);
+void RepositoriesTableView::ResetEdit() {
+    memset(_tempName, 0, 256);
+    memset(_tempGitUrl, 0, 256);
+    _tempDepth = 0;
+}
 
-        if (ImGui::Button("Edit")) {
-            _isEditing = true;
-            _currentRepo = &sel_item;
-            std::strncpy(_tempName, _currentRepo->Name.c_str(), sizeof(_tempName) - 1);
-            std::strncpy(_tempGitUrl, _currentRepo->GitUrl.c_str(), sizeof(_tempGitUrl) - 1);
-            _tempDepth = _currentRepo->Depth;
-        }
-        ImGui::SameLine();
+Components::TableView<Marmalade::Repository, std::vector<Marmalade::Repository>, void>::RemoveDialogResult RepositoriesTableView::DrawRemoveDialog(Marmalade::Repository* item) {
+    ImGui::Text("Are you sure you want to delete %s", item->Name.c_str());
 
-        if (ImGui::Button("Remove")) {
-            Config::engineConfig.Repos.erase(std::remove_if(Config::engineConfig.Repos.begin(), Config::engineConfig.Repos.end(),
-                                                            [&sel_item](const Repository& repo) {
-                                                                return sel_item.Name == repo.Name;
-                                                            }),
-                                             Config::engineConfig.Repos.end());
-            Config::SaveEngineConfig();
-            _selectedRow = -1;
-        }
+    if (ImGui::Button("Yes")) {
+        items.erase(std::remove_if(items.begin(), items.end(),
+                                   [&item](const Repository& repo) {
+                                       return item->Name == repo.Name;
+                                   }),
+                    items.end());
+        Config::SaveEngineConfig();
+
+        return RemoveDialogResult_REMOVED;
     }
 
-    if (_isEditing) {
-        ImGui::OpenPopup("Edit Repository##PackageManagerReposEdit");
+    ImGui::SameLine();
+
+    if (ImGui::Button("No")) {
+        return RemoveDialogResult_CANCELLED;
     }
 
-    if (ImGui::BeginPopupModal("Edit Repository##PackageManagerReposEdit")) {
-        bool creating = _currentRepo == nullptr;
+    return RemoveDialogResult_NONE;
+}
 
-        ImGui::InputText("Name", _tempName, 256);
-        ImGui::InputText("Git URL", _tempGitUrl, 256);
-        ImGui::InputInt("Depth", &_tempDepth);
+#pragma endregion
 
-        if (ImGui::Button("Cancel")) {
-            _isEditing = false;
-            memset(_tempName, 0, 256);
-            memset(_tempGitUrl, 0, 256);
-            _tempDepth = 0;
-            ImGui::CloseCurrentPopup();
-        }
+void PackageManagerOptions::Draw() {
+    ImGui::Begin(ICON_CI_SETTINGS_GEAR " Package Manager Settings", &visible);
 
-        ImGui::SameLine();
-
-        if (ImGui::Button("Save")) {
-            _isEditing = false;
-
-            if (creating) {
-                Marmalade::Config::engineConfig.Repos.push_back(Repository{_tempName, _tempGitUrl, _tempDepth});
-            } else {
-                _currentRepo->Name = _tempName;
-                _currentRepo->GitUrl = _tempGitUrl;
-                _currentRepo->Depth = _tempDepth;
-            }
-
-            Marmalade::Config::SaveEngineConfig();
-            memset(_tempName, 0, 256);
-            memset(_tempGitUrl, 0, 256);
-            _tempDepth = 0;
-            ImGui::CloseCurrentPopup();
-        }
-
-        ImGui::EndPopup();
-    }
+    _tableView.Draw();
 
     ImGui::End();
 }
@@ -175,7 +148,7 @@ void PackageManager::drawLeftPane(PackageManagerTab tab) {
         for (const auto& queryKw: queryKeywords) {
             for (const auto& [key, pkgs]: _keywordIndex) {
                 if (key.find(queryKw) != std::string::npos) {
-                    for (const auto &pkg : pkgs) {
+                    for (const auto& pkg: pkgs) {
                         packages[pkg->Name] = *pkg;
                     }
                 }
@@ -190,7 +163,7 @@ void PackageManager::drawLeftPane(PackageManagerTab tab) {
         for (const auto& pkg: packages) {
             ImGui::PushID(pkg.first.c_str());
             ImGui::Text("%s - %s", pkg.first.c_str(), pkg.second.Repo.c_str());
-            ImGui::Text(pkg.second.Author[0].c_str());
+            ImGui::Text(pkg.second.Authors[0].c_str());
             // ImGui::Checkbox();
             ImGui::PopID();
             ImGui::Separator();
@@ -469,7 +442,6 @@ void PackageManager::buildIndex(const Repository& config_repo) {
 
                 if (packageData.contains("name")) {
                     std::string packageName = packageData["name"];
-                    indexJson[packageName] = packageData;
                 }
 
                 Package package{packageData["name"], config_repo.Name, packageData["authors"], packageData["keywords"]};
@@ -485,9 +457,20 @@ void PackageManager::buildIndex(const Repository& config_repo) {
         }
     }
 
+    indexJson["packages"] = _packagesByName;
+    indexJson["index"] = [&]() {
+        std::unordered_map<std::string, std::vector<std::string>> transformed;
+        for (const auto& [key, pkgPtrs]: _keywordIndex) {
+            for (const Package* pkgPtr: pkgPtrs) {
+                if (pkgPtr) transformed[key].push_back(pkgPtr->Name);
+            }
+        }
+        return transformed;
+    }();
+
     // Write index.json
     std::ofstream outFile(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.Name / INDEX_FILENAME);
-    outFile << indexJson.dump(4);
+    outFile << indexJson;
 
     spdlog::info("Index built successfully.");
 }
