@@ -63,7 +63,12 @@ void Entity::UpdateModelMatrix() {
     if (parent) {
         transform.modelMatrix = parent->transform.modelMatrix * transform.modelMatrix;
     }
+
+    for (auto& child : children) {
+        child->UpdateModelMatrix();
+    }
 }
+
 void Entity::AddChild(std::unique_ptr<Entity> child) {
     child->parent = this;
     children.push_back(std::move(child));
