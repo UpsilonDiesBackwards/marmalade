@@ -12,4 +12,8 @@ void Editor::Render() {
     if (showSceneHeirarchy) {
         sceneHierarchy.Show();
     }
+
+    if (showDetails) {
+        details.Show();
+    }
 }
