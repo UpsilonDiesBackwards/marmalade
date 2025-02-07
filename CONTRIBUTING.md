@@ -20,8 +20,6 @@ Please format code in accordance to the .clang-format file at the root of this r
 | Enum Members        | `{enum name}_SCREAMING_SNAKE_CASE` | The enum name is written verbatim. For example: `EnumName_SOME_MEMBER` |
 | Header Guards       | `NAMESPACE_CLASS_H`                | e.g. `Marmalade::GUI::Window` would be `MARMALADE_GUI_WINDOW_H`        |
 
-Templates should use `class` instead of `typename`.
-
 ## Ordering
 
 Fields before methods.

@@ -8,6 +8,10 @@ Marmalade is a modular 2D game engine.
   - Everything is a package
   - No unnecessary code or dependencies
   - Keeps packaged games as small as possible
+- Code generation system
+  - Does not rely on redistributable libraries
+  - Reduces download size for games
+- Entity Component System (ECS)
 
 ## Building
 
