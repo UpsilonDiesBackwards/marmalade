@@ -11,6 +11,14 @@ namespace Marmalade::GUI {
         Entity* inspectedEntity;
 
         void Draw() override;
+    private:
+        Component* _selectedComponent;
+
+        bool _isAddingComponent{false};
+        bool _isRemovingComponent{false};
+
+        void ShowAddPopup();
+        void ShowRemovePopup();
     };
 }
 

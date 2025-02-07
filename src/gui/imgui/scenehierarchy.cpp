@@ -56,7 +56,7 @@ void SceneHierarchy::createEntity(const std::string& name) {
     auto currentScene = app.sceneManager.GetCurrentScene();
 
     if (!name.empty()) {
-        auto newEntity = std::make_unique<Entity>(name, EntityFlags::NONE, Transform());
+        auto newEntity = std::make_unique<Entity>(name, EntityFlags::NONE);
 
         if (_parent) {
             _parent->AddChild(std::move(newEntity));
@@ -65,31 +65,17 @@ void SceneHierarchy::createEntity(const std::string& name) {
         }
     }
 }
+
 void SceneHierarchy::displayEntity(Entity* entity, int index) {
     std::string nodeLabel = entity->name.empty() ? "Unnamed Entity" : entity->name;
     nodeLabel += "##" + std::to_string(index);
+
+    entity->id = index;
 
     if (ImGui::TreeNode(nodeLabel.c_str())) {
         if (ImGui::IsItemHovered()) {
             _selected = entity;
         }
-
-        // Entity Transforms
-        if (ImGui::InputFloat2(("Position##" + std::to_string(index)).c_str(), glm::value_ptr(entity->transform.pos))) {
-            entity->setPosition(glm::vec2(entity->transform.pos[0], entity->transform.pos[1]));
-        }
-        if (ImGui::SliderFloat(("Rotation##" + std::to_string(index)).c_str(), &entity->transform.rotation, 0, 360)) {
-            entity->setRotation((entity->transform.rotation));
-        }
-        if (ImGui::InputFloat2(("Scale##" + std::to_string(index)).c_str(), &entity->transform.scale[0])) {
-            entity->setScale(glm::vec2(entity->transform.scale[0], entity->transform.scale[1]));
-        }
-
-        ImGui::Separator();
-
-        ImGui::Image(ImTextureID(entity->renderable.GetTexture()), ImVec2(256, 256));
-
-        ImGui::Text("Children:");
 
         int i = 0;
         for (auto& entity: entity->children) {

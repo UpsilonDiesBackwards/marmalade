@@ -6,7 +6,12 @@
 #include <vector>
 #include <glm/mat4x4.hpp>
 #include <memory>
+#include <algorithm>
 #include "../../include/graphics/renderable.h"
+
+#include "componentmanager.h"
+#include "../../src/components/transform.h"
+#include "../../src/components/spriterender.h"
 
 enum EntityFlags {
     ACTIVE = 1 << 0,
@@ -16,25 +21,23 @@ enum EntityFlags {
     NONE,
 };
 
-struct Transform {
-    glm::vec2 pos = {0.0f, 0.0f};
-    float rotation = 0.0f;
-    glm::vec2 scale = {1.0f, 1.0f};
-
-    glm::mat4 modelMatrix = glm::mat4(1.0f);
-};
-
 struct Entity {
 public:
+    unsigned int id;
+
     std::string name;
     EntityFlags flags;
     Renderable renderable;
-    Transform transform;
+    ComponentManager componentManager{};
+
+    // Temp
+    std::shared_ptr<Transform> transform = std::make_shared<Transform>();
+    std::shared_ptr<SpriteRender> spriteRender = std::make_shared<SpriteRender>();
 
     Entity* parent{nullptr};
     std::vector<std::unique_ptr<Entity>> children;
 
-    Entity(const std::string& name, EntityFlags flags, Transform transform);
+    Entity(const std::string& name, EntityFlags flags);
 
     glm::vec2 getPosition();
     void setPosition(glm::vec2 newPos);

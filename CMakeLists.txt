@@ -54,6 +54,7 @@ list(APPEND ENGINE_API include/archetypes/camera.h include/archetypes/entity.h
         include/graphics/framebuffer.h include/graphics/multisampledframebuffer.h
         include/io/input.h include/io/inputmanager.h
         include/scene/scene.h include/scene/scenemanager.h
+        include/archetypes/componentmanager.h
 )
 
 list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
@@ -100,6 +101,16 @@ list(APPEND ENGINE_SRC src/application/application.cpp src/application/applicati
         src/application/project.h
         src/application/config.cpp
         src/application/config.h
+        src/archetypes/componentmanager.cpp
+        src/archetypes/component.cpp
+)
+
+list(APPEND ENGINE_SRC
+        src/components/transform.cpp
+        src/components/transform.h
+        src/components/spriterender.cpp
+        src/components/spriterender.h
+
 )
 
 add_executable(marmalade vendor/glad/src/glad.c ${IMGUI_SRC} vendor/imguifiledialog/ImGuiFileDialog.cpp
