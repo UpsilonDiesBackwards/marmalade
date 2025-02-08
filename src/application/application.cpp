@@ -100,7 +100,7 @@ void Application::Initialise() {
     sceneManager.SetCurrentScene("Default");
 
     Transform defaultTransform;
-    Entity *newEntity = new Entity("test entity", EntityFlags::RENDERABLE);
+    Entity *newEntity = new Entity("New Entity", EntityFlags::RENDERABLE);
     sceneManager. GetCurrentScene()->AddEntity(std::shared_ptr<Entity>(newEntity));
 }
 

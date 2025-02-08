@@ -117,8 +117,11 @@ list(APPEND ENGINE_SRC # ECS
 )
 
 list (APPEND ENGINE_SRC # Mathematics
-        src/mathematics/vector2.cpp
-        include/mathematics/vector2.h
+        src/mathematics/mathematics.cpp
+        include/mathematics/mathematics.h
+
+        src/mathematics/types/vector2.cpp
+        include/mathematics/types/vector2.h
 )
 
 add_executable(marmalade vendor/glad/src/glad.c ${IMGUI_SRC} vendor/imguifiledialog/ImGuiFileDialog.cpp
