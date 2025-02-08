@@ -1,5 +1,4 @@
-
-#include "../../include/archetypes/componentmanager.h"
+#include "../../include/ecs/componentmanager.h"
 
 void ComponentManager::AddComponent(std::shared_ptr<Component> component) {
     components.push_back(component);

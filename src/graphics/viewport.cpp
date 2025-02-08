@@ -1,5 +1,5 @@
-#include <glm/ext/matrix_clip_space.hpp>
-#include "../../include/archetypes/camera.h"
+#include "glm/ext/matrix_clip_space.hpp"
+#include "../../include/graphics/viewport.h"
 #include "../application/application.h"
 
 Camera::Camera(float width, float height, float zoom) : position(0.0f, 0.0f), zoom(zoom), width(width), height(height) {

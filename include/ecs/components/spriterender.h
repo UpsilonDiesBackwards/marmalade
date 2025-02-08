@@ -2,7 +2,7 @@
 #ifndef MARMALADE_SPRITERENDER_H
 #define MARMALADE_SPRITERENDER_H
 
-#include "../../include/archetypes/component.h"
+#include "../component.h"
 
 class SpriteRender : public Component {
 public:

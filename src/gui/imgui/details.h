@@ -3,7 +3,7 @@
 #define MARMALADE_DETAILS_H
 
 #include "../window.h"
-#include "../../../include/archetypes/entity.h"
+#include "../../../include/scene/entity.h"
 
 namespace Marmalade::GUI {
     class Details : public Window {

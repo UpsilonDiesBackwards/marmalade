@@ -1,13 +1,9 @@
 
-#include <iostream>
-#include <glm/ext/matrix_transform.hpp>
+#include "glm/ext/matrix_transform.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/string_cast.hpp>
-#include "../../include/archetypes/entity.h"
+#include "../../include/scene/entity.h"
 #include "../../include/graphics/texture.h"
 #include "spdlog/spdlog.h"
-
-#include "../components/transform.h"
 
 Entity::Entity(const std::string &name, EntityFlags flags)
     : name(name), flags(flags), renderable(0,0,0, Texture::LoadTexture("")) {

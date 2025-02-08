@@ -4,7 +4,7 @@
 
 
 #include <memory>
-#include "../../include/archetypes/entity.h"
+#include "entity.h"
 
 class Scene {
 public:

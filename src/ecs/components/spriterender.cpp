@@ -1,7 +1,7 @@
-#include "spriterender.h"
+#include "../../../include/ecs/components/spriterender.h"
 
-#include <imgui.h>
-#include "../../include/archetypes/entity.h"
+#include "imgui.h"
+#include "../../../include/scene/entity.h"
 
 void SpriteRender::Display(Entity* entity) {
     ImGui::Text(name.c_str());

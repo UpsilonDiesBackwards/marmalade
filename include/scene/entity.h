@@ -4,14 +4,13 @@
 
 #include <string>
 #include <vector>
-#include <glm/mat4x4.hpp>
+#include "glm/mat4x4.hpp"
 #include <memory>
 #include <algorithm>
-#include "../../include/graphics/renderable.h"
-
-#include "componentmanager.h"
-#include "../../src/components/transform.h"
-#include "../../src/components/spriterender.h"
+#include "../graphics/renderable.h"
+#include "../ecs/componentmanager.h"
+#include "../ecs/components/transform.h"
+#include "../ecs/components/spriterender.h"
 
 enum EntityFlags {
     ACTIVE = 1 << 0,

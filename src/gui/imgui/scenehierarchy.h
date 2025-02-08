@@ -1,7 +1,7 @@
 #ifndef ENGINE_SCENEHIERARCHY_H
 #define ENGINE_SCENEHIERARCHY_H
 
-#include "../../../include/archetypes/entity.h"
+#include "../../../include/scene/entity.h"
 
 class SceneHierarchy {
 public:

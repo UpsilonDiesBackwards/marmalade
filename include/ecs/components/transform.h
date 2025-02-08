@@ -2,9 +2,10 @@
 #ifndef MARMALADE_TRANSFORM_H
 #define MARMALADE_TRANSFORM_H
 
-#include <glm/vec2.hpp>
-#include <glm/glm.hpp>
-#include "../../include/archetypes/component.h"
+#include "glm/vec2.hpp"
+#include "glm/glm.hpp"
+
+#include "../component.h"
 
 class Transform : public Component {
 public:

@@ -1,9 +1,9 @@
 
-#include <glm/gtc/type_ptr.hpp>
-#include "transform.h"
-#include <imgui.h>
+#include "glm/gtc/type_ptr.hpp"
+#include "../../../include/ecs/components/transform.h"
+#include "imgui.h"
 
-#include "../../include/archetypes/entity.h"
+#include "../../../include/scene/entity.h"
 
 void Transform::Display(Entity* entity) {
         ImGui::Text(name.c_str());

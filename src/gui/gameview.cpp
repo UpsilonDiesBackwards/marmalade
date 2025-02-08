@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 #include "../../include/graphics/shader.h"
 #include "../../include/graphics/renderable.h"
-#include "../../include/archetypes/entity.h"
+#include "../../include/scene/entity.h"
 #include "../application/application.h"
 
 /*

@@ -2,7 +2,7 @@
 #define ENGINE_APPLICATION_H
 
 #include "GLFW/glfw3.h"
-#include "../../include/archetypes/entity.h"
+#include "../../include/scene/entity.h"
 #include "../../include/graphics/multisampledframebuffer.h"
 #include "../gui/gameview.h"
 #include "../gui/stylemanager.h"
@@ -11,7 +11,7 @@
 #include "../../include/io/inputmanager.h"
 #include "../../include//io/input.h"
 #include "profiler.h"
-#include "../../include/archetypes/camera.h"
+#include "../../include/graphics/viewport.h"
 #include "../gui/editorviews.h"
 #include "../../include/scene/scenemanager.h"
 #include "../gui/imgui/editor.h"

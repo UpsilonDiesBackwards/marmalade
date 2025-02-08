@@ -49,14 +49,15 @@ endif ()
 file(GLOB IMGUI_SRC "vendor/imgui/*.h" "vendor/imgui/*.cpp")
 list(APPEND IMGUI_SRC vendor/imgui/backends/imgui_impl_glfw.h vendor/imgui/backends/imgui_impl_glfw.cpp vendor/imgui/backends/imgui_impl_opengl3.h vendor/imgui/backends/imgui_impl_opengl3.cpp)
 
-list(APPEND ENGINE_API include/archetypes/camera.h include/archetypes/entity.h
+# Engine API
+list(APPEND ENGINE_API include/graphics/viewport.h include/scene/entity.h
         include/graphics/renderable.h include/graphics/shader.h include/graphics/texture.h
         include/graphics/framebuffer.h include/graphics/multisampledframebuffer.h
         include/io/input.h include/io/inputmanager.h
         include/scene/scene.h include/scene/scenemanager.h
-        include/archetypes/componentmanager.h
 )
 
+# ImGui GUI
 list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
         src/gui/imgui/editor.h
         src/gui/imgui/editorviews.cpp
@@ -92,8 +93,9 @@ list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
         src/gui/components/tableview.h
 )
 
+# Application
 list(APPEND ENGINE_SRC src/application/application.cpp src/application/application.h src/application/profiler.cpp src/application/profiler.h
-        src/archetypes/camera.cpp src/archetypes/entity.cpp
+        src/graphics/viewport.cpp src/scene/entity.cpp
         src/graphics/renderable.cpp src/graphics/shader.cpp src/graphics/texture.cpp src/graphics/framebuffer.cpp
         src/io/input.cpp src/io/inputmanager.cpp
         src/scene/scene.cpp src/scene/scenemanager.cpp
@@ -101,16 +103,22 @@ list(APPEND ENGINE_SRC src/application/application.cpp src/application/applicati
         src/application/project.h
         src/application/config.cpp
         src/application/config.h
-        src/archetypes/componentmanager.cpp
-        src/archetypes/component.cpp
 )
 
-list(APPEND ENGINE_SRC
-        src/components/transform.cpp
-        src/components/transform.h
-        src/components/spriterender.cpp
-        src/components/spriterender.h
+list(APPEND ENGINE_SRC # ECS
+        src/ecs/componentmanager.cpp
+        include/ecs/componentmanager.h
+        src/ecs/component.cpp
+        src/ecs/components/transform.cpp
+        include/ecs/components/transform.h
+        src/ecs/components/spriterender.cpp
+        include/ecs/components/spriterender.h
 
+)
+
+list (APPEND ENGINE_SRC # Mathematics
+        src/mathematics/vector2.cpp
+        include/mathematics/vector2.h
 )
 
 add_executable(marmalade vendor/glad/src/glad.c ${IMGUI_SRC} vendor/imguifiledialog/ImGuiFileDialog.cpp
@@ -134,4 +142,6 @@ if (WIN32)
 endif ()
 
 target_include_directories(marmalade PRIVATE vendor/glad/include vendor/glfw-3.4/include vendor/imgui vendor/imguifiledialog glm ${LUA_INCLUDE_DIR} vendor/luaaa vendor/stb vendor/libgit2/include vendor/iconfontcppheaders vendor/spdlog/include)
+target_include_directories(marmalade PRIVATE include)
+
 target_link_directories(marmalade PRIVATE vendor/nativefiledialog/lib vendor/luaaa)
