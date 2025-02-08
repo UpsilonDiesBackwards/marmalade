@@ -22,6 +22,4 @@ public:
     REGISTER_COMPONENT(Transform)
 };
 
-bool Transform::_registered = Transform::Register();
-
 #endif//MARMALADE_TRANSFORM_H

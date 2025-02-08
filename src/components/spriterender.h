@@ -10,6 +10,8 @@ public:
     void Apply(Entity* entity) override;
 
     SpriteRender() { name = "Sprite Render"; }
+
+    REGISTER_COMPONENT(SpriteRender)
 };
 
 

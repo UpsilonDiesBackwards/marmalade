@@ -26,7 +26,7 @@ void Entity::Render() {
     }
 
     if (RENDERABLE) {
-        renderable.Draw(transform.modelMatrix);
+        renderable.Draw(transform->modelMatrix);
     }
 
     for (auto &child : children) {

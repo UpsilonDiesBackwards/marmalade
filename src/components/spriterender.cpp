@@ -13,3 +13,5 @@ void SpriteRender::Display(Entity* entity) {
 void SpriteRender::Apply(Entity* entity) {
 
 }
+
+bool SpriteRender::_registered = SpriteRender::Register();

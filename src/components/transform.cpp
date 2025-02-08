@@ -22,3 +22,5 @@ void Transform::Display(Entity* entity) {
 
 void Transform::Apply(Entity* entity) {
 }
+
+bool Transform::_registered = Transform::Register();
