@@ -55,6 +55,8 @@ list(APPEND ENGINE_API include/graphics/viewport.h include/scene/entity.h
         include/graphics/framebuffer.h include/graphics/multisampledframebuffer.h
         include/io/input.h include/io/inputmanager.h
         include/scene/scene.h include/scene/scenemanager.h
+        include/graphics/lighting/light.h
+
 )
 
 # ImGui GUI
@@ -107,6 +109,7 @@ list(APPEND ENGINE_SRC src/application/application.cpp src/application/applicati
         src/application/config.h
         src/application/projectsettings.cpp
         src/application/projectsettings.h
+        src/graphics/lighting/light.cpp
 )
 
 list(APPEND ENGINE_SRC # ECS
