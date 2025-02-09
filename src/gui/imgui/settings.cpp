@@ -1,38 +1,85 @@
 #include "settings.h"
 
-#include "../../application/config.h"
+#include "../src/application/application.h"
 
 #include <imgui.h>
-
+#include <imgui_internal.h>
 #include <IconsCodicons.h>
 
-#include <spdlog/spdlog.h>
+void Marmalade::GUI::ProjectSettings::Draw() {
+    Application& app = Application::GetInstance();
+    auto currentProject = app.GetCurrentProject();
 
-void Marmalade::GUI::Settings::Draw() {
-    ImGui::Begin(ICON_CI_SETTINGS_GEAR " Settings", &visible);
+    ImGui::SetNextWindowSize(ImVec2(1080, 720), ImGuiCond_FirstUseEver);
+    ImGui::Begin(ICON_CI_SETTINGS " Project Settings", &visible, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
 
-    ImGui::Checkbox("ImGui Viewports", &Marmalade::Config::engineConfig.Viewports);
-    ImGui::SameLine();
-    requiresRestartWarning();
+    if (app.GetCurrentProject() == nullptr) {
+        spdlog::error("Can not open project settings! A project is not currently opened.");
+        return;
+    };
 
-    ImGui::Combo("Log Level", reinterpret_cast<int*>(&Config::engineConfig.LogLevel), getLogLevels, nullptr, spdlog::level::n_levels);
-    ImGui::SameLine();
-    requiresRestartWarning();
+    if (ImGui::BeginTabBar("ProjectSettingsTabs")) {
+        if (ImGui::BeginTabItem("Project")) {
+            drawProjectSettings();
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Build")) {
+            drawBuildSettings();
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Debug")) {
+            drawDebugSettings();
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
+    }
 
     if (ImGui::Button("Save")) {
-        Marmalade::Config::SaveEngineConfig();
+        currentProject->settings.SaveProjectSettings();
     }
 
     ImGui::End();
 }
 
-void Marmalade::GUI::Settings::requiresRestartWarning() {
-    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), ICON_CI_WARNING " Requires restart");
+void Marmalade::GUI::ProjectSettings::drawProjectSettings() {
+    Application& app = Application::GetInstance();
+    auto currentProject = app.GetCurrentProject();
+
+    char projectNameC[64];
+    std::strcpy(projectNameC, currentProject->settings.projectSettings.ProductName.c_str());
+
+    char companyNameC[64];
+    std::strcpy(companyNameC, currentProject->settings.projectSettings.CompanyName.c_str());
+
+    char projectDescriptionC[1024];
+    std::strcpy(projectDescriptionC, currentProject->settings.projectSettings.Description.c_str());
+
+    char projectVersionC[32];
+    std::strcpy(projectVersionC, currentProject->settings.projectSettings.Version.c_str());
+
+    if (ImGui::InputText("Project Name", projectNameC, IM_ARRAYSIZE(projectNameC))) {
+        currentProject->settings.projectSettings.ProductName = projectNameC;
+    }
+
+    if (ImGui::InputText("Company Name", companyNameC, IM_ARRAYSIZE(companyNameC))) {
+        currentProject->settings.projectSettings.CompanyName = companyNameC;
+    }
+
+    if (ImGui::InputText("Description", projectDescriptionC, IM_ARRAYSIZE(projectDescriptionC))) {
+        currentProject->settings.projectSettings.Description = projectDescriptionC;
+    }
+
+    if (ImGui::InputText("Version", projectVersionC, IM_ARRAYSIZE(projectVersionC))) {
+        currentProject->settings.projectSettings.Version = projectVersionC;
+    }
 }
 
-bool Marmalade::GUI::Settings::getLogLevels(void* data, int idx, const char** outText) {
-    static const char* levels[] = {"Trace", "Debug", "Info", "Warning", "Error", "Critical", "Off"};
-    if (idx < 0 || idx >= spdlog::level::n_levels) return false;
-    *outText = levels[idx];
-    return true;
+void Marmalade::GUI::ProjectSettings::drawBuildSettings() {
+    ImGui::Text("Build settings");
+}
+
+void Marmalade::GUI::ProjectSettings::drawDebugSettings() {
+    ImGui::Text("Debug settings");
 }

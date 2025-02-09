@@ -5,15 +5,19 @@
 #include <string>
 #include "../../include/scene/scenemanager.h"
 #include "../gui/imgui/projectwizard.h"
+#include "projectsettings.h"
 
 class Project {
 public:
     std::string name;
     std::string filePath; // Where the project is stored / the working directory
 
+    Settings settings;
     GitSettings gitSettings;
 
-    Project(std::string name, std::string filePath, GitSettings gitSettings);
+    bool loadingProject = false;
+
+    Project(std::string name, std::string filePath, GitSettings gitSettings, bool loadingProject);
 
 private:
     std::vector<std::string> baseDirectories = { // Directories auto-created when the project is made

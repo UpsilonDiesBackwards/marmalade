@@ -204,7 +204,7 @@ void Application::SetupLogger() {
     spdlog::set_level(Marmalade::Config::engineConfig.LogLevel);
 }
 
-void Application::SetCurrentProject(std::unique_ptr<Project> project) { // Change the current projects and update the window title to inc project name
+void Application::SetCurrentProject(std::unique_ptr<Project>& project) { // Change the current projects and update the window title to inc project name
     currentProject = std::move(project);
 
     std::string windowTitle = std::string(title) + " // " + currentProject->name;

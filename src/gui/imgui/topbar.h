@@ -6,7 +6,7 @@
 #include "log.h"
 #include "projectwizard.h"
 #include "preferences.h"
-#include "projectsettings.h"
+#include "settings.h"
 
 #include <vector>
 

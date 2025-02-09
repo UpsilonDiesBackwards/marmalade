@@ -91,8 +91,8 @@ list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
         src/gui/imgui/details.cpp
         src/gui/imgui/details.h
         src/gui/components/tableview.h
-        src/gui/imgui/projectsettings.cpp
-        src/gui/imgui/projectsettings.h
+        src/gui/imgui/settings.cpp
+        src/gui/imgui/settings.h
 )
 
 # Application
@@ -105,8 +105,8 @@ list(APPEND ENGINE_SRC src/application/application.cpp src/application/applicati
         src/application/project.h
         src/application/config.cpp
         src/application/config.h
-        src/application/settings.cpp
-        src/application/settings.h
+        src/application/projectsettings.cpp
+        src/application/projectsettings.h
 )
 
 list(APPEND ENGINE_SRC # ECS

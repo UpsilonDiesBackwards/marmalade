@@ -133,8 +133,10 @@ void Marmalade::GUI::ProjectWizard::CreateProject() {
     if (std::filesystem::create_directory(projectPath)) { // Create the project directory
         spdlog::info("Creating project: {}. Using Git: {}", projectName, gitSettings.initGitRepository);
 
+        auto project = std::make_unique<Project>(projectName, projectPath.string(), gitSettings, false);
+
         // Create the project and set it to the current project
-        Application::GetInstance().SetCurrentProject(std::make_unique<Project>(projectName, projectPath.string(), gitSettings));
+        Application::GetInstance().SetCurrentProject(project);
 
         if (gitSettings.initGitRepository) { // If desired then initialise a git repo at the project directory
             InitialiseGitRepository(projectPath.string().c_str());

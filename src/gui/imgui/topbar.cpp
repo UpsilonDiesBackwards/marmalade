@@ -1,5 +1,6 @@
 #include "topbar.h"
 #include "../../application/application.h"
+#include "ImGuiFileDialog.h"
 
 #include <imgui.h>
 
@@ -17,6 +18,9 @@ void Marmalade::GUI::TopBar::Show() {
                 projectWizard.ToggleWindow();
             }
             if (ImGui::MenuItem(ICON_CI_FOLDER_OPENED " Open Project")) {
+                IGFD::FileDialogConfig config;
+                config.path = Config::engineConfig.defaultProjectPath;
+                ImGuiFileDialog::Instance()->OpenDialog("ChooseProject", "Choose Project Directory", nullptr, config);
             }
             if (ImGui::MenuItem(ICON_CI_SCREEN_FULL " New Scene")) {
                 showSceneCreationPopUp = true;
@@ -71,6 +75,35 @@ void Marmalade::GUI::TopBar::Show() {
 
         ImGui::Text("FPS: %d | (%.2f ms)", Application::GetInstance().profiler.GetCurrentFPS(),
                     Application::GetInstance().profiler.GetCurrentFrameTime());
+
+        if (ImGuiFileDialog::Instance()->Display("ChooseProject")) {
+            static std::string selectedProject = "";
+
+            if (ImGuiFileDialog::Instance()->IsOk()) {
+                selectedProject  = ImGuiFileDialog::Instance()->GetCurrentPath();
+                std::filesystem::path projectPath = selectedProject;
+
+                if (std::filesystem::is_directory(projectPath)) {
+                    std::filesystem::path settingsFile = projectPath / "settings.marm"; // this should be changed to project.marmalade
+                    spdlog::info("settings path: {}", settingsFile.string());
+
+                    if (std::filesystem::exists(settingsFile)) {
+                        GitSettings gitSettings;
+
+                        auto project = std::make_unique<Project>(selectedProject, projectPath.string(), gitSettings, true);
+
+                        Application::GetInstance().SetCurrentProject(project);
+
+                        Settings::LoadProjectSettings();
+                    } else {
+                        spdlog::error("Project Settings file not found");
+                    }
+                } else {
+                    spdlog::error("Provided path is not a valid project directory");
+                }
+            }
+            ImGuiFileDialog::Instance()->Close();
+        }
 
         ImGui::EndMainMenuBar();
     }

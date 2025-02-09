@@ -70,7 +70,7 @@ public:
 
     std::shared_ptr<GuiLogSink> guiSink;
 
-    void SetCurrentProject(std::unique_ptr<Project> project);
+    void SetCurrentProject(std::unique_ptr<Project>& project);
     Project* GetCurrentProject();
 private:
     Application(int width, int height, const char* title);

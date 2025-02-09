@@ -5,7 +5,9 @@
 #include "project.h"
 #include "glm/gtx/pca.inl"
 
-Project::Project(std::string name, std::string filePath, GitSettings gitSettings) : name(name), filePath(filePath), gitSettings(gitSettings) {
+Project::Project(std::string name, std::string filePath, GitSettings gitSettings, bool loadingProject) : name(name), filePath(filePath), gitSettings(gitSettings) {
+    if (loadingProject) { return; }
+
     CreateProjectDirectories(gitSettings);
 }
 

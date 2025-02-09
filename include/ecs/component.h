@@ -2,7 +2,7 @@
 #ifndef MARMALADE_COMPONENT_H
 #define MARMALADE_COMPONENT_H
 
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
 
 #include <typeindex>
 

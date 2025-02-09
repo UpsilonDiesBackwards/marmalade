@@ -1,17 +1,19 @@
-#ifndef MARMALADE_GUI_SETTINGS_H
-#define MARMALADE_GUI_SETTINGS_H
+#ifndef MARMALADE_SETTINGS_H
+#define MARMALADE_SETTINGS_H
 
 #include "../window.h"
+#include <string>
 
 namespace Marmalade::GUI {
-    class Settings : public Window {
+    class ProjectSettings : public Window {
     public:
         void Draw() override;
     private:
-        void requiresRestartWarning();
-        static bool getLogLevels(void* data, int idx, const char** outText);
+        void drawProjectSettings();
+        void drawBuildSettings();
+        void drawDebugSettings();
     };
 }
 
 
-#endif
+#endif//MARMALADE_SETTINGS_H
