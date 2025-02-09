@@ -124,8 +124,13 @@ list (APPEND ENGINE_SRC # Mathematics
         include/mathematics/types/vector2.h
         src/mathematics/types/vector3.cpp
         include/mathematics/types/vector3.h
-        include/mathematics/types/vector4.cpp
+        src/mathematics/types/vector4.cpp
         include/mathematics/types/vector4.h
+        src/mathematics/types/matrix2x2.cpp
+        include/mathematics/types/matrix2x2.h
+
+        src/mathematics/functions/sqrt.cpp
+        include/mathematics/functions/sqrt.h
 )
 
 add_executable(marmalade vendor/glad/src/glad.c ${IMGUI_SRC} vendor/imguifiledialog/ImGuiFileDialog.cpp

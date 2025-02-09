@@ -6,10 +6,9 @@
 #include "types/vector3.h"
 #include "types/vector4.h"
 
-namespace Marmalade::Mathematics {
-       class Mathematics {
-       };
-}
+#include "types/matrix2x2.h"
+
+#include "functions/sqrt.h"
 
 
 #endif//MARMALADE_MATHEMATICS_H
