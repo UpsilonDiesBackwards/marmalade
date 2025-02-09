@@ -5,7 +5,8 @@
 #include "packagemanager.h"
 #include "log.h"
 #include "projectwizard.h"
-#include "settings.h"
+#include "preferences.h"
+#include "projectsettings.h"
 
 #include <vector>
 
@@ -17,6 +18,7 @@ namespace Marmalade::GUI {
             windows.push_back(&packageManager);
             windows.push_back(&log);
             windows.push_back(&projectWizard);
+            windows.push_back(&preferences);
             windows.push_back(&settings);
         }
 
@@ -26,7 +28,8 @@ namespace Marmalade::GUI {
         Marmalade::GUI::PackageManager packageManager{};
         Marmalade::GUI::Log log{true};
         Marmalade::GUI::ProjectWizard projectWizard{};
-        Marmalade::GUI::Settings settings{};
+        Marmalade::GUI::Preferences preferences{};
+        Marmalade::GUI::ProjectSettings settings{};
 
         bool showDebugWindow = false;
 

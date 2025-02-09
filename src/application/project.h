@@ -19,6 +19,7 @@ private:
     std::vector<std::string> baseDirectories = { // Directories auto-created when the project is made
             "assets",
             "packages",
+            "logs"
     };
 
     std::vector<std::string> baseFiles = { // Files auto-created when the project is made

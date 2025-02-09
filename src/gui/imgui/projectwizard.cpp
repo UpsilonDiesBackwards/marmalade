@@ -55,8 +55,8 @@ void Marmalade::GUI::ProjectWizard::Draw() {
 
     if (ImGui::Button(ICON_CI_FOLDER)) { // Create the ImGui File Dialog config and open it
         IGFD::FileDialogConfig config;
-        config.path = ".";
-        ImGuiFileDialog::Instance()->OpenDialog("ChooseProjectPath", "Choose Project Directory", nullptr);
+        config.path = Config::engineConfig.defaultProjectPath;
+        ImGuiFileDialog::Instance()->OpenDialog("ChooseProjectPath", "Choose Project Directory", nullptr, config);
     }
 
     if (ImGuiFileDialog::Instance()->Display("ChooseProjectPath")) { // Display the file dialogue

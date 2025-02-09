@@ -4,6 +4,7 @@
 #include <fstream>
 #include "project.h"
 #include "glm/gtx/pca.inl"
+
 Project::Project(std::string name, std::string filePath, GitSettings gitSettings) : name(name), filePath(filePath), gitSettings(gitSettings) {
     CreateProjectDirectories(gitSettings);
 }

@@ -86,11 +86,13 @@ list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
         src/gui/window.h
         src/gui/imgui/projectwizard.cpp
         src/gui/imgui/projectwizard.h
-        src/gui/imgui/settings.cpp
-        src/gui/imgui/settings.h
+        src/gui/imgui/preferences.cpp
+        src/gui/imgui/preferences.h
         src/gui/imgui/details.cpp
         src/gui/imgui/details.h
         src/gui/components/tableview.h
+        src/gui/imgui/projectsettings.cpp
+        src/gui/imgui/projectsettings.h
 )
 
 # Application
@@ -103,6 +105,8 @@ list(APPEND ENGINE_SRC src/application/application.cpp src/application/applicati
         src/application/project.h
         src/application/config.cpp
         src/application/config.h
+        src/application/settings.cpp
+        src/application/settings.h
 )
 
 list(APPEND ENGINE_SRC # ECS
@@ -113,7 +117,6 @@ list(APPEND ENGINE_SRC # ECS
         include/ecs/components/transform.h
         src/ecs/components/spriterender.cpp
         include/ecs/components/spriterender.h
-
 )
 
 list (APPEND ENGINE_SRC # Mathematics

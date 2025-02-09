@@ -34,8 +34,9 @@ void Marmalade::GUI::TopBar::Show() {
         }
 
         if (ImGui::BeginMenu("Settings")) {
+            ImGui::MenuItem(ICON_CI_SETTINGS " Project Settings", nullptr, &settings.visible);
             ImGui::MenuItem(ICON_CI_EDIT " Style Editor", nullptr, &showStyleEditor);
-            ImGui::MenuItem(ICON_CI_SETTINGS_GEAR " Settings", nullptr, &settings.visible);
+            ImGui::MenuItem(ICON_CI_SETTINGS_GEAR " Preferences", nullptr, &preferences.visible);
 
             ImGui::EndMenu();
         }
