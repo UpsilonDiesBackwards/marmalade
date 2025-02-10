@@ -27,7 +27,7 @@ public:
     StyleManager();
 
     void LoadStyle(const std::string& stylePath);
-    void SaveStyle();
+    void SaveStyle(const std::string& stylePath);
 private:
     std::string stylePath;
 };

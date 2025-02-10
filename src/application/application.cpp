@@ -86,7 +86,12 @@ void Application::Initialise() {
     ImGui_ImplOpenGL3_Init("#version 430");
 
     // Load ImGui custom style
-    styleManager.LoadStyle("res/config/editorstyle.txt");
+
+    if (!std::filesystem::exists(Marmalade::Config::GetConfigDirectory() / "editorstyle.txt")) {
+        std::filesystem::copy_file("res/config/editorstyle.txt", Marmalade::Config::GetConfigDirectory() / "editorstyle.txt");
+    }
+
+    styleManager.LoadStyle(Marmalade::Config::GetConfigDirectory() / "editorstyle.txt");
 
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigWindowsMoveFromTitleBarOnly = true;
