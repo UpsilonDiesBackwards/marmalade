@@ -4,6 +4,7 @@
 #include "../window.h"
 #include "../../application/config.h"
 #include "../components/tableview.h"
+#include "../components/selectablelistview.h"
 
 #include <string>
 #include <mutex>
@@ -15,6 +16,34 @@
 #include <nlohmann/json.hpp>
 
 namespace Marmalade::GUI {
+
+    struct Package {
+        std::string Name{};
+        std::string Repo{};
+        std::vector<std::string> Authors{};
+        std::vector<std::string> Keywords{};
+        bool Selected{false};
+
+        void SetSelected(bool selected) {
+            Selected = selected;
+        }
+
+        bool IsSelected() {
+            return Selected;
+        }
+
+        Package() = default;
+        Package(std::string name, std::string repo, std::vector<std::string> authors, const std::vector<std::string>& keywords) : Name(std::move(name)), Repo(std::move(repo)), Authors(std::move(authors)), Keywords(keywords) {}
+    };
+
+    class PackageManagerListView : public Components::SelectableListView<Package> {
+    public:
+        explicit PackageManagerListView(std::vector<Package>& items) : SelectableListView(items, {}, {}) {}
+
+        void SetupListView(std::string id, ImVec2 area);
+
+        void RenderItem(const Package& item, bool selected) override;
+    };
 
     enum PackageManagerTab {
         PackageManagerTab_ALL,
@@ -44,22 +73,13 @@ namespace Marmalade::GUI {
     class PackageManagerOptions : public Window {
     public:
         void Draw() override;
+
     private:
         RepositoriesTableView _tableView{};
     };
 
     class PackageManager : public Window {
     public:
-        struct Package {
-            std::string Name{};
-            std::string Repo{};
-            std::vector<std::string> Authors{};
-            std::vector<std::string> Keywords{};
-
-            Package() = default;
-            Package(std::string name, std::string repo, std::vector<std::string> authors, const std::vector<std::string>& keywords) : Name(std::move(name)), Repo(std::move(repo)), Authors(std::move(authors)), Keywords(keywords) {}
-        };
-
         void Draw() override;
 
         inline void SetProgressText(std::string text) {
@@ -78,6 +98,8 @@ namespace Marmalade::GUI {
         std::unordered_map<std::string, Package> _packagesByName{};
         std::unordered_map<std::string, std::vector<const Package*>> _keywordIndex{};
 
+        std::vector<Package> _allPackages{};
+
         void drawLeftPane(PackageManagerTab tab);
         void drawRightPane(PackageManagerTab tab);
         void drawSplit(PackageManagerTab tab, float bottom_bar_height);
@@ -91,9 +113,11 @@ namespace Marmalade::GUI {
         bool pullRepo(const Marmalade::Repository& config_repo);
         void buildIndex(const Marmalade::Repository& config_repo);
         void deleteLocalDatabase();
+
+        PackageManagerListView _listView{_allPackages};
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::GUI::PackageManager::Package, Name, Repo, Authors, Keywords);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::GUI::Package, Name, Repo, Authors, Keywords);
 }
 
 

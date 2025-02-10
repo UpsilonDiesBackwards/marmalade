@@ -93,6 +93,8 @@ list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
         src/gui/imgui/details.cpp
         src/gui/imgui/details.h
         src/gui/components/tableview.h
+        src/gui/components/selectablelistview.h
+        src/gui/components/util.h
         src/gui/imgui/settings.cpp
         src/gui/imgui/settings.h
 )

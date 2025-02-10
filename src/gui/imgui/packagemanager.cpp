@@ -19,6 +19,26 @@
 
 using namespace Marmalade::GUI;
 
+#pragma region List view
+
+void PackageManagerListView::SetupListView(std::string id, ImVec2 area) {
+    SetListViewId(std::move(id));
+    SetListViewArea(area);
+}
+
+void PackageManagerListView::RenderItem(const Package& item, bool selected) {
+    ImGui::SameLine();
+    ImGui::Text("%s - %s", item.Name.c_str(), item.Repo.c_str());
+
+    std::ostringstream authors;
+    std::copy(item.Authors.begin(), item.Authors.end() - 1, std::ostream_iterator<std::string>(authors, ", "));
+    authors << item.Authors.back();
+
+    ImGui::Text("    %s", authors.str().c_str());
+}
+
+#pragma endregion
+
 #pragma region Table view
 
 std::vector<std::string> RepositoriesTableView::RenderItem(const Marmalade::Repository& item) {
@@ -159,16 +179,21 @@ void PackageManager::drawLeftPane(PackageManagerTab tab) {
     }
 
     ImVec2 listbox_area = ImVec2(area.x, area.y - search_bar_height - ImGui::GetStyle().ItemSpacing.y);
-    if (ImGui::BeginListBox(itemId("##PackageManagerList", tab).c_str(), listbox_area)) {
-        for (const auto& pkg: packages) {
-            ImGui::PushID(pkg.first.c_str());
-            ImGui::Text("%s - %s", pkg.first.c_str(), pkg.second.Repo.c_str());
-            ImGui::Text(pkg.second.Authors[0].c_str());
-            // ImGui::Checkbox();
-            ImGui::PopID();
-            ImGui::Separator();
+    if (tab == PackageManagerTab_ALL) {
+        _listView.SetupListView(itemId("##PackageManagerList", tab), listbox_area);
+        _listView.Draw();
+    } else {
+        if (ImGui::BeginListBox(itemId("##PackageManagerList", tab).c_str(), listbox_area)) {
+            for (const auto& pkg: packages) {
+                ImGui::PushID(pkg.first.c_str());
+                ImGui::Text("%s - %s", pkg.first.c_str(), pkg.second.Repo.c_str());
+                ImGui::Text(pkg.second.Authors[0].c_str());
+                // ImGui::Checkbox();
+                ImGui::PopID();
+                ImGui::Separator();
+            }
+            ImGui::EndListBox();
         }
-        ImGui::EndListBox();
     }
 }
 
@@ -467,6 +492,12 @@ void PackageManager::buildIndex(const Repository& config_repo) {
         }
         return transformed;
     }();
+
+    _allPackages.clear();
+    for (auto &package : _packagesByName) {
+        _allPackages.push_back(package.second);
+    }
+
 
     // Write index.json
     std::ofstream outFile(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.Name / INDEX_FILENAME);
