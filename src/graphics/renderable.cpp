@@ -1,12 +1,30 @@
-#include <glm/ext/matrix_clip_space.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <iostream>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/string_cast.hpp>
-#include "../../include/graphics/renderable.h"
-#include "glad/glad.h"
-#include "../../include/graphics/shader.h"
+/*
+ * Marmalade - Lightweight Game Engine
+ * Copyright (C) 2025 Tayler Parsons
+ * Copyright (C) 2025 Ryan Bester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include <graphics/renderable.h>
+
+#include <glad/glad.h>
+
 #include "../application/application.h"
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtc/type_ptr.hpp>
 
 float vertices[] = {
         // Positions       // Texture Coords
@@ -74,4 +92,3 @@ void Renderable::Draw(glm::mat4 modelMatrix) {
 unsigned int Renderable::GetTexture() {
     return texture;
 }
-

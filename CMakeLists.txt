@@ -125,7 +125,6 @@ list(APPEND ENGINE_SRC # ECS
 )
 
 list (APPEND ENGINE_SRC # Mathematics
-        src/mathematics/mathematics.cpp
         include/mathematics/mathematics.h
 
         src/mathematics/types/vector2.cpp

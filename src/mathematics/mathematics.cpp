@@ -1,2 +1,0 @@
-
-#include "mathematics/mathematics.h"
