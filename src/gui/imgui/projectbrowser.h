@@ -22,16 +22,33 @@
 
 #include "../window.h"
 
+#include <glad/glad.h>
+
+#include <GLFW/glfw3.h>
+
+#include <imgui.h>
+
 #include <filesystem>
+#include <unordered_map>
 
 namespace Marmalade::GUI {
     class ProjectBrowser : public Window {
     public:
-        explicit ProjectBrowser(bool visible) : Window(visible) { }
+        explicit ProjectBrowser(bool visible) : Window(visible) {};
 
         void Draw() override;
+
     private:
         std::filesystem::path currentPath;
+
+        GLFWwindow* _loadingContext{nullptr};
+
+        std::unordered_map<std::string, ImTextureID> _textureCache{};
+        std::atomic<bool> _textureOperationRunning{false};
+        bool _texturesLoaded{false};
+
+        GLuint loadTexture(std::string filename);
+        void loadTextures();
     };
 }
 

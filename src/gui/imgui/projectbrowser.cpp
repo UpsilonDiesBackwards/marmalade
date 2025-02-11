@@ -25,7 +25,72 @@
 
 #include <IconsCodicons.h>
 
+#include <stb/stb_image.h>
+
+#include <spdlog/spdlog.h>
+
+#include <thread>
+
+GLuint Marmalade::GUI::ProjectBrowser::loadTexture(std::string filename) {
+    int width, height, channels;
+    unsigned char* data = ::stbi_load(filename.c_str(), &width, &height, &channels, 4);
+    if (!data) {
+        spdlog::error("Failed to load texture: {}", filename);
+        return 0;
+    }
+
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    stbi_image_free(data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    return textureID;
+}
+
+void Marmalade::GUI::ProjectBrowser::loadTextures() {
+    if (_textureOperationRunning.exchange(true)) {
+        return;
+    }
+
+    glfwMakeContextCurrent(_loadingContext);
+
+    spdlog::info("Loading textures");
+    _textureCache.clear();
+
+    for (const auto& item: std::filesystem::directory_iterator(currentPath)) {
+        if (item.is_directory()) continue;
+
+        // TODO: Magic number MIME type checking
+        GLuint textureId = loadTexture(item.path().string());
+        if (!_textureCache.contains(item.path().string())) {
+            _textureCache[item.path().string()] = textureId;
+        }
+    }
+
+    spdlog::info("Textures loaded");
+    _texturesLoaded = true;
+    _textureOperationRunning = false;
+
+    glfwMakeContextCurrent(nullptr);
+}
+
 void Marmalade::GUI::ProjectBrowser::Draw() {
+    // Basic context switching
+    if (_loadingContext == nullptr) {
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        _loadingContext = glfwCreateWindow(1, 1, "TextureLoader", nullptr, Application::GetInstance().getWindow());
+    }
+
     ImGui::SetNextWindowPos(ImVec2(256, 128), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(720, 380), ImGuiCond_FirstUseEver);
 
@@ -49,7 +114,12 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
         }
     }
 
-    for (const auto& item : std::filesystem::directory_iterator(currentPath)) {
+    if (!_texturesLoaded) {
+        std::thread thread(&ProjectBrowser::loadTextures, this);
+        thread.detach();
+    }
+
+    for (const auto& item: std::filesystem::directory_iterator(currentPath)) {
         const std::filesystem::path path = item.path();
         bool isDirectory = item.is_directory();
 
@@ -65,7 +135,11 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
             }
         }
 
-        ImTextureID textureId;
+        ImTextureID textureId = 0;
+        if (_texturesLoaded && _textureCache.contains(path.string())) {
+            textureId = _textureCache[path.string()];
+        }
+
         ImGui::SameLine();
         ImGui::Image(textureId, ImVec2(128, 128));
         ImGui::Text("%s", path.filename().string().c_str());
