@@ -97,6 +97,8 @@ list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
         src/gui/components/util.h
         src/gui/imgui/settings.cpp
         src/gui/imgui/settings.h
+        src/gui/imgui/projectbrowser.cpp
+        src/gui/imgui/projectbrowser.h
 )
 
 # Application

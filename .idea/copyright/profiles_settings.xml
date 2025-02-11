@@ -1,10 +1,11 @@
 <component name="CopyrightManager">
-  <settings>
+  <settings default="GPL v3.0">
     <module2copyright>
       <element module="Marmalade" copyright="GPL v3.0" />
     </module2copyright>
     <LanguageOptions name="ObjectiveC">
       <option name="fileTypeOverride" value="3" />
+      <option name="prefixLines" value="false" />
     </LanguageOptions>
   </settings>
 </component>
