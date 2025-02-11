@@ -91,7 +91,7 @@ void Application::Initialise() {
         std::filesystem::copy_file("res/config/editorstyle.txt", Marmalade::Config::GetConfigDirectory() / "editorstyle.txt");
     }
 
-    styleManager.LoadStyle((Marmalade::Config::GetConfigDirectory() / "editorstyle.txt").string());
+    styleManager.LoadStyle((Marmalade::Config::GetConfigDirectory() / Marmalade::Config::engineConfig.ThemeFile).string());
 
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigWindowsMoveFromTitleBarOnly = true;

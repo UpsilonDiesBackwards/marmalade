@@ -31,12 +31,15 @@ namespace Marmalade {
     struct Repository {
         std::string Name;
         std::string GitUrl{};
-        int Depth{1};// Local repos do not work with shallow clone
+        int Depth{1}; // Local repos do not work with shallow clone
     };
 
     struct EngineConfig {
         bool Viewports{true};
+        std::string ThemeFile{"editorstyle.txt"};
+
         spdlog::level::level_enum LogLevel{spdlog::level::info};
+
         std::string defaultProjectPath{"."};
         std::vector<Repository> Repos{};
     };
@@ -57,7 +60,7 @@ namespace Marmalade {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::Repository, Name, GitUrl, Depth);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, Viewports, LogLevel, defaultProjectPath, Repos);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, Viewports, ThemeFile, LogLevel, defaultProjectPath, Repos);
 }
 
 #endif

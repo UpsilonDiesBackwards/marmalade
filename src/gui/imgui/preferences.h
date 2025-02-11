@@ -22,12 +22,41 @@
 
 #include "../window.h"
 
+#include <string>
+#include <unordered_map>
+#include <functional>
+
 namespace Marmalade::GUI {
     class Preferences : public Window {
+        struct PreferencesPane {
+            std::function<void()> DrawFunc{};
+            std::function<void()> SaveFunc{};
+
+            PreferencesPane() {};
+
+            explicit PreferencesPane(const std::function<void()>& drawFunc) : DrawFunc(drawFunc) {}
+        };
+
     public:
+        explicit Preferences();
+
         void Draw() override;
+
     private:
-        void requiresRestartWarning();
+        std::string _selectedItem{};
+
+        std::unordered_map<std::string, PreferencesPane> _panes{};
+
+        void selectableTreeNode(const char* title, const char* id);
+        void drawLeftPane();
+        void drawRightPane();
+        void drawSplit();
+
+        static void drawGeneralLoggingPane();
+        static void drawGeneralAppearancePane();
+        static void drawGeneralProjectsPane();
+
+        static void requiresRestartWarning();
         static bool getLogLevels(void* data, int idx, const char** outText);
     };
 }
