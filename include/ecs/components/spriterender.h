@@ -17,20 +17,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_SPRITERENDER_H
-#define MARMALADE_SPRITERENDER_H
+#ifndef MARMALADE_ECS_SPRITERENDER_H
+#define MARMALADE_ECS_SPRITERENDER_H
 
 #include "../component.h"
 
-class SpriteRender : public Component {
-public:
-    void Display(Entity* entity) override;
-    void Apply(Entity* entity) override;
+namespace Marmalade::ECS {
+    class SpriteRender : public Component {
+    public:
+        void Display(Entity* entity) override;
+        void Apply(Entity* entity) override;
 
-    SpriteRender() { name = "Sprite Render"; }
+        SpriteRender() { name = "Sprite Render"; }
+    };
 
-    REGISTER_COMPONENT(SpriteRender)
-};
-
+    REGISTER_COMPONENT(SpriteRender);
+}
 
 #endif

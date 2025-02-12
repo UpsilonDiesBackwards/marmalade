@@ -31,7 +31,7 @@ namespace Marmalade::GUI {
 
         void Draw() override;
     private:
-        Component* _selectedComponent;
+        Marmalade::ECS::Component* _selectedComponent;
 
         bool _isAddingComponent{false};
         bool _isRemovingComponent{false};

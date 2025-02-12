@@ -17,40 +17,78 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_COMPONENT_H
-#define MARMALADE_COMPONENT_H
+#ifndef MARMALADE_ECS_COMPONENT_H
+#define MARMALADE_ECS_COMPONENT_H
 
 #include <spdlog/spdlog.h>
 
 #include <typeindex>
+#include <functional>
+#include <utility>
 
 class Entity;
 
-class Component {
-public:
-    std::string name;
+namespace Marmalade::ECS {
+    class Component {
+    public:
+        std::string name;
 
-    virtual void Display(Entity* entity) = 0;
-    virtual void Apply(Entity *entity) = 0;
+        virtual void Display(Entity* entity) = 0;
+        virtual void Apply(Entity* entity) = 0;
 
-    static std::unordered_map<std::type_index , std::string>& GetRegisteredComponents() {
-        static std::unordered_map<std::type_index, std::string> registry;
-        return registry;
-    }
+        virtual ~Component() = default;
+    };
 
-    static void RegisterComponent(std::type_index type, const std::string& name) {
-        GetRegisteredComponents()[type] = name;
-    }
+    class IComponentFactory {
+    public:
+        [[nodiscard]] virtual std::unique_ptr<Component> Create() const = 0;
+        virtual ~IComponentFactory() = default;
+    };
 
-    virtual ~Component() = default;
-};
+    template<typename T>
+    class ComponentFactory : public IComponentFactory {
+    public:
+        static_assert(std::is_base_of_v<Component, T>, "T must inherit from Component");
 
-// THANKS JAY FOR THE HELP WITH MACROS
-#define REGISTER_COMPONENT(TYPE) \
-    static bool _registered; \
-    static bool Register() { \
-    Component::RegisterComponent(typeid(TYPE), #TYPE); \
-    return true; \
-    }
+        [[nodiscard]] std::unique_ptr<Component> Create() const override {
+            return std::make_unique<T>();
+        }
+    };
+
+    class ComponentRegistry {
+    public:
+        static ComponentRegistry& Instance() {
+            static ComponentRegistry instance;
+            return instance;
+        }
+
+        template<typename T>
+        void RegisterComponent(const std::string& name) {
+            _registry[name] = std::make_unique<ComponentFactory<T>>();
+        }
+
+        [[nodiscard]] std::unique_ptr<Component> CreateComponent(const std::string& name) {
+            auto it = _registry.find(name);
+            if (it != _registry.end()) {
+                return it->second->Create();
+            }
+            return nullptr;
+        }
+
+        std::unordered_map<std::string, std::unique_ptr<IComponentFactory>>& GetRegisteredComponents() {
+            return _registry;
+        }
+
+    private:
+        std::unordered_map<std::string, std::unique_ptr<IComponentFactory>> _registry;
+    };
+
+#define REGISTER_COMPONENT(TYPE)                                      \
+    static bool TYPE##_registered = [] {                              \
+        ComponentRegistry::Instance().RegisterComponent<TYPE>(#TYPE); \
+        return true;                                                  \
+    }()
+
+}
 
 #endif

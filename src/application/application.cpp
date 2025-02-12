@@ -121,7 +121,7 @@ void Application::Initialise() {
     sceneManager.AddScene(scene);
     sceneManager.SetCurrentScene("Default");
 
-    Transform defaultTransform;
+    Marmalade::ECS::Transform defaultTransform;
     Entity *newEntity = new Entity("New Entity", EntityFlags::RENDERABLE);
     sceneManager. GetCurrentScene()->AddEntity(std::shared_ptr<Entity>(newEntity));
 }

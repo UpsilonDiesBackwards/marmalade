@@ -24,13 +24,13 @@
 #include <IconsCodicons.h>
 
 void Marmalade::GUI::Details::Draw() {
-    ImGui::Begin(ICON_CI_SEARCH " Details", &visible );
+    ImGui::Begin(ICON_CI_SEARCH " Details", &visible);
 
     if (inspectedEntity) {
         ImGui::Text(inspectedEntity->name.c_str());
         ImGui::Separator();
 
-        for (auto& comp : inspectedEntity->componentManager.components) {
+        for (auto& comp: inspectedEntity->componentManager.components) {
             ImGui::PushID(comp.get());
 
             comp->Display(inspectedEntity);
@@ -91,14 +91,14 @@ void Marmalade::GUI::Details::ShowAddPopup() {
     if (ImGui::BeginPopupModal("Add Component", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::Text("Choose component: ");
 
-        for (const auto& [type, name] : Component::GetRegisteredComponents()) {
+        for (const auto& [name, factory]: Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()) {
             if (ImGui::Button(name.c_str())) {
-                // TODO: List registered components
-//                inspectedEntity->componentManager.AddComponent(); // Add component
+                inspectedEntity->componentManager.AddComponent(factory->Create());// Add component
             }
         }
 
         if (ImGui::Button("Close")) {
+            _isAddingComponent = false;
             ImGui::CloseCurrentPopup();
         }
 

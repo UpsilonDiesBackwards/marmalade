@@ -23,15 +23,13 @@
 
 #include <imgui.h>
 
-void SpriteRender::Display(Entity* entity) {
-    ImGui::Text(name.c_str());
+void Marmalade::ECS::SpriteRender::Display(Entity* entity) {
+    ImGui::Text("%s", name.c_str());
 
     ImGui::Image(ImTextureID(entity->renderable.GetTexture()), ImVec2(256, 256));
 
 }
 
-void SpriteRender::Apply(Entity* entity) {
+void Marmalade::ECS::SpriteRender::Apply(Entity* entity) {
 
 }
-
-bool SpriteRender::_registered = SpriteRender::Register();

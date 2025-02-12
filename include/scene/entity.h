@@ -47,11 +47,11 @@ public:
     std::string name;
     EntityFlags flags;
     Renderable renderable;
-    ComponentManager componentManager{};
+    Marmalade::ECS::ComponentManager componentManager{};
 
     // Temp
-    std::shared_ptr<Transform> transform = std::make_shared<Transform>();
-    std::shared_ptr<SpriteRender> spriteRender = std::make_shared<SpriteRender>();
+    std::shared_ptr<Marmalade::ECS::Transform> transform = std::make_shared<Marmalade::ECS::Transform>();
+    std::shared_ptr<Marmalade::ECS::SpriteRender> spriteRender = std::make_shared<Marmalade::ECS::SpriteRender>();
 
     Entity* parent{nullptr};
     std::vector<std::unique_ptr<Entity>> children;

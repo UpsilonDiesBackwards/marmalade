@@ -119,7 +119,6 @@ list(APPEND ENGINE_SRC src/application/application.cpp src/application/applicati
 list(APPEND ENGINE_SRC # ECS
         src/ecs/componentmanager.cpp
         include/ecs/componentmanager.h
-        src/ecs/component.cpp
         src/ecs/components/transform.cpp
         include/ecs/components/transform.h
         src/ecs/components/spriterender.cpp

@@ -17,20 +17,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_COMPONENTMANAGER_H
-#define MARMALADE_COMPONENTMANAGER_H
+#ifndef MARMALADE_ECS_COMPONENTMANAGER_H
+#define MARMALADE_ECS_COMPONENTMANAGER_H
 
 #include "component.h"
 
-class ComponentManager {
-public:
-    std::vector<std::shared_ptr<Component>> components{};
+namespace Marmalade::ECS {
+    class ComponentManager {
+    public:
+        std::vector<std::shared_ptr<Component>> components{};
 
-    void AddComponent(std::shared_ptr<Component> component);
+        void AddComponent(std::shared_ptr<Component> component);
 
-    void RemoveComponent(Component* component);
+        void RemoveComponent(Component* component);
 
-    std::shared_ptr<Component> GetComponent();
-};
+        template<typename T>
+        T* GetComponentOfType() {
+            for (auto& component: components) {
+                if (auto derived = dynamic_cast<T*>(component.get())) {
+                    return derived;
+                }
+            }
+
+            return nullptr;
+        }
+    };
+}
 
 #endif

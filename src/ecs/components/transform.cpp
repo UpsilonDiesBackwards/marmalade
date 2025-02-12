@@ -18,14 +18,13 @@
  */
 
 #include <ecs/components/transform.h>
-
 #include <scene/entity.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
 #include <imgui.h>
 
-void Transform::Display(Entity* entity) {
+void Marmalade::ECS::Transform::Display(Entity* entity) {
         ImGui::Text("%s", name.c_str());
 
         // Transform
@@ -40,7 +39,6 @@ void Transform::Display(Entity* entity) {
         }
 }
 
-void Transform::Apply(Entity* entity) {
-}
+void Marmalade::ECS::Transform::Apply(Entity* entity) {
 
-bool Transform::_registered = Transform::Register();
+}
