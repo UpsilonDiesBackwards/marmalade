@@ -36,7 +36,7 @@ GLuint Texture::LoadTexture(const std::string &filePath) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     int width, height, channels;
-//    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(true);
 
     unsigned char *data;
     if (filePath == "") { // if not file path is defined, use default fallback texture
