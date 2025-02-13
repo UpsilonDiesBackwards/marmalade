@@ -11,8 +11,8 @@ endif ()
 
 set(LUA_VERSION "lua-5.4.7")
 # Lua libraries, if on Windows
-set(LUA_SRC_DIR "../lua/src/lua")
-set(LUA_LIB "../lua/lib/Lua.lib")
+set(LUA_SRC_DIR "../lua/src/lua" CACHE PATH "Lua source directory")
+set(LUA_LIB "../lua/lib/Lua.lib" CACHE FILEPATH "Lua library file")
 
 add_subdirectory(vendor/spdlog)
 add_subdirectory(vendor/glfw)
@@ -21,6 +21,9 @@ add_subdirectory(vendor/glm)
 
 set(USE_NSEC OFF)
 set(USE_SSH ON)
+if (WIN32)
+    set(USE_SSH OFF)
+endif()
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 add_subdirectory(vendor/libgit2)
 
@@ -125,7 +128,7 @@ list(APPEND ENGINE_SRC # ECS
         include/ecs/components/spriterender.h
 )
 
-list (APPEND ENGINE_SRC # Mathematics
+list(APPEND ENGINE_SRC # Mathematics
         include/mathematics/mathematics.h
 
         src/mathematics/types/vector2.cpp
