@@ -43,19 +43,17 @@ void Camera::UpdateViewport(float newWidth, float newHeight) {
 }
 
 glm::mat4 Camera::GetProjection() {
-    float left = -10.0f;
-    float right = 10.0f;
-    float bottom = -10.0f;
-    float top = 10.0f;
-    float nearPlane = 0.1f;
-    float farPlane = 100.0f;
+    float aspectRatio = width / height;
+    float orthoSize = 10.0f / zoom;
 
-    glm::mat4 projectionMatrix = glm::ortho(left, right, bottom, top, nearPlane, farPlane);
-    glm::mat4 projection = glm::ortho(0.0f, 10.0f, 10.0f, 0.0f, -1.0f, 1.0f);
+    glm::mat4 projection = glm::ortho(
+            -orthoSize * aspectRatio, orthoSize * aspectRatio,
+            -orthoSize, orthoSize,
+            -1.0f, 1.0f
+    );
 
     return projection;
 }
-
 
 glm::vec2 Camera::GetPosition() const {
     return position;
