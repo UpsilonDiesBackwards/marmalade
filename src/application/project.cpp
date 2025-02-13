@@ -19,8 +19,6 @@
 
 #include "project.h"
 
-#include <glm/gtx/pca.inl>
-
 #include <spdlog/spdlog.h>
 
 #include <fstream>

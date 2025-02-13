@@ -9,23 +9,99 @@ if (MSVC)
     add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 endif ()
 
-set(LUA_VERSION "lua-5.4.7")
-# Lua libraries, if on Windows
-set(LUA_SRC_DIR "../lua/src/lua" CACHE PATH "Lua source directory")
-set(LUA_LIB "../lua/lib/Lua.lib" CACHE FILEPATH "Lua library file")
+option(USE_SYSTEM_GLFW "Use system-installed GLFW instead of bundled one" ON)
+option(USE_SYSTEM_GLM "Use system-installed GLM instead of bundled one" ON)
+option(USE_SYSTEM_SPDLOG "Use system-installed spdlog instead of bundled one" ON)
+option(USE_SYSTEM_JSON "Use system-installed nlohmann::json instead of bundled one" ON)
+option(USE_SYSTEM_LIBGIT "Use system-installed libgit2 instead of bundled one" ON)
 
-add_subdirectory(vendor/spdlog)
-add_subdirectory(vendor/glfw)
-add_subdirectory(vendor/json)
-add_subdirectory(vendor/glm)
+if (USE_SYSTEM_GLFW)
+    find_package(glfw3 3.3...3.5 QUIET)
+    if (NOT glfw3_FOUND)
+        message(STATUS "System GLFW not found. Falling back to bundled GLFW.")
+        set(USE_SYSTEM_GLFW OFF)
+    else ()
+        message(STATUS "Using system GLFW.")
+    endif ()
+endif ()
 
+if (NOT USE_SYSTEM_GLFW)
+    message(STATUS "Using bundled GLFW")
+    add_subdirectory(vendor/glfw)
+endif ()
+
+if (USE_SYSTEM_GLM)
+    find_package(glm QUIET)
+    if (NOT glm_FOUND)
+        message(STATUS "System GLM not found. Falling back to bundled GLM.")
+        set(USE_SYSTEM_GLM OFF)
+    else ()
+        message(STATUS "Using system GLM.")
+    endif ()
+endif ()
+
+if (NOT USE_SYSTEM_GLM)
+    message(STATUS "Using bundled GLM")
+    add_subdirectory(vendor/glm)
+endif ()
+
+if (USE_SYSTEM_SPDLOG)
+    find_package(spdlog QUIET)
+    if (NOT spdlog_FOUND)
+        message(STATUS "System spdlog not found. Falling back to bundled spdlog.")
+        set(USE_SYSTEM_SPDLOG OFF)
+    else ()
+        message(STATUS "Using system spdlog.")
+    endif ()
+endif ()
+
+if (NOT USE_SYSTEM_SPDLOG)
+    message(STATUS "Using bundled spdlog")
+    add_subdirectory(vendor/spdlog)
+endif ()
+
+if (USE_SYSTEM_JSON)
+    find_package(nlohmann_json CONFIG QUIET)
+    if (NOT nlohmann_json_FOUND)
+        message(STATUS "System nlohmann::json not found. Falling back to bundled nlohmann::json.")
+        set(USE_SYSTEM_JSON OFF)
+    else ()
+        message(STATUS "Using system nlohmann::json.")
+    endif ()
+endif ()
+
+if (NOT USE_SYSTEM_JSON)
+    message(STATUS "Using bundled nlohmann::json")
+    add_subdirectory(vendor/json)
+endif ()
+
+# libgit2 options
 set(USE_NSEC OFF)
 set(USE_SSH ON)
 if (WIN32)
     set(USE_SSH OFF)
-endif()
+endif ()
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-add_subdirectory(vendor/libgit2)
+
+if (USE_SYSTEM_LIBGIT)
+    find_package(libgit2 QUIET)
+    if (NOT libgit2_FOUND)
+        message(STATUS "System libgit2 not found. Falling back to bundled libgit2.")
+        set(USE_SYSTEM_LIBGIT OFF)
+    else ()
+        message(STATUS "Using system libgit2.")
+    endif ()
+endif ()
+
+if (NOT USE_SYSTEM_LIBGIT)
+    message(STATUS "Using bundled libgit2")
+    add_subdirectory(vendor/libgit2)
+endif ()
+
+set(LUA_VERSION "lua-5.4.7" CACHE STRING "Lua version")
+# Lua libraries, if on Windows
+set(LUA_SRC_DIR "../lua/src/lua" CACHE PATH "Lua source directory")
+set(LUA_LIB "../lua/lib/Lua.lib" CACHE FILEPATH "Lua library file")
 
 find_package(OpenGL REQUIRED)
 
@@ -50,121 +126,58 @@ else ()
 endif ()
 
 file(GLOB IMGUI_SRC "vendor/imgui/*.h" "vendor/imgui/*.cpp")
-list(APPEND IMGUI_SRC vendor/imgui/backends/imgui_impl_glfw.h vendor/imgui/backends/imgui_impl_glfw.cpp vendor/imgui/backends/imgui_impl_opengl3.h vendor/imgui/backends/imgui_impl_opengl3.cpp)
-
-# Engine API
-list(APPEND ENGINE_API include/graphics/viewport.h include/scene/entity.h
-        include/graphics/renderable.h include/graphics/shader.h include/graphics/texture.h
-        include/graphics/framebuffer.h include/graphics/multisampledframebuffer.h
-        include/io/input.h include/io/inputmanager.h
-        include/scene/scene.h include/scene/scenemanager.h
-        include/graphics/lighting/light.h
-
+list(APPEND IMGUI_SRC
+        vendor/imgui/backends/imgui_impl_glfw.h
+        vendor/imgui/backends/imgui_impl_glfw.cpp
+        vendor/imgui/backends/imgui_impl_opengl3.h
+        vendor/imgui/backends/imgui_impl_opengl3.cpp
 )
 
-# ImGui GUI
-list(APPEND ENGINE_SRC src/gui/imgui/editor.cpp
-        src/gui/imgui/editor.h
-        src/gui/imgui/editorviews.cpp
-        src/gui/imgui/editorviews.h
-        src/gui/imgui/editorviewstatusbar.cpp
-        src/gui/imgui/editorviewstatusbar.h
-        src/gui/imgui/scenehierarchy.cpp
-        src/gui/imgui/scenehierarchy.h
-        src/gui/imgui/topbar.cpp
-        src/gui/imgui/topbar.h
-        src/gui/editorviews.h
-        src/gui/editview.cpp
-        src/gui/editview.h
-        src/graphics/multisampledframebuffer.cpp
-        src/gui/gameview.cpp
-        src/gui/gameview.h
-        src/gui/imgui
-        src/gui/stylemanager.cpp
-        src/gui/stylemanager.h
-        src/gui/imgui/packagemanager.cpp
-        src/gui/imgui/packagemanager.h
-        src/application/guilogsink.cpp
-        src/application/guilogsink.h
-        src/gui/imgui/log.cpp
-        src/gui/imgui/log.h
-        src/gui/window.h
-        src/gui/imgui/projectwizard.cpp
-        src/gui/imgui/projectwizard.h
-        src/gui/imgui/preferences.cpp
-        src/gui/imgui/preferences.h
-        src/gui/imgui/details.cpp
-        src/gui/imgui/details.h
-        src/gui/components/tableview.h
-        src/gui/components/selectablelistview.h
-        src/gui/components/util.h
-        src/gui/imgui/settings.cpp
-        src/gui/imgui/settings.h
-        src/gui/imgui/projectbrowser.cpp
-        src/gui/imgui/projectbrowser.h
+add_executable(marmalade
+        vendor/glad/src/glad.c
+        ${IMGUI_SRC}
+        vendor/imguifiledialog/ImGuiFileDialog.cpp
 )
 
-# Application
-list(APPEND ENGINE_SRC src/application/application.cpp src/application/application.h src/application/profiler.cpp src/application/profiler.h
-        src/graphics/viewport.cpp src/scene/entity.cpp
-        src/graphics/renderable.cpp src/graphics/shader.cpp src/graphics/texture.cpp src/graphics/framebuffer.cpp
-        src/io/input.cpp src/io/inputmanager.cpp
-        src/scene/scene.cpp src/scene/scenemanager.cpp
-        src/application/project.cpp
-        src/application/project.h
-        src/application/config.cpp
-        src/application/config.h
-        src/application/projectsettings.cpp
-        src/application/projectsettings.h
-        src/graphics/lighting/light.cpp
-)
-
-list(APPEND ENGINE_SRC # ECS
-        src/ecs/componentmanager.cpp
-        include/ecs/componentmanager.h
-        src/ecs/components/transform.cpp
-        include/ecs/components/transform.h
-        src/ecs/components/spriterender.cpp
-        include/ecs/components/spriterender.h
-)
-
-list(APPEND ENGINE_SRC # Mathematics
-        include/mathematics/mathematics.h
-
-        src/mathematics/types/vector2.cpp
-        include/mathematics/types/vector2.h
-        src/mathematics/types/vector3.cpp
-        include/mathematics/types/vector3.h
-        src/mathematics/types/vector4.cpp
-        include/mathematics/types/vector4.h
-        src/mathematics/types/matrix2x2.cpp
-        include/mathematics/types/matrix2x2.h
-
-        src/mathematics/functions/sqrt.cpp
-        include/mathematics/functions/sqrt.h
-)
-
-add_executable(marmalade vendor/glad/src/glad.c ${IMGUI_SRC} vendor/imguifiledialog/ImGuiFileDialog.cpp
-        ${ENGINE_API}
-        ${ENGINE_SRC}
-        src/main.cpp
-)
+add_subdirectory(include)
+add_subdirectory(src)
 
 if (NOT WIN32)
     add_dependencies(marmalade lua)
 endif ()
 
-file(COPY vendor/imgui/misc/fonts/ProggyClean.ttf DESTINATION ${CMAKE_BINARY_DIR}/resources/fonts)
-file(COPY vendor/imgui/misc/fonts/Roboto-Medium.ttf DESTINATION ${CMAKE_BINARY_DIR}/resources/fonts)
+# Copy static resources
 file(COPY res DESTINATION ${CMAKE_BINARY_DIR})
 
-target_link_libraries(marmalade PRIVATE glfw OpenGL::GL ${OPENGL_gl_LIBRARY} nlohmann_json::nlohmann_json glm::glm ${LUA_LIBRARIES} libgit2package)
+target_link_libraries(marmalade PRIVATE
+        glfw
+        OpenGL::GL
+        ${OPENGL_gl_LIBRARY}
+        nlohmann_json::nlohmann_json
+        glm::glm
+        ${LUA_LIBRARIES}
+        libgit2package
+)
 
 if (WIN32)
     target_link_libraries(marmalade PRIVATE Shcore.lib ws2_32.lib)
 endif ()
 
-target_include_directories(marmalade PRIVATE vendor/glad/include vendor/glfw-3.4/include vendor/imgui vendor/imguifiledialog glm ${LUA_INCLUDE_DIR} vendor/luaaa vendor/stb vendor/libgit2/include vendor/iconfontcppheaders vendor/spdlog/include)
+target_include_directories(marmalade PRIVATE
+        vendor/glad/include
+        vendor/glfw-3.4/include
+        vendor/imgui
+        vendor/imguifiledialog
+        vendor/glm/glm
+        ${LUA_INCLUDE_DIR}
+        vendor/luaaa
+        vendor/stb
+        vendor/libgit2/include
+        vendor/iconfontcppheaders
+        vendor/spdlog/include
+)
+
+target_include_directories(marmalade PRIVATE include)
 target_include_directories(marmalade PRIVATE include)
 
 target_link_directories(marmalade PRIVATE vendor/nativefiledialog/lib vendor/luaaa)
