@@ -138,14 +138,6 @@ void Application::Run() {
 
     SetupDocking();
 
-    if (editorMode == EditorMode::EDIT) {
-        editView->RunInput();
-    }
-
-    if (editorMode == EditorMode::GAME) {
-        gameView->RunInput();
-    }
-
     input.Update();
 
     editorGUI->Render();

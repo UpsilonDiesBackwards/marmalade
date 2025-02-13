@@ -51,8 +51,9 @@ public:
     void UnbindMouseButton(int button, MouseEventType eventType);
     void UnbindScroll();
 
-    void Update();
+    void ClearAllInputEvents();
 
+    void Update();
 private:
     InputManager *inputManager;
     std::map<std::pair<int, KeyEventType>, std::function<void()>> keyBinds;

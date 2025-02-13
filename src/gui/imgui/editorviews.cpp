@@ -46,13 +46,21 @@ void EditorViews::Show() {
         }
 
         if (ImGui::BeginTabItem("Edit")) {
+            Application::GetInstance().input.ClearAllInputEvents();
+            Application::GetInstance().editView->RunInput();
+
             application.editView->Render();
             Application::GetInstance().editorMode = EditorMode::EDIT;
+
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Game")) {
+            Application::GetInstance().input.ClearAllInputEvents();
+            Application::GetInstance().gameView->RunInput();
+
             application.gameView->Render();
             Application::GetInstance().editorMode = EditorMode::GAME;
+
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();

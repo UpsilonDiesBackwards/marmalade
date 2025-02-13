@@ -85,3 +85,8 @@ void Input::UnbindMouseButton(int button, MouseEventType eventType) {
 void Input::UnbindScroll() {
     scrollAction = nullptr;
 }
+void Input::ClearAllInputEvents() {
+    keyBinds.clear();
+    mouseButtonBinds.clear();
+    scrollAction = nullptr;
+}
