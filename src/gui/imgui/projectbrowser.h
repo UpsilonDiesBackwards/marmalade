@@ -30,6 +30,7 @@
 
 #include <filesystem>
 #include <unordered_map>
+#include <atomic>
 
 namespace Marmalade::GUI {
     class ProjectBrowser : public Window {

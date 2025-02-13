@@ -67,12 +67,15 @@ void Marmalade::GUI::ProjectBrowser::loadTextures() {
     spdlog::info("Loading textures");
     _textureCache.clear();
 
+    _textureCache["directory"] = loadTexture("../res/icons/ui/directory.png");
+    _textureCache["document"] = loadTexture("../res/icons/ui/document.png");
+
     for (const auto& item: std::filesystem::directory_iterator(currentPath)) {
         if (item.is_directory()) continue;
 
         // TODO: Magic number MIME type checking
         GLuint textureId = loadTexture(item.path().string());
-        if (!_textureCache.contains(item.path().string())) {
+        if (textureId != 0) {
             _textureCache[item.path().string()] = textureId;
         }
     }
@@ -119,33 +122,61 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
         thread.detach();
     }
 
+    static float thumbnailSize = 128.0f;
+    static float thumbnailPadding = 8.0f;
+    float cellSize = thumbnailSize + thumbnailPadding;
+
+    float panelWidth = ImGui::GetContentRegionAvail().x;
+
+    int columnCount = std::max(1, int(panelWidth / cellSize));
+
+    ImGui::BeginChild("AssetList", ImVec2(0, -22), true);
+
+    ImGui::Columns(columnCount, nullptr, false);
+
+    if (_textureCache.find("directory") == _textureCache.end()) {
+        _textureCache["directory"] = loadTexture("res/icons/ui/directory.png");
+    }
+    if (_textureCache.find("document") == _textureCache.end()) {
+        _textureCache["document"] = loadTexture("res/icons/ui/document.png");
+    }
+
     for (const auto& item: std::filesystem::directory_iterator(currentPath)) {
         const std::filesystem::path path = item.path();
-        bool isDirectory = item.is_directory();
 
-        ImGui::BeginGroup();
+        ImGui::PushID(path.c_str());
 
-        bool selected = ImGui::Selectable("##", false, ImGuiSelectableFlags_DontClosePopups);
+        GLuint textureId = item.is_directory() ? _textureCache["directory"] : _textureCache["document"];
 
-        if (selected) {
-            if (isDirectory) {
-                currentPath = path;
-            } else {
-                // other stuff
+        ImGui::ImageButton(item.path().c_str(), textureId, ImVec2(thumbnailSize, thumbnailSize));
+        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+            if (item.is_directory()) {
+                currentPath /= path.filename();
             }
         }
 
-        ImTextureID textureId = 0;
-        if (_texturesLoaded && _textureCache.contains(path.string())) {
-            textureId = _textureCache[path.string()];
-        }
+        ImGui::TextWrapped(path.filename().c_str());
 
-        ImGui::SameLine();
-        ImGui::Image(textureId, ImVec2(128, 128));
-        ImGui::Text("%s", path.filename().string().c_str());
-
-        ImGui::EndGroup();
+        ImGui::PopID();
+        ImGui::NextColumn();
     }
+
+    ImGui::Columns(1);
+    ImGui::EndChild();
+
+    // Bottom bar
+
+    float status_bar_height = 22.0f;
+
+    ImGui::SetCursorPosY(ImGui::GetWindowHeight() - status_bar_height);
+
+    ImGui::BeginChild("BottomBar", ImVec2(0, status_bar_height), false);
+
+    ImGui::SliderFloat("Size", &thumbnailSize, 16, 512);
+    ImGui::SameLine();
+    ImGui::SliderFloat("Padding", &thumbnailPadding, 0, 128);
+
+    ImGui::EndChild();
 
     ImGui::End();
 }
