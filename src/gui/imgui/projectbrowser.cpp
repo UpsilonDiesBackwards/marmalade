@@ -31,6 +31,21 @@
 
 #include <thread>
 
+Marmalade::GUI::FileType Marmalade::GUI::ProjectBrowser::determineFileType(const std::filesystem::path& extension) {
+    if (extension == ".png" || extension == ".jpg" || extension == ".gif") {
+        return FileType_IMAGE;
+    } else if (extension == ".mp4" || extension == ".avi") {
+        return FileType_VIDEO;
+    } else if (extension == ".lua") {
+        return FileType_SCRIPT;
+    } else if (extension == ".cpp") {
+        return FileType_CODE;
+    } else if (extension == ".txt") {
+        return FileType_TEXT;
+    }
+    return FileType_UNKNOWN;
+}
+
 GLuint Marmalade::GUI::ProjectBrowser::loadTexture(std::string filename) {
     int width, height, channels;
     unsigned char* data = ::stbi_load(filename.c_str(), &width, &height, &channels, 4);
@@ -67,21 +82,22 @@ void Marmalade::GUI::ProjectBrowser::loadTextures() {
     spdlog::info("Loading textures");
     _textureCache.clear();
 
-    _textureCache["directory"] = loadTexture("../res/icons/ui/directory.png");
-    _textureCache["document"] = loadTexture("../res/icons/ui/document.png");
+    _textureCache["directory"] = loadTexture("res/icons/ui/directory.png");
+    _textureCache["document"] = loadTexture("res/icons/ui/document.png");
 
-    for (const auto& item: std::filesystem::directory_iterator(currentPath)) {
+    for (const auto& item: std::filesystem::directory_iterator(_currentPath)) {
         if (item.is_directory()) continue;
 
-        // TODO: Magic number MIME type checking
-        GLuint textureId = loadTexture(item.path().string());
-        if (textureId != 0) {
-            _textureCache[item.path().string()] = textureId;
+        if (determineFileType(item.path().extension()) == FileType_IMAGE) {
+            GLuint textureId = loadTexture(item.path().string());
+            if (textureId != 0) {
+                _textureCache[item.path().string()] = textureId;
+            }
         }
     }
 
     spdlog::info("Textures loaded");
-    _texturesLoaded = true;
+    _texturesLoaded = _currentPath.string();
     _textureOperationRunning = false;
 
     glfwMakeContextCurrent(nullptr);
@@ -107,17 +123,18 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
         return;
     }
 
-    std::filesystem::path rootAssetFolder = std::filesystem::path(project->filePath) / "assets";
+    _rootAssetDir = std::filesystem::path(project->filePath) / "assets";
+    if (_currentPath.empty()) {
+        _currentPath = _rootAssetDir;
+    }
 
-    currentPath = rootAssetFolder;
-
-    if (currentPath != rootAssetFolder) {
+    if (_currentPath != _rootAssetDir) {
         if (ImGui::Button("..")) {
-            currentPath = currentPath.parent_path();
+            _currentPath = _currentPath.parent_path();
         }
     }
 
-    if (!_texturesLoaded) {
+    if (_texturesLoaded != _currentPath.string()) {
         std::thread thread(&ProjectBrowser::loadTextures, this);
         thread.detach();
     }
@@ -134,28 +151,25 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
 
     ImGui::Columns(columnCount, nullptr, false);
 
-    if (_textureCache.find("directory") == _textureCache.end()) {
-        _textureCache["directory"] = loadTexture("res/icons/ui/directory.png");
-    }
-    if (_textureCache.find("document") == _textureCache.end()) {
-        _textureCache["document"] = loadTexture("res/icons/ui/document.png");
-    }
-
-    for (const auto& item: std::filesystem::directory_iterator(currentPath)) {
+    for (const auto& item: std::filesystem::directory_iterator(_currentPath)) {
         const std::filesystem::path path = item.path();
 
         ImGui::PushID(path.c_str());
 
         GLuint textureId = item.is_directory() ? _textureCache["directory"] : _textureCache["document"];
 
-        ImGui::ImageButton(item.path().c_str(), textureId, ImVec2(thumbnailSize, thumbnailSize));
+        if (determineFileType(path.extension()) == FileType_IMAGE) {
+            textureId = _textureCache[path.string()];
+        }
+
+        ImGui::ImageButton(item.path().string().c_str(), textureId, ImVec2(thumbnailSize, thumbnailSize));
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
             if (item.is_directory()) {
-                currentPath /= path.filename();
+                _currentPath /= path.filename();
             }
         }
 
-        ImGui::TextWrapped(path.filename().c_str());
+        ImGui::TextWrapped("%s", path.filename().string().c_str());
 
         ImGui::PopID();
         ImGui::NextColumn();

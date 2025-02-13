@@ -33,6 +33,15 @@
 #include <atomic>
 
 namespace Marmalade::GUI {
+    enum FileType {
+        FileType_IMAGE,
+        FileType_VIDEO,
+        FileType_SCRIPT,
+        FileType_CODE,
+        FileType_TEXT,
+        FileType_UNKNOWN
+    };
+
     class ProjectBrowser : public Window {
     public:
         explicit ProjectBrowser(bool visible) : Window(visible) {};
@@ -40,13 +49,16 @@ namespace Marmalade::GUI {
         void Draw() override;
 
     private:
-        std::filesystem::path currentPath;
+        std::filesystem::path _currentPath;
+        std::filesystem::path _rootAssetDir;
 
         GLFWwindow* _loadingContext{nullptr};
 
         std::unordered_map<std::string, ImTextureID> _textureCache{};
         std::atomic<bool> _textureOperationRunning{false};
-        bool _texturesLoaded{false};
+        std::string _texturesLoaded{};
+
+        FileType determineFileType(const std::filesystem::path& extension);
 
         GLuint loadTexture(std::string filename);
         void loadTextures();
