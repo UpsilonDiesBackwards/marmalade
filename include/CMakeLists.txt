@@ -18,6 +18,8 @@ list(APPEND ENGINE_API
         ecs/componentmanager.h
         ecs/components/transform.h
         ecs/components/spriterender.h
+        ecs/components/physics/rigidbody.h
+        ecs/components/physics/boxcollider.h
 )
 
 target_sources(marmalade PRIVATE ${ENGINE_API})

@@ -35,6 +35,8 @@ list(APPEND ENGINE_SRC # ECS
         ecs/componentmanager.cpp
         ecs/components/transform.cpp
         ecs/components/spriterender.cpp
+        ecs/components/physics/boxcollider.cpp
+        ecs/components/physics/rigidbody.cpp
 )
 
 list(APPEND ENGINE_SRC # Mathematics
