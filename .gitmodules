@@ -29,3 +29,6 @@
 [submodule "vendor/spdlog"]
 	path = vendor/spdlog
 	url = git@github.com:gabime/spdlog.git
+[submodule "vendor/imguizmo"]
+	path = vendor/imguizmo
+	url = https://github.com/CedricGuillemet/ImGuizmo.git

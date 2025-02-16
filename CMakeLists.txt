@@ -133,9 +133,12 @@ list(APPEND IMGUI_SRC
         vendor/imgui/backends/imgui_impl_opengl3.cpp
 )
 
+file (GLOB IMGUIZMO_SRC "vendor/imguizmo/*.h" "vendor/imguizmo/*.cpp")
+
 add_executable(marmalade
         vendor/glad/src/glad.c
         ${IMGUI_SRC}
+        ${IMGUIZMO_SRC}
         vendor/imguifiledialog/ImGuiFileDialog.cpp
 )
 
@@ -168,6 +171,7 @@ target_include_directories(marmalade PRIVATE
         vendor/glfw-3.4/include
         vendor/imgui
         vendor/imguifiledialog
+        vendor/imguizmo
         vendor/glm/glm
         ${LUA_INCLUDE_DIR}
         vendor/luaaa
