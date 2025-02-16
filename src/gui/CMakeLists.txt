@@ -4,6 +4,8 @@ list(APPEND ENGINE_SRC_GUI
         components/tableview.h
         components/selectablelistview.h
 
+        imgui/about.cpp
+        imgui/about.h
         imgui/editor.cpp
         imgui/editor.h
         imgui/editorviews.cpp

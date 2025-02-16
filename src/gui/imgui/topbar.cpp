@@ -89,6 +89,12 @@ void Marmalade::GUI::TopBar::Show() {
             ImGui::EndMenu();
         }
 
+        if (ImGui::BeginMenu("Help")) {
+            ImGui::MenuItem(ICON_CI_INFO " About", nullptr, &about.visible);
+
+            ImGui::EndMenu();
+        }
+
         if (showDebugWindow) ImGui::ShowDemoWindow();
 
         float alignRight = ImGui::GetWindowWidth() - 170;

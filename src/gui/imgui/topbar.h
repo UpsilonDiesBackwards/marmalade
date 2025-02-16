@@ -27,6 +27,7 @@
 #include "preferences.h"
 #include "settings.h"
 #include "projectbrowser.h"
+#include "about.h"
 
 #include <vector>
 
@@ -41,6 +42,7 @@ namespace Marmalade::GUI {
             windows.push_back(&preferences);
             windows.push_back(&settings);
             windows.push_back(&projectBrowser);
+            windows.push_back(&about);
         }
 
         void Show();
@@ -52,6 +54,7 @@ namespace Marmalade::GUI {
         Marmalade::GUI::Preferences preferences{};
         Marmalade::GUI::ProjectSettings settings{};
         Marmalade::GUI::ProjectBrowser projectBrowser{true};
+        Marmalade::GUI::About about{};
 
         bool showDebugWindow = false;
 
