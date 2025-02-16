@@ -91,7 +91,9 @@ void SceneHierarchy::displayEntity(Entity* entity, int index) {
 
     entity->id = index;
 
-    if (ImGui::TreeNode(nodeLabel.c_str())) {
+    ImGuiTreeNodeFlags nodeFlags = entity->children.empty() ? ImGuiTreeNodeFlags_Leaf : 0;
+
+    if (ImGui::TreeNodeEx(nodeLabel.c_str(), nodeFlags)) {
         if (ImGui::IsItemHovered()) {
             _selected = entity;
         }
@@ -108,6 +110,7 @@ void SceneHierarchy::displayEntity(Entity* entity, int index) {
         ImGui::TreePop();
     }
 }
+
 void SceneHierarchy::showCreatePopup() {
     if (ImGui::BeginPopupModal("Create Entity", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         if (_parent) {

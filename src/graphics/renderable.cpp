@@ -22,6 +22,7 @@
 #include <glad/glad.h>
 
 #include "../application/application.h"
+#include "graphics/texture.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/type_ptr.hpp>
@@ -87,6 +88,12 @@ void Renderable::Draw(glm::mat4 modelMatrix) {
 
     glDrawElements(GL_TRIANGLES, sizeof(indices)/4, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
+}
+
+void Renderable::SetTexture(const std::string& filePath) {
+    glDeleteTextures(1, &texture);
+
+    texture = Texture::LoadTexture(filePath);
 }
 
 unsigned int Renderable::GetTexture() {

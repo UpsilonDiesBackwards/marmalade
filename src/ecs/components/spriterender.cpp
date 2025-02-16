@@ -19,15 +19,43 @@
 
 #include <ecs/components/spriterender.h>
 
+#include "../../application/config.h"
+#include "../../application/application.h"
+
 #include <scene/entity.h>
 
 #include <imgui.h>
+#include <ImGuiFileDialog.h>
 
 void Marmalade::ECS::SpriteRender::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
 
-    ImGui::Image(ImTextureID(entity->renderable.GetTexture()), ImVec2(256, 256));
+    GLuint textureID = entity->renderable.GetTexture();
+    if (textureID == 0) {
+        ImGui::Text("No texture available");
+    } else {
+        ImGui::Image(ImTextureID(textureID), ImVec2(128, 128));
+    }
 
+    if (ImGui::Button("Choose Texture")) {
+        auto* project = Application::GetInstance().GetCurrentProject();
+        if (project) {
+            IGFD::FileDialogConfig config;
+            config.path = project->filePath + "/assets";
+
+            ImGuiFileDialog::Instance()->OpenDialog("SelectTexture", "Select image file", ".png,.jpg,.jpeg", config);
+        } else {
+            ImGui::Text("No project loaded!");
+        }
+    }
+
+    if (ImGuiFileDialog::Instance()->Display("SelectTexture")) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
+            std::string texturePath = ImGuiFileDialog::Instance()->GetFilePathName();
+            entity->renderable.SetTexture(texturePath);
+        }
+        ImGuiFileDialog::Instance()->Close();
+    }
 }
 
 void Marmalade::ECS::SpriteRender::Apply(Entity* entity) {

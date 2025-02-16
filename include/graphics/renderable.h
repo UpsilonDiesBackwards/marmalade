@@ -34,6 +34,7 @@ public:
     void Initialise(); // Buffer Setup
     void Draw(glm::mat4 modelMatrix);
 
+    void SetTexture(const std::string& filePath);
     unsigned int GetTexture();
 private:
     unsigned int VAO, VBO, EBO;

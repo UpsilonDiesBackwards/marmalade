@@ -22,6 +22,8 @@
 
 #include "../component.h"
 
+#include "graphics/renderable.h"
+
 namespace Marmalade::ECS {
     class SpriteRender : public Component {
     public:
