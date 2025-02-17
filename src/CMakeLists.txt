@@ -8,12 +8,8 @@ list(APPEND ENGINE_SRC
         application/profiler.h
         application/guilogsink.cpp
         application/guilogsink.h
-        application/project.cpp
-        application/project.h
         application/config.cpp
         application/config.h
-        application/projectsettings.cpp
-        application/projectsettings.h
 
         graphics/viewport.cpp
         graphics/renderable.cpp
@@ -29,6 +25,12 @@ list(APPEND ENGINE_SRC
         scene/entity.cpp
         scene/scene.cpp
         scene/scenemanager.cpp
+
+        project/project.cpp
+        project/project.h
+        project/projectsettings.cpp
+        project/projectsettings.h
+        project/projectmanager.h
 )
 
 list(APPEND ENGINE_SRC # ECS

@@ -19,27 +19,27 @@
 
 #include "projectsettings.h"
 
-#include "application.h"
+#include "../application/application.h"
 
 #include <fstream>
 
-ProjectSettings Settings::projectSettings;
+Marmalade::Project::ProjectSettings Marmalade::Project::Settings::projectSettings;
 
-void Settings::SaveProjectSettings() {
+void Marmalade::Project::Settings::SaveProjectSettings() {
     Application& app = Application::GetInstance();
     auto project = app.GetCurrentProject();
 
-    std::ofstream o(std::filesystem::path(project->filePath) / "settings.marm");
+    std::ofstream o(std::filesystem::path(project->basePath) / "settings.marm");
     nlohmann::json new_settings = projectSettings;
     o << new_settings.dump(2);
     o.close();
 }
 
-void Settings::LoadProjectSettings() {
+void Marmalade::Project::Settings::LoadProjectSettings() {
     Application& app = Application::GetInstance();
     auto project = app.GetCurrentProject();
 
-    std::ifstream i(std::filesystem::path(project->filePath) / "settings.marm");
+    std::ifstream i(std::filesystem::path(project->basePath) / "settings.marm");
     if (i.fail()) {
         // File doesn't exist!
         spdlog::error("Failed to load project settings, file does not exist!");

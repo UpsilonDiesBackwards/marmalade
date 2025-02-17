@@ -20,7 +20,7 @@
 #ifndef ENGINE_APPLICATION_H
 #define ENGINE_APPLICATION_H
 
-#include "project.h"
+#include "../project/project.h"
 
 #include "../gui/gameview.h"
 #include "../gui/stylemanager.h"
@@ -43,7 +43,8 @@
 #include <spdlog/spdlog.h>
 
 enum PlayState {
-    Play, Stop,
+    Play,
+    Stop,
 };
 
 enum EditorMode {
@@ -92,8 +93,9 @@ public:
 
     std::shared_ptr<GuiLogSink> guiSink;
 
-    void SetCurrentProject(std::unique_ptr<Project>& project);
-    Project* GetCurrentProject();
+    void SetCurrentProject(std::unique_ptr<Marmalade::Project::Project>& project);
+    Marmalade::Project::Project* GetCurrentProject();
+
 private:
     Application(int width, int height, const char* title);
 
@@ -109,7 +111,7 @@ private:
 
     std::shared_ptr<spdlog::logger> logger;
 
-    std::unique_ptr<Project> currentProject;
+    std::unique_ptr<Marmalade::Project::Project> currentProject;
 };
 
 #endif

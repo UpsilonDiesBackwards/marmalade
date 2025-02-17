@@ -20,6 +20,7 @@
 #include "topbar.h"
 
 #include "../../application/application.h"
+#include "../../project/projectmanager.h"
 
 #include <imgui.h>
 
@@ -40,8 +41,9 @@ void Marmalade::GUI::TopBar::Show() {
             }
             if (ImGui::MenuItem(ICON_CI_FOLDER_OPENED " Open Project")) {
                 IGFD::FileDialogConfig config;
-                config.path = Config::engineConfig.defaultProjectPath;
-                ImGuiFileDialog::Instance()->OpenDialog("ChooseProject", "Choose Project Directory", nullptr, config);
+                config.path = Config::engineConfig.DefaultProjectPath;
+                config.fileName = "project.marmalade";
+                ImGuiFileDialog::Instance()->OpenDialog("ChooseProject", "Choose Project File", ".marmalade", config);
             }
             if (ImGui::MenuItem(ICON_CI_SCREEN_FULL " New Scene")) {
                 showSceneCreationPopUp = true;
@@ -104,29 +106,19 @@ void Marmalade::GUI::TopBar::Show() {
                     Application::GetInstance().profiler.GetCurrentFrameTime());
 
         if (ImGuiFileDialog::Instance()->Display("ChooseProject")) {
-            static std::string selectedProject = "";
-
             if (ImGuiFileDialog::Instance()->IsOk()) {
-                selectedProject  = ImGuiFileDialog::Instance()->GetCurrentPath();
-                std::filesystem::path projectPath = selectedProject;
+                auto dir = ImGuiFileDialog::Instance()->GetCurrentPath();
+                auto fileName = ImGuiFileDialog::Instance()->GetCurrentFileName();
+                std::filesystem::path projectPath = std::filesystem::path(dir) / fileName;
 
-                if (std::filesystem::is_directory(projectPath)) {
-                    std::filesystem::path settingsFile = projectPath / "settings.marm"; // this should be changed to project.marmalade
-                    spdlog::info("settings path: {}", settingsFile.string());
+                try {
+                    auto project = std::make_unique<Marmalade::Project::Project>(Marmalade::Project::ProjectManager<>::OpenProject(projectPath));
 
-                    if (std::filesystem::exists(settingsFile)) {
-                        GitSettings gitSettings;
+                    Application::GetInstance().SetCurrentProject(project);
 
-                        auto project = std::make_unique<Project>(selectedProject, projectPath.string(), gitSettings, true);
-
-                        Application::GetInstance().SetCurrentProject(project);
-
-                        Settings::LoadProjectSettings();
-                    } else {
-                        spdlog::error("Project Settings file not found");
-                    }
-                } else {
-                    spdlog::error("Provided path is not a valid project directory");
+                    Marmalade::Project::Settings::LoadProjectSettings();
+                } catch (const std::exception& ex) {
+                    spdlog::error("Failed to open project: {}", ex.what());
                 }
             }
             ImGuiFileDialog::Instance()->Close();

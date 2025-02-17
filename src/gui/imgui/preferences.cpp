@@ -58,10 +58,10 @@ void Marmalade::GUI::Preferences::drawGeneralAppearancePane() {
 
 void Marmalade::GUI::Preferences::drawGeneralProjectsPane() {
     static char defaultProjectPathC[512];
-    strncpy(defaultProjectPathC, Config::engineConfig.defaultProjectPath.c_str(), sizeof(defaultProjectPathC));
+    strncpy(defaultProjectPathC, Config::engineConfig.DefaultProjectPath.c_str(), sizeof(defaultProjectPathC));
 
     if (ImGui::InputText("Default Project Path", defaultProjectPathC, sizeof(defaultProjectPathC))) {
-        Config::engineConfig.defaultProjectPath = defaultProjectPathC;
+        Config::engineConfig.DefaultProjectPath = defaultProjectPathC;
     }
 }
 

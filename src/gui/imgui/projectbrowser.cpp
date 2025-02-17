@@ -123,7 +123,7 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
         return;
     }
 
-    _rootAssetDir = std::filesystem::path(project->filePath) / "assets";
+    _rootAssetDir = std::filesystem::path(project->basePath) / "assets";
     if (_currentPath.empty()) {
         _currentPath = _rootAssetDir;
     }

@@ -41,7 +41,7 @@ void Marmalade::ECS::SpriteRender::Display(Entity* entity) {
         auto* project = Application::GetInstance().GetCurrentProject();
         if (project) {
             IGFD::FileDialogConfig config;
-            config.path = project->filePath + "/assets";
+            config.path = (project->basePath / "assets").string();
 
             ImGuiFileDialog::Instance()->OpenDialog("SelectTexture", "Select image file", ".png,.jpg,.jpeg", config);
         } else {
@@ -59,5 +59,4 @@ void Marmalade::ECS::SpriteRender::Display(Entity* entity) {
 }
 
 void Marmalade::ECS::SpriteRender::Apply(Entity* entity) {
-
 }

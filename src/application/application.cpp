@@ -24,7 +24,7 @@
 #include "config.h"
 
 #include <imgui.h>
-#include <imgui_internal.h> // Only for docking API
+#include <imgui_internal.h>// Only for docking API
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 
@@ -37,9 +37,8 @@
 #include <iostream>
 #include <fstream>
 
-Application::Application(int width, int height, const char *title) :
-    window(nullptr), width(width), height(height), title(title), inputManager(InputManager::GetInstance()),
-    input(&inputManager), camera(new Camera(1920, 1080, 1.0f)) {
+Application::Application(int width, int height, const char* title) : window(nullptr), width(width), height(height), title(title), inputManager(InputManager::GetInstance()),
+                                                                     input(&inputManager), camera(new Camera(1920, 1080, 1.0f)) {
 
     sceneManager = SceneManager();
     profiler = Profiler();
@@ -47,7 +46,7 @@ Application::Application(int width, int height, const char *title) :
 }
 
 Application::~Application() {
-//    Terminate();
+    //    Terminate();
 }
 
 void Application::Initialise() {
@@ -60,14 +59,16 @@ void Application::Initialise() {
     if (!glfwInit()) {// Initialise GLFW
         std::cerr << "Failed to Initialise GLFW!" << std::endl;
         return;
-    } else std::cout << "GLFW Initialised" << std::endl;
+    } else
+        std::cout << "GLFW Initialised" << std::endl;
 
-    window = glfwCreateWindow(width, height, title, NULL, NULL); // Create the main application window
+    window = glfwCreateWindow(width, height, title, NULL, NULL);// Create the main application window
     if (!window) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return;
-    } else std::cout << "Window Created" << std::endl;
+    } else
+        std::cout << "Window Created" << std::endl;
     glfwWindowHint(GLFW_SAMPLES, 4);
 
     glfwMakeContextCurrent(window);
@@ -75,13 +76,14 @@ void Application::Initialise() {
 
     inputManager.SetWindow(window);
 
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) { // Initialise GLAD
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {// Initialise GLAD
         std::cout << "Failed to initialize GLAD" << std::endl;
         return;
-    } else std::cout << "GLAD Initialised" << std::endl;
+    } else
+        std::cout << "GLAD Initialised" << std::endl;
 
     IMGUI_CHECKVERSION();
-    ImGui::CreateContext(); // Create ImGui Context
+    ImGui::CreateContext();// Create ImGui Context
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 430");
 
@@ -122,8 +124,8 @@ void Application::Initialise() {
     sceneManager.SetCurrentScene("Default");
 
     Marmalade::ECS::Transform defaultTransform;
-    Entity *newEntity = new Entity("New Entity", EntityFlags::RENDERABLE);
-    sceneManager. GetCurrentScene()->AddEntity(std::shared_ptr<Entity>(newEntity));
+    Entity* newEntity = new Entity("New Entity", EntityFlags::RENDERABLE);
+    sceneManager.GetCurrentScene()->AddEntity(std::shared_ptr<Entity>(newEntity));
 }
 
 void Application::Run() {
@@ -192,11 +194,11 @@ void Application::Terminate() {
     glfwTerminate();
 }
 
-GLFWwindow *Application::getWindow() {
+GLFWwindow* Application::getWindow() {
     return window;
 }
 
-Camera *Application::getCamera() {
+Camera* Application::getCamera() {
     return camera;
 }
 
@@ -218,7 +220,7 @@ void Application::SetupLogger() {
     spdlog::set_level(Marmalade::Config::engineConfig.LogLevel);
 }
 
-void Application::SetCurrentProject(std::unique_ptr<Project>& project) { // Change the current projects and update the window title to inc project name
+void Application::SetCurrentProject(std::unique_ptr<Marmalade::Project::Project>& project) {// Change the current projects and update the window title to inc project name
     currentProject = std::move(project);
 
     std::string windowTitle = std::string(title) + " // " + currentProject->name;
@@ -226,6 +228,6 @@ void Application::SetCurrentProject(std::unique_ptr<Project>& project) { // Chan
     glfwSetWindowTitle(window, windowTitle.c_str());
 }
 
-Project* Application::GetCurrentProject() {
+Marmalade::Project::Project* Application::GetCurrentProject() {
     return currentProject.get();
 }

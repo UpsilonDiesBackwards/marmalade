@@ -26,7 +26,7 @@
 
 #include <string>
 
-struct GitSettings {
+struct ProjectCreationOptions {
     git_repository* repo = NULL;
 
     bool initGitRepository{false};
@@ -43,7 +43,8 @@ namespace Marmalade::GUI {
     public:
         void Draw() override;
 
-        GitSettings gitSettings;
+        ProjectCreationOptions creationOptions;
+
     private:
         std::string projectName = "";
         std::string projectFilePath = "";
@@ -51,7 +52,7 @@ namespace Marmalade::GUI {
 
         void CreateProject();
         void InitialiseGitRepository(const char* repoPath);
-        void SetGitRemoteURL(GitSettings gitSettings);
+        void SetGitRemoteURL(ProjectCreationOptions creationOptions);
     };
 }
 
