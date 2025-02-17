@@ -163,8 +163,6 @@ void Marmalade::GUI::ProjectWizard::CreateProject() {
         // Create the project and set it to the current project
         Application::GetInstance().SetCurrentProject(project);
 
-        Marmalade::Project::Settings::SaveProjectSettings();
-
         if (creationOptions.initGitRepository) {// If desired then initialise a git repo at the project directory
             InitialiseGitRepository(projectPath.string().c_str());
         }

@@ -39,7 +39,7 @@ Marmalade::Project::Project::Project(std::string name, const std::filesystem::pa
     this->name = std::move(name);
 }
 
-void Marmalade::Project::Project::CreateProjectDirectories(ProjectCreationOptions creationOptions) {
+void Marmalade::Project::Project::CreateEmptyProject(ProjectCreationOptions creationOptions) {
     for (const auto& directory: baseDirectories) {// Create Directories
         std::filesystem::path path = basePath / directory;
 
@@ -77,14 +77,11 @@ void Marmalade::Project::Project::CreateProjectDirectories(ProjectCreationOption
         }
     }
 
-    saveProjectMarmalade(basePath.string());
+    SaveProjectMarmalade();
 }
 
-void Marmalade::Project::Project::loadProjectMarmalade() {
-    Application& app = Application::GetInstance();
-    auto project = app.GetCurrentProject();
-
-    std::ifstream i(std::filesystem::path(project->basePath) / "project.marmalade");
+void Marmalade::Project::Project::LoadProjectMarmalade() {
+    std::ifstream i(filePath);
     if (i.fail()) {
         // File doesn't exist!
         spdlog::error("Failed to load project marmalade, file does not exist!");
@@ -96,9 +93,29 @@ void Marmalade::Project::Project::loadProjectMarmalade() {
     i.close();
 }
 
-void Marmalade::Project::Project::saveProjectMarmalade(std::string filePath) {
-    std::ofstream o(std::filesystem::path(filePath) / "project.marmalade");
+void Marmalade::Project::Project::SaveProjectMarmalade() {
+    std::ofstream o(filePath);
     nlohmann::json new_settings = projectMarmalade;
     o << new_settings.dump(2);
     o.close();
+}
+
+void Marmalade::Project::Project::SaveProjectSettings() {
+    std::ofstream o(basePath / projectMarmalade.paths.settings);
+    nlohmann::json new_settings = settings;
+    o << new_settings.dump(2);
+    o.close();
+}
+
+void Marmalade::Project::Project::LoadProjectSettings() {
+    std::ifstream i(basePath / projectMarmalade.paths.settings);
+    if (i.fail()) {
+        // File doesn't exist!
+        spdlog::error("Failed to load project settings, file does not exist!");
+        return;
+    }
+
+    auto data = nlohmann::json::parse(i);
+    settings = data.template get<ProjectSettings>();
+    i.close();
 }

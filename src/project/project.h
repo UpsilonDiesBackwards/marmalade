@@ -30,17 +30,17 @@
 namespace Marmalade::Project {
 
     struct ProjectPaths {
-        std::string Settings{"settings.marm"};
-        std::vector<std::string> Scenes;
+        std::string settings{"settings.marm"};
+        std::vector<std::string> scenes;
     };
 
     struct ProjectMarmalade {
-        std::string Name{"A Marmalade Project"};
-        ProjectPaths Paths{};
+        std::string name{"A Marmalade Project"};
+        ProjectPaths paths{};
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectPaths, Settings, Scenes);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectMarmalade, Name, Paths);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectPaths, settings, scenes);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectMarmalade, name, paths);
 
     class Project {
     public:
@@ -48,13 +48,19 @@ namespace Marmalade::Project {
         std::filesystem::path basePath;// Project base directory
         std::filesystem::path filePath;// Where the project is stored / project.marmalade file path
 
-        Settings settings;
+        ProjectSettings settings;
         ProjectMarmalade projectMarmalade;
 
         explicit Project(const std::filesystem::path& filePath);
         Project(std::string name, const std::filesystem::path& filePath);
 
-        void CreateProjectDirectories(ProjectCreationOptions creationOptions);
+        void CreateEmptyProject(ProjectCreationOptions creationOptions);
+
+        void LoadProjectMarmalade();
+        void SaveProjectMarmalade();
+
+        void LoadProjectSettings();
+        void SaveProjectSettings();
 
     private:
         std::vector<std::string> baseDirectories = {// Directories auto-created when the project is made
@@ -68,9 +74,6 @@ namespace Marmalade::Project {
                 "README.md",
                 "settings.marm",
                 "package-settings.marm"};
-
-        void loadProjectMarmalade();
-        void saveProjectMarmalade(std::string string);
     };
 }
 

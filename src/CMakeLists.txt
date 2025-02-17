@@ -28,7 +28,6 @@ list(APPEND ENGINE_SRC
 
         project/project.cpp
         project/project.h
-        project/projectsettings.cpp
         project/projectsettings.h
         project/projectmanager.h
 )

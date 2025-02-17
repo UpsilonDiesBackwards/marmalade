@@ -115,8 +115,6 @@ void Marmalade::GUI::TopBar::Show() {
                     auto project = std::make_unique<Marmalade::Project::Project>(Marmalade::Project::ProjectManager<>::OpenProject(projectPath));
 
                     Application::GetInstance().SetCurrentProject(project);
-
-                    Marmalade::Project::Settings::LoadProjectSettings();
                 } catch (const std::exception& ex) {
                     spdlog::error("Failed to open project: {}", ex.what());
                 }
