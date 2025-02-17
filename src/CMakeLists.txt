@@ -30,6 +30,8 @@ list(APPEND ENGINE_SRC
         project/project.h
         project/projectsettings.h
         project/projectmanager.h
+        project/projectscenes.cpp
+        project/projectscenes.h
 )
 
 list(APPEND ENGINE_SRC # ECS

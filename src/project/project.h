@@ -21,9 +21,9 @@
 #define MARMALADE_PROJECT_PROJECT_H
 
 #include "projectsettings.h"
-#include "../gui/imgui/projectwizard.h"
+#include "projectscenes.h"
 
-#include <scene/scenemanager.h>
+#include "../gui/imgui/projectwizard.h"
 
 #include <string>
 
@@ -39,9 +39,6 @@ namespace Marmalade::Project {
         ProjectPaths paths{};
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectPaths, settings, scenes);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectMarmalade, name, paths);
-
     class Project {
     public:
         std::string name;
@@ -50,6 +47,8 @@ namespace Marmalade::Project {
 
         ProjectSettings settings;
         ProjectMarmalade projectMarmalade;
+
+        ProjectScenes scenes;
 
         explicit Project(const std::filesystem::path& filePath);
         Project(std::string name, const std::filesystem::path& filePath);
@@ -75,6 +74,9 @@ namespace Marmalade::Project {
                 "settings.marm",
                 "package-settings.marm"};
     };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectPaths, settings, scenes)
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectMarmalade, name, paths)
 }
 
 #endif

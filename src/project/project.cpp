@@ -19,8 +19,6 @@
 
 #include "project.h"
 
-#include "../application/application.h"
-
 #include <spdlog/spdlog.h>
 
 #include <fstream>
