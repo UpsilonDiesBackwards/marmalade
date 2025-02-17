@@ -41,7 +41,7 @@ void Marmalade::GUI::TopBar::Show() {
             }
             if (ImGui::MenuItem(ICON_CI_FOLDER_OPENED " Open Project")) {
                 IGFD::FileDialogConfig config;
-                config.path = Config::engineConfig.DefaultProjectPath;
+                config.path = Config::engineConfig.defaultProjectPath;
                 config.fileName = "project.marmalade";
                 ImGuiFileDialog::Instance()->OpenDialog("ChooseProject", "Choose Project File", ".marmalade", config);
             }
@@ -74,7 +74,7 @@ void Marmalade::GUI::TopBar::Show() {
             ImGui::MenuItem(ICON_CI_FILE_TEXT " Log", nullptr, &log.visible);
 
             if (ImGui::MenuItem(ICON_CI_SAVE " Save Layout")) {
-                Application::GetInstance().styleManager.SaveStyle((Marmalade::Config::GetConfigDirectory() / Marmalade::Config::engineConfig.ThemeFile).string());
+                Application::GetInstance().styleManager.SaveStyle((Marmalade::Config::GetConfigDirectory() / Marmalade::Config::engineConfig.themeFile).string());
 
                 ImGui::OpenPopup("LayoutSavePopup");
             }

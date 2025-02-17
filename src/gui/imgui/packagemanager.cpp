@@ -61,19 +61,19 @@ void PackageManagerListView::RenderItem(const Package& item, bool selected) {
 #pragma region Table view
 
 std::vector<std::string> RepositoriesTableView::RenderItem(const Marmalade::Repository& item) {
-    return {item.Name, item.GitUrl};
+    return {item.name, item.gitUrl};
 }
 
 void RepositoriesTableView::PrepareEdit(const Marmalade::Repository& item) {
-    std::strncpy(_tempName, item.Name.c_str(), sizeof(_tempName) - 1);
-    std::strncpy(_tempGitUrl, item.GitUrl.c_str(), sizeof(_tempGitUrl) - 1);
-    _tempDepth = item.Depth;
+    std::strncpy(_tempName, item.name.c_str(), sizeof(_tempName) - 1);
+    std::strncpy(_tempGitUrl, item.gitUrl.c_str(), sizeof(_tempGitUrl) - 1);
+    _tempDepth = item.depth;
 }
 
 bool RepositoriesTableView::DrawEditDialog(Marmalade::Repository* item) {
     ImGui::InputText("Name", _tempName, 256);
     ImGui::InputText("Git URL", _tempGitUrl, 256);
-    ImGui::InputInt("Depth", &_tempDepth);
+    ImGui::InputInt("depth", &_tempDepth);
 
     if (ImGui::Button("Cancel")) {
         return true;
@@ -86,9 +86,9 @@ bool RepositoriesTableView::DrawEditDialog(Marmalade::Repository* item) {
             // Create
             items.push_back(Repository{_tempName, _tempGitUrl, _tempDepth});
         } else {
-            item->Name = _tempName;
-            item->GitUrl = _tempGitUrl;
-            item->Depth = _tempDepth;
+            item->name = _tempName;
+            item->gitUrl = _tempGitUrl;
+            item->depth = _tempDepth;
         }
 
         Marmalade::Config::SaveEngineConfig();
@@ -106,12 +106,12 @@ void RepositoriesTableView::ResetEdit() {
 }
 
 Components::TableView<Marmalade::Repository, std::vector<Marmalade::Repository>, void>::RemoveDialogResult RepositoriesTableView::DrawRemoveDialog(Marmalade::Repository* item) {
-    ImGui::Text("Are you sure you want to delete %s", item->Name.c_str());
+    ImGui::Text("Are you sure you want to delete %s", item->name.c_str());
 
     if (ImGui::Button("Yes")) {
         items.erase(std::remove_if(items.begin(), items.end(),
                                    [&item](const Repository& repo) {
-                                       return item->Name == repo.Name;
+                                       return item->name == repo.name;
                                    }),
                     items.end());
         Config::SaveEngineConfig();
@@ -337,10 +337,10 @@ void PackageManager::updateLocalDatabase() {
     _packagesByName.clear();
     _keywordIndex.clear();
 
-    for (const auto& repo: Marmalade::Config::engineConfig.Repos) {
+    for (const auto& repo: Marmalade::Config::engineConfig.repos) {
         bool no_err{false};
 
-        if (std::filesystem::exists(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / repo.Name)) {
+        if (std::filesystem::exists(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / repo.name)) {
             no_err = pullRepo(repo);
         } else {
             no_err = cloneRepo(repo);
@@ -369,9 +369,9 @@ bool PackageManager::cloneRepo(const Repository& config_repo) {
     clone_opts.fetch_opts.callbacks.payload = this;
     clone_opts.fetch_opts.callbacks.sideband_progress = sideband_progress;
     clone_opts.fetch_opts.callbacks.transfer_progress = &fetch_progress;
-    clone_opts.fetch_opts.depth = config_repo.Depth;
+    clone_opts.fetch_opts.depth = config_repo.depth;
 
-    int error = git_clone(&cloned_repo, config_repo.GitUrl.c_str(), (Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.Name).string().c_str(), &clone_opts);
+    int error = git_clone(&cloned_repo, config_repo.gitUrl.c_str(), (Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name).string().c_str(), &clone_opts);
     if (error != 0) {
         handleGitError("clone");
         return false;
@@ -385,16 +385,16 @@ bool PackageManager::cloneRepo(const Repository& config_repo) {
 bool PackageManager::pullRepo(const Repository& config_repo) {
     git_libgit2_init();
 
-    spdlog::info("Beginning pull for {}", config_repo.Name);
+    spdlog::info("Beginning pull for {}", config_repo.name);
 
     // Delete index first
-    if (std::filesystem::remove(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.Name / INDEX_FILENAME)) {
+    if (std::filesystem::remove(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name / INDEX_FILENAME)) {
         spdlog::info("Index deleted successfully.");
     }
 
     spdlog::debug("Opening local repository");
     git_repository* repo = nullptr;
-    int error = git_repository_open(&repo, (Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.Name).string().c_str());
+    int error = git_repository_open(&repo, (Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name).string().c_str());
     if (error != 0) {
         handleGitError("open");
         return false;
@@ -462,11 +462,11 @@ bool PackageManager::pullRepo(const Repository& config_repo) {
 }
 
 void PackageManager::buildIndex(const Repository& config_repo) {
-    spdlog::info("Building index for {}...", config_repo.Name);
+    spdlog::info("Building index for {}...", config_repo.name);
 
     nlohmann::json indexJson;
 
-    for (const auto& letterDir: std::filesystem::directory_iterator(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.Name)) {
+    for (const auto& letterDir: std::filesystem::directory_iterator(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name)) {
         if (!std::filesystem::is_directory(letterDir)) continue;
         if (letterDir.path().filename().string() == ".git") continue;
 
@@ -488,7 +488,7 @@ void PackageManager::buildIndex(const Repository& config_repo) {
                     std::string packageName = packageData["name"];
                 }
 
-                Package package{packageData["name"], config_repo.Name, packageData["authors"], packageData["keywords"]};
+                Package package{packageData["name"], config_repo.name, packageData["authors"], packageData["keywords"]};
 
                 _packagesByName[package.Name] = package;
                 for (const std::string& keyword: package.Keywords) {
@@ -519,7 +519,7 @@ void PackageManager::buildIndex(const Repository& config_repo) {
 
 
     // Write index.json
-    std::ofstream outFile(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.Name / INDEX_FILENAME);
+    std::ofstream outFile(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name / INDEX_FILENAME);
     outFile << indexJson;
 
     spdlog::info("Index built successfully.");
