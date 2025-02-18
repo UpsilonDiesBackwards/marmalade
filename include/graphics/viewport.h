@@ -35,6 +35,7 @@ public:
     void UpdateViewport(float width, float height);
 
     glm::mat4 GetProjection();
+    glm::mat4 GetView();
     glm::vec2 GetPosition() const;
 
     float GetZoom() const;

@@ -23,6 +23,8 @@
 
 #include "../application/application.h"
 
+#include <ImGuizmo.h>
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 
@@ -79,6 +81,8 @@ void EditView::Render() {
 
     imageMin = ImGui::GetWindowPos();
     imageMax = ImVec2(imageMin.x + windowSize.x, imageMin.y + windowSize.y);
+
+    framebuffer.position = windowPos;
 }
 
 void EditView::Resize(int width, int height) {
@@ -89,6 +93,8 @@ void EditView::Resize(int width, int height) {
 }
 
 void EditView::RunInput() {
+    if (ImGuizmo::IsUsing()) { return; }
+
     Application& app = Application::GetInstance();
 
     if (app.editorMode != EditorMode::EDIT) {

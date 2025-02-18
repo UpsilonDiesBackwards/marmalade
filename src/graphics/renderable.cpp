@@ -77,13 +77,13 @@ void Renderable::Draw(glm::mat4 modelMatrix) {
     glBindTexture(GL_TEXTURE_2D, texture);
     shaderProgram.SetInt("texture0", 0);
 
-    shaderProgram.SetMat4("projection",Application::GetInstance().camera->GetProjection());
+    shaderProgram.SetMat4("projection", Application::GetInstance().camera->GetProjection());
 
-    glm::mat4 view_mat = glm::mat4(1.0f);
-    view_mat = glm::translate(view_mat, glm::vec3(-Application::GetInstance().camera->GetPosition(), 0.0f));
-    view_mat = glm::scale(view_mat, glm::vec3(Application::GetInstance().camera->GetZoom(), Application::GetInstance().camera->GetZoom(), 1.0f));
+//    glm::mat4 view_mat = glm::mat4(1.0f);
+//    view_mat = glm::translate(view_mat, glm::vec3(-Application::GetInstance().camera->GetPosition(), 0.0f));
+//    view_mat = glm::scale(view_mat, glm::vec3(Application::GetInstance().camera->GetZoom(), Application::GetInstance().camera->GetZoom(), 1.0f));
 
-    shaderProgram.SetMat4("view", view_mat);
+    shaderProgram.SetMat4("view", Application::GetInstance().camera->GetView());
     shaderProgram.SetMat4("model", modelMatrix);
 
     glDrawElements(GL_TRIANGLES, sizeof(indices)/4, GL_UNSIGNED_INT, nullptr);

@@ -20,8 +20,17 @@
 #ifndef ENGINE_MULTISAMPLEDFRAMEBUFFER_H
 #define ENGINE_MULTISAMPLEDFRAMEBUFFER_H
 
+#include <imgui.h>
+
 class MultiSampledFramebuffer {
 public:
+    int width = 1920;
+    int height = 1080;
+
+    ImVec2 position;
+
+    int sampleCount = 16; // MSAA sample count. not a const because we want this to be editable by user
+
     MultiSampledFramebuffer();
     ~MultiSampledFramebuffer();
 
@@ -33,11 +42,6 @@ public:
 
     unsigned int GetTexture() const;
     unsigned int GetFBO() const;
-
-    int width = 1920;
-    int height = 1080;
-
-    int sampleCount = 16; // MSAA sample count. not a const because we want this to be editable by user
 private:
     unsigned int fbo, resolvedFBO;
     unsigned int texture, resolvedTexture;
