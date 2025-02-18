@@ -72,7 +72,7 @@ namespace Marmalade::GUI {
 
     class RepositoriesTableView : public Components::TableView<Repository> {
     public:
-        RepositoriesTableView() : TableView<Repository>(Config::engineConfig.Repos, {Components::TableViewColumn("Name"), Components::TableViewColumn("URL")},
+        RepositoriesTableView() : TableView<Repository>(Config::engineConfig.repos, {Components::TableViewColumn("Name"), Components::TableViewColumn("URL")},
                                                         "PackageManagerRepositoryTable", "Edit Repository", "Remove Repository") {};
 
         std::vector<std::string> RenderItem(const Repository& item) override;

@@ -36,21 +36,21 @@ Marmalade::GUI::Preferences::Preferences() : Window() {
 }
 
 void Marmalade::GUI::Preferences::drawGeneralLoggingPane() {
-    ImGui::Combo("Log Level", reinterpret_cast<int*>(&Config::engineConfig.LogLevel), getLogLevels, nullptr, spdlog::level::n_levels);
+    ImGui::Combo("Log Level", reinterpret_cast<int*>(&Config::engineConfig.logLevel), getLogLevels, nullptr, spdlog::level::n_levels);
     ImGui::SameLine();
     requiresRestartWarning();
 }
 
 void Marmalade::GUI::Preferences::drawGeneralAppearancePane() {
-    ImGui::Checkbox("ImGui Viewports", &Marmalade::Config::engineConfig.Viewports);
+    ImGui::Checkbox("ImGui Viewports", &Marmalade::Config::engineConfig.viewports);
     ImGui::SameLine();
     requiresRestartWarning();
 
     static char themeFileC[512];
-    strncpy(themeFileC, Config::engineConfig.ThemeFile.c_str(), sizeof(themeFileC));
+    strncpy(themeFileC, Config::engineConfig.themeFile.c_str(), sizeof(themeFileC));
 
     if (ImGui::InputText("Theme File", themeFileC, sizeof(themeFileC))) {
-        Config::engineConfig.ThemeFile = themeFileC;
+        Config::engineConfig.themeFile = themeFileC;
     }
     ImGui::SameLine();
     requiresRestartWarning();
@@ -58,10 +58,10 @@ void Marmalade::GUI::Preferences::drawGeneralAppearancePane() {
 
 void Marmalade::GUI::Preferences::drawGeneralProjectsPane() {
     static char defaultProjectPathC[512];
-    strncpy(defaultProjectPathC, Config::engineConfig.DefaultProjectPath.c_str(), sizeof(defaultProjectPathC));
+    strncpy(defaultProjectPathC, Config::engineConfig.defaultProjectPath.c_str(), sizeof(defaultProjectPathC));
 
     if (ImGui::InputText("Default Project Path", defaultProjectPathC, sizeof(defaultProjectPathC))) {
-        Config::engineConfig.DefaultProjectPath = defaultProjectPathC;
+        Config::engineConfig.defaultProjectPath = defaultProjectPathC;
     }
 }
 

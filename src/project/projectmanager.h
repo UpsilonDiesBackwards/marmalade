@@ -26,17 +26,23 @@ namespace Marmalade::Project {
     template<typename P = Project>
     class ProjectManager {
     public:
-        static P CreateProject(std::string name, const std::filesystem::path& filePath, const ProjectCreationOptions& gitSettings) {
+        static P CreateProject(std::string name, const std::filesystem::path& filePath, const ProjectCreationOptions& creationOptions) {
             P project(name, filePath);
-            project.CreateProjectDirectories(gitSettings);
+            project.CreateEmptyProject(creationOptions);
+            project.SaveProjectSettings();
             return project;
         }
 
         static P OpenProject(const std::filesystem::path& filePath) {
-            return P(filePath);
+            P project(filePath);
+            project.LoadProjectMarmalade();
+            project.LoadProjectSettings();
+            return project;
         }
 
-        static void SaveProject(P project) {
+        static void SaveProject(P* project) {
+            project->SaveProjectMarmalade();
+            project->SaveProjectSettings();
         }
     };
 }

@@ -20,6 +20,7 @@
 #include "settings.h"
 
 #include "../src/application/application.h"
+#include "../../project/projectmanager.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -28,7 +29,6 @@
 
 void Marmalade::GUI::ProjectSettings::Draw() {
     Application& app = Application::GetInstance();
-    auto currentProject = app.GetCurrentProject();
 
     ImGui::SetNextWindowSize(ImVec2(1080, 720), ImGuiCond_FirstUseEver);
     ImGui::Begin(ICON_CI_SETTINGS " Project Settings", &visible, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
@@ -57,7 +57,7 @@ void Marmalade::GUI::ProjectSettings::Draw() {
     }
 
     if (ImGui::Button("Save")) {
-        currentProject->settings.SaveProjectSettings();
+        Marmalade::Project::ProjectManager<>::SaveProject(app.GetCurrentProject());
     }
 
     ImGui::End();
@@ -68,31 +68,31 @@ void Marmalade::GUI::ProjectSettings::drawProjectSettings() {
     auto currentProject = app.GetCurrentProject();
 
     char projectNameC[64];
-    std::strcpy(projectNameC, currentProject->settings.projectSettings.ProductName.c_str());
+    std::strcpy(projectNameC, currentProject->settings.productName.c_str());
 
     char companyNameC[64];
-    std::strcpy(companyNameC, currentProject->settings.projectSettings.CompanyName.c_str());
+    std::strcpy(companyNameC, currentProject->settings.companyName.c_str());
 
     char projectDescriptionC[1024];
-    std::strcpy(projectDescriptionC, currentProject->settings.projectSettings.Description.c_str());
+    std::strcpy(projectDescriptionC, currentProject->settings.description.c_str());
 
     char projectVersionC[32];
-    std::strcpy(projectVersionC, currentProject->settings.projectSettings.Version.c_str());
+    std::strcpy(projectVersionC, currentProject->settings.version.c_str());
 
     if (ImGui::InputText("Project Name", projectNameC, IM_ARRAYSIZE(projectNameC))) {
-        currentProject->settings.projectSettings.ProductName = projectNameC;
+        currentProject->settings.productName = projectNameC;
     }
 
     if (ImGui::InputText("Company Name", companyNameC, IM_ARRAYSIZE(companyNameC))) {
-        currentProject->settings.projectSettings.CompanyName = companyNameC;
+        currentProject->settings.companyName = companyNameC;
     }
 
     if (ImGui::InputText("Description", projectDescriptionC, IM_ARRAYSIZE(projectDescriptionC))) {
-        currentProject->settings.projectSettings.Description = projectDescriptionC;
+        currentProject->settings.description = projectDescriptionC;
     }
 
     if (ImGui::InputText("Version", projectVersionC, IM_ARRAYSIZE(projectVersionC))) {
-        currentProject->settings.projectSettings.Version = projectVersionC;
+        currentProject->settings.version = projectVersionC;
     }
 }
 

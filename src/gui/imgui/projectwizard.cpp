@@ -78,7 +78,7 @@ void Marmalade::GUI::ProjectWizard::Draw() {
 
     if (ImGui::Button(ICON_CI_FOLDER)) {// Create the ImGui File Dialog config and open it
         IGFD::FileDialogConfig config;
-        config.path = Config::engineConfig.DefaultProjectPath;
+        config.path = Config::engineConfig.defaultProjectPath;
         ImGuiFileDialog::Instance()->OpenDialog("ChooseProjectPath", "Choose Project Directory", nullptr, config);
     }
 
@@ -162,8 +162,6 @@ void Marmalade::GUI::ProjectWizard::CreateProject() {
 
         // Create the project and set it to the current project
         Application::GetInstance().SetCurrentProject(project);
-
-        Marmalade::Project::Settings::SaveProjectSettings();
 
         if (creationOptions.initGitRepository) {// If desired then initialise a git repo at the project directory
             InitialiseGitRepository(projectPath.string().c_str());
