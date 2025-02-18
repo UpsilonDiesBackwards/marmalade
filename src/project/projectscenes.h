@@ -17,22 +17,33 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_PROJECT_PROJECTSETTINGS_H
-#define MARMALADE_PROJECT_PROJECTSETTINGS_H
+#ifndef MARMALADE_PROJECT_PROJECTSCENES_H
+#define MARMALADE_PROJECT_PROJECTSCENES_H
+
+#include <scene/scene.h>
 
 #include <nlohmann/json.hpp>
 
 #include <string>
 
 namespace Marmalade::Project {
-    struct ProjectSettings {
-        std::string productName{"Marmalade Project"};
-        std::string companyName{"Example Company"};
-        std::string description{"A Marmalade Project"};
-        std::string version{"v0.0.1"};
-    };
+    class Project;
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectSettings, productName, companyName, description, version)
+    class ProjectScenes {
+    public:
+        void RegisterScene(const std::string& fileName);
+
+        void SaveScene(const std::string& fileName, Scene* scene);
+
+        Scene LoadScene(const std::string& fileName);
+
+        void UnregisterScene(const std::string& fileName);
+
+    private:
+        nlohmann::json serializeEntity(const Entity* entity);
+        Entity deserializeEntity(const nlohmann::json& e);
+    };
 }
+
 
 #endif

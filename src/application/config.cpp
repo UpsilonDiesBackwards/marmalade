@@ -75,7 +75,7 @@ void Marmalade::Config::LoadEngineConfig() {
     if (i.fail()) {
         // File doesn't exist
         engineConfig = {};
-        engineConfig.Repos.push_back(Repository{"default", "https://github.com/UpsilonDiesBackwards/marmalade-pkgs.git", 1});
+        engineConfig.repos.push_back(Repository{"default", "https://github.com/UpsilonDiesBackwards/marmalade-pkgs.git", 1});
         SaveEngineConfig();
         return;
     }

@@ -94,12 +94,12 @@ void Application::Initialise() {
         std::filesystem::copy_file("res/config/editorstyle.txt", Marmalade::Config::GetConfigDirectory() / "editorstyle.txt");
     }
 
-    styleManager.LoadStyle((Marmalade::Config::GetConfigDirectory() / Marmalade::Config::engineConfig.ThemeFile).string());
+    styleManager.LoadStyle((Marmalade::Config::GetConfigDirectory() / Marmalade::Config::engineConfig.themeFile).string());
 
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigWindowsMoveFromTitleBarOnly = true;
     io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable;
-    if (Marmalade::Config::engineConfig.Viewports) {
+    if (Marmalade::Config::engineConfig.viewports) {
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     }
     ImFont* font = io.Fonts->AddFontFromFileTTF("res/fonts/monofur/monof55.ttf", 16);
@@ -220,7 +220,7 @@ void Application::SetupLogger() {
                                               spdlog::sinks_init_list{consoleSink, fileSink, guiSink});
     spdlog::register_logger(logger);
     spdlog::set_default_logger(logger);
-    spdlog::set_level(Marmalade::Config::engineConfig.LogLevel);
+    spdlog::set_level(Marmalade::Config::engineConfig.logLevel);
 }
 
 void Application::SetCurrentProject(std::unique_ptr<Marmalade::Project::Project>& project) {// Change the current projects and update the window title to inc project name

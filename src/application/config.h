@@ -29,19 +29,19 @@
 namespace Marmalade {
 
     struct Repository {
-        std::string Name;
-        std::string GitUrl{};
-        int Depth{1};// Local repos do not work with shallow clone
+        std::string name;
+        std::string gitUrl{};
+        int depth{1};// Local repos do not work with shallow clone
     };
 
     struct EngineConfig {
-        bool Viewports{true};
-        std::string ThemeFile{"editorstyle.txt"};
+        bool viewports{true};
+        std::string themeFile{"editorstyle.txt"};
 
-        spdlog::level::level_enum LogLevel{spdlog::level::info};
+        spdlog::level::level_enum logLevel{spdlog::level::info};
 
-        std::string DefaultProjectPath{"."};
-        std::vector<Repository> Repos{};
+        std::string defaultProjectPath{"."};
+        std::vector<Repository> repos{};
     };
 
     class Config {
@@ -58,9 +58,9 @@ namespace Marmalade {
         static std::filesystem::path _configDir;
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::Repository, Name, GitUrl, Depth);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::Repository, name, gitUrl, depth);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, Viewports, ThemeFile, LogLevel, DefaultProjectPath, Repos);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, viewports, themeFile, logLevel, defaultProjectPath, repos);
 }
 
 #endif
