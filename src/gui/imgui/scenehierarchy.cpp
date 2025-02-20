@@ -65,6 +65,12 @@ void SceneHierarchy::Show() {
     showRenamePopup();
     showDeletePopup();
 
+    if (_selected && ImGui::IsKeyPressed(ImGuiKey_Escape) || // If entity is selected AND escaped is pressed...
+        _selected && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) { // ...or RMB is pressed...
+
+        _selected = nullptr; // ...then deselect the current entity
+    }
+
     ImGui::End();
 }
 
@@ -115,6 +121,7 @@ void SceneHierarchy::displayEntity(Entity* entity, int index) {
 
 void SceneHierarchy::showCreatePopup() {
     if (ImGui::BeginPopupModal("Create Entity", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+
         if (_parent) {
             ImGui::Text("Creating child entity for %s", _parent->name.c_str());
         }
@@ -145,7 +152,7 @@ void SceneHierarchy::showCreatePopup() {
 }
 void SceneHierarchy::showContextMenu() {
     if (ImGui::BeginPopupContextWindow("EntityRMBContextMenu", ImGuiPopupFlags_MouseButtonRight)) {
-        if (ImGui::MenuItem("Create Child Entity")) {
+        if (ImGui::MenuItem("Create Entity")) {
             _isCreatingEntityChild = true;
         }
 
