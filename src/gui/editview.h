@@ -23,9 +23,12 @@
 #include <graphics/multisampledframebuffer.h>
 
 #include <imgui.h>
+#include "scene/entity.h"
 
 class EditView {
 public:
+    Entity* selectedEntity;
+
     EditView(int width, int height);
     ~EditView();
 
@@ -37,6 +40,8 @@ private:
     MultiSampledFramebuffer framebuffer;
     int width, height;
     ImVec2 imageMin, imageMax;
+
+    void ShowGizmo();
 };
 
 

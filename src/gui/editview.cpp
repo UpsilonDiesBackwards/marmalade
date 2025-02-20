@@ -32,6 +32,7 @@
 
 #include <iostream>
 #include <functional>
+#include <glm/gtc/type_ptr.hpp>
 
 EditView::EditView(int width, int height) : width(width), height(height) {
     Application::GetInstance().framebuffer = &framebuffer;
@@ -83,6 +84,10 @@ void EditView::Render() {
     imageMax = ImVec2(imageMin.x + windowSize.x, imageMin.y + windowSize.y);
 
     framebuffer.position = windowPos;
+
+    if (selectedEntity) {
+        ShowGizmo();
+    }
 }
 
 void EditView::Resize(int width, int height) {
@@ -122,4 +127,53 @@ void EditView::RunInput() {
         app.camera->Zoom(yOffset);
     });
 
+}
+
+void EditView::ShowGizmo() {
+    Application& app = Application::GetInstance();
+
+    static ImGuizmo::OPERATION currentGuizmoOperation(ImGuizmo::TRANSLATE);
+    static ImGuizmo::MODE currentGuizmoMode(ImGuizmo::WORLD);
+
+    if (ImGui::IsKeyPressed(ImGuiKey_Q)) { currentGuizmoOperation = ImGuizmo::TRANSLATE; }
+    if (ImGui::IsKeyPressed(ImGuiKey_W)) { currentGuizmoOperation = ImGuizmo::ROTATE; }
+    if (ImGui::IsKeyPressed(ImGuiKey_E)) { currentGuizmoOperation = ImGuizmo::SCALE; }
+
+    if (ImGuizmo::IsUsing()) {
+        glm::vec3 translation, scale, rotation;
+        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(selectedEntity->transform->modelMatrix),
+                                              glm::value_ptr(translation),
+                                              glm::value_ptr(rotation),
+                                              glm::value_ptr(scale));
+
+        selectedEntity->setPosition(glm::vec2(translation.x, translation.y));
+        selectedEntity->setRotation(rotation.z);
+        selectedEntity->setScale(glm::vec2(scale.x, scale.y));
+
+        ImGuizmo::RecomposeMatrixFromComponents(glm::value_ptr(selectedEntity->transform->modelMatrix),
+                                                glm::value_ptr(translation),
+                                                glm::value_ptr(rotation),
+                                                glm::value_ptr(scale));
+    }
+
+    if (currentGuizmoOperation != ImGuizmo::SCALE) {
+        if (ImGui::RadioButton("World", currentGuizmoMode == ImGuizmo::WORLD)) {
+            currentGuizmoMode = ImGuizmo::WORLD;
+        }
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Local", currentGuizmoMode == ImGuizmo::LOCAL)) {
+            currentGuizmoMode = ImGuizmo::LOCAL;
+        }
+    }
+
+    ImGuizmo::SetOrthographic(true);
+    ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+
+    ImGuizmo::SetRect(app.framebuffer->position.x, app.framebuffer->position.y,
+                      app.framebuffer->width, app.framebuffer->height);
+
+    ImGuizmo::Manipulate(glm::value_ptr(app.camera->GetView()),
+                         glm::value_ptr(app.camera->GetProjection()),
+                         currentGuizmoOperation, currentGuizmoMode,
+                         glm::value_ptr(selectedEntity->transform->modelMatrix));
 }

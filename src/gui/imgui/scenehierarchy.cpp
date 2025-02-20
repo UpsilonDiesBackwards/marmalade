@@ -107,6 +107,8 @@ void SceneHierarchy::displayEntity(Entity* entity, int index) {
         Application::GetInstance().editorGUI->details.visible = true;
         Application::GetInstance().editorGUI->details.inspectedEntity = _selected;
 
+        Application::GetInstance().editView->selectedEntity = _selected;
+
         ImGui::TreePop();
     }
 }
