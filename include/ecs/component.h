@@ -85,7 +85,7 @@ namespace Marmalade::ECS {
 
 #define REGISTER_COMPONENT(TYPE)                                      \
     static bool TYPE##_registered = [] {                              \
-        ComponentRegistry::Instance().RegisterComponent<TYPE>(#TYPE); \
+        ComponentRegistry::Instance().RegisterComponent<TYPE>(TYPE().name); \
         return true;                                                  \
     }()
 
