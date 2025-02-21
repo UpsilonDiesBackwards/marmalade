@@ -180,14 +180,20 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
 
     // Bottom bar
 
-    float status_bar_height = 22.0f;
+    float availableWindowWidth = ImGui::GetContentRegionAvail().x;
+    float labelWidth = 7.0f;
+    float sliderWidth = (availableWindowWidth - (labelWidth * 0.5) - 18.5f) * 0.46f;
+
+    float status_bar_height = 26.0f;
 
     ImGui::SetCursorPosY(ImGui::GetWindowHeight() - status_bar_height);
 
     ImGui::BeginChild("BottomBar", ImVec2(0, status_bar_height), false);
 
+    ImGui::PushItemWidth(sliderWidth);
     ImGui::SliderFloat("Size", &thumbnailSize, 16, 512);
     ImGui::SameLine();
+    ImGui::PushItemWidth(sliderWidth);
     ImGui::SliderFloat("Padding", &thumbnailPadding, 0, 128);
 
     ImGui::EndChild();
