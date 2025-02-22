@@ -30,11 +30,11 @@ void Marmalade::ECS::BoxCollider::Display(Entity* entity) {
     ImGui::DragFloat2("Size", &size.x, 0.1);
     ImGui::DragFloat2("Offset", &offset.x, 0.1);
 
-    ImGui::Checkbox("Draw bounds", &drawBounds);
-
-    if (drawBounds) {
-        DrawBounds(entity);
-    }
+//    ImGui::Checkbox("Draw bounds", &drawBounds);
+//
+//    if (drawBounds) {
+//        DrawBounds(entity);
+//    }
 }
 
 void Marmalade::ECS::BoxCollider::Apply(Entity* entity) {
@@ -43,16 +43,28 @@ void Marmalade::ECS::BoxCollider::Apply(Entity* entity) {
 
         if (!other->componentManager.GetComponentOfType<BoxCollider>()) { return; }
 
-        glm::vec2 posA = entity->getPosition();
-        glm::vec2 posB = other->getPosition();
-
-        if (Intersects(*other->componentManager.GetComponentOfType<BoxCollider>(), posA, posB)) {
-            spdlog::info("Entity collision! {} with {}", entity->name, other->name);
-        }
+        Intersects(entity, other.get());
     }
 }
 
-bool Marmalade::ECS::BoxCollider::Intersects(const Marmalade::ECS::BoxCollider& other, const glm::vec2& posA, const glm::vec2& posB) const {
+void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
+    if (!self || !other) return;
+
+    glm::vec2 posA = self->getPosition();
+    glm::vec2 posB = other->getPosition();
+
+    if (self->getRotation() == 0 || other->getRotation() == 0) {
+        if (IntersectsAABB(*other->componentManager.GetComponentOfType<BoxCollider>(), posA, posB)) {
+            spdlog::info("Collision detected using AABB");
+
+        }
+    } else if (self->getRotation() != 0 && other->getRotation() != 0) {
+        spdlog::info("using OBB");
+
+    } else { spdlog::error("Invalid collision type pair!"); }
+}
+
+bool Marmalade::ECS::BoxCollider::IntersectsAABB(const Marmalade::ECS::ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
     glm::vec2 minA = posA + offset;
     glm::vec2 maxA = minA + size;
 
@@ -63,7 +75,9 @@ bool Marmalade::ECS::BoxCollider::Intersects(const Marmalade::ECS::BoxCollider& 
             minA.y < maxB.y && maxA.y > minB.y);
 }
 
-void Marmalade::ECS::BoxCollider::DrawBounds(Entity* entity) {
-    // Todo: Draw bounding box
+bool Marmalade::ECS::BoxCollider::IntersectsOBB(const Marmalade::ECS::ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
+    return false;
 }
 
+void Marmalade::ECS::BoxCollider::ShowBounds() {
+}

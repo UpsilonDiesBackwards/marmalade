@@ -22,6 +22,7 @@
 #define MARMALADE_BOXCOLLIDER_H
 
 #include "ecs/component.h"
+#include "colliderbase.h"
 
 #include <glm/vec2.hpp>
 
@@ -34,7 +35,7 @@ namespace Marmalade::ECS {
      * ... and additional collision methods such as OBB.
      * */
 
-    class BoxCollider : public Component {
+    class BoxCollider : public Component, public ColliderBase {
     public:
         glm::vec2 size = {1.0f, 1.0f};
         glm::vec2 offset = {0.0f, 0.0f};
@@ -44,11 +45,15 @@ namespace Marmalade::ECS {
 
         BoxCollider() { name = "BoxCollider"; }
 
-        bool Intersects(const BoxCollider& other, const glm::vec2& posA, const glm::vec2& posB) const;
-    private:
-        bool drawBounds = false;
 
-        void DrawBounds(Entity* entity);
+        void Intersects(Entity* self, Entity* other) override;
+
+        bool IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override;
+        bool IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override;
+
+        void ShowBounds() override;
+
+    private:
     };
 
     REGISTER_COMPONENT(BoxCollider);
