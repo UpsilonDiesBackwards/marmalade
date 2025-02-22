@@ -35,9 +35,11 @@ void Marmalade::GUI::Details::Draw() {
 
             comp->Display(inspectedEntity);
 
-            if (ImGui::Button(ICON_CI_TRASHCAN " Remove")) {
-                _isRemovingComponent = true;
-                _selectedComponent = comp.get();
+            if (comp->isMutable) { // If entity is mutable then allow it to be removed
+                if (ImGui::Button(ICON_CI_TRASHCAN " Remove")) {
+                    _isRemovingComponent = true;
+                    _selectedComponent = comp.get();
+                }
             }
 
             ImGui::Separator();
