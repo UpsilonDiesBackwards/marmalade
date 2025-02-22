@@ -32,7 +32,6 @@ Entity::Entity(const std::string &name, EntityFlags flags)
     renderable.Initialise();
 
     componentManager.AddComponent(transform);
-    componentManager.AddComponent(spriteRender);
 
     Render();
 }
@@ -43,7 +42,9 @@ void Entity::Render() {
     }
 
     if (RENDERABLE) {
-        renderable.Draw(transform->modelMatrix);
+        bool hasTexture = componentManager.GetComponentOfType<Marmalade::ECS::SpriteRender>();
+
+        renderable.Draw(transform->modelMatrix, hasTexture);
     }
 
     for (auto &child : children) {

@@ -68,7 +68,9 @@ void Renderable::Initialise() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Renderable::Draw(glm::mat4 modelMatrix) {
+void Renderable::Draw(glm::mat4 modelMatrix, bool renderTexture) {
+    if (!renderTexture || texture == 0) { return; }
+
     shaderProgram.Use();
 
     glBindVertexArray(VAO);
@@ -78,10 +80,6 @@ void Renderable::Draw(glm::mat4 modelMatrix) {
     shaderProgram.SetInt("texture0", 0);
 
     shaderProgram.SetMat4("projection", Application::GetInstance().camera->GetProjection());
-
-//    glm::mat4 view_mat = glm::mat4(1.0f);
-//    view_mat = glm::translate(view_mat, glm::vec3(-Application::GetInstance().camera->GetPosition(), 0.0f));
-//    view_mat = glm::scale(view_mat, glm::vec3(Application::GetInstance().camera->GetZoom(), Application::GetInstance().camera->GetZoom(), 1.0f));
 
     shaderProgram.SetMat4("view", Application::GetInstance().camera->GetView());
     shaderProgram.SetMat4("model", modelMatrix);

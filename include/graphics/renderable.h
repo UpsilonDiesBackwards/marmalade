@@ -32,7 +32,7 @@ public:
     Renderable(unsigned int VAO, unsigned int VBO, unsigned int EBO, unsigned int texture);
 
     void Initialise(); // Buffer Setup
-    void Draw(glm::mat4 modelMatrix);
+    void Draw(glm::mat4 modelMatrix, bool renderTexture);
 
     void SetTexture(const std::string& filePath);
     unsigned int GetTexture();
