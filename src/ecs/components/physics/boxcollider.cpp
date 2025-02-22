@@ -27,14 +27,23 @@
 void Marmalade::ECS::BoxCollider::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
 
-    ImGui::DragFloat2("Size", &size.x, 0.1);
-    ImGui::DragFloat2("Offset", &offset.x, 0.1);
+    auto* aabb = GetCollisionData<AABBData>();
+    if (aabb) {
+        ImGui::DragFloat2("AABB Size", &aabb->size.x, 0.1f, 0.1f, 100.0f);
+        ImGui::DragFloat2("AABB Offset", &aabb->offset.x, 0.1f, -10.0f, 10.0f);
+    }
 
-//    ImGui::Checkbox("Draw bounds", &drawBounds);
-//
-//    if (drawBounds) {
-//        DrawBounds(entity);
-//    }
+    auto* obb = GetCollisionData<OBBData>();
+    if (obb) {
+        ImGui::DragFloat2("OBB Size", &obb->size.x, 0.1f, 0.1f, 100.0f);
+        ImGui::DragFloat2("OBB Offset", &obb->offset.x, 0.1f, -10.0f, 10.0f);
+        ImGui::DragFloat("OBB Rotation", &obb->rotation, 0.1f, -180.0f, 180.0f);
+    }
+
+    ImGui::Checkbox("Draw Bounds", &_showBounds);
+    if (_showBounds) {
+        ShowBounds(entity);
+    }
 }
 
 void Marmalade::ECS::BoxCollider::Apply(Entity* entity) {
@@ -53,31 +62,42 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
     glm::vec2 posA = self->getPosition();
     glm::vec2 posB = other->getPosition();
 
-    if (self->getRotation() == 0 || other->getRotation() == 0) {
-        if (IntersectsAABB(*other->componentManager.GetComponentOfType<BoxCollider>(), posA, posB)) {
+    auto* aabbA = GetCollisionData<AABBData>();
+    auto* aabbB = other->componentManager.GetComponentOfType<BoxCollider>()->GetCollisionData<AABBData>();
+
+    auto* obbA = GetCollisionData<OBBData>();
+    auto* obbB = other->componentManager.GetComponentOfType<BoxCollider>()->GetCollisionData<OBBData>();
+
+
+    if (aabbA && aabbB) {
+        if (IntersectsAABB(*other->componentManager.GetComponentOfType<ColliderBase>(), posA, posB)) {
             spdlog::info("Collision detected using AABB");
-
         }
-    } else if (self->getRotation() != 0 && other->getRotation() != 0) {
-        spdlog::info("using OBB");
-
+    } else if (obbA && obbB) {
+        spdlog::info("Collision detected using OBB");
     } else { spdlog::error("Invalid collision type pair!"); }
 }
 
-bool Marmalade::ECS::BoxCollider::IntersectsAABB(const Marmalade::ECS::ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
-    glm::vec2 minA = posA + offset;
-    glm::vec2 maxA = minA + size;
+bool Marmalade::ECS::BoxCollider::IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
+    auto* aabbA = GetCollisionData<AABBData>();
+    auto* aabbB = std::get_if<AABBData>(&other.data);
 
-    glm::vec2 minB = posB + other.offset;
-    glm::vec2 maxB = minB + other.size;
+    if (!aabbA || !aabbB) return false;
+
+    glm::vec2 minA = posA + aabbA->offset;
+    glm::vec2 maxA = minA + aabbA->size;
+
+    glm::vec2 minB = posB + aabbB->offset;
+    glm::vec2 maxB = minB + aabbB->size;
 
     return (minA.x < maxB.x && maxA.x > minB.x &&
             minA.y < maxB.y && maxA.y > minB.y);
 }
 
-bool Marmalade::ECS::BoxCollider::IntersectsOBB(const Marmalade::ECS::ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
+bool Marmalade::ECS::BoxCollider::IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB, float rotation) {
     return false;
 }
 
-void Marmalade::ECS::BoxCollider::ShowBounds() {
+void Marmalade::ECS::BoxCollider::ShowBounds(Entity* entity) {
+    // TODO: Implement bounds rendering
 }

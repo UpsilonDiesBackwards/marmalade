@@ -26,17 +26,27 @@
 #include <glm/vec2.hpp>
 
 namespace Marmalade::ECS {
+    struct AABBData {
+        glm::vec2 size;
+        glm::vec2 offset;
+    };
+
+    struct OBBData {
+        glm::vec2 size;
+        glm::vec2 offset;
+        float rotation;
+    };
+
     class ColliderBase {
     public:
-        glm::vec2 size = {1.0f, 1.0f};
-        glm::vec2 offset = {0.0f, 0.0f};
+        std::variant<AABBData, OBBData> data;
 
         virtual void Intersects(Entity* self, Entity* other) = 0;
 
         virtual bool IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) = 0;
-        virtual bool IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) = 0;
+        virtual bool IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB, float rotation) = 0;
 
-        virtual void ShowBounds() = 0;
+        virtual void ShowBounds(Entity* entity) = 0;
     };
 }
 

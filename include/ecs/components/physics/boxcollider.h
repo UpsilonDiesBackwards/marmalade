@@ -37,23 +37,28 @@ namespace Marmalade::ECS {
 
     class BoxCollider : public Component, public ColliderBase {
     public:
-        glm::vec2 size = {1.0f, 1.0f};
-        glm::vec2 offset = {0.0f, 0.0f};
+        BoxCollider() {
+            name = "BoxCollider",
+                data = AABBData{{1.0f, 1.0f}, {0.0f, 0.0f} };
+        }
 
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
 
-        BoxCollider() { name = "BoxCollider"; }
-
-
         void Intersects(Entity* self, Entity* other) override;
 
-        bool IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override;
         bool IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override;
+        bool IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB, float rotation) override;
 
-        void ShowBounds() override;
+        void ShowBounds(Entity* entity) override;
 
     private:
+        bool _showBounds{false};
+
+        template<typename T>
+        T* GetCollisionData() {
+            return std::get_if<T>(&data);
+        }
     };
 
     REGISTER_COMPONENT(BoxCollider);
