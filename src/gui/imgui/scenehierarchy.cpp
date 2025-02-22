@@ -100,7 +100,7 @@ void SceneHierarchy::displayEntity(Entity* entity, int index) {
     ImGuiTreeNodeFlags nodeFlags = entity->children.empty() ? ImGuiTreeNodeFlags_Leaf : 0;
 
     if (ImGui::TreeNodeEx(nodeLabel.c_str(), nodeFlags)) {
-        if (ImGui::IsItemHovered()) {
+        if (ImGui::IsItemClicked()) {
             _selected = entity;
         }
 
