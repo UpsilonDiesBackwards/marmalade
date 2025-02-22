@@ -31,12 +31,16 @@ Entity::Entity(const std::string &name, EntityFlags flags)
 
     renderable.Initialise();
 
-    componentManager.AddComponent(transform);
+    // Every entity should have a transform component by default
+    componentManager.AddComponent(std::make_shared<Marmalade::ECS::Transform>());
 
     Render();
 }
 
 void Entity::Render() {
+    auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
+    if (!transform) return;
+
     for (const auto &component : componentManager.components) {
         component->Apply(this);
     }
@@ -53,33 +57,41 @@ void Entity::Render() {
 }
 
 glm::vec2 Entity::getPosition() {
+    auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
     return transform->pos;
 }
 
 void Entity::setPosition(glm::vec2 newPos) {
+    auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
     transform->pos = newPos;
     UpdateModelMatrix();
 }
 
 float Entity::getRotation() {
+    auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
     return transform->rotation;
 }
 
 void Entity::setRotation(float newRot) {
+    auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
     transform->rotation = newRot;
     UpdateModelMatrix();
 }
 
 glm::vec2 Entity::getScale() {
+    auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
     return transform->scale;
 }
 
 void Entity::setScale(glm::vec2 newScale) {
+    auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
     transform->scale = newScale;
     UpdateModelMatrix();
 }
 
 void Entity::UpdateModelMatrix() {
+    auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
+
     transform->modelMatrix = glm::mat4(1.0f);
 
     transform->modelMatrix = glm::translate(transform->modelMatrix, glm::vec3(transform->pos, 0.0f));
@@ -88,7 +100,7 @@ void Entity::UpdateModelMatrix() {
     transform->modelMatrix = glm::scale(transform->modelMatrix, glm::vec3(transform->scale, 1.0f));
 
     if (parent) {
-        transform->modelMatrix = parent->transform->modelMatrix * transform->modelMatrix;
+        transform->modelMatrix = parent->componentManager.GetComponentOfType<Marmalade::ECS::Transform>()->modelMatrix * transform->modelMatrix;
     }
 
     for (auto& child : children) {

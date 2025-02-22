@@ -132,6 +132,9 @@ void EditView::RunInput() {
 void EditView::ShowGizmo() {
     Application& app = Application::GetInstance();
 
+    auto transform = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
+    if (!transform) return;
+
     static ImGuizmo::OPERATION currentGuizmoOperation(ImGuizmo::TRANSLATE);
     static ImGuizmo::MODE currentGuizmoMode(ImGuizmo::WORLD);
 
@@ -141,7 +144,7 @@ void EditView::ShowGizmo() {
 
     if (ImGuizmo::IsUsing()) {
         glm::vec3 translation, scale, rotation;
-        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(selectedEntity->transform->modelMatrix),
+        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform->modelMatrix),
                                               glm::value_ptr(translation),
                                               glm::value_ptr(rotation),
                                               glm::value_ptr(scale));
@@ -150,7 +153,7 @@ void EditView::ShowGizmo() {
         selectedEntity->setRotation(rotation.z);
         selectedEntity->setScale(glm::vec2(scale.x, scale.y));
 
-        ImGuizmo::RecomposeMatrixFromComponents(glm::value_ptr(selectedEntity->transform->modelMatrix),
+        ImGuizmo::RecomposeMatrixFromComponents(glm::value_ptr(transform->modelMatrix),
                                                 glm::value_ptr(translation),
                                                 glm::value_ptr(rotation),
                                                 glm::value_ptr(scale));
@@ -175,5 +178,5 @@ void EditView::ShowGizmo() {
     ImGuizmo::Manipulate(glm::value_ptr(app.camera->GetView()),
                          glm::value_ptr(app.camera->GetProjection()),
                          currentGuizmoOperation, currentGuizmoMode,
-                         glm::value_ptr(selectedEntity->transform->modelMatrix));
+                         glm::value_ptr(transform->modelMatrix));
 }

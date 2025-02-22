@@ -49,8 +49,6 @@ public:
     Renderable renderable;
     Marmalade::ECS::ComponentManager componentManager{};
 
-    std::shared_ptr<Marmalade::ECS::Transform> transform = std::make_shared<Marmalade::ECS::Transform>();
-
     Entity* parent{nullptr};
     std::vector<std::unique_ptr<Entity>> children;
 

@@ -23,6 +23,8 @@
 
 #include "ecs/component.h"
 
+#include "boxcollider.h"
+
 namespace Marmalade::ECS {
     /*
      * This handles rigid physics resolution of a colliding entity.
@@ -37,7 +39,10 @@ namespace Marmalade::ECS {
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
 
-        RigidBody() { name = "Rigidbody"; }
+        RigidBody() {
+            name = "Rigidbody";
+            dependencies = {std::type_index(typeid(BoxCollider))};
+        }
     };
 
     REGISTER_COMPONENT(RigidBody);

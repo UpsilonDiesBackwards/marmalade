@@ -31,6 +31,9 @@
 void DrawLabelWithBackground(const char* text, ImVec4 color); // Predeclare function to keep file cohesive
 
 void Marmalade::ECS::Transform::Display(Entity* entity) {
+        auto transform = entity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
+        if (!transform) return;
+
         ImGui::Text("%s", name.c_str());
 
         float availableWindowWidth = ImGui::GetContentRegionAvail().x;
@@ -45,16 +48,16 @@ void Marmalade::ECS::Transform::Display(Entity* entity) {
         DrawLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(sliderWidth);
-        if (ImGui::DragFloat(("##PosX" + std::to_string(entity->id)).c_str(), &entity->transform->pos.x, 0.1f)) {
-            entity->setPosition(glm::vec2(entity->transform->pos.x, entity->transform->pos.y));
+        if (ImGui::DragFloat(("##PosX" + std::to_string(entity->id)).c_str(), &transform->pos.x, 0.1f)) {
+            entity->setPosition(glm::vec2(transform->pos.x, transform->pos.y));
         }
 
         ImGui::SameLine();
         DrawLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(sliderWidth);
-        if (ImGui::DragFloat(("##PosY" + std::to_string(entity->id)).c_str(), &entity->transform->pos.y, 0.1f)) {
-            entity->setPosition(glm::vec2(entity->transform->pos.x, entity->transform->pos.y));
+        if (ImGui::DragFloat(("##PosY" + std::to_string(entity->id)).c_str(), &transform->pos.y, 0.1f)) {
+            entity->setPosition(glm::vec2(transform->pos.x, transform->pos.y));
         }
 
 
@@ -66,8 +69,8 @@ void Marmalade::ECS::Transform::Display(Entity* entity) {
         DrawLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(sliderWidth);
-        if (ImGui::SliderFloat(("##Rot" + std::to_string(entity->id)).c_str(), &entity->transform->rotation, 0, 180)) {
-            entity->setRotation(entity->transform->rotation);
+        if (ImGui::SliderFloat(("##Rot" + std::to_string(entity->id)).c_str(), &transform->rotation, 0, 180)) {
+            entity->setRotation(transform->rotation);
         }
 
         // Scale
@@ -78,15 +81,15 @@ void Marmalade::ECS::Transform::Display(Entity* entity) {
         DrawLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(sliderWidth);
-        if (ImGui::DragFloat(("##ScaX" + std::to_string(entity->id)).c_str(), &entity->transform->scale.x, 0.1f)) {
-            entity->setScale(glm::vec2(entity->transform->scale.x, entity->transform->scale.y));
+        if (ImGui::DragFloat(("##ScaX" + std::to_string(entity->id)).c_str(), &transform->scale.x, 0.1f)) {
+            entity->setScale(glm::vec2(transform->scale.x, transform->scale.y));
         }
 
         ImGui::SameLine();
         DrawLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
         ImGui::SameLine();
-        if (ImGui::DragFloat(("##ScaY" + std::to_string(entity->id)).c_str(), &entity->transform->scale.y, 0.1f)) {
-            entity->setScale(glm::vec2(entity->transform->scale.x, entity->transform->scale.y));
+        if (ImGui::DragFloat(("##ScaY" + std::to_string(entity->id)).c_str(), &transform->scale.y, 0.1f)) {
+            entity->setScale(glm::vec2(transform->scale.x, transform->scale.y));
         }
 }
 
