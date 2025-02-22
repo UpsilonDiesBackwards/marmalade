@@ -37,7 +37,7 @@ namespace Marmalade::ECS {
         void Apply(Entity* entity) override;
         void Display(Entity* entity) override;
 
-        Transform() { name = "Transform"; isMutable = false; }
+        Transform() { name = "Transform"; isMutable = false; allowMultiple = false; }
     };
 
     REGISTER_COMPONENT(Transform);

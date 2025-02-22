@@ -20,6 +20,15 @@
 #include <ecs/componentmanager.h>
 
 void Marmalade::ECS::ComponentManager::AddComponent(std::shared_ptr<Component> component) {
+    if (!component->allowMultiple) {
+        for (const auto& existing : components) {
+            if (typeid(*component) == typeid(*existing)) {
+                spdlog::error("Can not add {}, component already exists", component->name);
+                return;
+            }
+        }
+    }
+
     components.push_back(component);
 }
 

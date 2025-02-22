@@ -34,6 +34,7 @@ namespace Marmalade::ECS {
         std::string name;
 
         bool isMutable{true};
+        bool allowMultiple{false};
 
         virtual void Display(Entity* entity) = 0;
         virtual void Apply(Entity* entity) = 0;

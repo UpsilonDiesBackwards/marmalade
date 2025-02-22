@@ -39,7 +39,8 @@ namespace Marmalade::ECS {
     public:
         BoxCollider() {
             name = "BoxCollider",
-                data = AABBData{{1.0f, 1.0f}, {0.0f, 0.0f} };
+            allowMultiple = true,
+            data = AABBData{{1.0f, 1.0f}, {0.0f, 0.0f} };
         }
 
         void Display(Entity* entity) override;

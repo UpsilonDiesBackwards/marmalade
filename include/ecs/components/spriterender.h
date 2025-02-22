@@ -30,7 +30,7 @@ namespace Marmalade::ECS {
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
 
-        SpriteRender() { name = "Sprite Render"; }
+        SpriteRender() { name = "Sprite Render"; allowMultiple = false; }
     };
 
     REGISTER_COMPONENT(SpriteRender);
