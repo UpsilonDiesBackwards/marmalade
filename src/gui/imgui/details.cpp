@@ -96,6 +96,9 @@ void Marmalade::GUI::Details::ShowAddPopup() {
         for (const auto& [name, factory]: Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()) {
             if (ImGui::Button(name.c_str())) {
                 inspectedEntity->componentManager.AddComponent(factory->Create());// Add component
+
+                _isAddingComponent = false;
+                ImGui::CloseCurrentPopup();
             }
         }
 
