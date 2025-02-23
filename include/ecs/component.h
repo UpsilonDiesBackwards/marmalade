@@ -36,7 +36,7 @@ namespace Marmalade::ECS {
         bool isMutable{true};
         bool allowMultiple{false};
 
-        std::vector<std::type_index> dependencies{};
+        std::vector<std::string> dependencies{};
 
         virtual void Display(Entity* entity) = 0;
         virtual void Apply(Entity* entity) = 0;

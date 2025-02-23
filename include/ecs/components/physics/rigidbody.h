@@ -41,7 +41,7 @@ namespace Marmalade::ECS {
 
         RigidBody() {
             name = "Rigidbody";
-            dependencies = {std::type_index(typeid(BoxCollider))};
+            dependencies = {"BoxCollider"};
         }
     };
 

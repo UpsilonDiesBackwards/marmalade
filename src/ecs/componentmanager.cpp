@@ -32,17 +32,17 @@ void Marmalade::ECS::ComponentManager::AddComponent(std::shared_ptr<Component> c
     for (const auto& dependency : component->dependencies) { // Loop through each dependency...
         bool hasDependency = false;
         for (const auto& existing : components) {
-            if (std::type_index(typeid(*existing)) == dependency) {
+            if (existing->name == dependency) {
                 hasDependency = true;
                 break;
             }
         }
 
         if (!hasDependency) { // ... and add any if it's not already added
-            auto newDependency = Marmalade::ECS::ComponentRegistry::Instance().CreateComponent(dependency.name());
+            auto newDependency = Marmalade::ECS::ComponentRegistry::Instance().CreateComponent(dependency);
             if (newDependency) {
                 components.push_back(std::move(newDependency));
-                spdlog::warn("Automatically add {} component as {} depends on it", dependency.name(), component->name);
+                spdlog::warn("Automatically add {} component as {} depends on it", dependency, component->name);
             }
         }
     }
@@ -53,7 +53,7 @@ void Marmalade::ECS::ComponentManager::AddComponent(std::shared_ptr<Component> c
 void Marmalade::ECS::ComponentManager::RemoveComponent(Component* component) {
     for (const auto& existing : components) { // Check for dependencies before removing a component
         for (const auto& dependency : existing->dependencies) {
-            if (typeid(*component) == dependency) {
+            if (component->name == dependency) {
                 spdlog::error("Could not remove {} because its a dependency of {}", component->name, existing->name);
                 return;
             }

@@ -110,7 +110,7 @@ Entity Marmalade::Project::ProjectScenes::deserializeEntity(const nlohmann::json
     for (const auto& componentName: e["components"]) {
         auto factory = Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()[componentName].get();
 
-        entity.componentManager.AddComponent(factory->Create());// Add component
+        entity.componentManager.AddComponent(factory->Create()); // Add component
     }
 
     // Deserialize children (recursive)

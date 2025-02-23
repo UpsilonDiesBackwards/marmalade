@@ -27,7 +27,7 @@
 
 class EditView {
 public:
-    Entity* selectedEntity;
+    Entity* selectedEntity{};
 
     EditView(int width, int height);
     ~EditView();
