@@ -22,16 +22,12 @@
 #include <glad/glad.h>
 
 #include "../application/application.h"
+#include "ecs/components/physics/colliderbase.h"
 
 #include <ImGuizmo.h>
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/string_cast.hpp>
-
 #include <imgui.h>
 
-#include <iostream>
-#include <functional>
 #include <glm/gtc/type_ptr.hpp>
 
 EditView::EditView(int width, int height) : width(width), height(height) {
@@ -87,6 +83,7 @@ void EditView::Render() {
 
     if (selectedEntity) {
         ShowGizmo();
+        ShowColliderBounds();
     }
 }
 
@@ -179,4 +176,14 @@ void EditView::ShowGizmo() {
                          glm::value_ptr(app.camera->GetProjection()),
                          currentGuizmoOperation, currentGuizmoMode,
                          glm::value_ptr(transform->modelMatrix));
+}
+
+void EditView::ShowColliderBounds() {
+    auto comp = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::ColliderBase>();
+
+    if (!comp || !comp->showingBounds) { return; } // Collider component does not exist, or not showing bounds. Do not continue
+
+    auto* transform = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
+
+    comp->ShowBounds(selectedEntity->getPosition(), *transform);
 }

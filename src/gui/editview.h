@@ -42,6 +42,7 @@ private:
     ImVec2 imageMin, imageMax;
 
     void ShowGizmo();
+    void ShowColliderBounds();
 };
 
 

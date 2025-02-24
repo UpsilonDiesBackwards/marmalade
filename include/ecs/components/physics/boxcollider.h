@@ -35,7 +35,7 @@ namespace Marmalade::ECS {
      * ... and additional collision methods such as OBB.
      * */
 
-    class BoxCollider : public Component, public ColliderBase {
+    class BoxCollider : public ColliderBase {
     public:
         BoxCollider() {
             name = "BoxCollider",
@@ -49,17 +49,9 @@ namespace Marmalade::ECS {
         void Intersects(Entity* self, Entity* other) override;
 
         bool IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override;
-        bool IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB, float rotation) override;
+        bool IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override;
 
-        void ShowBounds(Entity* entity) override;
-
-    private:
-        bool _showBounds{false};
-
-        template<typename T>
-        T* GetCollisionData() {
-            return std::get_if<T>(&data);
-        }
+        void ShowBounds(const glm::vec2& entityPosition, Transform transform) override;
     };
 
     REGISTER_COMPONENT(BoxCollider);

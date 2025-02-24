@@ -20,30 +20,30 @@
 
 #include "ecs/components/physics/boxcollider.h"
 
-#include "../../../application/application.h"
-
 #include <imgui.h>
+#include <glm/gtc/type_ptr.hpp>
 
 void Marmalade::ECS::BoxCollider::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
 
-    auto* aabb = GetCollisionData<AABBData>();
-    if (aabb) {
-        ImGui::DragFloat2("AABB Size", &aabb->size.x, 0.1f, 0.1f, 100.0f);
-        ImGui::DragFloat2("AABB Offset", &aabb->offset.x, 0.1f, -10.0f, 10.0f);
+    float rotation = entity->getRotation();
+
+    if (rotation == 0.0f) {
+        if (!std::holds_alternative<AABBData>(data)) {
+            OBBData prevData = std::get<OBBData>(data);
+            data = AABBData{prevData.size, prevData.offset};
+        }
+    } else if (!std::holds_alternative<OBBData>(data)) {
+        AABBData prevData = std::get<AABBData>(data);
+        data = OBBData{prevData.size, prevData.offset, rotation};
     }
 
-    auto* obb = GetCollisionData<OBBData>();
-    if (obb) {
-        ImGui::DragFloat2("OBB Size", &obb->size.x, 0.1f, 0.1f, 100.0f);
-        ImGui::DragFloat2("OBB Offset", &obb->offset.x, 0.1f, -10.0f, 10.0f);
-        ImGui::DragFloat("OBB Rotation", &obb->rotation, 0.1f, -180.0f, 180.0f);
-    }
+    std::visit([&](auto &colliderData) {
+        ImGui::DragFloat2("Size", glm::value_ptr(colliderData.size), 0.1f);
+        ImGui::DragFloat2("Offset", glm::value_ptr(colliderData.offset), 0.1f);
+    }, data);
 
-    ImGui::Checkbox("Draw Bounds", &_showBounds);
-    if (_showBounds) {
-        ShowBounds(entity);
-    }
+    ImGui::Checkbox("Draw Bounds", &showingBounds);
 }
 
 void Marmalade::ECS::BoxCollider::Apply(Entity* entity) {
@@ -67,7 +67,6 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
 
     auto* obbA = GetCollisionData<OBBData>();
     auto* obbB = other->componentManager.GetComponentOfType<BoxCollider>()->GetCollisionData<OBBData>();
-
 
     if (aabbA && aabbB) {
         if (IntersectsAABB(*other->componentManager.GetComponentOfType<ColliderBase>(), posA, posB)) {
@@ -98,6 +97,43 @@ bool Marmalade::ECS::BoxCollider::IntersectsOBB(const ColliderBase& other, const
     return false;
 }
 
-void Marmalade::ECS::BoxCollider::ShowBounds(Entity* entity) {
-    // TODO: Implement bounds rendering
+void Marmalade::ECS::BoxCollider::ShowBounds(const glm::vec2& entityPosition, Transform transform) {
+    std::visit([&](auto& colliderData) {
+        glm::vec2 pos = entityPosition + colliderData.offset;
+
+        if constexpr (std::is_same_v<std::decay_t<decltype(colliderData)>, AABBData>) {
+            glm::vec2 min = pos;
+            glm::vec2 max = min + colliderData.size;
+
+            ImVec2 screenMin = WorldToScreenSpace(min);
+            ImVec2 screenMax = WorldToScreenSpace(max);
+
+            ImGui::GetWindowDrawList()->AddRect(screenMin, screenMax,
+                                                ImGui::GetColorU32(IM_COL32(255, 255, 255, 255)), 0.0f, 0.0f, 2.0f);
+        } else if constexpr (std::is_same_v<std::decay_t<decltype(colliderData)>, OBBData>) {
+            float theta = glm::radians(transform.rotation);
+
+            glm::vec2 corners[4] = {
+                    {0, 0}, {colliderData.size.x, 0}, {colliderData.size.x, colliderData.size.y}, {0, colliderData.size.y}
+            };
+
+            glm::vec2 rotatedCorners[4];
+            for (int i = 0; i < 4; ++i) {
+                rotatedCorners[i] = pos + glm::vec2(
+                                                  corners[i].x * cos(theta) - corners[i].y * sin(theta),
+                                                  corners[i].x * sin(theta) + corners[i].y * cos(theta)
+                                                 );
+            }
+
+            ImVec2 screenCorners[4];
+            for (int i = 0; i < 4; ++i) {
+                screenCorners[i] = WorldToScreenSpace(rotatedCorners[i]);
+            }
+
+            ImGui::GetWindowDrawList()->AddQuad(
+                    screenCorners[0], screenCorners[1], screenCorners[2], screenCorners[3],
+                    ImGui::GetColorU32(IM_COL32(255, 255, 255, 255)), 2.0f
+            );
+        }
+    }, data);
 }

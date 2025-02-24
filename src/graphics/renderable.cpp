@@ -29,10 +29,10 @@
 
 float vertices[] = {
         // Positions       // Texture Coords
-        -0.5f,  0.5f, 0.0f,  0.0f, 1.0f,  // Top-left corner
-        0.5f,  0.5f, 0.0f,  1.0f, 1.0f,  // Top-right corner
-        0.5f, -0.5f, 0.0f,  1.0f, 0.0f,  // Bottom-right corner
-        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f   // Bottom-left corner
+        0.0f,  1.0f, 0.0f,  0.0f, 1.0f,  // Top-left
+        1.0f,  1.0f, 0.0f,  1.0f, 1.0f,  // Top-right
+        1.0f,  0.0f, 0.0f,  1.0f, 0.0f,  // Bottom-right
+        0.0f,  0.0f, 0.0f,  0.0f, 0.0f   // Bottom-left
 };
 
 int indices[] = {
