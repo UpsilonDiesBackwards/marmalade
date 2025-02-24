@@ -65,9 +65,7 @@ void SceneHierarchy::Show() {
     showRenamePopup();
     showDeletePopup();
 
-    if (_selected && ImGui::IsKeyPressed(ImGuiKey_Escape) || // If entity is selected AND escaped is pressed...
-        _selected && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) { // ...or RMB is pressed...
-
+    if (_selected && ImGui::IsKeyPressed(ImGuiKey_Escape)) { // If entity is selected AND escaped is pressed...
         _selected = nullptr; // ...then deselect the current entity
     }
 

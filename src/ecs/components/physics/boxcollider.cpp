@@ -93,7 +93,7 @@ bool Marmalade::ECS::BoxCollider::IntersectsAABB(const ColliderBase& other, cons
             minA.y < maxB.y && maxA.y > minB.y);
 }
 
-bool Marmalade::ECS::BoxCollider::IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB, float rotation) {
+bool Marmalade::ECS::BoxCollider::IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
     return false;
 }
 

@@ -69,7 +69,7 @@ void Marmalade::ECS::Transform::Display(Entity* entity) {
         DrawLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(sliderWidth);
-        if (ImGui::SliderFloat(("##Rot" + std::to_string(entity->id)).c_str(), &transform->rotation, 0, 180)) {
+        if (ImGui::SliderFloat(("##Rot" + std::to_string(entity->id)).c_str(), &transform->rotation, 0, 360)) {
             entity->setRotation(transform->rotation);
         }
 

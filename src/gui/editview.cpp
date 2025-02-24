@@ -116,7 +116,7 @@ void EditView::RunInput() {
             float posX = app.inputManager.getMouseDeltaX();
             float posY = app.inputManager.getMouseDeltaY();
 
-            app.camera->Move(-posX, -posY);
+            app.camera->Move(-posX, posY);
         }
     });
 
