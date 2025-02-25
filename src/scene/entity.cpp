@@ -25,6 +25,7 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include <spdlog/spdlog.h>
+#include "ecs/components/physics/boxcollider.h"
 
 Entity::Entity(const std::string &name, EntityFlags flags)
     : name(name), flags(flags), renderable(0,0,0, Texture::LoadTexture("")) {
@@ -33,6 +34,10 @@ Entity::Entity(const std::string &name, EntityFlags flags)
 
     // Every entity should have a transform component by default
     componentManager.AddComponent(std::make_shared<Marmalade::ECS::Transform>());
+
+    // Temporary
+    componentManager.AddComponent(std::make_shared<Marmalade::ECS::SpriteRender>());
+    componentManager.AddComponent(std::make_shared<Marmalade::ECS::BoxCollider>());
 
     Render();
 }

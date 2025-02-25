@@ -28,14 +28,18 @@ void Marmalade::ECS::BoxCollider::Display(Entity* entity) {
 
     float rotation = entity->getRotation();
 
-    if (rotation == 0.0f) {
+    if (rotation == 0.0f || rotation == 360.f) {
         if (!std::holds_alternative<AABBData>(data)) {
             OBBData prevData = std::get<OBBData>(data);
             data = AABBData{prevData.size, prevData.offset};
         }
     } else if (!std::holds_alternative<OBBData>(data)) {
         AABBData prevData = std::get<AABBData>(data);
-        data = OBBData{prevData.size, prevData.offset, rotation};
+
+        glm::vec2 uX = glm::vec2(cos(rotation), sin(rotation));
+        glm::vec2 uY = glm::vec2(-sin(rotation), cos(rotation));
+
+        data = OBBData{prevData.size, prevData.offset, rotation, uX, uY};
     }
 
     std::visit([&](auto &colliderData) {
@@ -73,8 +77,10 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
             spdlog::info("Collision detected using AABB");
         }
     } else if (obbA && obbB) {
-        spdlog::info("Collision detected using OBB");
-    } else { spdlog::error("Invalid collision type pair!"); }
+        if (IntersectsOBB(*other->componentManager.GetComponentOfType<ColliderBase>(), posA, posB)) {
+            spdlog::info("Collision detected using OBB");
+        }
+    }
 }
 
 bool Marmalade::ECS::BoxCollider::IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
@@ -94,46 +100,98 @@ bool Marmalade::ECS::BoxCollider::IntersectsAABB(const ColliderBase& other, cons
 }
 
 bool Marmalade::ECS::BoxCollider::IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
-    return false;
+    auto* obbA = GetCollisionData<OBBData>();
+    auto* obbB = std::get_if<OBBData>(&other.data);
+
+    if (!obbA || !obbB) return false;
+
+    float radiiA, radiiB;
+    glm::mat2 R, AbsR;
+
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            R[i][j] = glm::dot(obbA->u[i], obbB->u[j]);
+        }
+    }
+
+    spdlog::info("Entity A Pos: {}, {}", posA.x, posA.y);
+    spdlog::info("Entity B Pos: {}, {}", posB.x, posB.y);
+
+    spdlog::info("OBB A Center: {}, {}", obbA->c.x, obbA->c.y);
+    spdlog::info("OBB B Center: {}, {}", obbB->c.x, obbB->c.y);
+    spdlog::info("OBB A Half-Extents: {}, {}", obbA->e.x, obbA->e.y);
+    spdlog::info("OBB B Half-Extents: {}, {}", obbB->e.x, obbB->e.y);
+
+    spdlog::info("OBB A uX: {}, {}", obbA->u[0].x, obbA->u[0].y);
+    spdlog::info("OBB A uY: {}, {}", obbA->u[1].x, obbA->u[1].y);
+    spdlog::info("OBB B uX: {}, {}", obbB->u[0].x, obbB->u[0].y);
+    spdlog::info("OBB B uY: {}, {}", obbB->u[1].x, obbB->u[1].y);
+
+    // Compute translation vector
+    glm::vec2 t = obbB->c - obbA->c;
+    t = glm::vec2(glm::dot(t, obbA->u[0]), glm::dot(t, obbA->u[1]));
+
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            AbsR[i][j] = glm::abs(R[i][j] + FLT_EPSILON);
+        }
+    }
+
+    // Test Axes L = A0/A1
+    for (int i = 0; i < 2; ++i) {
+        radiiA = obbA->e[i];
+        radiiB = obbB->e[0] * AbsR[i][0] + obbB->e[1] * AbsR[i][1];
+        if (glm::abs(t[i]) > radiiA + radiiB) return false;
+    }
+
+    // Test Axes L = B0/B1
+    for (int i = 0; i < 2; ++i) {
+        radiiA = obbA->e[0] * AbsR[0][i] + obbA->e[1] * AbsR[1][i];
+        radiiB = obbB->e[i];
+        if (glm::abs(t[0] * R[0][i] + t[1] * R[1][i]) > radiiA + radiiB) return false;
+    }
+
+    return true; // No separating axis found, OBBs intersecting
 }
 
 void Marmalade::ECS::BoxCollider::ShowBounds(const glm::vec2& entityPosition, Transform transform) {
-    std::visit([&](auto& colliderData) {
-        glm::vec2 pos = entityPosition + colliderData.offset;
+    if (auto* aabbData = std::get_if<AABBData>(&data)) {
+        glm::vec2 min = entityPosition + aabbData->offset;
+        glm::vec2 max = min + aabbData->size;
 
-        if constexpr (std::is_same_v<std::decay_t<decltype(colliderData)>, AABBData>) {
-            glm::vec2 min = pos;
-            glm::vec2 max = min + colliderData.size;
+        ImVec2 screenMin = WorldToScreenSpace(min);
+        ImVec2 screenMax = WorldToScreenSpace(max);
 
-            ImVec2 screenMin = WorldToScreenSpace(min);
-            ImVec2 screenMax = WorldToScreenSpace(max);
+        ImGui::GetWindowDrawList()->AddRect(
+                screenMin, screenMax,
+                ImGui::GetColorU32(IM_COL32(255, 255, 255, 255)), 0.0f, 0.0f, 2.0f
+        );
+    } else if (auto* obbData = std::get_if<OBBData>(&data)) {
+        obbData->c = entityPosition + obbData->offset;
+        obbData->e = glm::vec2(obbData->size.x * 0.5f, obbData->size.y * 0.5f);
 
-            ImGui::GetWindowDrawList()->AddRect(screenMin, screenMax,
-                                                ImGui::GetColorU32(IM_COL32(255, 255, 255, 255)), 0.0f, 0.0f, 2.0f);
-        } else if constexpr (std::is_same_v<std::decay_t<decltype(colliderData)>, OBBData>) {
-            float theta = glm::radians(transform.rotation);
+        float theta = glm::radians(transform.rotation);
 
-            glm::vec2 corners[4] = {
-                    {0, 0}, {colliderData.size.x, 0}, {colliderData.size.x, colliderData.size.y}, {0, colliderData.size.y}
-            };
+        glm::vec2 corners[4] = {
+                {0, 0}, {obbData->size.x, 0}, {obbData->size.x, obbData->size.y}, {0, obbData->size.y}
+        };
 
-            glm::vec2 rotatedCorners[4];
-            for (int i = 0; i < 4; ++i) {
-                rotatedCorners[i] = pos + glm::vec2(
-                                                  corners[i].x * cos(theta) - corners[i].y * sin(theta),
-                                                  corners[i].x * sin(theta) + corners[i].y * cos(theta)
-                                                 );
-            }
-
-            ImVec2 screenCorners[4];
-            for (int i = 0; i < 4; ++i) {
-                screenCorners[i] = WorldToScreenSpace(rotatedCorners[i]);
-            }
-
-            ImGui::GetWindowDrawList()->AddQuad(
-                    screenCorners[0], screenCorners[1], screenCorners[2], screenCorners[3],
-                    ImGui::GetColorU32(IM_COL32(255, 255, 255, 255)), 2.0f
-            );
+        glm::vec2 rotatedCorners[4];
+        for (int i = 0; i < 4; ++i) {
+            rotatedCorners[i] = obbData->c + glm::vec2(
+                                                     corners[i].x * cos(theta) - corners[i].y * sin(theta),
+                                                     corners[i].x * sin(theta) + corners[i].y * cos(theta)
+                                             );
         }
-    }, data);
+
+        ImVec2 screenCorners[4];
+        for (int i = 0; i < 4; ++i) {
+            screenCorners[i] = WorldToScreenSpace(rotatedCorners[i]);
+        }
+
+        ImGui::GetWindowDrawList()->AddQuad(
+                screenCorners[0], screenCorners[1], screenCorners[2], screenCorners[3],
+                ImGui::GetColorU32(IM_COL32(255, 255, 255, 255)), 2.0f
+        );
+    }
 }
