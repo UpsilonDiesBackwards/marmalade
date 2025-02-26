@@ -36,13 +36,24 @@ namespace Marmalade::ECS {
 
     class RigidBody : public Component {
     public:
+        bool isStatic = true;
+        glm::vec2 velocity = {0.0f, 0.0f};
+        float mass = 1.0f;
+        float gravity = -9.81f;
+
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
+
+        void UpdatePhysics(Entity* entity, float deltaTime);
 
         RigidBody() {
             name = "Rigidbody";
             dependencies = {"BoxCollider"};
         }
+    private:
+        // Accumulator for phys updates
+        float _accumulator = 0.0f;
+        const float fixedTimeStep = 1.0f / 60.0f; // Target is 60 updates per second
     };
 
     REGISTER_COMPONENT(RigidBody);

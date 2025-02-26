@@ -25,7 +25,28 @@
 void Marmalade::ECS::RigidBody::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
 
+    ImGui::Checkbox("Static", &isStatic);
+    ImGui::DragFloat2("Velocity", &velocity.x, 0.1f);
+    ImGui::DragFloat("Gravity", &gravity, 0.1f);
+    ImGui::DragFloat("Mass", &mass, 0.1f);
 }
 
 void Marmalade::ECS::RigidBody::Apply(Entity* entity) {
+    if (isStatic) return;
+
+    float deltaTime = static_cast<float>(Application::GetInstance().profiler.GetDeltaTime());
+
+    _accumulator += deltaTime;
+
+    while (_accumulator >= fixedTimeStep) { // We use an accumulator to prevent jitteriness
+        UpdatePhysics(entity, fixedTimeStep);
+        _accumulator -= fixedTimeStep;
+    }
+}
+
+void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float deltaTime) {
+    velocity.y += gravity * deltaTime;
+
+    glm::vec2 newPos = entity->getPosition() + velocity * deltaTime;
+    entity->setPosition(newPos);
 }
