@@ -34,7 +34,7 @@ void Marmalade::ECS::RigidBody::Display(Entity* entity) {
 void Marmalade::ECS::RigidBody::Apply(Entity* entity) {
     if (isStatic) return;
 
-    float deltaTime = static_cast<float>(Application::GetInstance().profiler.GetDeltaTime());
+    auto deltaTime = static_cast<float>(Application::GetInstance().profiler.GetDeltaTime());
 
     _accumulator += deltaTime;
 
@@ -47,6 +47,8 @@ void Marmalade::ECS::RigidBody::Apply(Entity* entity) {
 void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float deltaTime) {
     velocity.y += gravity * deltaTime;
 
-    glm::vec2 newPos = entity->getPosition() + velocity * deltaTime;
+    glm::vec2 momentum = mass * velocity;
+
+    glm::vec2 newPos = entity->getPosition() + momentum * deltaTime;
     entity->setPosition(newPos);
 }
