@@ -37,9 +37,11 @@ void Marmalade::ECS::BoxCollider::Display(Entity* entity) {
         AABBData prevData = std::get<AABBData>(data);
 
         glm::vec2 uX = glm::vec2(cos(rotation), sin(rotation));
-        glm::vec2 uY = glm::vec2(-sin(rotation), cos(rotation));
+        glm::vec2 uY = glm::vec2(-uX.y, uX.x);
 
-        data = OBBData{prevData.size, prevData.offset, rotation, uX, uY};
+
+        data = OBBData{prevData.size, prevData.offset, rotation,
+                       prevData.offset, {uX, uY}, prevData.size * 0.5f};
     }
 
     std::visit([&](auto &colliderData) {
@@ -114,18 +116,18 @@ bool Marmalade::ECS::BoxCollider::IntersectsOBB(const ColliderBase& other, const
         }
     }
 
-    spdlog::info("Entity A Pos: {}, {}", posA.x, posA.y);
-    spdlog::info("Entity B Pos: {}, {}", posB.x, posB.y);
+//    spdlog::info("Entity A Pos: {}, {}", posA.x, posA.y);
+//    spdlog::info("Entity B Pos: {}, {}", posB.x, posB.y);
+//
+//    spdlog::info("OBB A Center: {}, {}", obbA->c.x, obbA->c.y);
+//    spdlog::info("OBB B Center: {}, {}", obbB->c.x, obbB->c.y);
+//    spdlog::info("OBB A Half-Extents: {}, {}", obbA->e.x, obbA->e.y);
+//    spdlog::info("OBB B Half-Extents: {}, {}", obbB->e.x, obbB->e.y);
 
-    spdlog::info("OBB A Center: {}, {}", obbA->c.x, obbA->c.y);
-    spdlog::info("OBB B Center: {}, {}", obbB->c.x, obbB->c.y);
-    spdlog::info("OBB A Half-Extents: {}, {}", obbA->e.x, obbA->e.y);
-    spdlog::info("OBB B Half-Extents: {}, {}", obbB->e.x, obbB->e.y);
-
-    spdlog::info("OBB A uX: {}, {}", obbA->u[0].x, obbA->u[0].y);
-    spdlog::info("OBB A uY: {}, {}", obbA->u[1].x, obbA->u[1].y);
-    spdlog::info("OBB B uX: {}, {}", obbB->u[0].x, obbB->u[0].y);
-    spdlog::info("OBB B uY: {}, {}", obbB->u[1].x, obbB->u[1].y);
+//    spdlog::info("OBB A uX: s {}, {}", obbA->u[0].x, obbA->u[0].y);
+//    spdlog::info("OBB A uY: {}, {}", obbA->u[1].x, obbA->u[1].y);
+//    spdlog::info("OBB B uX: {}, {}", obbB->u[0].x, obbB->u[0].y);
+//    spdlog::info("OBB B uY: {}, {}", obbB->u[1].x, obbB->u[1].y);
 
     // Compute translation vector
     glm::vec2 t = obbB->c - obbA->c;
@@ -133,7 +135,7 @@ bool Marmalade::ECS::BoxCollider::IntersectsOBB(const ColliderBase& other, const
 
     for (int i = 0; i < 2; ++i) {
         for (int j = 0; j < 2; ++j) {
-            AbsR[i][j] = glm::abs(R[i][j] + FLT_EPSILON);
+            AbsR[i][j] = glm::max(glm::abs(R[i][j]), 1e-6f);
         }
     }
 
@@ -168,7 +170,6 @@ void Marmalade::ECS::BoxCollider::ShowBounds(const glm::vec2& entityPosition, Tr
         );
     } else if (auto* obbData = std::get_if<OBBData>(&data)) {
         obbData->c = entityPosition + obbData->offset;
-        obbData->e = glm::vec2(obbData->size.x * 0.5f, obbData->size.y * 0.5f);
 
         float theta = glm::radians(transform.rotation);
 
