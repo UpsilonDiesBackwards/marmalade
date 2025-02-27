@@ -20,6 +20,8 @@
 
 #include "ecs/components/physics/boxcollider.h"
 
+#include "ecs/components/physics/rigidbody.h"
+
 #include <imgui.h>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -76,10 +78,22 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
 
     if (aabbA && aabbB) {
         if (IntersectsAABB(*other->componentManager.GetComponentOfType<ColliderBase>(), posA, posB)) {
+            if (self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
+
+                glm::vec2 collisionNorm = glm::normalize(posB - posA);
+                self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()->Collide(self, other, collisionNorm);
+            }
+
             spdlog::info("Collision detected using AABB");
         }
     } else if (obbA && obbB) {
         if (IntersectsOBB(*other->componentManager.GetComponentOfType<ColliderBase>(), posA, posB)) {
+            if (self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
+
+                glm::vec2 collisionNorm = glm::normalize(posB - posA);
+                self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()->Collide(self, other, collisionNorm);
+            }
+
             spdlog::info("Collision detected using OBB");
         }
     }

@@ -81,7 +81,6 @@ namespace Marmalade::ECS {
 
             return ImVec2(screenX + framebufferPos.x, screenY + framebufferPos.y);
         }
-
     };
 }
 

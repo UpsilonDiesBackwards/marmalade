@@ -46,6 +46,8 @@ namespace Marmalade::ECS {
 
         void UpdatePhysics(Entity* entity, float deltaTime);
 
+        void Collide(Entity* self, Entity* other, const glm::vec2 normal);
+
         RigidBody() {
             name = "Rigidbody";
             dependencies = {"BoxCollider"};
@@ -54,6 +56,8 @@ namespace Marmalade::ECS {
         // Accumulator for phys updates
         float _accumulator = 0.0f;
         const float fixedTimeStep = 1.0f / 60.0f; // Target is 60 updates per second
+
+        glm::vec2 momentum;
     };
 
     REGISTER_COMPONENT(RigidBody);

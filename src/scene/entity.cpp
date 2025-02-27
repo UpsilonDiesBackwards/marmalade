@@ -19,13 +19,15 @@
 
 #include <scene/entity.h>
 
+#include "ecs/components/physics/boxcollider.h"
+#include "ecs/components/physics/rigidbody.h"
+
 #include <graphics/texture.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext/matrix_transform.hpp>
 
 #include <spdlog/spdlog.h>
-#include "ecs/components/physics/boxcollider.h"
 
 Entity::Entity(const std::string &name, EntityFlags flags)
     : name(name), flags(flags), renderable(0,0,0, Texture::LoadTexture("")) {
@@ -38,6 +40,7 @@ Entity::Entity(const std::string &name, EntityFlags flags)
     // Temporary
     componentManager.AddComponent(std::make_shared<Marmalade::ECS::SpriteRender>());
     componentManager.AddComponent(std::make_shared<Marmalade::ECS::BoxCollider>());
+    componentManager.AddComponent(std::make_shared<Marmalade::ECS::RigidBody>());
 
     Render();
 }

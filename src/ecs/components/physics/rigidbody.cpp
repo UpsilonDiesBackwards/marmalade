@@ -47,8 +47,31 @@ void Marmalade::ECS::RigidBody::Apply(Entity* entity) {
 void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float deltaTime) {
     velocity.y += gravity * deltaTime;
 
-    glm::vec2 momentum = mass * velocity;
+    momentum = mass * velocity;
 
     glm::vec2 newPos = entity->getPosition() + momentum * deltaTime;
     entity->setPosition(newPos);
+}
+
+void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::vec2 normal) {
+    /*
+     * This function is still very rudimentary and does not currently provide accurate physics collision.
+     * currently when a moving (non-static) rigidbody collides with a stationary (static) rigidbody the
+     * non-static entity will "bounce" on the surface of the static rigidbody. This is most likely due to
+     * the collision normal being incorrectly computed in the Colliders.
+     *
+     * It seems that different collision detection methods have their own way of calculating a collision
+     * normal.
+     *
+     * TODO: We should eventually add rotational force for when a rigidbody falls of the corner of a rb
+     * */
+
+    if (isStatic) return;
+
+    glm::vec2 overlap = self->getPosition() - other->getPosition();
+    float overlapDist = glm::dot(overlap, normal);
+
+    self->setPosition(self->getPosition() + normal * overlapDist);
+
+    velocity *= 0.0;
 }
