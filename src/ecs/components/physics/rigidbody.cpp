@@ -68,10 +68,16 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::
 
     if (isStatic) return;
 
-    glm::vec2 overlap = self->getPosition() - other->getPosition();
-    float overlapDist = glm::dot(overlap, normal);
+    glm::vec2 selfHalfHeight = self->componentManager.GetComponentOfType<BoxCollider>()->GetCollisionData<AABBData>()->size / 2.0f;
+    glm::vec2 otherHalfHeight = other->componentManager.GetComponentOfType<BoxCollider>()->GetCollisionData<AABBData>()->size / 2.0f;
+
+    glm::vec2 overlapDist = self->getPosition() - other->getPosition();
+
+    glm::vec2 combinedHalfHeight = selfHalfHeight + otherHalfHeight;
+
+    overlapDist = combinedHalfHeight - overlapDist;
 
     self->setPosition(self->getPosition() + normal * overlapDist);
 
-    velocity *= 0.0;
+    velocity = glm::vec2(0);
 }

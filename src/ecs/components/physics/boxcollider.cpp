@@ -80,7 +80,7 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
         if (IntersectsAABB(*other->componentManager.GetComponentOfType<ColliderBase>(), posA, posB)) {
             if (self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
 
-                glm::vec2 collisionNorm = glm::normalize(posB - posA);
+                glm::vec2 collisionNorm = glm::normalize(posA - posB);
                 self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()->Collide(self, other, collisionNorm);
             }
 
