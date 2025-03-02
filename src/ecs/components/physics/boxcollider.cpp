@@ -78,20 +78,19 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
 
     if (aabbA && aabbB) {
         if (IntersectsAABB(*other->componentManager.GetComponentOfType<ColliderBase>(), posA, posB)) {
-            if (self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
-
+            if (auto* rb = self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
                 glm::vec2 collisionNorm = glm::normalize(posA - posB);
-                self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()->Collide(self, other, collisionNorm);
+                rb->collisionQueue.push({self, other, collisionNorm});
             }
 
             spdlog::info("Collision detected using AABB");
         }
     } else if (obbA && obbB) {
         if (IntersectsOBB(*other->componentManager.GetComponentOfType<ColliderBase>(), posA, posB)) {
-            if (self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
+            if (auto* rb = self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
 
                 glm::vec2 collisionNorm = glm::normalize(posB - posA);
-                self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()->Collide(self, other, collisionNorm);
+                rb->collisionQueue.push({self, other, collisionNorm});
             }
 
             spdlog::info("Collision detected using OBB");

@@ -45,6 +45,18 @@ void Marmalade::ECS::RigidBody::Apply(Entity* entity) {
 }
 
 void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float deltaTime) {
+    // Collision queue
+    while (!collisionQueue.empty()) {
+        CollisionEvent event = collisionQueue.front();
+        collisionQueue.pop();
+
+        Collide(event.self, event.other, event.normal);
+
+        if (event.normal.y < 0 && event.other->componentManager.GetComponentOfType<RigidBody>()->isStatic) {
+            velocity.y = 0;
+        }
+    }
+
     velocity.y += gravity * deltaTime;
 
     momentum = mass * velocity;
@@ -68,16 +80,36 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::
 
     if (isStatic) return;
 
-    glm::vec2 selfHalfHeight = self->componentManager.GetComponentOfType<BoxCollider>()->GetCollisionData<AABBData>()->size / 2.0f;
-    glm::vec2 otherHalfHeight = other->componentManager.GetComponentOfType<BoxCollider>()->GetCollisionData<AABBData>()->size / 2.0f;
+    // TODO: We should eventually add rotational force for when a rigidbody falls of the corner of a rb
+
+    auto* selfCollider = self->componentManager.GetComponentOfType<ColliderBase>();
+    auto* otherCollider = other->componentManager.GetComponentOfType<ColliderBase>();
+
+    if (!selfCollider || !otherCollider) return;
+
+    glm::vec2 selfHalfHeight, otherHalfHeight;
+
+    // SELF
+
+    if (std::holds_alternative<AABBData>(selfCollider->data)) {
+        selfHalfHeight = std::get<AABBData>(selfCollider->data).size / 2.0f;
+    } else if (std::holds_alternative<OBBData>(selfCollider->data)) {
+        selfHalfHeight = std::get<OBBData>(selfCollider->data).size / 2.0f;
+    }
+
+    // OTHER
+
+    if (std::holds_alternative<AABBData>(otherCollider->data)) {
+        otherHalfHeight = std::get<AABBData>(otherCollider->data).size / 2.0f;
+    } else if (std::holds_alternative<OBBData>(otherCollider->data)) {
+        otherHalfHeight = std::get<OBBData>(otherCollider->data).size / 2.0f;
+    }
 
     glm::vec2 overlapDist = self->getPosition() - other->getPosition();
-
     glm::vec2 combinedHalfHeight = selfHalfHeight + otherHalfHeight;
-
     overlapDist = combinedHalfHeight - overlapDist;
 
-    self->setPosition(self->getPosition() + normal * overlapDist);
-
-    velocity = glm::vec2(0);
+    glm::vec2 correction = normal * glm::max(glm::vec2(0.0f), overlapDist);
+    self->setPosition(self->getPosition() + correction);
+    velocity -= glm::dot(velocity, normal) * normal;
 }

@@ -25,6 +25,8 @@
 
 #include "boxcollider.h"
 
+#include <queue>
+
 namespace Marmalade::ECS {
     /*
      * This handles rigid physics resolution of a colliding entity.
@@ -34,8 +36,16 @@ namespace Marmalade::ECS {
      * ....if it's not already attached?
      * */
 
+    struct CollisionEvent {
+        Entity* self;
+        Entity* other = nullptr;
+        glm::vec2 normal;
+    };
+
     class RigidBody : public Component {
     public:
+        std::queue<CollisionEvent> collisionQueue;
+
         bool isStatic = true;
         glm::vec2 velocity = {0.0f, 0.0f};
         float mass = 1.0f;
