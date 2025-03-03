@@ -31,6 +31,9 @@
 
 #include <thread>
 
+// Needed for drag and drop
+static Marmalade::GUI::ProjectItem projectItem;
+
 Marmalade::GUI::FileType Marmalade::GUI::ProjectBrowser::determineFileType(const std::filesystem::path& extension) {
     if (extension == ".png" || extension == ".jpg" || extension == ".gif") {
         return FileType_IMAGE;
@@ -154,16 +157,25 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
     for (const auto& item: std::filesystem::directory_iterator(_currentPath)) {
         const std::filesystem::path path = item.path();
 
-        ImGui::PushID(path.c_str());
-
         GLuint textureId = item.is_directory() ? _textureCache["directory"] : _textureCache["document"];
 
-        if (determineFileType(path.extension()) == FileType_IMAGE) {
+        const auto fileType = determineFileType(path.extension());
+        if (fileType == FileType_IMAGE) {
             textureId = _textureCache[path.string()];
         }
 
-        ImGui::ImageButton(item.path().string().c_str(), textureId, ImVec2(thumbnailSize, thumbnailSize),
+        ImGui::ImageButton(path.string().c_str(), textureId, ImVec2(thumbnailSize, thumbnailSize),
                            ImVec2(0, 1), ImVec2(1, 0));
+
+        if (!item.is_directory()) {
+            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                projectItem = ProjectItem{fileType, path.string()};
+                ImGui::SetDragDropPayload("PROJECT_BROWSER_FILE", &projectItem, sizeof(ProjectItem));
+                ImGui::Image(textureId, ImVec2(thumbnailSize, thumbnailSize));
+                ImGui::EndDragDropSource();
+            }
+        }
+
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
             if (item.is_directory()) {
                 _currentPath /= path.filename();
@@ -172,7 +184,6 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
 
         ImGui::TextWrapped("%s", path.filename().string().c_str());
 
-        ImGui::PopID();
         ImGui::NextColumn();
     }
 
@@ -180,7 +191,6 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
     ImGui::EndChild();
 
     // Bottom bar
-
     float availableWindowWidth = ImGui::GetContentRegionAvail().x;
     float labelWidth = 7.0f;
     float sliderWidth = (availableWindowWidth - (labelWidth * 0.5) - 18.5f) * 0.46f;

@@ -42,6 +42,11 @@ namespace Marmalade::GUI {
         FileType_UNKNOWN
     };
 
+    struct ProjectItem {
+        FileType Type;
+        std::string Path;
+    };
+
     class ProjectBrowser : public Window {
     public:
         explicit ProjectBrowser(bool visible) : Window(visible) {};

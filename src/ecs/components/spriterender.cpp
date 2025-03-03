@@ -27,6 +27,8 @@
 #include <imgui.h>
 #include <ImGuiFileDialog.h>
 
+#include <spdlog/spdlog.h>
+
 void Marmalade::ECS::SpriteRender::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
 
@@ -35,6 +37,18 @@ void Marmalade::ECS::SpriteRender::Display(Entity* entity) {
         ImGui::Text("No texture available");
     } else {
         ImGui::Image(ImTextureID(textureID), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
+    }
+
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("PROJECT_BROWSER_FILE")) {
+            auto projectItem = *(Marmalade::GUI::ProjectItem*) payload->Data;
+            if (projectItem.Type != GUI::FileType_IMAGE) {
+                spdlog::error("Texture must be an image");
+            } else {
+                entity->renderable.SetTexture(projectItem.Path);
+            }
+        }
+        ImGui::EndDragDropTarget();
     }
 
     if (ImGui::Button("Choose Texture")) {
