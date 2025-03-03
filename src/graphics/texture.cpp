@@ -46,7 +46,16 @@ GLuint Texture::LoadTexture(const std::string &filePath) {
     }
 
     if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        GLenum format = GL_RGB;
+        if (channels == 1) {
+            format = GL_RED;
+        } else if (channels == 3) {
+            format = GL_RGB;
+        } else if (channels == 4) {
+            format = GL_RGBA;
+        }
+
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     } else {
         std::cout << "Failed to load texture from file: " + filePath << std::endl;

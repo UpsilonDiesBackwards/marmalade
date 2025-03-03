@@ -79,6 +79,9 @@ void Renderable::Draw(glm::mat4 modelMatrix, bool renderTexture) {
     glBindTexture(GL_TEXTURE_2D, texture);
     shaderProgram.SetInt("texture0", 0);
 
+    glEnable(GL_BLEND);
+    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+
     shaderProgram.SetMat4("projection", Application::GetInstance().camera->GetProjection());
 
     shaderProgram.SetMat4("view", Application::GetInstance().camera->GetView());
