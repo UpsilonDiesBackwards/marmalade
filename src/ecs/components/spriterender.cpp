@@ -56,6 +56,23 @@ void Marmalade::ECS::SpriteRender::Display(Entity* entity) {
         }
         ImGuiFileDialog::Instance()->Close();
     }
+
+    // Image Settingss
+
+    const char* filterModes[] = { "Nearest", "Linear", "Mipmap Nearest", "Mipmap Linear" };
+    int minFilterIdx = (entity->renderable.texSettings.minFilter == GL_NEAREST) ? 0:
+                       (entity->renderable.texSettings.minFilter == GL_LINEAR) ? 1:
+                       (entity->renderable.texSettings.minFilter == GL_NEAREST_MIPMAP_NEAREST) ? 2 : 3;
+
+    if (ImGui::Combo("Min Filter", &minFilterIdx, filterModes, IM_ARRAYSIZE(filterModes))) {
+        entity->renderable.texSettings.minFilter =
+                (minFilterIdx == 0) ? GL_NEAREST :
+                (minFilterIdx == 1) ? GL_LINEAR :
+                (minFilterIdx == 2) ? GL_NEAREST_MIPMAP_NEAREST :
+                                    GL_LINEAR_MIPMAP_LINEAR;
+
+        entity->renderable.UpdateTextureSettings();
+    }
 }
 
 void Marmalade::ECS::SpriteRender::Apply(Entity* entity) {

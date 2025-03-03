@@ -22,13 +22,24 @@
 
 #include "shader.h"
 
+#include <glad/glad.h>
+
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/mat4x4.hpp>
 
 #include <cstdlib>
 
 class Renderable {
+    struct TextureSettings {
+        int wrapS = GL_REPEAT;
+        int wrapT = GL_REPEAT;
+        int minFilter = GL_LINEAR_MIPMAP_LINEAR;
+        int magFilter = GL_LINEAR;
+    };
+
 public:
+    TextureSettings texSettings;
+
     Renderable(unsigned int VAO, unsigned int VBO, unsigned int EBO, unsigned int texture);
 
     void Initialise(); // Buffer Setup
@@ -36,6 +47,8 @@ public:
 
     void SetTexture(const std::string& filePath);
     unsigned int GetTexture();
+    void UpdateTextureSettings();
+
 private:
     unsigned int VAO, VBO, EBO;
     Shader shaderProgram;

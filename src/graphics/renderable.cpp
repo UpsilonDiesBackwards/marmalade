@@ -91,10 +91,23 @@ void Renderable::Draw(glm::mat4 modelMatrix, bool renderTexture) {
     glBindVertexArray(0);
 }
 
+void Renderable::UpdateTextureSettings() {
+    if (texture == 0) return;
+
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texSettings.wrapS);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texSettings.wrapT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texSettings.minFilter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texSettings.magFilter);
+}
+
 void Renderable::SetTexture(const std::string& filePath) {
     glDeleteTextures(1, &texture);
 
     texture = Texture::LoadTexture(filePath);
+
+    UpdateTextureSettings();
 }
 
 unsigned int Renderable::GetTexture() {
