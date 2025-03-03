@@ -34,7 +34,7 @@ void Marmalade::ECS::SpriteRender::Display(Entity* entity) {
     if (textureID == 0) {
         ImGui::Text("No texture available");
     } else {
-        ImGui::Image(ImTextureID(textureID), ImVec2(128, 128));
+        ImGui::Image(ImTextureID(textureID), ImVec2(128, 128), ImVec2(0, 1), ImVec2(1, 0));
     }
 
     if (ImGui::Button("Choose Texture")) {
@@ -73,6 +73,21 @@ void Marmalade::ECS::SpriteRender::Display(Entity* entity) {
 
         entity->renderable.UpdateTextureSettings();
     }
+
+    const char* magFilterModes[]= { "Point" , "Nearest", "Bilinear" };
+    int magFilterIdx = (entity->renderable.texSettings.magFilter == GL_POINT) ? 0 :
+                       (entity->renderable.texSettings.magFilter == GL_NEAREST) ? 1 :
+                       (entity->renderable.texSettings.magFilter == GL_LINEAR) ? 2 : 3;
+
+    if (ImGui::Combo("Mag Filter", &magFilterIdx, magFilterModes, IM_ARRAYSIZE(magFilterModes))) {
+        entity->renderable.texSettings.magFilter =
+                (magFilterIdx == 0) ? GL_POINT :
+                (magFilterIdx == 1) ? GL_NEAREST :
+                (magFilterIdx == 2) ? GL_LINEAR  : GL_LINEAR;
+
+        entity->renderable.UpdateTextureSettings();
+    }
+
 }
 
 void Marmalade::ECS::SpriteRender::Apply(Entity* entity) {

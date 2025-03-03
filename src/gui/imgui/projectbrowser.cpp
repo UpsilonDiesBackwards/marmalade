@@ -79,7 +79,7 @@ void Marmalade::GUI::ProjectBrowser::loadTextures() {
 
     glfwMakeContextCurrent(_loadingContext);
 
-    spdlog::info("Loading textures");
+//    spdlog::info("Loading textures");
     _textureCache.clear();
 
     _textureCache["directory"] = loadTexture("res/icons/ui/directory.png");
@@ -96,7 +96,7 @@ void Marmalade::GUI::ProjectBrowser::loadTextures() {
         }
     }
 
-    spdlog::info("Textures loaded");
+//    spdlog::info("Textures loaded");
     _texturesLoaded = _currentPath.string();
     _textureOperationRunning = false;
 
@@ -162,7 +162,8 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
             textureId = _textureCache[path.string()];
         }
 
-        ImGui::ImageButton(item.path().string().c_str(), textureId, ImVec2(thumbnailSize, thumbnailSize));
+        ImGui::ImageButton(item.path().string().c_str(), textureId, ImVec2(thumbnailSize, thumbnailSize),
+                           ImVec2(0, 1), ImVec2(1, 0));
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
             if (item.is_directory()) {
                 _currentPath /= path.filename();
