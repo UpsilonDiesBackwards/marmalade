@@ -31,6 +31,13 @@ namespace Marmalade::Project {
 
     class ProjectScenes {
     public:
+        struct Component {
+            std::string name;
+            nlohmann::json data;
+        };
+
+        static std::string GetSceneFileName(const std::string &sceneName);
+
         void RegisterScene(const std::string& fileName);
 
         void SaveScene(const std::string& fileName, Scene* scene);
@@ -43,6 +50,8 @@ namespace Marmalade::Project {
         nlohmann::json serializeEntity(const Entity* entity);
         Entity deserializeEntity(const nlohmann::json& e);
     };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectScenes::Component, name, data);
 }
 
 

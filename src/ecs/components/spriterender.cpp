@@ -92,3 +92,10 @@ void Marmalade::ECS::SpriteRender::Display(Entity* entity) {
 
 void Marmalade::ECS::SpriteRender::Apply(Entity* entity) {
 }
+
+nlohmann::json Marmalade::ECS::SpriteRender::Serialize() {
+    return nullptr;
+}
+
+void Marmalade::ECS::SpriteRender::Deserialize(nlohmann::json json) {
+}

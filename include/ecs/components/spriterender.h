@@ -24,11 +24,16 @@
 
 #include "graphics/renderable.h"
 
+#include <nlohmann/json.hpp>
+
 namespace Marmalade::ECS {
     class SpriteRender : public Component {
     public:
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
+
+        nlohmann::json Serialize() override;
+        void Deserialize(nlohmann::json json) override;
 
         SpriteRender() { name = "Sprite Render"; allowMultiple = false; }
     };

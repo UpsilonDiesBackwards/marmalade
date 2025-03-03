@@ -42,6 +42,16 @@ void EditorViews::Show() {
             if (ImGui::Button("Play")) {
                 application.playState = PlayState::Play;
                 std::cout << "Play button clicked!" << std::endl;
+
+                spdlog::info("Serializing scene...");
+
+                Scene* scene = Application::GetInstance().sceneManager.GetCurrentScene().get();
+                Marmalade::Project::Project* project = Application::GetInstance().GetCurrentProject();
+
+                const std::string fileName = Marmalade::Project::ProjectScenes::GetSceneFileName(scene->GetName());
+                project->scenes.RegisterScene(fileName);
+                project->scenes.SaveScene(fileName, scene);
+                project->SaveProjectMarmalade();
             }
         }
 

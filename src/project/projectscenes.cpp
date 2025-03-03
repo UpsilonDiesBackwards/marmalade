@@ -25,6 +25,10 @@
 
 #include <fstream>
 
+std::string Marmalade::Project::ProjectScenes::GetSceneFileName(const std::string& sceneName) {
+    return "data/" + sceneName + ".json";
+}
+
 void Marmalade::Project::ProjectScenes::RegisterScene(const std::string& fileName) {
     auto project = Application::GetInstance().GetCurrentProject();
     auto& scenes = project->projectMarmalade.paths.scenes;
@@ -91,8 +95,9 @@ nlohmann::json Marmalade::Project::ProjectScenes::serializeEntity(const Entity* 
     e["name"] = entity->name;
 
     for (const auto& component: entity->componentManager.components) {
-        e["components"].push_back(component->name);
-        // TODO: Components need function to serialize and deserialize
+        auto componentData = component->Serialize();
+        if (componentData.is_null()) componentData = nlohmann::json::object();
+        e["components"].push_back(Component{component->name, componentData});
     }
 
     for (const auto& child: entity->children) {
@@ -107,10 +112,13 @@ Entity Marmalade::Project::ProjectScenes::deserializeEntity(const nlohmann::json
     auto entity = Entity(name, EntityFlags::RENDERABLE);
 
     // Deserialize components
-    for (const auto& componentName: e["components"]) {
-        auto factory = Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()[componentName].get();
+    for (const auto& componentJson: e["components"]) {
+        auto component = componentJson.get<Component>();
+        auto factory = Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()[component.name].get();
 
-        entity.componentManager.AddComponent(factory->Create()); // Add component
+        auto newComponent = factory->Create();
+        newComponent->Deserialize(component.data);
+        entity.componentManager.AddComponent(std::move(newComponent)); // Add component
     }
 
     // Deserialize children (recursive)
@@ -122,4 +130,3 @@ Entity Marmalade::Project::ProjectScenes::deserializeEntity(const nlohmann::json
 
     return entity;
 }
-

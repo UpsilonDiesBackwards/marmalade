@@ -64,6 +64,13 @@ void Marmalade::ECS::BoxCollider::Apply(Entity* entity) {
     }
 }
 
+nlohmann::json Marmalade::ECS::BoxCollider::Serialize() {
+    return nlohmann::json();
+}
+
+void Marmalade::ECS::BoxCollider::Deserialize(nlohmann::json json) {
+}
+
 void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
     if (!self || !other) return;
 

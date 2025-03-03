@@ -25,6 +25,8 @@
 
 #include "../component.h"
 
+#include <nlohmann/json.hpp>
+
 namespace Marmalade::ECS {
     class Transform : public Component {
     public:
@@ -36,6 +38,9 @@ namespace Marmalade::ECS {
 
         void Apply(Entity* entity) override;
         void Display(Entity* entity) override;
+
+        nlohmann::json Serialize() override;
+        void Deserialize(nlohmann::json json) override;
 
         Transform() {
             name = "Transform";

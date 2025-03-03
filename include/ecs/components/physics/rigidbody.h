@@ -25,6 +25,8 @@
 
 #include "boxcollider.h"
 
+#include <nlohmann/json.hpp>
+
 #include <queue>
 
 namespace Marmalade::ECS {
@@ -53,6 +55,9 @@ namespace Marmalade::ECS {
 
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
+
+        nlohmann::json Serialize() override;
+        void Deserialize(nlohmann::json json) override;
 
         void UpdatePhysics(Entity* entity, float deltaTime);
 

@@ -44,6 +44,13 @@ void Marmalade::ECS::RigidBody::Apply(Entity* entity) {
     }
 }
 
+nlohmann::json Marmalade::ECS::RigidBody::Serialize() {
+    return nlohmann::json();
+}
+
+void Marmalade::ECS::RigidBody::Deserialize(nlohmann::json json) {
+}
+
 void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float deltaTime) {
     // Collision queue
     while (!collisionQueue.empty()) {

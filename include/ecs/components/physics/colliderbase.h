@@ -28,6 +28,8 @@
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
+#include <variant>
+
 namespace Marmalade::ECS {
     struct AABBData {
         glm::vec2 size;

@@ -24,9 +24,6 @@
 #include <scene/entity.h>
 
 #include <imgui.h>
-#include <ImGuizmo.h>
-
-#include <glm/gtc/type_ptr.hpp>
 
 void DrawLabelWithBackground(const char* text, ImVec4 color); // Predeclare function to keep file cohesive
 
@@ -95,6 +92,29 @@ void Marmalade::ECS::Transform::Display(Entity* entity) {
 
 void Marmalade::ECS::Transform::Apply(Entity* entity) {
 
+}
+
+nlohmann::json Marmalade::ECS::Transform::Serialize() {
+    nlohmann::json j;
+    j["pos"]["x"] = pos.x;
+    j["pos"]["y"] = pos.y;
+
+    j["rot"] = rotation;
+
+    j["scale"]["x"] = scale.x;
+    j["scale"]["y"] = scale.y;
+
+    return j;
+}
+
+void Marmalade::ECS::Transform::Deserialize(nlohmann::json json) {
+    pos.x = json["pos"]["x"].get<float>();
+    pos.y = json["pos"]["y"].get<float>();
+
+    rotation = json["rot"].get<float>();
+
+    scale.x = json["scale"]["x"].get<float>();
+    scale.y = json["scale"]["y"].get<float>();
 }
 
 void DrawLabelWithBackground(const char* text, ImVec4 color) {

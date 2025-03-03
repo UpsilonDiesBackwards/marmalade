@@ -26,6 +26,8 @@
 
 #include <glm/vec2.hpp>
 
+#include <nlohmann/json.hpp>
+
 namespace Marmalade::ECS {
     /*
      * This handles the collision detection of an entity.
@@ -45,6 +47,9 @@ namespace Marmalade::ECS {
 
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
+
+        nlohmann::json Serialize() override;
+        void Deserialize(nlohmann::json json) override;
 
         void Intersects(Entity* self, Entity* other) override;
 

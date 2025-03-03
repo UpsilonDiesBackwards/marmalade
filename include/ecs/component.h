@@ -22,6 +22,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include <nlohmann/json.hpp>
+
 #include <typeindex>
 #include <functional>
 #include <utility>
@@ -40,6 +42,9 @@ namespace Marmalade::ECS {
 
         virtual void Display(Entity* entity) = 0;
         virtual void Apply(Entity* entity) = 0;
+
+        virtual nlohmann::json Serialize() = 0;
+        virtual void Deserialize(nlohmann::json json) = 0;
 
         virtual ~Component() = default;
     };
