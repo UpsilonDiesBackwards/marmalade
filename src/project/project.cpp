@@ -19,6 +19,8 @@
 
 #include "project.h"
 
+#include "../application/util.h"
+
 #include <spdlog/spdlog.h>
 
 #include <fstream>
@@ -74,6 +76,9 @@ void Marmalade::Project::Project::CreateEmptyProject(ProjectCreationOptions crea
             spdlog::error("Error creating file '{}'", e.what());
         }
     }
+
+    // Generate UUID
+    projectMarmalade.uuid = Marmalade::Util::GenerateUUIDv4();
 
     SaveProjectMarmalade();
 }

@@ -36,6 +36,7 @@ namespace Marmalade::Project {
 
     struct ProjectMarmalade {
         std::string name{"A Marmalade Project"};
+        std::string uuid{};
         ProjectPaths paths{};
     };
 
@@ -76,7 +77,7 @@ namespace Marmalade::Project {
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectPaths, settings, scenes)
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectMarmalade, name, paths)
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectMarmalade, name, uuid, paths)
 }
 
 #endif
