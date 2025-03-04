@@ -21,6 +21,7 @@
 
 #include "../../application/application.h"
 #include "../../project/projectmanager.h"
+#include "../windowmanager.h"
 
 #include <imgui.h>
 
@@ -37,7 +38,7 @@ void Marmalade::GUI::TopBar::Show() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem(ICON_CI_ADD " New Project")) {
-                projectWizard.ToggleWindow();
+                WindowManager::GetInstance().projectWizard.ToggleWindow();
             }
             if (ImGui::MenuItem(ICON_CI_FOLDER_OPENED " Open Project")) {
                 IGFD::FileDialogConfig config;
@@ -61,17 +62,17 @@ void Marmalade::GUI::TopBar::Show() {
         }
 
         if (ImGui::BeginMenu("Settings")) {
-            ImGui::MenuItem(ICON_CI_SETTINGS " Project Settings", nullptr, &settings.visible);
+            ImGui::MenuItem(ICON_CI_SETTINGS " Project Settings", nullptr, &WindowManager::GetInstance().settings.visible);
             ImGui::MenuItem(ICON_CI_EDIT " Style Editor", nullptr, &showStyleEditor);
-            ImGui::MenuItem(ICON_CI_SETTINGS_GEAR " Preferences", nullptr, &preferences.visible);
+            ImGui::MenuItem(ICON_CI_SETTINGS_GEAR " Preferences", nullptr, &WindowManager::GetInstance().preferences.visible);
 
             ImGui::EndMenu();
         }
 
         if (ImGui::BeginMenu("Window")) {
-            ImGui::MenuItem(ICON_CI_PACKAGE " Package Manager", nullptr, &packageManager.visible);
+            ImGui::MenuItem(ICON_CI_PACKAGE " Package Manager", nullptr, &WindowManager::GetInstance().packageManager.visible);
 
-            ImGui::MenuItem(ICON_CI_FILE_TEXT " Log", nullptr, &log.visible);
+            ImGui::MenuItem(ICON_CI_FILE_TEXT " Log", nullptr, &WindowManager::GetInstance().log.visible);
 
             if (ImGui::MenuItem(ICON_CI_SAVE " Save Layout")) {
                 Application::GetInstance().styleManager.SaveStyle((Marmalade::Config::GetConfigDirectory() / Marmalade::Config::engineConfig.themeFile).string());
@@ -85,19 +86,19 @@ void Marmalade::GUI::TopBar::Show() {
             }
 
             if (ImGui::MenuItem(ICON_CI_DEBUG " ImGui Demo")) {
-                showDebugWindow = !showDebugWindow;
+                WindowManager::GetInstance().ToggleDebugWindow();
             }
 
             ImGui::EndMenu();
         }
 
         if (ImGui::BeginMenu("Help")) {
-            ImGui::MenuItem(ICON_CI_INFO " About", nullptr, &about.visible);
+            ImGui::MenuItem(ICON_CI_INFO " About", nullptr, &WindowManager::GetInstance().about.visible);
 
             ImGui::EndMenu();
         }
 
-        if (showDebugWindow) ImGui::ShowDemoWindow();
+        if (WindowManager::GetInstance().showDebugWindow) ImGui::ShowDemoWindow();
 
         float alignRight = ImGui::GetWindowWidth() - 170;
         ImGui::SameLine(alignRight);
@@ -141,7 +142,7 @@ void Marmalade::GUI::TopBar::Show() {
         ImGui::OpenPopup("Open Scene");
     }
 
-    for (const auto& window: windows) {
+    for (const auto &window : WindowManager::GetInstance().windows){
         window->Show();
     }
 

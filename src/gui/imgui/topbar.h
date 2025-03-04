@@ -35,30 +35,7 @@ namespace Marmalade::GUI {
 
     class TopBar {
     public:
-        inline TopBar() {
-            windows.push_back(&packageManager);
-            windows.push_back(&log);
-            windows.push_back(&projectWizard);
-            windows.push_back(&preferences);
-            windows.push_back(&settings);
-            windows.push_back(&projectBrowser);
-            windows.push_back(&about);
-        }
-
         void Show();
-
-    private:
-        Marmalade::GUI::PackageManager packageManager{};
-        Marmalade::GUI::Log log{true};
-        Marmalade::GUI::ProjectWizard projectWizard{};
-        Marmalade::GUI::Preferences preferences{};
-        Marmalade::GUI::ProjectSettings settings{};
-        Marmalade::GUI::ProjectBrowser projectBrowser{true};
-        Marmalade::GUI::About about{};
-
-        bool showDebugWindow = false;
-
-        std::vector<Marmalade::GUI::Window*> windows{};
     };
 }
 
