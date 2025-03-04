@@ -19,6 +19,7 @@
 
 #include "application/application.h"
 #include "application/config.h"
+#include "application/recents.h"
 
 #include <iostream>
 
@@ -35,6 +36,7 @@ int main(int argc, char** argv) {
 
     Marmalade::Config::SetConfigDirectory(sameDirConfig);
     Marmalade::Config::LoadEngineConfig();
+    Marmalade::Recents::LoadRecents();
 
     Application& application = Application::GetInstance(1920, 1080, "Marmalade Engine");
     application.Initialise();

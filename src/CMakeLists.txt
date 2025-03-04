@@ -10,6 +10,8 @@ list(APPEND ENGINE_SRC
         application/guilogsink.h
         application/config.cpp
         application/config.h
+        application/recents.cpp
+        application/recents.h
         application/util.cpp
         application/util.h
 

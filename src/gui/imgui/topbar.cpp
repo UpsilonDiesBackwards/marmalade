@@ -20,6 +20,7 @@
 #include "topbar.h"
 
 #include "../../application/application.h"
+#include "../../application/recents.h"
 #include "../../project/projectmanager.h"
 #include "../windowmanager.h"
 
@@ -114,6 +115,8 @@ void Marmalade::GUI::TopBar::Show() {
 
                 try {
                     auto project = std::make_unique<Marmalade::Project::Project>(Marmalade::Project::ProjectManager<>::OpenProject(projectPath));
+                    Recents::AddRecentProject(RecentProject{project->projectMarmalade.name, project->projectMarmalade.uuid, projectPath.string()});
+                    Recents::SaveRecents();
 
                     Application::GetInstance().SetCurrentProject(project);
                 } catch (const std::exception& ex) {

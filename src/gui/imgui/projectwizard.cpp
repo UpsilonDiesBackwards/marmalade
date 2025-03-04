@@ -22,6 +22,7 @@
 #include "../../project/project.h"
 #include "../../project/projectmanager.h"
 #include "../../application/application.h"
+#include "../../application/recents.h"
 
 #include <spdlog/spdlog.h>
 
@@ -159,6 +160,9 @@ void Marmalade::GUI::ProjectWizard::CreateProject() {
         spdlog::info("Creating project: {}. Using Git: {}", projectName, creationOptions.initGitRepository);
 
         auto project = std::make_unique<Marmalade::Project::Project>(Marmalade::Project::ProjectManager<>::CreateProject(projectName, projectPath / "project.marmalade", creationOptions));
+
+        Recents::AddRecentProject(RecentProject{project->projectMarmalade.name, project->projectMarmalade.uuid, projectPath.string()});
+        Recents::SaveRecents();
 
         // Create the project and set it to the current project
         Application::GetInstance().SetCurrentProject(project);
