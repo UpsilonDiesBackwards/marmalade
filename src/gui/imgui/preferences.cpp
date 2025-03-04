@@ -63,6 +63,8 @@ void Marmalade::GUI::Preferences::drawGeneralProjectsPane() {
     if (ImGui::InputText("Default Project Path", defaultProjectPathC, sizeof(defaultProjectPathC))) {
         Config::engineConfig.defaultProjectPath = defaultProjectPathC;
     }
+
+    ImGui::Checkbox("Show Welcome Screen on Startup", &Marmalade::Config::engineConfig.showWelcomeScreen);
 }
 
 void Marmalade::GUI::Preferences::selectableTreeNode(const char* title, const char* id) {

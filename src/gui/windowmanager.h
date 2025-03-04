@@ -21,6 +21,7 @@
 #define MARMALADE_GUI_WINDOWMANAGER_H
 
 #include "window.h"
+#include "imgui/welcomescreen.h"
 #include "imgui/packagemanager.h"
 #include "imgui/log.h"
 #include "imgui/projectwizard.h"
@@ -36,6 +37,7 @@ namespace Marmalade::GUI {
     public:
         static WindowManager& GetInstance();
 
+        WelcomeScreen welcomeScreen{Config::engineConfig.showWelcomeScreen};
         PackageManager packageManager{};
         Log log{true};
         ProjectWizard projectWizard{};

@@ -37,6 +37,7 @@ namespace Marmalade {
     struct EngineConfig {
         bool viewports{true};
         std::string themeFile{"editorstyle.txt"};
+        bool showWelcomeScreen{true};
 
         spdlog::level::level_enum logLevel{spdlog::level::info};
 
@@ -60,7 +61,7 @@ namespace Marmalade {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::Repository, name, gitUrl, depth);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, viewports, themeFile, logLevel, defaultProjectPath, repos);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, viewports, themeFile, showWelcomeScreen, logLevel, defaultProjectPath, repos);
 }
 
 #endif

@@ -17,24 +17,37 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "windowmanager.h"
+#ifndef MARMALADE_GUI_WELCOMESCREEN_H
+#define MARMALADE_GUI_WELCOMESCREEN_H
 
-Marmalade::GUI::WindowManager& Marmalade::GUI::WindowManager::GetInstance() {
-    static WindowManager instance{};
-    return instance;
+#include "../window.h"
+
+#include <string>
+#include <functional>
+
+namespace Marmalade::GUI {
+    class WelcomeScreen : public Window {
+    public:
+        struct LeftPaneItem {
+            std::string name;
+            std::function<void ()> action;
+        };
+
+        explicit WelcomeScreen(bool visible) : Window(visible) {};
+
+        void Draw() override;
+    private:
+        int leftPaneSelected = -1;
+        int rightPaneSelected = -1;
+
+        void drawLeftPane();
+        void drawRightPane();
+        void drawSplit();
+
+        static void createProject();
+        static void openProject();
+    };
 }
 
-Marmalade::GUI::WindowManager::WindowManager() {
-    windows.push_back(&welcomeScreen);
-    windows.push_back(&packageManager);
-    windows.push_back(&log);
-    windows.push_back(&projectWizard);
-    windows.push_back(&preferences);
-    windows.push_back(&settings);
-    windows.push_back(&projectBrowser);
-    windows.push_back(&about);
-}
 
-void Marmalade::GUI::WindowManager::ToggleDebugWindow() {
-    showDebugWindow = !showDebugWindow;
-}
+#endif

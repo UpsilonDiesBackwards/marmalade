@@ -53,6 +53,9 @@ void Marmalade::GUI::TopBar::Show() {
             if (ImGui::MenuItem(ICON_CI_OPEN_PREVIEW " Open Scene")) {
                 showSceneOpenPopUp = true;
             }
+            if (ImGui::MenuItem(ICON_CI_STAR " Welcome Screen")) {
+                WindowManager::GetInstance().welcomeScreen.ToggleWindow();
+            }
             if (ImGui::MenuItem(ICON_CI_CLOSE_ALL " Quit")) {
                 glfwSetWindowShouldClose(Application::GetInstance().getWindow(), true);
             }

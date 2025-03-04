@@ -30,6 +30,8 @@ list(APPEND ENGINE_SRC_GUI
         imgui/packagemanager.h
         imgui/log.cpp
         imgui/log.h
+        imgui/welcomescreen.cpp
+        imgui/welcomescreen.h
 
         editorviews.h
         editview.cpp
