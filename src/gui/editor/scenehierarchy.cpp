@@ -211,6 +211,11 @@ void SceneHierarchy::showDeletePopup() {
             } else {
                 Application::GetInstance().sceneManager.GetCurrentScene()->RemoveEntity(_selected);
             }
+
+            Application::GetInstance().editorGUI->details.inspectedEntity = nullptr;
+            Application::GetInstance().editView->selectedEntity = nullptr;
+            _selected = nullptr;
+
             _isDeleting = false;
             ImGui::CloseCurrentPopup();
         }

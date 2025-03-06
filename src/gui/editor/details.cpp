@@ -26,30 +26,34 @@
 void Marmalade::GUI::Details::Draw() {
     ImGui::Begin(ICON_CI_SEARCH " Details", &visible);
 
-    if (inspectedEntity) {
-        ImGui::Text(inspectedEntity->name.c_str());
-        ImGui::Separator();
+    if (!inspectedEntity) { // Do not draw if there is no entity selected
+        visible = false;
+        ImGui::End();
+        return;
+    }
 
-        for (auto& comp: inspectedEntity->componentManager.components) {
-            ImGui::PushID(comp.get());
+    ImGui::Text(inspectedEntity->name.c_str());
+    ImGui::Separator();
 
-            comp->Display(inspectedEntity);
+    for (auto& comp: inspectedEntity->componentManager.components) {
+        ImGui::PushID(comp.get());
 
-            if (comp->isMutable) { // If entity is mutable then allow it to be removed
-                if (ImGui::Button(ICON_CI_TRASHCAN " Remove")) {
-                    _isRemovingComponent = true;
-                    _selectedComponent = comp.get();
-                }
+        comp->Display(inspectedEntity);
+
+        if (comp->isMutable) { // If entity is mutable then allow it to be removed
+            if (ImGui::Button(ICON_CI_TRASHCAN " Remove")) {
+                _isRemovingComponent = true;
+                _selectedComponent = comp.get();
             }
-
-            ImGui::Separator();
-            ImGui::PopID();
         }
 
-        ImGui::SetCursorPosX((ImGui::GetWindowSize().x - 125) * 0.5f);
-        if (ImGui::Button(ICON_CI_PLUS " Add Component")) {
-            _isAddingComponent = true;
-        }
+        ImGui::Separator();
+        ImGui::PopID();
+    }
+
+    ImGui::SetCursorPosX((ImGui::GetWindowSize().x - 125) * 0.5f);
+    if (ImGui::Button(ICON_CI_PLUS " Add Component")) {
+        _isAddingComponent = true;
     }
 
     if (_isRemovingComponent) {
