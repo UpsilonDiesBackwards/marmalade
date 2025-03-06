@@ -31,6 +31,8 @@
 #include <spdlog/spdlog.h>
 
 void Marmalade::GUI::WelcomeScreen::Draw() {
+    ImGui::SetNextWindowSize(ImVec2(700.0f, 400.0f), ImGuiCond_FirstUseEver);
+
     ImGui::Begin(ICON_CI_STAR " Welcome", &visible);
 
     drawSplit();
