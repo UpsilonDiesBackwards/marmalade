@@ -21,14 +21,14 @@
 #define MARMALADE_GUI_WINDOWMANAGER_H
 
 #include "window.h"
-#include "imgui/welcomescreen.h"
-#include "imgui/packagemanager.h"
-#include "imgui/log.h"
-#include "imgui/projectwizard.h"
-#include "imgui/preferences.h"
-#include "imgui/settings.h"
-#include "imgui/projectbrowser.h"
-#include "imgui/about.h"
+#include "windows/welcomescreen.h"
+#include "windows/packagemanager.h"
+#include "log/log.h"
+#include "wizards/projectwizard.h"
+#include "settings/preferences.h"
+#include "settings/settings.h"
+#include "editor/projectbrowser.h"
+#include "dialogs/about.h"
 
 #include <vector>
 

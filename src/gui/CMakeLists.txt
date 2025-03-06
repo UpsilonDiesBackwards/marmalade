@@ -4,42 +4,44 @@ list(APPEND ENGINE_SRC_GUI
         components/tableview.h
         components/selectablelistview.h
 
-        imgui/about.cpp
-        imgui/about.h
-        imgui/editor.cpp
-        imgui/editor.h
-        imgui/editorviews.cpp
-        imgui/editorviews.h
-        imgui/editorviewstatusbar.cpp
-        imgui/editorviewstatusbar.h
-        imgui/scenehierarchy.cpp
-        imgui/scenehierarchy.h
-        imgui/topbar.cpp
-        imgui/topbar.h
-        imgui/projectwizard.cpp
-        imgui/projectwizard.h
-        imgui/preferences.cpp
-        imgui/preferences.h
-        imgui/details.cpp
-        imgui/details.h
-        imgui/settings.cpp
-        imgui/settings.h
-        imgui/projectbrowser.cpp
-        imgui/projectbrowser.h
-        imgui/packagemanager.cpp
-        imgui/packagemanager.h
-        imgui/log.cpp
-        imgui/log.h
-        imgui/welcomescreen.cpp
-        imgui/welcomescreen.h
+        dialogs/about.cpp
+        dialogs/about.h
 
-        editorviews.h
-        editview.cpp
-        editview.h
-        gameview.cpp
-        gameview.h
-        stylemanager.cpp
-        stylemanager.h
+        editor/details.cpp
+        editor/details.h
+        editor/editorviews.cpp
+        editor/editorviews.h
+        editor/editview.cpp
+        editor/editview.h
+        editor/gameview.cpp
+        editor/gameview.h
+        editor/projectbrowser.cpp
+        editor/projectbrowser.h
+        editor/scenehierarchy.cpp
+        editor/scenehierarchy.h
+        editor/topbar.cpp
+        editor/topbar.h
+
+        log/log.cpp
+        log/log.h
+
+        settings/preferences.cpp
+        settings/preferences.h
+        settings/settings.cpp
+        settings/settings.h
+
+        windows/packagemanager.cpp
+        windows/packagemanager.h
+        windows/stylemanager.cpp
+        windows/stylemanager.h
+        windows/welcomescreen.cpp
+        windows/welcomescreen.h
+
+        wizards/projectwizard.cpp
+        wizards/projectwizard.h
+
+        editor.cpp
+        editor.h
         window.h
         windowmanager.cpp
         windowmanager.h

@@ -19,13 +19,13 @@
 
 #include "settings.h"
 
-#include "../src/application/application.h"
+#include "../../application/application.h"
 #include "../../project/projectmanager.h"
 
-#include <imgui.h>
-#include <imgui_internal.h>
+#include "imgui.h"
+#include "imgui_internal.h"
 
-#include <IconsCodicons.h>
+#include "IconsCodicons.h"
 
 void Marmalade::GUI::ProjectSettings::Draw() {
     Application& app = Application::GetInstance();

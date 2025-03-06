@@ -21,13 +21,13 @@
 
 #include "../../application/application.h"
 
-#include <imgui.h>
+#include "imgui.h"
 
-#include <IconsCodicons.h>
+#include "IconsCodicons.h"
 
-#include <stb/stb_image.h>
+#include "stb/stb_image.h"
 
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
 
 #include <thread>
 

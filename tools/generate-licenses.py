@@ -18,7 +18,7 @@
 # generate-licenses.py
 #
 # Simple tool to generate an open source licenses JSON file for display in
-# the about dialog.
+# the about dialogs.
 
 import os
 import json
@@ -51,9 +51,9 @@ def main():
             packages.append({'name': package_name, 'license': license_text})
 
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
-        json.dump({'packages': packages}, f, indent=4)
+        json.dump({'windows': packages}, f, indent=4)
 
-    print(f'Generated "{OUTPUT_FILE}" with {len(packages)} packages.')
+    print(f'Generated "{OUTPUT_FILE}" with {len(packages)} windows.')
 
 
 if __name__ == '__main__':

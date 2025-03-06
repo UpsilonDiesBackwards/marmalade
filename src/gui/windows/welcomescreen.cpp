@@ -23,12 +23,12 @@
 #include "../../application/recents.h"
 #include "../../project/projectmanager.h"
 
-#include <imgui.h>
-#include <imgui_internal.h>
+#include "imgui.h"
+#include "imgui_internal.h"
 
-#include <IconsCodicons.h>
+#include "IconsCodicons.h"
 
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
 
 void Marmalade::GUI::WelcomeScreen::Draw() {
     ImGui::SetNextWindowSize(ImVec2(700.0f, 400.0f), ImGuiCond_FirstUseEver);

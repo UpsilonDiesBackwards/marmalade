@@ -501,7 +501,7 @@ void PackageManager::buildIndex(const Repository& config_repo) {
         }
     }
 
-    indexJson["packages"] = _packagesByName;
+    indexJson["windows"] = _packagesByName;
     indexJson["index"] = [&]() {
         std::unordered_map<std::string, std::vector<std::string>> transformed;
         for (const auto& [key, pkgPtrs]: _keywordIndex) {

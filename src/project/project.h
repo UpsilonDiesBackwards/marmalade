@@ -23,7 +23,7 @@
 #include "projectsettings.h"
 #include "projectscenes.h"
 
-#include "../gui/imgui/projectwizard.h"
+#include "../gui/wizards/projectwizard.h"
 
 #include <string>
 
@@ -65,7 +65,7 @@ namespace Marmalade::Project {
     private:
         std::vector<std::string> baseDirectories = {// Directories auto-created when the project is made
                 "assets",
-                "packages",
+                "windows",
                 "logs"};
 
         std::vector<std::string> baseFiles = {// Files auto-created when the project is made

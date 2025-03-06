@@ -19,11 +19,11 @@
 
 #include "gameview.h"
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 
-#include "../application/application.h"
+#include "../../application/application.h"
 
-#include <imgui.h>
+#include "imgui.h"
 
 /*
  * We will use a frame buffer to display a texture in an imgui window. this will allow us to have a detachable

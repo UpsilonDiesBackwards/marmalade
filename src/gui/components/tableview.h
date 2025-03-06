@@ -60,7 +60,7 @@ namespace Marmalade::GUI::Components {
     class TableView {
     public:
         /**
-         * @brief Represents possible results of the remove confirmation dialog.
+         * @brief Represents possible results of the remove confirmation dialogs.
          */
         enum RemoveDialogResult {
             RemoveDialogResult_REMOVED,   ///< The item was removed.
@@ -79,8 +79,8 @@ namespace Marmalade::GUI::Components {
          * @param items Reference to the container holding items.
          * @param columns The columns that define the table structure.
          * @param tableName The unique identifier for the table.
-         * @param editPopupName The identifier for the edit dialog.
-         * @param removePopupName The identifier for the remove confirmation dialog.
+         * @param editPopupName The identifier for the edit dialogs.
+         * @param removePopupName The identifier for the remove confirmation dialogs.
          */
         TableView(L& items, std::vector<TableViewColumn> columns, std::string tableName, std::string editPopupName, std::string removePopupName) : items(items), _columns(std::move(columns)),
                                                                                                                                                    _tableName(std::move(tableName)),
@@ -113,7 +113,7 @@ namespace Marmalade::GUI::Components {
         virtual void PrepareEdit(const T& item) = 0;
 
         /**
-         * @brief Renders the edit dialog.
+         * @brief Renders the edit dialogs.
          *
          * Must be implemented by derived classes to allow item modifications.
          *
@@ -125,17 +125,17 @@ namespace Marmalade::GUI::Components {
         /**
          * @brief Resets the editing state.
          *
-         * Called when an edit dialog is closed.
+         * Called when an edit dialogs is closed.
          */
         virtual void ResetEdit() = 0;
 
         /**
-         * @brief Renders the remove confirmation dialog.
+         * @brief Renders the remove confirmation dialogs.
          *
          * Must be implemented by derived classes to confirm item deletion.
          *
          * @param item A pointer to the item being removed.
-         * @return The result of the dialog (remove, cancel, or none).
+         * @return The result of the dialogs (remove, cancel, or none).
          */
         virtual RemoveDialogResult DrawRemoveDialog(T* item) = 0;
 

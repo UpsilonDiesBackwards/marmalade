@@ -19,14 +19,14 @@
 
 #include "editview.h"
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 
-#include "../application/application.h"
+#include "../../application/application.h"
 #include "ecs/components/physics/colliderbase.h"
 
-#include <ImGuizmo.h>
+#include "ImGuizmo.h"
 
-#include <imgui.h>
+#include "imgui.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
