@@ -117,15 +117,7 @@ void Marmalade::GUI::TopBar::Show() {
                 auto fileName = ImGuiFileDialog::Instance()->GetCurrentFileName();
                 std::filesystem::path projectPath = std::filesystem::path(dir) / fileName;
 
-                try {
-                    auto project = std::make_unique<Marmalade::Project::Project>(Marmalade::Project::ProjectManager<>::OpenProject(projectPath));
-                    Recents::AddRecentProject(RecentProject{project->projectMarmalade.name, project->projectMarmalade.uuid, projectPath.string()});
-                    Recents::SaveRecents();
-
-                    Application::GetInstance().SetCurrentProject(project);
-                } catch (const std::exception& ex) {
-                    spdlog::error("Failed to open project: {}", ex.what());
-                }
+                Application::GetInstance().OpenProject(projectPath);
             }
             ImGuiFileDialog::Instance()->Close();
         }

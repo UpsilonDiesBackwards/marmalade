@@ -80,16 +80,7 @@ void Marmalade::GUI::WelcomeScreen::drawRightPane() {
                 rightPaneSelected = i;
 
                 if (ImGui::IsMouseDoubleClicked(0)) {
-                    try {
-                        auto project = std::make_unique<Marmalade::Project::Project>(Marmalade::Project::ProjectManager<>::OpenProject(item.path));
-                        Recents::AddRecentProject(RecentProject{project->projectMarmalade.name, project->projectMarmalade.uuid, item.path});
-                        Recents::SaveRecents();
-
-                        Application::GetInstance().SetCurrentProject(project);
-                        visible = false;
-                    } catch (const std::exception& ex) {
-                        spdlog::error("Failed to open project: {}", ex.what());
-                    }
+                    if (Application::GetInstance().OpenProject(item.path)) visible = false;
                 }
             }
 

@@ -93,6 +93,8 @@ public:
 
     std::shared_ptr<GuiLogSink> guiSink;
 
+    bool OpenProject(const std::filesystem::path& path);
+
     void SetCurrentProject(std::unique_ptr<Marmalade::Project::Project>& project);
     Marmalade::Project::Project* GetCurrentProject();
 

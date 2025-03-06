@@ -22,6 +22,8 @@
 #include "application.h"
 
 #include "config.h"
+#include "recents.h"
+#include "../project/projectmanager.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>// Only for docking API
@@ -225,6 +227,21 @@ void Application::SetupLogger() {
     spdlog::register_logger(logger);
     spdlog::set_default_logger(logger);
     spdlog::set_level(Marmalade::Config::engineConfig.logLevel);
+}
+
+bool Application::OpenProject(const std::filesystem::path& path) {
+    try {
+        auto project = std::make_unique<Marmalade::Project::Project>(Marmalade::Project::ProjectManager<>::OpenProject(path));
+        Marmalade::Recents::AddRecentProject(Marmalade::RecentProject{project->projectMarmalade.name, project->projectMarmalade.uuid, path.string()});
+        Marmalade::Recents::SaveRecents();
+
+        SetCurrentProject(project);
+    } catch (const std::exception& ex) {
+        spdlog::error("Failed to open project: {}", ex.what());
+        return false;
+    }
+
+    return true;
 }
 
 void Application::SetCurrentProject(std::unique_ptr<Marmalade::Project::Project>& project) {// Change the current projects and update the window title to inc project name

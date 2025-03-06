@@ -20,11 +20,13 @@
 #include "application/application.h"
 #include "application/config.h"
 #include "application/recents.h"
+#include "gui/windowmanager.h"
 
 #include <iostream>
 
 int main(int argc, char** argv) {
     bool sameDirConfig{false};
+    char *project = nullptr;
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -32,6 +34,19 @@ int main(int argc, char** argv) {
         if (arg == "--same-dir-config") {
             sameDirConfig = true;
         }
+
+        if (arg == "--project") {
+            if (argc > i) {
+                project = argv[i + 1];
+                i++;
+            }
+        }
+    }
+
+    if (project != nullptr) {
+        std::cout << "Chosen project" << project << std::endl;
+    } else {
+        std::cout << "No chosen project" << std::endl;
     }
 
     Marmalade::Config::SetConfigDirectory(sameDirConfig);
@@ -40,6 +55,13 @@ int main(int argc, char** argv) {
 
     Application& application = Application::GetInstance(1920, 1080, "Marmalade Engine");
     application.Initialise();
+
+    if (project != nullptr) {
+        // Open specified project
+        if (application.OpenProject(project)) {
+            Marmalade::GUI::WindowManager::GetInstance().welcomeScreen.visible = false;
+        }
+    }
 
     while (!glfwWindowShouldClose(application.getWindow())) {
         application.Run();
