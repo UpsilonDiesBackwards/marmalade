@@ -32,12 +32,13 @@
 
 void Marmalade::GUI::WelcomeScreen::Draw() {
     ImGui::SetNextWindowSize(ImVec2(700.0f, 400.0f), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowFocus();
 
-    ImGui::Begin(ICON_CI_STAR " Welcome", &visible);
+    WINDOW_BEGIN_MODAL(ICON_CI_STAR " Welcome")
 
     drawSplit();
 
-    ImGui::End();
+    WINDOW_END_MODAL()
 }
 
 void Marmalade::GUI::WelcomeScreen::drawLeftPane() {

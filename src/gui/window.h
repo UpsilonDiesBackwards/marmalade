@@ -20,6 +20,16 @@
 #ifndef MARMALADE_GUI_WINDOW_H
 #define MARMALADE_GUI_WINDOW_H
 
+#define WINDOW_BEGIN_MODAL(name) \
+    if (visible) {               \
+        ImGui::OpenPopup(name);  \
+    }                            \
+    if (ImGui::BeginPopupModal(name, &visible)) {
+
+#define WINDOW_END_MODAL() \
+    ImGui::EndPopup();     \
+    }
+
 namespace Marmalade::GUI {
     /**
      * \brief Abstract class to control an ImGui window.
