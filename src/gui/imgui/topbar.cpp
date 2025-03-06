@@ -45,6 +45,7 @@ void Marmalade::GUI::TopBar::Show() {
                 IGFD::FileDialogConfig config;
                 config.path = Config::engineConfig.defaultProjectPath;
                 config.fileName = "project.marmalade";
+                config.flags = ImGuiFileDialogFlags_Modal;
                 ImGuiFileDialog::Instance()->OpenDialog("ChooseProject", "Choose Project File", ".marmalade", config);
             }
             if (ImGui::MenuItem(ICON_CI_SCREEN_FULL " New Scene")) {

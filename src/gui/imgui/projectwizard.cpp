@@ -57,7 +57,7 @@ void Marmalade::GUI::ProjectWizard::Draw() {
     char readMEC[2048];
     std::strcpy(readMEC, creationOptions.readmeText.c_str());
 
-    ImGui::Begin(ICON_CI_FILE_TEXT " New Project", &visible, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+    WINDOW_BEGIN_MODAL(ICON_CI_FILE_TEXT " New Project", ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize)
 
     if (ImGui::InputText("Project Name##", projectNameC, sizeof(projectNameC))) {
         projectName = projectNameC;
@@ -142,7 +142,7 @@ void Marmalade::GUI::ProjectWizard::Draw() {
                            "Directory already exists!");
     }
 
-    ImGui::End();
+    WINDOW_END_MODAL()
 }
 
 void Marmalade::GUI::ProjectWizard::CreateProject() {

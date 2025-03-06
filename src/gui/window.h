@@ -20,11 +20,11 @@
 #ifndef MARMALADE_GUI_WINDOW_H
 #define MARMALADE_GUI_WINDOW_H
 
-#define WINDOW_BEGIN_MODAL(name) \
+#define WINDOW_BEGIN_MODAL(name, flags) \
     if (visible) {               \
         ImGui::OpenPopup(name);  \
     }                            \
-    if (ImGui::BeginPopupModal(name, &visible)) {
+    if (ImGui::BeginPopupModal(name, &visible, flags)) {
 
 #define WINDOW_END_MODAL() \
     ImGui::EndPopup();     \
