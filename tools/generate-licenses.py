@@ -51,9 +51,9 @@ def main():
             packages.append({'name': package_name, 'license': license_text})
 
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
-        json.dump({'windows': packages}, f, indent=4)
+        json.dump({'packages': packages}, f, indent=4)
 
-    print(f'Generated "{OUTPUT_FILE}" with {len(packages)} windows.')
+    print(f'Generated "{OUTPUT_FILE}" with {len(packages)} packages.')
 
 
 if __name__ == '__main__':

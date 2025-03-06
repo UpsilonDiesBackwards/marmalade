@@ -19,11 +19,11 @@
 
 #include "about.h"
 
-#include "imgui.h"
+#include <imgui.h>
 
-#include "IconsCodicons.h"
+#include <IconsCodicons.h>
 
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 
 #include <fstream>
 
@@ -37,7 +37,7 @@ std::vector<Marmalade::GUI::About::Package> Marmalade::GUI::About::loadPackages(
     file >> package_json;
 
     std::vector<Package> packages;
-    for (const auto& pkg: package_json["windows"]) {
+    for (const auto& pkg: package_json["packages"]) {
         packages.push_back({pkg["name"], pkg["license"]});
     }
 
@@ -60,7 +60,7 @@ void Marmalade::GUI::About::Draw() {
 
             if (ImGui::BeginTabBar("AboutPackagesTabs")) {
                 try {
-                    static std::vector<Package> packages = loadPackages("res/windows.json");
+                    static std::vector<Package> packages = loadPackages("res/packages.json");
                     for (const auto& pkg: packages) {
                         if (ImGui::BeginTabItem(pkg.name.c_str())) {
                             ImGui::Text("%s", pkg.license.c_str());
