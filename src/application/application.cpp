@@ -108,7 +108,7 @@ void Application::Initialise() {
     if (Marmalade::Config::engineConfig.viewports) {
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     }
-    ImFont* font = io.Fonts->AddFontFromFileTTF("res/fonts/monofur/monof55.ttf", 16);
+    ImFont* font = io.Fonts->AddFontFromFileTTF("res/fonts/Cabin/static/Cabin-Regular.ttf", 16);
 
     static const ImWchar icons_ranges[] = {ICON_MIN_CI, ICON_MAX_16_CI, 0};
 
