@@ -53,7 +53,10 @@ Application::~Application() {
 void Application::Initialise() {
     SetupLogger();
 
-    std::ifstream imguiIni("imgui.ini");
+    static std::filesystem::path imguiIniPath = Marmalade::Config::GetConfigDirectory() / "imgui.ini";
+    static std::string imguiIniPathStr = imguiIniPath.string();
+
+    std::ifstream imguiIni(imguiIniPath);
     firstRun = !imguiIni.good();
     imguiIni.close();
 
@@ -97,6 +100,7 @@ void Application::Initialise() {
     styleManager.LoadStyle((Marmalade::Config::GetConfigDirectory() / Marmalade::Config::engineConfig.themeFile).string());
 
     ImGuiIO& io = ImGui::GetIO();
+    io.IniFilename = imguiIniPathStr.c_str();
     io.ConfigWindowsMoveFromTitleBarOnly = true;
     io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable;
     if (Marmalade::Config::engineConfig.viewports) {
