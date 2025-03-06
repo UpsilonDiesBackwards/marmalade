@@ -82,12 +82,18 @@ void Renderable::Draw(glm::mat4 modelMatrix, bool renderTexture) {
     glEnable(GL_BLEND);
     glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 
+    glDepthMask(GL_FALSE);
+    glEnable(GL_DEPTH_TEST);
+
     shaderProgram.SetMat4("projection", Application::GetInstance().camera->GetProjection());
 
     shaderProgram.SetMat4("view", Application::GetInstance().camera->GetView());
     shaderProgram.SetMat4("model", modelMatrix);
 
     glDrawElements(GL_TRIANGLES, sizeof(indices)/4, GL_UNSIGNED_INT, nullptr);
+
+    glDepthMask(GL_TRUE);
+
     glBindVertexArray(0);
 }
 
