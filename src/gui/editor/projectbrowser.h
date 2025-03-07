@@ -54,14 +54,22 @@ namespace Marmalade::GUI {
         void Draw() override;
 
     private:
+        float _thumbnailSize = 128.0f;
+        float _thumbnailPadding = 8.0f;
+
         std::filesystem::path _currentPath;
         std::filesystem::path _rootAssetDir;
 
         GLFWwindow* _loadingContext{nullptr};
 
+        std::vector<std::filesystem::directory_entry> _items{};
+
         std::unordered_map<std::string, ImTextureID> _textureCache{};
         std::atomic<bool> _textureOperationRunning{false};
         std::string _texturesLoaded{};
+
+        void drawTopBar();
+        void drawBottomBar();
 
         FileType determineFileType(const std::filesystem::path& extension);
 

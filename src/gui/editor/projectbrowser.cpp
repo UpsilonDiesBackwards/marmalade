@@ -34,6 +34,39 @@
 // Needed for drag and drop
 static Marmalade::GUI::ProjectItem projectItem;
 
+void Marmalade::GUI::ProjectBrowser::drawTopBar() {
+    if (ImGui::Button(ICON_CI_REFRESH)) {
+        _texturesLoaded = "";
+    }
+
+    ImGui::SameLine();
+    ImGui::Text("%s", _currentPath.string().c_str());
+}
+
+void Marmalade::GUI::ProjectBrowser::drawBottomBar() {
+    float availableWindowWidth = ImGui::GetContentRegionAvail().x;
+    float labelWidth = 7.0f;
+    float sliderWidth = (availableWindowWidth - (labelWidth * 0.5) - 18.5f) * 0.3f;
+
+    float statusBarHeight = 26.0f;
+
+    ImGui::SetCursorPosY(ImGui::GetWindowHeight() - statusBarHeight);
+
+    ImGui::BeginChild("BottomBar", ImVec2(0, statusBarHeight), false);
+
+    ImGui::PushItemWidth(sliderWidth);
+    ImGui::SliderFloat("Size", &_thumbnailSize, 16, 512);
+    ImGui::SameLine();
+    ImGui::PushItemWidth(sliderWidth);
+    ImGui::SliderFloat("Padding", &_thumbnailPadding, 0, 128);
+
+    ImGui::SameLine();
+    ImGui::PushItemWidth(sliderWidth);
+    ImGui::ProgressBar(_texturesLoaded == _currentPath.string() ? -1.0f : ImGui::GetTime() * -0.2f);
+
+    ImGui::EndChild();
+}
+
 Marmalade::GUI::FileType Marmalade::GUI::ProjectBrowser::determineFileType(const std::filesystem::path& extension) {
     if (extension == ".png" || extension == ".jpg" || extension == ".gif") {
         return FileType_IMAGE;
@@ -82,7 +115,6 @@ void Marmalade::GUI::ProjectBrowser::loadTextures() {
 
     glfwMakeContextCurrent(_loadingContext);
 
-//    spdlog::info("Loading textures");
     _textureCache.clear();
 
     _textureCache["directory"] = loadTexture("res/icons/ui/directory.png");
@@ -99,7 +131,6 @@ void Marmalade::GUI::ProjectBrowser::loadTextures() {
         }
     }
 
-//    spdlog::info("Textures loaded");
     _texturesLoaded = _currentPath.string();
     _textureOperationRunning = false;
 
@@ -117,6 +148,9 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
     ImGui::SetNextWindowSize(ImVec2(720, 380), ImGuiCond_FirstUseEver);
 
     ImGui::Begin(ICON_CI_ZOOM_IN " Project Browser", &visible);
+
+    // Top bar
+    drawTopBar();
 
     auto* project = Application::GetInstance().GetCurrentProject();
 
@@ -137,14 +171,14 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
         }
     }
 
+    bool mustLoadFiles = false;
     if (_texturesLoaded != _currentPath.string()) {
+        mustLoadFiles = true;
         std::thread thread(&ProjectBrowser::loadTextures, this);
         thread.detach();
     }
 
-    static float thumbnailSize = 128.0f;
-    static float thumbnailPadding = 8.0f;
-    float cellSize = thumbnailSize + thumbnailPadding;
+    float cellSize = _thumbnailSize + _thumbnailPadding;
 
     float panelWidth = ImGui::GetContentRegionAvail().x;
 
@@ -154,7 +188,14 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
 
     ImGui::Columns(columnCount, nullptr, false);
 
-    for (const auto& item: std::filesystem::directory_iterator(_currentPath)) {
+    if (mustLoadFiles) {
+        _items.clear();
+        for (const auto& item: std::filesystem::directory_iterator(_currentPath)) {
+            _items.push_back(item);
+        }
+    }
+
+    for (const auto& item: _items) {
         const std::filesystem::path path = item.path();
 
         GLuint textureId = item.is_directory() ? _textureCache["directory"] : _textureCache["document"];
@@ -164,14 +205,14 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
             textureId = _textureCache[path.string()];
         }
 
-        ImGui::ImageButton(path.string().c_str(), textureId, ImVec2(thumbnailSize, thumbnailSize),
+        ImGui::ImageButton(path.string().c_str(), textureId, ImVec2(_thumbnailSize, _thumbnailSize),
                            ImVec2(0, 1), ImVec2(1, 0));
 
         if (!item.is_directory()) {
             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
                 projectItem = ProjectItem{fileType, path.string()};
                 ImGui::SetDragDropPayload("PROJECT_BROWSER_FILE", &projectItem, sizeof(ProjectItem));
-                ImGui::Image(textureId, ImVec2(thumbnailSize, thumbnailSize));
+                ImGui::Image(textureId, ImVec2(_thumbnailSize, _thumbnailSize));
                 ImGui::EndDragDropSource();
             }
         }
@@ -191,23 +232,7 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
     ImGui::EndChild();
 
     // Bottom bar
-    float availableWindowWidth = ImGui::GetContentRegionAvail().x;
-    float labelWidth = 7.0f;
-    float sliderWidth = (availableWindowWidth - (labelWidth * 0.5) - 18.5f) * 0.46f;
-
-    float status_bar_height = 26.0f;
-
-    ImGui::SetCursorPosY(ImGui::GetWindowHeight() - status_bar_height);
-
-    ImGui::BeginChild("BottomBar", ImVec2(0, status_bar_height), false);
-
-    ImGui::PushItemWidth(sliderWidth);
-    ImGui::SliderFloat("Size", &thumbnailSize, 16, 512);
-    ImGui::SameLine();
-    ImGui::PushItemWidth(sliderWidth);
-    ImGui::SliderFloat("Padding", &thumbnailPadding, 0, 128);
-
-    ImGui::EndChild();
+    drawBottomBar();
 
     ImGui::End();
 }
