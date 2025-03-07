@@ -54,9 +54,9 @@ public:
     Entity* parent{nullptr};
     std::vector<std::unique_ptr<Entity>> children;
 
-    Entity(const std::string& name, const std::string& uuid, EntityFlags flags);
+    Entity(const std::string& name, const std::string& uuid, EntityFlags flags, bool withDefaultComponents = true);
 
-    Entity(const std::string& name, EntityFlags flags);
+    Entity(const std::string& name, EntityFlags flags, bool withDefaultComponents = true);
 
     glm::vec2 getPosition();
     void setPosition(glm::vec2 newPos);

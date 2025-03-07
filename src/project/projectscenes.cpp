@@ -67,7 +67,7 @@ Scene Marmalade::Project::ProjectScenes::LoadScene(const std::string& fileName) 
         file >> j;
         file.close();
 
-        auto scene = Scene(j["name"]);
+        auto scene = Scene(j["name"], j["uuid"]);
 
         for (const auto& entityJson: j["entities"]) {
             scene.AddEntity(std::make_shared<Entity>(deserializeEntity(entityJson)));
@@ -97,7 +97,7 @@ nlohmann::json Marmalade::Project::ProjectScenes::serializeEntity(const Entity* 
     e["uuid"] = entity->uuid;
 
     for (const auto& component: entity->componentManager.components) {
-        auto componentData = component->Serialize();
+        auto componentData = component->Serialize(entity);
         if (componentData.is_null()) componentData = nlohmann::json::object();
         e["components"].push_back(Component{component->name, component->uuid, componentData});
     }
@@ -112,7 +112,7 @@ nlohmann::json Marmalade::Project::ProjectScenes::serializeEntity(const Entity* 
 Entity Marmalade::Project::ProjectScenes::deserializeEntity(const nlohmann::json& e) {
     std::string name = e["name"];
     std::string uuid = e["uuid"];
-    auto entity = Entity(name, uuid, EntityFlags::RENDERABLE);
+    auto entity = Entity(name, uuid, EntityFlags::RENDERABLE, false);
 
     // Deserialize components
     for (const auto& componentJson: e["components"]) {
@@ -120,7 +120,7 @@ Entity Marmalade::Project::ProjectScenes::deserializeEntity(const nlohmann::json
         auto factory = Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()[component.name].get();
 
         auto newComponent = factory->Create(component.uuid);
-        newComponent->Deserialize(component.data);
+        newComponent->Deserialize(component.data, &entity);
         entity.componentManager.AddComponent(std::move(newComponent));// Add component
     }
 

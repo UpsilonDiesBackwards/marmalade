@@ -44,11 +44,23 @@ void Marmalade::ECS::RigidBody::Apply(Entity* entity) {
     }
 }
 
-nlohmann::json Marmalade::ECS::RigidBody::Serialize() {
-    return nlohmann::json();
+nlohmann::json Marmalade::ECS::RigidBody::Serialize(const Entity* entity) {
+    nlohmann::json j;
+    j["static"] = isStatic;
+    j["velocity"]["x"] = velocity.x;
+    j["velocity"]["y"] = velocity.y;
+    j["gravity"] = gravity;
+    j["mass"] = mass;
+
+    return j;
 }
 
-void Marmalade::ECS::RigidBody::Deserialize(nlohmann::json json) {
+void Marmalade::ECS::RigidBody::Deserialize(nlohmann::json json, Entity* entity) {
+    isStatic = json["static"].get<bool>();
+    velocity.x = json["velocity"]["x"].get<float>();
+    velocity.y = json["velocity"]["y"].get<float>();
+    gravity = json["gravity"].get<float>();
+    mass = json["mass"].get<float>();
 }
 
 void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float deltaTime) {

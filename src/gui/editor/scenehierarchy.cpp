@@ -72,6 +72,12 @@ void SceneHierarchy::Show() {
     ImGui::End();
 }
 
+void SceneHierarchy::DeselectEntity() {
+    Application::GetInstance().editorGUI->details.inspectedEntity = nullptr;
+    Application::GetInstance().editView->selectedEntity = nullptr;
+    _selected = nullptr;
+}
+
 void SceneHierarchy::createEntity(const std::string& name) {
     if (name.empty()) return;
 
@@ -223,3 +229,4 @@ void SceneHierarchy::showDeletePopup() {
         ImGui::EndPopup();
     }
 }
+

@@ -31,6 +31,7 @@
 
 class Renderable {
     struct TextureSettings {
+        std::string filePath;
         int wrapS = GL_REPEAT;
         int wrapT = GL_REPEAT;
         int minFilter = GL_LINEAR_MIPMAP_LINEAR;

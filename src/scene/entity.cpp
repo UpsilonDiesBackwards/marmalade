@@ -31,23 +31,25 @@
 
 #include <spdlog/spdlog.h>
 
-Entity::Entity(const std::string& name, const std::string& uuid, EntityFlags flags)
+Entity::Entity(const std::string& name, const std::string& uuid, EntityFlags flags, bool withDefaultComponents)
     : name(name), uuid(uuid), flags(flags), renderable(0, 0, 0, Texture::LoadTexture("")) {
 
     renderable.Initialise();
 
-    // Every entity should have a transform component by default
-    componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Transform", Marmalade::Util::GenerateUUIDv4()));
+    if (withDefaultComponents) {
+        // Every entity should have a transform component by default
+        componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Transform", Marmalade::Util::GenerateUUIDv4()));
 
-    // Temporary
-    componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Sprite Render", Marmalade::Util::GenerateUUIDv4()));
-    componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("BoxCollider", Marmalade::Util::GenerateUUIDv4()));
-    componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Rigidbody", Marmalade::Util::GenerateUUIDv4()));
+        // Temporary
+        componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Sprite Render", Marmalade::Util::GenerateUUIDv4()));
+        componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("BoxCollider", Marmalade::Util::GenerateUUIDv4()));
+        componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Rigidbody", Marmalade::Util::GenerateUUIDv4()));
+    }
 
     Render();
 }
 
-Entity::Entity(const std::string& name, EntityFlags flags) : Entity(name, Marmalade::Util::GenerateUUIDv4(), flags) {
+Entity::Entity(const std::string& name, EntityFlags flags, bool withDefaultComponents) : Entity(name, Marmalade::Util::GenerateUUIDv4(), flags, withDefaultComponents) {
 }
 
 void Entity::Render() {

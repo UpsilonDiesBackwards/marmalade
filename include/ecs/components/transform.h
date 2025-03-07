@@ -39,13 +39,14 @@ namespace Marmalade::ECS {
         void Apply(Entity* entity) override;
         void Display(Entity* entity) override;
 
-        nlohmann::json Serialize() override;
-        void Deserialize(nlohmann::json json) override;
+        nlohmann::json Serialize(const Entity* entity) override;
+        void Deserialize(nlohmann::json json, Entity* entity) override;
 
         Transform() {
             name = "Transform";
             isMutable = false;
-            allowMultiple = false; }
+            allowMultiple = false;
+        }
     };
 
     REGISTER_COMPONENT(Transform);

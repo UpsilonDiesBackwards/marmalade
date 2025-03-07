@@ -25,6 +25,7 @@
 class SceneHierarchy {
 public:
     void Show();
+    void DeselectEntity();
 
 private:
     Entity* _parent{nullptr};

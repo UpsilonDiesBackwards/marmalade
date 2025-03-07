@@ -68,11 +68,27 @@ void Marmalade::ECS::BoxCollider::Apply(Entity* entity) {
     }
 }
 
-nlohmann::json Marmalade::ECS::BoxCollider::Serialize() {
-    return nlohmann::json();
+nlohmann::json Marmalade::ECS::BoxCollider::Serialize(const Entity* entity) {
+    nlohmann::json j;
+    std::visit([&](auto &colliderData) {
+        j["size"]["x"] = colliderData.size.x;
+        j["size"]["y"] = colliderData.size.y;
+
+        j["offset"]["x"] = colliderData.offset.x;
+        j["offset"]["y"] = colliderData.offset.y;
+    }, data);
+
+    return j;
 }
 
-void Marmalade::ECS::BoxCollider::Deserialize(nlohmann::json json) {
+void Marmalade::ECS::BoxCollider::Deserialize(nlohmann::json json, Entity* entity) {
+    std::visit([&](auto &colliderData) {
+        colliderData.size.x = json["size"]["x"].get<float>();
+        colliderData.size.y = json["size"]["y"].get<float>();
+
+        colliderData.offset.x = json["offset"]["x"].get<float>();
+        colliderData.offset.y = json["offset"]["y"].get<float>();
+    }, data);
 }
 
 void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {

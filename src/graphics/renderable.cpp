@@ -109,6 +109,8 @@ void Renderable::UpdateTextureSettings() {
 }
 
 void Renderable::SetTexture(const std::string& filePath) {
+    texSettings.filePath = filePath;
+
     glDeleteTextures(1, &texture);
 
     texture = Texture::LoadTexture(filePath);

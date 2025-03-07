@@ -94,7 +94,7 @@ void Marmalade::ECS::Transform::Apply(Entity* entity) {
 
 }
 
-nlohmann::json Marmalade::ECS::Transform::Serialize() {
+nlohmann::json Marmalade::ECS::Transform::Serialize(const Entity* entity) {
     nlohmann::json j;
     j["pos"]["x"] = pos.x;
     j["pos"]["y"] = pos.y;
@@ -107,7 +107,7 @@ nlohmann::json Marmalade::ECS::Transform::Serialize() {
     return j;
 }
 
-void Marmalade::ECS::Transform::Deserialize(nlohmann::json json) {
+void Marmalade::ECS::Transform::Deserialize(nlohmann::json json, Entity* entity) {
     pos.x = json["pos"]["x"].get<float>();
     pos.y = json["pos"]["y"].get<float>();
 

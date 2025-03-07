@@ -48,8 +48,8 @@ namespace Marmalade::ECS {
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
 
-        nlohmann::json Serialize() override;
-        void Deserialize(nlohmann::json json) override;
+        nlohmann::json Serialize(const Entity* entity) override;
+        void Deserialize(nlohmann::json json, Entity* entity) override;
 
         void Intersects(Entity* self, Entity* other) override;
 

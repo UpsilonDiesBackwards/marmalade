@@ -72,7 +72,7 @@ void Marmalade::ECS::SpriteRender::Display(Entity* entity) {
         ImGuiFileDialog::Instance()->Close();
     }
 
-    // Image Settingss
+    // Image Settings
 
     const char* filterModes[] = { "Nearest", "Linear", "Mipmap Nearest", "Mipmap Linear" };
     int minFilterIdx = (entity->renderable.texSettings.minFilter == GL_NEAREST) ? 0 :
@@ -108,9 +108,17 @@ void Marmalade::ECS::SpriteRender::Display(Entity* entity) {
 void Marmalade::ECS::SpriteRender::Apply(Entity* entity) {
 }
 
-nlohmann::json Marmalade::ECS::SpriteRender::Serialize() {
-    return nullptr;
+nlohmann::json Marmalade::ECS::SpriteRender::Serialize(const Entity* entity) {
+    nlohmann::json j;
+    j["path"] = entity->renderable.texSettings.filePath;
+    j["minFilter"] = entity->renderable.texSettings.minFilter;
+    j["magFilter"] = entity->renderable.texSettings.magFilter;
+
+    return j;
 }
 
-void Marmalade::ECS::SpriteRender::Deserialize(nlohmann::json json) {
+void Marmalade::ECS::SpriteRender::Deserialize(nlohmann::json json, Entity* entity) {
+    entity->renderable.SetTexture(json["path"]);
+    entity->renderable.texSettings.minFilter = json["minFilter"].get<int>();
+    entity->renderable.texSettings.magFilter = json["magFilter"].get<int>();
 }
