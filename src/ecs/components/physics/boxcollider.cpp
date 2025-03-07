@@ -36,6 +36,14 @@ void Marmalade::ECS::BoxCollider::Display(Entity* entity) {
             data = AABBData{prevData.size, prevData.offset};
         }
     } else if (!std::holds_alternative<OBBData>(data)) {
+        AABBData prevData = std::get<AABBData>(data);
+
+        glm::vec2 uX = glm::vec2(cos(rotation), sin(rotation));
+        glm::vec2 uY = glm::vec2(-uX.y, uX.x);
+
+
+        data = OBBData{prevData.size, prevData.offset, rotation,
+                       prevData.offset, {uX, uY}, prevData.size * 0.5f};
     }
 
     std::visit([&](auto &colliderData) {
@@ -57,7 +65,6 @@ void Marmalade::ECS::BoxCollider::Apply(Entity* entity) {
 
             glm::vec2 uX = glm::vec2(cos(entity->getRotation()), -sin(entity->getRotation()));
             glm::vec2 uY = glm::vec2(sin(entity->getRotation()), cos(entity->getRotation()));
-
 
             data = OBBData{prevData.size, prevData.offset, entity->getRotation(),
                            CalculateOBBCentrePoint(entity->getPosition(), prevData.offset),
