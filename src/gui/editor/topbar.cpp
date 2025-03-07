@@ -34,7 +34,7 @@
 void Marmalade::GUI::TopBar::Show() {
     static bool showStyleEditor = false;
     static bool showSceneCreationPopUp = false;
-    static char sceneNameBuffer[32] = "";
+    static char sceneNameBuffer[256] = "";
     static bool showSceneOpenPopUp = false;
 
     if (ImGui::BeginMainMenuBar()) {
@@ -142,7 +142,7 @@ void Marmalade::GUI::TopBar::Show() {
         ImGui::OpenPopup("Open Scene");
     }
 
-    for (const auto &window : WindowManager::GetInstance().windows){
+    for (const auto& window: WindowManager::GetInstance().windows) {
         window->Show();
     }
 
@@ -177,26 +177,27 @@ void Marmalade::GUI::TopBar::Show() {
     }
 
     if (ImGui::BeginPopupModal("Open Scene", &showSceneOpenPopUp, ImGuiWindowFlags_AlwaysAutoResize)) {
-        ImGui::Text("Scene Name: ");
-        ImGui::InputText("##SceneName", sceneNameBuffer, sizeof(sceneNameBuffer));
+        Marmalade::Project::Project* project = Application::GetInstance().GetCurrentProject();
+        static auto scenes = project->scenes.GetScenes();
+
+        for (const auto& scene: scenes) {
+            if (ImGui::Button(scene.GetName().c_str())) {
+                auto& sceneManager = Application::GetInstance().sceneManager;
+
+                Application::GetInstance().editorGUI->sceneHierarchy.DeselectEntity();
+
+                const std::string fileName = Marmalade::Project::ProjectScenes::GetSceneFileName(scene.GetUuid());
+                auto newScene = project->scenes.LoadScene(fileName);
+
+                sceneManager.AddScene(std::make_shared<Scene>(newScene));
+                sceneManager.SetCurrentScene(newScene.GetUuid());
+
+                showSceneOpenPopUp = false;
+            }
+        }
 
         if (ImGui::Button("Cancel")) {
-            memset(sceneNameBuffer, 0, sizeof(sceneNameBuffer));
             showSceneOpenPopUp = false;
-        }
-        ImGui::SameLine();
-
-        if (ImGui::Button("Open")) {
-            std::string name = std::string(sceneNameBuffer);
-
-            if (!name.empty()) {
-                Application::GetInstance().sceneManager.SetCurrentScene(name);
-
-                memset(sceneNameBuffer, 0, sizeof(sceneNameBuffer));
-                showSceneOpenPopUp = false;
-            } else {
-                ImGui::Text("Empty or invalid scene name.");
-            }
         }
 
         ImGui::EndPopup();

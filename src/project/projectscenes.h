@@ -45,9 +45,11 @@ namespace Marmalade::Project {
 
         void SaveScene(const std::string& fileName, Scene* scene);
 
-        Scene LoadScene(const std::string& fileName);
+        Scene LoadScene(const std::string& fileName, bool infoOnly = false);
 
         void UnregisterScene(const std::string& fileName);
+
+        std::vector<Scene> GetScenes();
 
     private:
         nlohmann::json serializeEntity(const Entity* entity);

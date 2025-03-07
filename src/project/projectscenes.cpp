@@ -74,7 +74,7 @@ void Marmalade::Project::ProjectScenes::SaveScene(const std::string& fileName, S
     }
 }
 
-Scene Marmalade::Project::ProjectScenes::LoadScene(const std::string& fileName) {
+Scene Marmalade::Project::ProjectScenes::LoadScene(const std::string& fileName, bool infoOnly) {
     auto project = Application::GetInstance().GetCurrentProject();
     std::ifstream file(project->basePath / fileName);
 
@@ -84,6 +84,7 @@ Scene Marmalade::Project::ProjectScenes::LoadScene(const std::string& fileName) 
         file.close();
 
         auto scene = Scene(j["name"], j["uuid"]);
+        if (infoOnly) return scene;
 
         for (const auto& entityFileName: j["entities"]) {
             std::ifstream entityFile(GetEntityDirectory() / entityFileName);
@@ -157,7 +158,7 @@ Entity Marmalade::Project::ProjectScenes::deserializeEntity(const nlohmann::json
 
     // Deserialize children (recursive)
     if (e.contains("entities")) {
-        for (const auto& entityFileName : e["entities"]) {
+        for (const auto& entityFileName: e["entities"]) {
             std::ifstream entityFile(GetEntityDirectory() / entityFileName);
             if (entityFile.is_open()) {
                 nlohmann::json childJson;
@@ -170,4 +171,16 @@ Entity Marmalade::Project::ProjectScenes::deserializeEntity(const nlohmann::json
     }
 
     return entity;
+}
+
+std::vector<Scene> Marmalade::Project::ProjectScenes::GetScenes() {
+    auto project = Application::GetInstance().GetCurrentProject();
+    auto& scenePaths = project->projectMarmalade.paths.scenes;
+
+    std::vector<Scene> scenes{};
+    for (const auto& path: scenePaths) {
+        scenes.push_back(LoadScene(path, true));
+    }
+
+    return scenes;
 }
