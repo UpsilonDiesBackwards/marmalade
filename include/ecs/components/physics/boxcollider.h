@@ -57,6 +57,8 @@ namespace Marmalade::ECS {
         bool IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override;
 
         void ShowBounds(const glm::vec2& entityPosition, Transform transform) override;
+
+        glm::vec2 CalculateOBBCentrePoint(const glm::vec2& entityPosition, const glm::vec2& offset) override;
     };
 
     REGISTER_COMPONENT(BoxCollider);

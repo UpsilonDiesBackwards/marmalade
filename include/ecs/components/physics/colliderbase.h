@@ -59,6 +59,8 @@ namespace Marmalade::ECS {
         virtual bool IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) = 0;
         virtual bool IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) = 0;
 
+        virtual glm::vec2 CalculateOBBCentrePoint(const glm::vec2& entityPosition, const glm::vec2& offset) = 0;
+
         template<typename T>
         T* GetCollisionData() {
             return std::get_if<T>(&data);
