@@ -37,7 +37,9 @@ namespace Marmalade::Project {
             nlohmann::json data;
         };
 
-        static std::string GetSceneFileName(const std::string &sceneName);
+        static std::string GetSceneFileName(const std::string &sceneUuid);
+
+        static std::filesystem::path GetEntityDirectory();
 
         void RegisterScene(const std::string& fileName);
 

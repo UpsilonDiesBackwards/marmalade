@@ -25,8 +25,17 @@
 
 #include <fstream>
 
-std::string Marmalade::Project::ProjectScenes::GetSceneFileName(const std::string& sceneName) {
-    return "data/" + sceneName + ".json";
+std::string Marmalade::Project::ProjectScenes::GetSceneFileName(const std::string& sceneUuid) {
+    return "data/" + sceneUuid + ".json";
+}
+
+std::filesystem::path Marmalade::Project::ProjectScenes::GetEntityDirectory() {
+    auto project = Application::GetInstance().GetCurrentProject();
+    auto dir = std::filesystem::path(project->basePath) / "data" / "entities";
+    if (!std::filesystem::exists(dir)) {
+        std::filesystem::create_directories(dir);
+    }
+    return dir;
 }
 
 void Marmalade::Project::ProjectScenes::RegisterScene(const std::string& fileName) {
@@ -48,7 +57,14 @@ void Marmalade::Project::ProjectScenes::SaveScene(const std::string& fileName, S
     // TODO: Entities should be in own files
     j["entities"] = nlohmann::json::array();
     for (const auto& entity: scene->GetEntities()) {
-        j["entities"].push_back(serializeEntity(entity.get()));
+        std::string entityFileName = entity->uuid + ".json";
+        j["entities"].push_back(entityFileName);
+
+        std::ofstream entityFile(GetEntityDirectory() / entityFileName);
+        if (entityFile.is_open()) {
+            entityFile << serializeEntity(entity.get()).dump(4);
+            entityFile.close();
+        }
     }
 
     std::ofstream file(project->basePath / fileName);
@@ -69,8 +85,15 @@ Scene Marmalade::Project::ProjectScenes::LoadScene(const std::string& fileName) 
 
         auto scene = Scene(j["name"], j["uuid"]);
 
-        for (const auto& entityJson: j["entities"]) {
-            scene.AddEntity(std::make_shared<Entity>(deserializeEntity(entityJson)));
+        for (const auto& entityFileName: j["entities"]) {
+            std::ifstream entityFile(GetEntityDirectory() / entityFileName);
+            if (entityFile.is_open()) {
+                nlohmann::json entityJson;
+                entityFile >> entityJson;
+                entityFile.close();
+
+                scene.AddEntity(std::make_shared<Entity>(deserializeEntity(entityJson)));
+            }
         }
 
         return scene;
@@ -102,8 +125,16 @@ nlohmann::json Marmalade::Project::ProjectScenes::serializeEntity(const Entity* 
         e["components"].push_back(Component{component->name, component->uuid, componentData});
     }
 
+    e["entities"] = nlohmann::json::array();
     for (const auto& child: entity->children) {
-        e["entities"].push_back(serializeEntity(child.get()));
+        std::string entityFileName = child->uuid + ".json";
+        e["entities"].push_back(entityFileName);
+
+        std::ofstream entityFile(GetEntityDirectory() / entityFileName);
+        if (entityFile.is_open()) {
+            entityFile << serializeEntity(child.get()).dump(4);
+            entityFile.close();
+        }
     }
 
     return e;
@@ -126,8 +157,15 @@ Entity Marmalade::Project::ProjectScenes::deserializeEntity(const nlohmann::json
 
     // Deserialize children (recursive)
     if (e.contains("entities")) {
-        for (const auto& childEntityJson: e["entities"]) {
-            entity.AddChild(std::make_unique<Entity>(deserializeEntity(childEntityJson)));
+        for (const auto& entityFileName : e["entities"]) {
+            std::ifstream entityFile(GetEntityDirectory() / entityFileName);
+            if (entityFile.is_open()) {
+                nlohmann::json childJson;
+                entityFile >> childJson;
+                entityFile.close();
+
+                entity.AddChild(std::make_unique<Entity>(deserializeEntity(childJson)));
+            }
         }
     }
 

@@ -37,6 +37,20 @@ void EditorViews::Show() {
             if (ImGui::Button("Stop")) {
                 application.playState = PlayState::Stop;
                 std::cout << "Stop button clicked!" << std::endl;
+
+
+                auto& sceneManager = Application::GetInstance().sceneManager;
+                Scene* scene = Application::GetInstance().sceneManager.GetCurrentScene().get();
+                Marmalade::Project::Project* project = Application::GetInstance().GetCurrentProject();
+
+                Application::GetInstance().editorGUI->sceneHierarchy.DeselectEntity();
+
+                const std::string fileName = Marmalade::Project::ProjectScenes::GetSceneFileName(scene->GetUuid());
+                auto newScene = project->scenes.LoadScene(fileName);
+                Application::GetInstance().sceneManager.RemoveScene(sceneManager.GetCurrentScene());
+
+                Application::GetInstance().sceneManager.AddScene(std::make_shared<Scene>(newScene));
+                Application::GetInstance().sceneManager.SetCurrentScene(newScene.GetUuid());
             }
         } else {
             if (ImGui::Button("Play")) {
@@ -48,7 +62,7 @@ void EditorViews::Show() {
                 Scene* scene = Application::GetInstance().sceneManager.GetCurrentScene().get();
                 Marmalade::Project::Project* project = Application::GetInstance().GetCurrentProject();
 
-                const std::string fileName = Marmalade::Project::ProjectScenes::GetSceneFileName(scene->GetName());
+                const std::string fileName = Marmalade::Project::ProjectScenes::GetSceneFileName(scene->GetUuid());
                 project->scenes.RegisterScene(fileName);
                 project->scenes.SaveScene(fileName, scene);
                 project->SaveProjectMarmalade();
