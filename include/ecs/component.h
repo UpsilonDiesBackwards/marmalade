@@ -34,6 +34,7 @@ namespace Marmalade::ECS {
     class Component {
     public:
         std::string name;
+        std::string uuid;
 
         bool isMutable{true};
         bool allowMultiple{false};
@@ -51,7 +52,7 @@ namespace Marmalade::ECS {
 
     class IComponentFactory {
     public:
-        [[nodiscard]] virtual std::unique_ptr<Component> Create() const = 0;
+        [[nodiscard]] virtual std::unique_ptr<Component> Create(const std::string& uuid) const = 0;
         virtual ~IComponentFactory() = default;
     };
 
@@ -60,8 +61,10 @@ namespace Marmalade::ECS {
     public:
         static_assert(std::is_base_of_v<Component, T>, "T must inherit from Component");
 
-        [[nodiscard]] std::unique_ptr<Component> Create() const override {
-            return std::make_unique<T>();
+        [[nodiscard]] std::unique_ptr<Component> Create(const std::string& uuid) const override {
+            auto component = std::make_unique<T>();
+            component->uuid = uuid;
+            return component;
         }
     };
 
@@ -77,10 +80,10 @@ namespace Marmalade::ECS {
             _registry[name] = std::make_unique<ComponentFactory<T>>();
         }
 
-        [[nodiscard]] std::unique_ptr<Component> CreateComponent(const std::string& name) {
+        [[nodiscard]] std::unique_ptr<Component> CreateComponent(const std::string& name, const std::string& uuid) {
             auto it = _registry.find(name);
             if (it != _registry.end()) {
-                return it->second->Create();
+                return it->second->Create(uuid);
             }
             return nullptr;
         }
@@ -93,10 +96,10 @@ namespace Marmalade::ECS {
         std::unordered_map<std::string, std::unique_ptr<IComponentFactory>> _registry;
     };
 
-#define REGISTER_COMPONENT(TYPE)                                      \
-    static bool TYPE##_registered = [] {                              \
+#define REGISTER_COMPONENT(TYPE)                                            \
+    static bool TYPE##_registered = [] {                                    \
         ComponentRegistry::Instance().RegisterComponent<TYPE>(TYPE().name); \
-        return true;                                                  \
+        return true;                                                        \
     }()
 
 }

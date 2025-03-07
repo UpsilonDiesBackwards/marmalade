@@ -33,6 +33,7 @@ namespace Marmalade::Project {
     public:
         struct Component {
             std::string name;
+            std::string uuid;
             nlohmann::json data;
         };
 
@@ -51,7 +52,7 @@ namespace Marmalade::Project {
         Entity deserializeEntity(const nlohmann::json& e);
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectScenes::Component, name, data);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectScenes::Component, name, uuid, data);
 }
 
 

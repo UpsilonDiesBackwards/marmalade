@@ -22,7 +22,7 @@
 #include <iostream>
 #include <algorithm>
 
-Scene::Scene(const std::string& name) : name(name) {
+Scene::Scene(const std::string& name, const std::string& uuid) : name(name), uuid(uuid) {
 }
 
 Scene::~Scene() {
@@ -58,4 +58,8 @@ void Scene::Render() {
 
 const std::string& Scene::GetName() const {
     return name;
+}
+
+const std::string& Scene::GetUuid() const {
+    return uuid;
 }

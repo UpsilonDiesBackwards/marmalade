@@ -19,6 +19,8 @@
 
 #include <ecs/componentmanager.h>
 
+#include "../application/util.h"
+
 void Marmalade::ECS::ComponentManager::AddComponent(std::shared_ptr<Component> component) {
     if (!component->allowMultiple) {
         for (const auto& existing : components) {
@@ -39,7 +41,7 @@ void Marmalade::ECS::ComponentManager::AddComponent(std::shared_ptr<Component> c
         }
 
         if (!hasDependency) { // ... and add any if it's not already added
-            auto newDependency = Marmalade::ECS::ComponentRegistry::Instance().CreateComponent(dependency);
+            auto newDependency = Marmalade::ECS::ComponentRegistry::Instance().CreateComponent(dependency, Util::GenerateUUIDv4());
             if (newDependency) {
                 components.push_back(std::move(newDependency));
                 spdlog::warn("Automatically add {} component as {} depends on it", dependency, component->name);

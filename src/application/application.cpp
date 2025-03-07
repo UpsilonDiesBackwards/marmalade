@@ -23,6 +23,7 @@
 
 #include "config.h"
 #include "recents.h"
+#include "util.h"
 #include "../project/projectmanager.h"
 
 #include <imgui.h>
@@ -126,9 +127,10 @@ void Application::Initialise() {
     gameView = new GameView(width, height);
     editView = new EditView(width, height);
 
-    auto scene = std::make_shared<Scene>("Default");
+    const auto uuid = Marmalade::Util::GenerateUUIDv4();
+    auto scene = std::make_shared<Scene>("Default", uuid);
     sceneManager.AddScene(scene);
-    sceneManager.SetCurrentScene("Default");
+    sceneManager.SetCurrentScene(uuid);
 
     Marmalade::ECS::Transform defaultTransform;
     Entity* newEntity = new Entity("New Entity", EntityFlags::RENDERABLE);
