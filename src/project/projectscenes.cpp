@@ -43,6 +43,7 @@ void Marmalade::Project::ProjectScenes::SaveScene(const std::string& fileName, S
 
     nlohmann::json j;
     j["name"] = scene->GetName();
+    j["uuid"] = scene->GetUuid();
 
     // TODO: Entities should be in own files
     j["entities"] = nlohmann::json::array();
@@ -75,7 +76,7 @@ Scene Marmalade::Project::ProjectScenes::LoadScene(const std::string& fileName) 
         return scene;
     }
 
-    return Scene("");
+    return Scene("", "");
 }
 
 void Marmalade::Project::ProjectScenes::UnregisterScene(const std::string& fileName) {
@@ -93,11 +94,12 @@ void Marmalade::Project::ProjectScenes::UnregisterScene(const std::string& fileN
 nlohmann::json Marmalade::Project::ProjectScenes::serializeEntity(const Entity* entity) {
     nlohmann::json e;
     e["name"] = entity->name;
+    e["uuid"] = entity->uuid;
 
     for (const auto& component: entity->componentManager.components) {
         auto componentData = component->Serialize();
         if (componentData.is_null()) componentData = nlohmann::json::object();
-        e["components"].push_back(Component{component->name, componentData});
+        e["components"].push_back(Component{component->name, component->uuid, componentData});
     }
 
     for (const auto& child: entity->children) {
@@ -109,16 +111,17 @@ nlohmann::json Marmalade::Project::ProjectScenes::serializeEntity(const Entity* 
 
 Entity Marmalade::Project::ProjectScenes::deserializeEntity(const nlohmann::json& e) {
     std::string name = e["name"];
-    auto entity = Entity(name, EntityFlags::RENDERABLE);
+    std::string uuid = e["uuid"];
+    auto entity = Entity(name, uuid, EntityFlags::RENDERABLE);
 
     // Deserialize components
     for (const auto& componentJson: e["components"]) {
         auto component = componentJson.get<Component>();
         auto factory = Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()[component.name].get();
 
-        auto newComponent = factory->Create();
+        auto newComponent = factory->Create(component.uuid);
         newComponent->Deserialize(component.data);
-        entity.componentManager.AddComponent(std::move(newComponent)); // Add component
+        entity.componentManager.AddComponent(std::move(newComponent));// Add component
     }
 
     // Deserialize children (recursive)

@@ -19,9 +19,11 @@
 
 #include "details.h"
 
-#include "imgui.h"
+#include "../../application/util.h"
 
-#include "IconsCodicons.h"
+#include <imgui.h>
+
+#include <IconsCodicons.h>
 
 void Marmalade::GUI::Details::Draw() {
     ImGui::Begin(ICON_CI_SEARCH " Details", &visible);
@@ -99,7 +101,7 @@ void Marmalade::GUI::Details::ShowAddPopup() {
 
         for (const auto& [name, factory]: Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()) {
             if (ImGui::Button(name.c_str())) {
-                inspectedEntity->componentManager.AddComponent(factory->Create());// Add component
+                inspectedEntity->componentManager.AddComponent(factory->Create(Util::GenerateUUIDv4()));// Add component
 
                 _isAddingComponent = false;
                 ImGui::CloseCurrentPopup();

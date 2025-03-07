@@ -29,17 +29,17 @@ SceneManager::~SceneManager() {
 }
 
 void SceneManager::AddScene(std::shared_ptr<Scene> scene) {
-    const std::string& name = scene->GetName();
-    if (scenes.find(name) != scenes.end()) {
+    const std::string& uuid = scene->GetUuid();
+    if (scenes.find(uuid) != scenes.end()) {
         std::cout << "Scene already exists!" << std::endl;
     }
 
-    scenes[name] = scene;
+    scenes[uuid] = scene;
 }
 
 void SceneManager::RemoveScene(std::shared_ptr<Scene> scene) {
-    const std::string& name = scene->GetName();
-    auto targetScene = scenes.find(name);
+    const std::string& uuid = scene->GetUuid();
+    auto targetScene = scenes.find(uuid);
     if (targetScene != scenes.end()) {
         if (currentScene == targetScene->second) {
             currentScene = nullptr;
@@ -52,8 +52,8 @@ std::shared_ptr<Scene> SceneManager::GetCurrentScene() const {
     return currentScene;
 }
 
-void SceneManager::SetCurrentScene(const std::string &name) {
-    auto scene = scenes.find(name);
+void SceneManager::SetCurrentScene(const std::string &uuid) {
+    auto scene = scenes.find(uuid);
     if (scene != scenes.end()) {
         currentScene = scene->second;
     }

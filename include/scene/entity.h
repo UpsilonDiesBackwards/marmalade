@@ -45,12 +45,16 @@ public:
     unsigned int id;
 
     std::string name;
+    std::string uuid;
+
     EntityFlags flags;
     Renderable renderable;
     Marmalade::ECS::ComponentManager componentManager{};
 
     Entity* parent{nullptr};
     std::vector<std::unique_ptr<Entity>> children;
+
+    Entity(const std::string& name, const std::string& uuid, EntityFlags flags);
 
     Entity(const std::string& name, EntityFlags flags);
 

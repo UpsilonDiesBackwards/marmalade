@@ -22,6 +22,8 @@
 #include "ecs/components/physics/boxcollider.h"
 #include "ecs/components/physics/rigidbody.h"
 
+#include "../application/util.h"
+
 #include <graphics/texture.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -29,27 +31,30 @@
 
 #include <spdlog/spdlog.h>
 
-Entity::Entity(const std::string &name, EntityFlags flags)
-    : name(name), flags(flags), renderable(0,0,0, Texture::LoadTexture("")) {
+Entity::Entity(const std::string& name, const std::string& uuid, EntityFlags flags)
+    : name(name), uuid(uuid), flags(flags), renderable(0, 0, 0, Texture::LoadTexture("")) {
 
     renderable.Initialise();
 
     // Every entity should have a transform component by default
-    componentManager.AddComponent(std::make_shared<Marmalade::ECS::Transform>());
+    componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Transform", Marmalade::Util::GenerateUUIDv4()));
 
     // Temporary
-    componentManager.AddComponent(std::make_shared<Marmalade::ECS::SpriteRender>());
-    componentManager.AddComponent(std::make_shared<Marmalade::ECS::BoxCollider>());
-    componentManager.AddComponent(std::make_shared<Marmalade::ECS::RigidBody>());
+    componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Sprite Render", Marmalade::Util::GenerateUUIDv4()));
+    componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("BoxCollider", Marmalade::Util::GenerateUUIDv4()));
+    componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Rigidbody", Marmalade::Util::GenerateUUIDv4()));
 
     Render();
+}
+
+Entity::Entity(const std::string& name, EntityFlags flags) : Entity(name, Marmalade::Util::GenerateUUIDv4(), flags) {
 }
 
 void Entity::Render() {
     auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
     if (!transform) return;
 
-    for (const auto &component : componentManager.components) {
+    for (const auto& component: componentManager.components) {
         component->Apply(this);
     }
 
@@ -59,7 +64,7 @@ void Entity::Render() {
         renderable.Draw(transform->modelMatrix, hasTexture);
     }
 
-    for (auto &child : children) {
+    for (auto& child: children) {
         child->Render();
     }
 }
@@ -104,14 +109,14 @@ void Entity::UpdateModelMatrix() {
 
     transform->modelMatrix = glm::translate(transform->modelMatrix, glm::vec3(transform->pos, 0.0f));
     transform->modelMatrix = glm::rotate(transform->modelMatrix, glm::radians(transform->rotation),
-                                        glm::vec3(0.0f, 0.0f, 1.0f));
+                                         glm::vec3(0.0f, 0.0f, 1.0f));
     transform->modelMatrix = glm::scale(transform->modelMatrix, glm::vec3(transform->scale, 1.0f));
 
     if (parent) {
         transform->modelMatrix = parent->componentManager.GetComponentOfType<Marmalade::ECS::Transform>()->modelMatrix * transform->modelMatrix;
     }
 
-    for (auto& child : children) {
+    for (auto& child: children) {
         child->UpdateModelMatrix();
     }
 }

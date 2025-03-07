@@ -26,7 +26,7 @@
 
 class Scene {
 public:
-    Scene(const std::string& name);
+    Scene(const std::string& name, const std::string& uuid);
     ~Scene();
 
     void AddEntity(std::shared_ptr<Entity> entity);
@@ -39,9 +39,11 @@ public:
     void Update(float deltaTime);
 
     const std::string& GetName() const;
+    const std::string& GetUuid() const;
 
 private:
     std::string name;
+    std::string uuid;
     std::vector<std::shared_ptr<Entity>> entities;
 };
 

@@ -33,12 +33,12 @@ public:
     void AddScene(std::shared_ptr<Scene> scene);
     void RemoveScene(std::shared_ptr<Scene> scene);
 
-    std::shared_ptr<Scene> GetSceneByName(const std::string& name) const;
+    std::shared_ptr<Scene> GetSceneByUuid(const std::string& uuid) const;
     std::shared_ptr<Scene> GetCurrentScene() const;
 
-    void SetCurrentScene(const std::string& name);
+    void SetCurrentScene(const std::string& uuid);
 private:
-    std::unordered_map<std::string, std::shared_ptr<Scene>> scenes;
+    std::unordered_map<std::string, std::shared_ptr<Scene>> scenes; // UUID -> Scene
     std::shared_ptr<Scene> currentScene;
 };
 

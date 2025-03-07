@@ -21,6 +21,7 @@
 
 #include "../../application/application.h"
 #include "../../application/recents.h"
+#include "../../application/util.h"
 #include "../../project/projectmanager.h"
 #include "../windowmanager.h"
 
@@ -160,9 +161,10 @@ void Marmalade::GUI::TopBar::Show() {
             std::string name = std::string(sceneNameBuffer);
 
             if (!name.empty()) {
-                auto scene = std::make_shared<Scene>(name);
+                auto uuid = Util::GenerateUUIDv4();
+                auto scene = std::make_shared<Scene>(name, uuid);
                 Application::GetInstance().sceneManager.AddScene(scene);
-                Application::GetInstance().sceneManager.SetCurrentScene(name);
+                Application::GetInstance().sceneManager.SetCurrentScene(uuid);
 
                 memset(sceneNameBuffer, 0, sizeof(sceneNameBuffer));
 
