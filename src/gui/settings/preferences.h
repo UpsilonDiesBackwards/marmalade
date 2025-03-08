@@ -55,6 +55,7 @@ namespace Marmalade::GUI {
         static void drawGeneralLoggingPane();
         static void drawGeneralAppearancePane();
         static void drawGeneralProjectsPane();
+        static void drawGeneralProjectBrowserPane();
 
         static void requiresRestartWarning();
         static bool getLogLevels(void* data, int idx, const char** outText);

@@ -34,6 +34,12 @@ namespace Marmalade {
         int depth{1};// Local repos do not work with shallow clone
     };
 
+    struct ProjectBrowserConfig {
+        long long colorAssets = 4279242858;
+        long long colorData = 4281109100;
+        long long colorSrc = 4284895275;
+    };
+
     struct EngineConfig {
         bool viewports{true};
         std::string themeFile{"editorstyle.txt"};
@@ -43,6 +49,8 @@ namespace Marmalade {
 
         std::string defaultProjectPath{"."};
         std::vector<Repository> repos{};
+
+        ProjectBrowserConfig projectBrowser{};
     };
 
     class Config {
@@ -61,7 +69,9 @@ namespace Marmalade {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::Repository, name, gitUrl, depth);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, viewports, themeFile, showWelcomeScreen, logLevel, defaultProjectPath, repos);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::ProjectBrowserConfig, colorAssets, colorData, colorSrc);
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, viewports, themeFile, showWelcomeScreen, logLevel, defaultProjectPath, repos, projectBrowser);
 }
 
 #endif

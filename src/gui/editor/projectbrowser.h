@@ -22,18 +22,24 @@
 
 #include "../window.h"
 
-#include "glad/glad.h"
+#include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
 
-#include "imgui.h"
+#include <imgui.h>
 
 #include <filesystem>
 #include <unordered_map>
 #include <atomic>
 #include <vector>
+#include <functional>
 
 namespace Marmalade::GUI {
+    enum BrowserMode {
+        BrowserMode_PROJECT,
+        BrowserMode_FILES
+    };
+
     enum FileType {
         FileType_IMAGE,
         FileType_VIDEO,
@@ -43,9 +49,21 @@ namespace Marmalade::GUI {
         FileType_UNKNOWN
     };
 
+    enum CommonDirectory {
+        CommonDirectory_ASSETS,
+        CommonDirectory_DATA,
+        CommonDirectory_SRC,
+        CommonDirectory_UNKNOWN
+    };
+
     struct ProjectItem {
         FileType Type;
         std::string Path;
+    };
+
+    struct DirectoryEntry {
+        std::filesystem::directory_entry Entry;
+        CommonDirectory Type;
     };
 
     class ProjectBrowser : public Window {
@@ -55,15 +73,26 @@ namespace Marmalade::GUI {
         void Draw() override;
 
     private:
+        BrowserMode _mode = BrowserMode_PROJECT;
         float _thumbnailSize = 128.0f;
         float _thumbnailPadding = 8.0f;
 
-        std::filesystem::path _currentPath;
+        // Only relevant for BrowserMode_PROJECT:
+        bool _showAssets = true;
+        bool _showData = true;
+        bool _showSrc = true;
+
+        char _filterText[512] = "";
+
         std::filesystem::path _rootAssetDir;
+        std::filesystem::path _rootDataDir;
+        std::filesystem::path _rootSrcDir;
+
+        std::filesystem::path _currentPath;
 
         GLFWwindow* _loadingContext{nullptr};
 
-        std::vector<std::filesystem::directory_entry> _items{};
+        std::vector<DirectoryEntry> _items{};
 
         std::unordered_map<std::string, ImTextureID> _textureCache{};
         std::atomic<bool> _textureOperationRunning{false};
@@ -71,8 +100,11 @@ namespace Marmalade::GUI {
 
         void drawTopBar();
         void drawBottomBar();
+        void drawItem(DirectoryEntry item);
 
+        void iterateFiles(std::function<void(DirectoryEntry)> item_callback);
         FileType determineFileType(const std::filesystem::path& extension);
+        ImU32 getBackgroundColor(CommonDirectory type);
 
         GLuint loadTexture(std::string filename);
         void loadTextures();

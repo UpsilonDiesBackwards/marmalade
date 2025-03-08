@@ -32,7 +32,8 @@ Marmalade::GUI::Preferences::Preferences() : Window() {
     _panes = {
             {"logging", PreferencesPane(drawGeneralLoggingPane)},
             {"appearance", PreferencesPane(drawGeneralAppearancePane)},
-            {"projects", PreferencesPane(drawGeneralProjectsPane)}};
+            {"projects", PreferencesPane(drawGeneralProjectsPane)},
+            {"projectBrowser", PreferencesPane(drawGeneralProjectBrowserPane)}};
 }
 
 void Marmalade::GUI::Preferences::drawGeneralLoggingPane() {
@@ -78,6 +79,7 @@ void Marmalade::GUI::Preferences::drawLeftPane() {
         selectableTreeNode("Logging", "logging");
         selectableTreeNode("Appearance", "appearance");
         selectableTreeNode("Projects", "projects");
+        selectableTreeNode("Project Browser", "projectBrowser");
 
         ImGui::TreePop();
     }
@@ -146,6 +148,24 @@ void Marmalade::GUI::Preferences::Draw() {
     drawSplit();
 
     ImGui::End();
+}
+
+void Marmalade::GUI::Preferences::drawGeneralProjectBrowserPane() {
+    static auto assetsCol = ImGui::ColorConvertU32ToFloat4(Config::engineConfig.projectBrowser.colorAssets);
+    static auto dataCol = ImGui::ColorConvertU32ToFloat4(Config::engineConfig.projectBrowser.colorData);
+    static auto srcCol = ImGui::ColorConvertU32ToFloat4(Config::engineConfig.projectBrowser.colorSrc);
+
+    if (ImGui::ColorEdit4("Assets", &assetsCol.x)) {
+        Config::engineConfig.projectBrowser.colorAssets = ImGui::ColorConvertFloat4ToU32(assetsCol);
+    }
+
+    if (ImGui::ColorEdit4("Data", &dataCol.x)) {
+        Config::engineConfig.projectBrowser.colorData = ImGui::ColorConvertFloat4ToU32(dataCol);
+    }
+
+    if (ImGui::ColorEdit4("Src", &srcCol.x)) {
+        Config::engineConfig.projectBrowser.colorSrc = ImGui::ColorConvertFloat4ToU32(srcCol);
+    }
 }
 
 void Marmalade::GUI::Preferences::requiresRestartWarning() {

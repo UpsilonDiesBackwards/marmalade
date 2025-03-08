@@ -20,14 +20,15 @@
 #include "projectbrowser.h"
 
 #include "../../application/application.h"
+#include "../../application/util.h"
 
-#include "imgui.h"
+#include <imgui.h>
 
-#include "IconsCodicons.h"
+#include <IconsCodicons.h>
 
-#include "stb/stb_image.h"
+#include <stb/stb_image.h>
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 
 #include <thread>
 
@@ -35,18 +36,51 @@
 static Marmalade::GUI::ProjectItem projectItem;
 
 void Marmalade::GUI::ProjectBrowser::drawTopBar() {
-    if (ImGui::Button(ICON_CI_REFRESH)) {
+    const char* modes[] = {ICON_CI_PROJECT " Project", ICON_CI_FILE_DIRECTORY " Files"};
+
+    ImGui::SetNextItemWidth(100.0f);
+    if (ImGui::Combo("##Mode", reinterpret_cast<int*>(&_mode), modes, IM_ARRAYSIZE(modes))) {
+        // Refresh needed
         _texturesLoaded = "";
     }
 
     ImGui::SameLine();
-    ImGui::Text("%s", _currentPath.string().c_str());
+    if (ImGui::Button(ICON_CI_REFRESH)) {
+        _texturesLoaded = "";
+    }
+
+    auto* project = Application::GetInstance().GetCurrentProject();
+    if (project) {
+        ImGui::SameLine();
+        ImGui::Text("/%s", _currentPath.generic_string().c_str());
+    }
+
+    if (_mode == BrowserMode_PROJECT) {
+        ImGui::SameLine();
+        ImGui::Text("%s", "Show: ");
+
+        ImGui::SameLine();
+        ImGui::Checkbox("Assets", &_showAssets);
+
+        ImGui::SameLine();
+        ImGui::Checkbox("Data     ", &_showData);
+
+        ImGui::SameLine();
+        ImGui::Checkbox("Source", &_showSrc);
+    }
+
+    const float searchBarWidth = 200.0f;
+    ImGui::SameLine(ImGui::GetContentRegionAvail().x - searchBarWidth);
+    ImGui::SetNextItemWidth(searchBarWidth);
+    ImGui::InputTextWithHint("##Search", "Filter", _filterText, sizeof(_filterText));
 }
 
 void Marmalade::GUI::ProjectBrowser::drawBottomBar() {
     float availableWindowWidth = ImGui::GetContentRegionAvail().x;
     float labelWidth = 7.0f;
     float sliderWidth = (availableWindowWidth - (labelWidth * 0.5) - 18.5f) * 0.3f;
+
+    auto* project = Application::GetInstance().GetCurrentProject();
 
     float statusBarHeight = 26.0f;
 
@@ -62,9 +96,76 @@ void Marmalade::GUI::ProjectBrowser::drawBottomBar() {
 
     ImGui::SameLine();
     ImGui::PushItemWidth(sliderWidth);
-    ImGui::ProgressBar(_texturesLoaded == _currentPath.string() ? -1.0f : ImGui::GetTime() * -0.2f);
+    ImGui::ProgressBar(_texturesLoaded == (project->basePath / _currentPath).string() ? -1.0f : ImGui::GetTime() * -0.2f);
 
     ImGui::EndChild();
+}
+
+void Marmalade::GUI::ProjectBrowser::drawItem(Marmalade::GUI::DirectoryEntry item) {
+    const std::filesystem::path path = item.Entry.path();
+
+    GLuint textureId = item.Entry.is_directory() ? _textureCache["directory"] : _textureCache["document"];
+
+    const auto fileType = determineFileType(path.extension());
+    if (fileType == FileType_IMAGE) {
+        textureId = _textureCache[path.string()];
+    }
+
+    ImGui::ImageButton(path.string().c_str(), textureId, ImVec2(_thumbnailSize, _thumbnailSize),
+                       ImVec2(0, 1), ImVec2(1, 0));
+
+    if (!item.Entry.is_directory()) {
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+            projectItem = ProjectItem{fileType, path.string()};
+            ImGui::SetDragDropPayload("PROJECT_BROWSER_FILE", &projectItem, sizeof(ProjectItem));
+            ImGui::Image(textureId, ImVec2(_thumbnailSize, _thumbnailSize));
+            ImGui::EndDragDropSource();
+        }
+    }
+
+    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+        if (item.Entry.is_directory()) {
+            _texturesLoaded = "";
+            _currentPath /= path.filename();
+        }
+    }
+
+    ImVec2 curPos = ImGui::GetCursorScreenPos();
+    ImVec2 textSize = ImGui::CalcTextSize(path.filename().string().c_str(), nullptr, true);
+
+    ImGui::GetWindowDrawList()->AddRectFilled(curPos, ImVec2(curPos.x + textSize.x, curPos.y + textSize.y), getBackgroundColor(item.Type));
+    ImGui::TextWrapped("%s", path.filename().string().c_str());
+}
+
+void Marmalade::GUI::ProjectBrowser::iterateFiles(std::function<void(DirectoryEntry)> item_callback) {
+    auto* project = Application::GetInstance().GetCurrentProject();
+
+    std::vector<DirectoryEntry> items;
+
+    std::unordered_map<CommonDirectory, std::filesystem::path> paths{};
+    if (_mode == BrowserMode_PROJECT) {
+        paths[CommonDirectory_ASSETS] = _rootAssetDir / _currentPath;
+        paths[CommonDirectory_DATA] = _rootDataDir / _currentPath;
+        paths[CommonDirectory_SRC] = _rootSrcDir / _currentPath;
+    } else {
+        paths[CommonDirectory_UNKNOWN] = project->basePath / _currentPath;
+    }
+
+    for (const auto& [key, dirPath]: paths) {
+        if (std::filesystem::exists(dirPath) && std::filesystem::is_directory(dirPath)) {
+            for (const auto& item: std::filesystem::directory_iterator(dirPath)) {
+                items.push_back(DirectoryEntry{item, key});
+            }
+        }
+    }
+
+    std::sort(items.begin(), items.end(), [](const auto& a, const auto& b) {
+        return a.Entry.path().filename().string() < b.Entry.path().filename().string();
+    });
+
+    for (const auto& item: items) {
+        item_callback(item);
+    }
 }
 
 Marmalade::GUI::FileType Marmalade::GUI::ProjectBrowser::determineFileType(const std::filesystem::path& extension) {
@@ -108,6 +209,19 @@ GLuint Marmalade::GUI::ProjectBrowser::loadTexture(std::string filename) {
     return textureID;
 }
 
+ImU32 Marmalade::GUI::ProjectBrowser::getBackgroundColor(Marmalade::GUI::CommonDirectory type) {
+    switch (type) {
+        case CommonDirectory_ASSETS:
+            return Config::engineConfig.projectBrowser.colorAssets;
+        case CommonDirectory_DATA:
+            return Config::engineConfig.projectBrowser.colorData;
+        case CommonDirectory_SRC:
+            return Config::engineConfig.projectBrowser.colorSrc;
+        default:
+            return IM_COL32(0, 0, 0, 0);
+    }
+}
+
 void Marmalade::GUI::ProjectBrowser::loadTextures() {
     if (_textureOperationRunning.exchange(true)) {
         return;
@@ -120,18 +234,20 @@ void Marmalade::GUI::ProjectBrowser::loadTextures() {
     _textureCache["directory"] = loadTexture("res/icons/ui/directory.png");
     _textureCache["document"] = loadTexture("res/icons/ui/document.png");
 
-    for (const auto& item: std::filesystem::directory_iterator(_currentPath)) {
-        if (item.is_directory()) continue;
+    auto* project = Application::GetInstance().GetCurrentProject();
 
-        if (determineFileType(item.path().extension()) == FileType_IMAGE) {
-            GLuint textureId = loadTexture(item.path().string());
+    iterateFiles([this](const auto& item) {
+        if (item.Entry.is_directory()) return;
+
+        if (determineFileType(item.Entry.path().extension()) == FileType_IMAGE) {
+            GLuint textureId = loadTexture(item.Entry.path().string());
             if (textureId != 0) {
-                _textureCache[item.path().string()] = textureId;
+                _textureCache[item.Entry.path().string()] = textureId;
             }
         }
-    }
+    });
 
-    _texturesLoaded = _currentPath.string();
+    _texturesLoaded = (project->basePath / _currentPath).string();
     _textureOperationRunning = false;
 
     glfwMakeContextCurrent(nullptr);
@@ -160,19 +276,19 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
         return;
     }
 
-    _rootAssetDir = std::filesystem::path(project->basePath) / "assets";
-    if (_currentPath.empty()) {
-        _currentPath = _rootAssetDir;
-    }
+    _rootAssetDir = project->basePath / "assets";
+    _rootDataDir = project->basePath / "data";
+    _rootSrcDir = project->basePath / "src";
 
-    if (_currentPath != _rootAssetDir) {
+    if (!_currentPath.empty()) {
         if (ImGui::Button("..")) {
             _currentPath = _currentPath.parent_path();
+            _texturesLoaded = "";
         }
     }
 
     bool mustLoadFiles = false;
-    if (_texturesLoaded != _currentPath.string()) {
+    if (_texturesLoaded != (project->basePath / _currentPath).string()) {
         mustLoadFiles = true;
         std::thread thread(&ProjectBrowser::loadTextures, this);
         thread.detach();
@@ -190,42 +306,23 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
 
     if (mustLoadFiles) {
         _items.clear();
-        for (const auto& item: std::filesystem::directory_iterator(_currentPath)) {
+        iterateFiles([this](const auto& item) {
             _items.push_back(item);
-        }
+        });
     }
 
     for (const auto& item: _items) {
-        const std::filesystem::path path = item.path();
+        if ((item.Type == CommonDirectory_ASSETS && _showAssets)//
+            || (item.Type == CommonDirectory_DATA && _showData) //
+            || (item.Type == CommonDirectory_SRC && _showSrc)   //
+            || (item.Type == CommonDirectory_UNKNOWN)) {
 
-        GLuint textureId = item.is_directory() ? _textureCache["directory"] : _textureCache["document"];
-
-        const auto fileType = determineFileType(path.extension());
-        if (fileType == FileType_IMAGE) {
-            textureId = _textureCache[path.string()];
-        }
-
-        ImGui::ImageButton(path.string().c_str(), textureId, ImVec2(_thumbnailSize, _thumbnailSize),
-                           ImVec2(0, 1), ImVec2(1, 0));
-
-        if (!item.is_directory()) {
-            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-                projectItem = ProjectItem{fileType, path.string()};
-                ImGui::SetDragDropPayload("PROJECT_BROWSER_FILE", &projectItem, sizeof(ProjectItem));
-                ImGui::Image(textureId, ImVec2(_thumbnailSize, _thumbnailSize));
-                ImGui::EndDragDropSource();
+            std::string filterText = _filterText;
+            if (filterText.empty() || Util::StringToLower(item.Entry.path().filename().string()).find(Util::StringToLower(filterText)) != std::string::npos) {
+                drawItem(item);
+                ImGui::NextColumn();
             }
         }
-
-        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-            if (item.is_directory()) {
-                _currentPath /= path.filename();
-            }
-        }
-
-        ImGui::TextWrapped("%s", path.filename().string().c_str());
-
-        ImGui::NextColumn();
     }
 
     ImGui::Columns(1);

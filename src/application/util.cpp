@@ -44,3 +44,9 @@ std::string Marmalade::Util::GenerateUUIDv4() {
 
     return ss.str();
 }
+
+std::string Marmalade::Util::StringToLower(std::string str) {
+    std::transform(str.begin(), str.end(), str.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+    return str;
+}

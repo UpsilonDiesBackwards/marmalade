@@ -26,6 +26,8 @@ namespace Marmalade {
     class Util {
     public:
         static std::string GenerateUUIDv4();
+
+        static std::string StringToLower(std::string str);
     };
 }
 
