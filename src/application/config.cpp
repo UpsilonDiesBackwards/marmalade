@@ -33,6 +33,10 @@ Marmalade::EngineConfig Marmalade::Config::engineConfig{};
 
 std::filesystem::path Marmalade::Config::_configDir{};
 
+const std::map<int, std::function<void(nlohmann::json&)>> Marmalade::Config::_migrations = {
+        {1, migrateFromVersion1}, // Currently a stub until version 2
+};
+
 void Marmalade::Config::SetConfigDirectory(bool sameDirConfig) {
     if (sameDirConfig) {
         _configDir = std::filesystem::current_path();
@@ -81,7 +85,28 @@ void Marmalade::Config::LoadEngineConfig() {
     }
 
     auto data = nlohmann::json::parse(i);
+
+    bool migrated = false;
+    int currentVersion = data.value("version", 1);
+    while (currentVersion < CONFIG_VERSION) {
+        // If the config version is less than the latest, migrate
+        auto it = _migrations.find(currentVersion);
+        if (it != _migrations.end()) {
+            it->second(data);
+            currentVersion++;
+            migrated = true;
+        } else {
+            spdlog::error("Unknown config migration for version {}", currentVersion);
+            break;
+        }
+    }
+
     engineConfig = data.template get<EngineConfig>();
+    if (migrated) {
+        engineConfig.version = currentVersion;
+        SaveEngineConfig();
+    }
+
     i.close();
 }
 
@@ -91,3 +116,11 @@ void Marmalade::Config::SaveEngineConfig() {
     o << new_config.dump(2);
     o.close();
 }
+
+#pragma region Migrations
+
+void Marmalade::Config::migrateFromVersion1(nlohmann::json& data) {
+    // Stub here, when version is set to 2, add code here for adding extra keys
+}
+
+#pragma endregion

@@ -26,6 +26,8 @@
 
 #include <filesystem>
 
+#define CONFIG_VERSION 1
+
 namespace Marmalade {
 
     struct Repository {
@@ -41,6 +43,8 @@ namespace Marmalade {
     };
 
     struct EngineConfig {
+        int version{CONFIG_VERSION};
+
         bool viewports{true};
         std::string themeFile{"editorstyle.txt"};
         bool showWelcomeScreen{true};
@@ -65,13 +69,21 @@ namespace Marmalade {
 
     private:
         static std::filesystem::path _configDir;
+
+#pragma region Migrations
+
+        static const std::map<int, std::function<void(nlohmann::json&)>> _migrations;
+
+        static void migrateFromVersion1(nlohmann::json& data);
+
+#pragma endregion
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::Repository, name, gitUrl, depth);
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::ProjectBrowserConfig, colorAssets, colorData, colorSrc);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, viewports, themeFile, showWelcomeScreen, logLevel, defaultProjectPath, repos, projectBrowser);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, version, viewports, themeFile, showWelcomeScreen, logLevel, defaultProjectPath, repos, projectBrowser);
 }
 
 #endif
