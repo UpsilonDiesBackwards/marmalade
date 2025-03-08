@@ -28,6 +28,8 @@ namespace Marmalade {
         static std::string GenerateUUIDv4();
 
         static std::string StringToLower(std::string str);
+
+        static void DisplayFile(const std::string& path);
     };
 }
 

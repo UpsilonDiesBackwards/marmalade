@@ -51,6 +51,7 @@ void Marmalade::Project::ProjectScenes::SaveScene(const std::string& fileName, S
     auto project = Application::GetInstance().GetCurrentProject();
 
     nlohmann::json j;
+    j["type"] = "Marmalade::Scene";
     j["name"] = scene->GetName();
     j["uuid"] = scene->GetUuid();
 
@@ -117,6 +118,8 @@ void Marmalade::Project::ProjectScenes::UnregisterScene(const std::string& fileN
 
 nlohmann::json Marmalade::Project::ProjectScenes::serializeEntity(const Entity* entity) {
     nlohmann::json e;
+    e["type"] = "Marmalade::Entity";
+
     e["name"] = entity->name;
     e["uuid"] = entity->uuid;
 

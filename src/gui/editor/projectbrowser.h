@@ -31,6 +31,7 @@
 #include <filesystem>
 #include <unordered_map>
 #include <atomic>
+#include <utility>
 #include <vector>
 #include <functional>
 
@@ -64,6 +65,10 @@ namespace Marmalade::GUI {
     struct DirectoryEntry {
         std::filesystem::directory_entry Entry;
         CommonDirectory Type;
+        std::string DisplayName;
+        std::function<void(DirectoryEntry)> ClickFunc{nullptr};
+
+        DirectoryEntry(std::filesystem::directory_entry  entry, CommonDirectory type) : Entry(std::move(entry)), Type(type) {}
     };
 
     class ProjectBrowser : public Window {
@@ -104,6 +109,7 @@ namespace Marmalade::GUI {
 
         void iterateFiles(std::function<void(DirectoryEntry)> item_callback);
         FileType determineFileType(const std::filesystem::path& extension);
+        void processItem(DirectoryEntry& item);
         ImU32 getBackgroundColor(CommonDirectory type);
 
         GLuint loadTexture(std::string filename);

@@ -21,6 +21,7 @@
 
 #include "../../application/application.h"
 #include "../../application/util.h"
+#include "../windowmanager.h"
 
 #include <imgui.h>
 
@@ -31,6 +32,7 @@
 #include <spdlog/spdlog.h>
 
 #include <thread>
+#include <fstream>
 
 // Needed for drag and drop
 static Marmalade::GUI::ProjectItem projectItem;
@@ -127,14 +129,23 @@ void Marmalade::GUI::ProjectBrowser::drawItem(Marmalade::GUI::DirectoryEntry ite
         if (item.Entry.is_directory()) {
             _texturesLoaded = "";
             _currentPath /= path.filename();
+        } else {
+            if (item.ClickFunc != nullptr) {
+                item.ClickFunc(item);
+            }
         }
     }
 
+    std::string label = path.filename().string();
+    if (!item.DisplayName.empty()) {
+        label = item.DisplayName;
+    }
+
     ImVec2 curPos = ImGui::GetCursorScreenPos();
-    ImVec2 textSize = ImGui::CalcTextSize(path.filename().string().c_str(), nullptr, true);
+    ImVec2 textSize = ImGui::CalcTextSize(label.c_str(), nullptr, true);
 
     ImGui::GetWindowDrawList()->AddRectFilled(curPos, ImVec2(curPos.x + textSize.x, curPos.y + textSize.y), getBackgroundColor(item.Type));
-    ImGui::TextWrapped("%s", path.filename().string().c_str());
+    ImGui::TextWrapped("%s", label.c_str());
 }
 
 void Marmalade::GUI::ProjectBrowser::iterateFiles(std::function<void(DirectoryEntry)> item_callback) {
@@ -207,6 +218,55 @@ GLuint Marmalade::GUI::ProjectBrowser::loadTexture(std::string filename) {
     glBindTexture(GL_TEXTURE_2D, 0);
 
     return textureID;
+}
+
+void Marmalade::GUI::ProjectBrowser::processItem(Marmalade::GUI::DirectoryEntry& item) {
+    std::filesystem::path ext = item.Entry.path().extension();
+
+    if (ext == ".json" || ext == ".marm") {
+        // Parse JSON
+        std::ifstream i(item.Entry.path());
+        if (i.fail()) {
+            // File should exist
+            return;
+        }
+
+        try {
+            auto data = nlohmann::json::parse(i);
+            if (data["type"] == "Marmalade::Scene") {
+                item.DisplayName = data["name"];
+                const auto uuid = data["uuid"];
+                item.ClickFunc = [uuid](const Marmalade::GUI::DirectoryEntry&) {
+                    // Open scene
+                    auto& sceneManager = Application::GetInstance().sceneManager;
+                    auto* project = Application::GetInstance().GetCurrentProject();
+
+                    Application::GetInstance().editorGUI->sceneHierarchy.DeselectEntity();
+
+                    const std::string fileName = Marmalade::Project::ProjectScenes::GetSceneFileName(uuid);
+                    auto newScene = project->scenes.LoadScene(fileName);
+
+                    sceneManager.AddScene(std::make_shared<Scene>(newScene));
+                    sceneManager.SetCurrentScene(newScene.GetUuid());
+                };
+            } else if (data["type"] == "Marmalade::Entity") {
+                item.DisplayName = data["name"];
+            } else if (data["type"] == "Marmalade::Project::Settings") {
+                item.ClickFunc = [](const Marmalade::GUI::DirectoryEntry&) {
+                    WindowManager::GetInstance().settings.visible = true;
+                };
+            }
+
+        } catch (const nlohmann::json::parse_error& e) {
+            // Parse error, ignore
+        }
+    }
+
+    if (item.Type == CommonDirectory_ASSETS) {
+        item.ClickFunc = [](const Marmalade::GUI::DirectoryEntry& item) {
+            Util::DisplayFile(item.Entry.path().string());
+        };
+    }
 }
 
 ImU32 Marmalade::GUI::ProjectBrowser::getBackgroundColor(Marmalade::GUI::CommonDirectory type) {
@@ -319,7 +379,10 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
 
             std::string filterText = _filterText;
             if (filterText.empty() || Util::StringToLower(item.Entry.path().filename().string()).find(Util::StringToLower(filterText)) != std::string::npos) {
-                drawItem(item);
+                DirectoryEntry newItem = item;
+                processItem(newItem);
+
+                drawItem(newItem);
                 ImGui::NextColumn();
             }
         }

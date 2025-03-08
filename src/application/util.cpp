@@ -23,6 +23,11 @@
 #include <random>
 #include <sstream>
 #include <iomanip>
+#include <algorithm>
+
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 std::string Marmalade::Util::GenerateUUIDv4() {
     std::random_device rd;
@@ -49,4 +54,16 @@ std::string Marmalade::Util::StringToLower(std::string str) {
     std::transform(str.begin(), str.end(), str.begin(),
                    [](unsigned char c) { return std::tolower(c); });
     return str;
+}
+
+void Marmalade::Util::DisplayFile(const std::string& path) {
+#ifdef _WIN32
+    ShellExecute(nullptr, "open", path.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+#elif __APPLE__
+    std::string command = "open " + path + " &";
+    std::system(command.c_str());
+#else
+    std::string command = "xdg-open " + path + " &";
+    std::system(command.c_str());
+#endif
 }
