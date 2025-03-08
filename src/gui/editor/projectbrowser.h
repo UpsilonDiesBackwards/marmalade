@@ -31,6 +31,7 @@
 #include <filesystem>
 #include <unordered_map>
 #include <atomic>
+#include <vector>
 
 namespace Marmalade::GUI {
     enum FileType {

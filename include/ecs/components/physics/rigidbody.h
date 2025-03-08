@@ -59,9 +59,11 @@ namespace Marmalade::ECS {
         nlohmann::json Serialize(const Entity* entity) override;
         void Deserialize(nlohmann::json json, Entity* entity) override;
 
-        void UpdatePhysics(Entity* entity, float deltaTime);
+        void UpdatePhysics(Entity* entity, float fixedDelta);
 
         void Collide(Entity* self, Entity* other, const glm::vec2 normal);
+
+        void ApplyImpulse(glm::vec2 impulse);
 
         RigidBody() {
             name = "Rigidbody";

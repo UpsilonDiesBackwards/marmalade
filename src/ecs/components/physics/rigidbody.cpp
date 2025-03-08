@@ -32,7 +32,10 @@ void Marmalade::ECS::RigidBody::Display(Entity* entity) {
 }
 
 void Marmalade::ECS::RigidBody::Apply(Entity* entity) {
-    if (isStatic) return;
+    if (isStatic) {
+        velocity *= 0.0f;
+        return;
+    }
 
     auto deltaTime = static_cast<float>(Application::GetInstance().profiler.GetDeltaTime());
 
@@ -63,7 +66,13 @@ void Marmalade::ECS::RigidBody::Deserialize(nlohmann::json json, Entity* entity)
     mass = json["mass"].get<float>();
 }
 
-void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float deltaTime) {
+void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float time) {
+    if (glm::length(velocity) < 0.01f) {
+        velocity = glm::vec2(0.0f);
+    }
+
+    velocity.y += gravity * time;
+
     // Collision queue
     while (!collisionQueue.empty()) {
         CollisionEvent event = collisionQueue.front();
@@ -76,16 +85,13 @@ void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float deltaTime) {
         }
     }
 
-    velocity.y += gravity * deltaTime;
-
     momentum = mass * velocity;
 
-    glm::vec2 newPos = entity->getPosition() + momentum * deltaTime;
+    glm::vec2 newPos = entity->getPosition() + momentum * time;
     entity->setPosition(newPos);
 }
 
-void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::vec2 normal) {
-    /*
+/*
      * This function is still very rudimentary and does not currently provide accurate physics collision.
      * currently when a moving (non-static) rigidbody collides with a stationary (static) rigidbody the
      * non-static entity will "bounce" on the surface of the static rigidbody. This is most likely due to
@@ -96,39 +102,52 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::
      *
      * TODO: We should eventually add rotational force for when a rigidbody falls of the corner of a rb
      * */
-
+void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::vec2 normal) {
     if (isStatic) return;
-
-    // TODO: We should eventually add rotational force for when a rigidbody falls of the corner of a rb
 
     auto* selfCollider = self->componentManager.GetComponentOfType<ColliderBase>();
     auto* otherCollider = other->componentManager.GetComponentOfType<ColliderBase>();
+    auto* otherRigidBody = other->componentManager.GetComponentOfType<RigidBody>();
 
     if (!selfCollider || !otherCollider) return;
 
-    glm::vec2 selfHalfHeight, otherHalfHeight;
-
-    // SELF
+    glm::vec2 selfSize, otherSize;
 
     if (std::holds_alternative<AABBData>(selfCollider->data)) {
-        selfHalfHeight = std::get<AABBData>(selfCollider->data).size / 2.0f;
+        selfSize = std::get<AABBData>(selfCollider->data).size;
     } else if (std::holds_alternative<OBBData>(selfCollider->data)) {
-        selfHalfHeight = std::get<OBBData>(selfCollider->data).size / 2.0f;
+        selfSize = std::get<OBBData>(selfCollider->data).size;
     }
 
-    // OTHER
-
     if (std::holds_alternative<AABBData>(otherCollider->data)) {
-        otherHalfHeight = std::get<AABBData>(otherCollider->data).size / 2.0f;
+        otherSize = std::get<AABBData>(otherCollider->data).size;
     } else if (std::holds_alternative<OBBData>(otherCollider->data)) {
-        otherHalfHeight = std::get<OBBData>(otherCollider->data).size / 2.0f;
+        otherSize = std::get<OBBData>(otherCollider->data).size;
     }
 
     glm::vec2 overlapDist = self->getPosition() - other->getPosition();
-    glm::vec2 combinedHalfHeight = selfHalfHeight + otherHalfHeight;
-    overlapDist = combinedHalfHeight - overlapDist;
+    glm::vec2 combinedHalfHeight = selfSize * 0.5f + otherSize * 0.5f;
+    overlapDist = combinedHalfHeight - glm::abs(overlapDist);
 
-    glm::vec2 correction = normal * glm::max(glm::vec2(0.0f), overlapDist);
+    glm::vec2 correction = normal * glm::max(glm::vec2(0.0f), overlapDist) * 0.37f;
     self->setPosition(self->getPosition() + correction);
-    velocity -= glm::dot(velocity, normal) * normal;
+
+    if (!otherRigidBody || otherRigidBody->isStatic) {
+        velocity -= glm::dot(velocity, normal) * normal;
+        return;
+    }
+
+    glm::vec2 combinedVelocities = velocity - otherRigidBody->velocity;
+    float impulse = 2.0f * glm::dot(combinedVelocities, normal) / (mass + otherRigidBody->mass);
+    glm::vec2 vectorImpulse = normal * impulse;
+
+    ApplyImpulse(vectorImpulse);
+    otherRigidBody->ApplyImpulse(-vectorImpulse);
+}
+
+
+void Marmalade::ECS::RigidBody::ApplyImpulse(glm::vec2 impulse) {
+    if (mass == 0 || isStatic) return;
+
+    velocity += impulse / mass;
 }
