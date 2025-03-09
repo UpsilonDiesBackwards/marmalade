@@ -55,6 +55,11 @@ void Marmalade::GUI::Preferences::drawGeneralAppearancePane() {
     }
     ImGui::SameLine();
     requiresRestartWarning();
+
+    static auto backgroundCol = ImGui::ColorConvertU32ToFloat4(Config::engineConfig.backgroundColor);
+    if (ImGui::ColorEdit4("Background Color", &backgroundCol.x)) {
+        Config::engineConfig.backgroundColor = ImGui::ColorConvertFloat4ToU32(backgroundCol);
+    }
 }
 
 void Marmalade::GUI::Preferences::drawGeneralProjectsPane() {

@@ -140,7 +140,8 @@ void Application::Initialise() {
 void Application::Run() {
     profiler.Update();
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    ImVec4 backgroundCol = ImGui::ColorConvertU32ToFloat4(Marmalade::Config::engineConfig.backgroundColor);
+    glClearColor(backgroundCol.x, backgroundCol.y, backgroundCol.z, backgroundCol.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     ImGui_ImplOpenGL3_NewFrame();
