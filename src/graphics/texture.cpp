@@ -35,9 +35,9 @@ GLuint Texture::LoadTexture(const std::string &filePath) {
 
     unsigned char *data;
     if (filePath == "") { // if not file path is defined, use default fallback texture
-        data = stbi_load("res/textures/UVFallback.png", &width, &height, &channels, 0);
+        data = stbi_load("res/textures/UVFallback.png", &width, &height, &channels, 4);
     } else { // if path is defined then use the given path
-        data = stbi_load(filePath.c_str(), &width, &height, &channels, 0);
+        data = stbi_load(filePath.c_str(), &width, &height, &channels, 4);
     }
 
     if (data) {
@@ -50,7 +50,7 @@ GLuint Texture::LoadTexture(const std::string &filePath) {
             format = GL_RGBA;
         }
 
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     } else {
         std::cout << "Failed to load texture from file: " + filePath << std::endl;
