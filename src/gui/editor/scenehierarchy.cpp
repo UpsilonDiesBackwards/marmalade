@@ -104,8 +104,15 @@ void SceneHierarchy::displayEntity(std::shared_ptr<Entity> entity, int index) {
     ImGuiTreeNodeFlags nodeFlags = entity->children.empty() ? ImGuiTreeNodeFlags_Leaf : 0;
 
     if (ImGui::TreeNodeEx(nodeLabel.c_str(), nodeFlags)) {
+        if (ImGui::IsItemHovered()) {
+            _selected = entity;
+        }
+
         if (ImGui::IsItemClicked()) {
             _selected = entity;
+            Application::GetInstance().editorGUI->details.visible = true;
+            Application::GetInstance().editorGUI->details.inspectedEntity = _selected.lock().get();
+            Application::GetInstance().editView->selectedEntity = _selected.lock().get();
         }
 
         int i = 0;
@@ -113,11 +120,6 @@ void SceneHierarchy::displayEntity(std::shared_ptr<Entity> entity, int index) {
             displayEntity(entity, i);
             i++;
         }
-
-        Application::GetInstance().editorGUI->details.visible = true;
-        Application::GetInstance().editorGUI->details.inspectedEntity = _selected.lock().get();
-
-        Application::GetInstance().editView->selectedEntity = _selected.lock().get();
 
         ImGui::TreePop();
     }

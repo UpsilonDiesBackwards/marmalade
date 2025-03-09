@@ -119,8 +119,6 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
                 glm::vec2 collisionNorm = glm::normalize(posA - posB);
                 rb->collisionQueue.push({self, other, collisionNorm});
             }
-
-            spdlog::info("Collision detected using AABB");
         }
     } else if (obbA && obbB) {
         if (IntersectsOBB(*other->componentManager.GetComponentOfType<ColliderBase>(), posA, posB)) {
@@ -129,8 +127,6 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
                 glm::vec2 collisionNorm = glm::normalize(posB - posA);
                 rb->collisionQueue.push({self, other, collisionNorm});
             }
-
-            spdlog::info("Collision detected using OBB");
         }
     }
 }
