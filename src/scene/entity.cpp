@@ -114,8 +114,8 @@ void Entity::UpdateModelMatrix() {
                                          glm::vec3(0.0f, 0.0f, 1.0f));
     transform->modelMatrix = glm::scale(transform->modelMatrix, glm::vec3(transform->scale, 1.0f));
 
-    if (parent) {
-        transform->modelMatrix = parent->componentManager.GetComponentOfType<Marmalade::ECS::Transform>()->modelMatrix * transform->modelMatrix;
+    if (auto parentPtr = parent.lock()) {
+        transform->modelMatrix = parentPtr->componentManager.GetComponentOfType<Marmalade::ECS::Transform>()->modelMatrix * transform->modelMatrix;
     }
 
     for (auto& child: children) {
@@ -123,8 +123,8 @@ void Entity::UpdateModelMatrix() {
     }
 }
 
-void Entity::AddChild(std::unique_ptr<Entity> child) {
-    child->parent = this;
+void Entity::AddChild(std::shared_ptr<Entity> parent, std::shared_ptr<Entity> child) {
+    child->parent = parent;
     children.push_back(std::move(child));
 
     spdlog::info("child: {}", this->children[0]->name);
@@ -132,7 +132,7 @@ void Entity::AddChild(std::unique_ptr<Entity> child) {
 
 void Entity::RemoveChild(Entity* target) {
     auto i = std::remove_if(children.begin(), children.end(),
-                            [target](const std::unique_ptr<Entity>& child) {
+                            [target](const std::shared_ptr<Entity>& child) {
                                 return child.get() == target;
                             });
 
@@ -142,9 +142,5 @@ void Entity::RemoveChild(Entity* target) {
 }
 
 bool Entity::HasParent() const {
-    return parent != nullptr;
-}
-
-void Entity::SetParent(Entity* newParent) {
-    parent = newParent;
+    return !parent.expired();
 }

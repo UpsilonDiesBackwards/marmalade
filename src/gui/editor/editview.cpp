@@ -57,7 +57,7 @@ void EditView::Render() {
     }
 
     // Render Space
-    for (const auto& entity : app.sceneManager.GetCurrentScene()->GetEntities()) {
+    for (const auto& entity: app.sceneManager.GetCurrentScene()->GetEntities()) {
         entity->Render();
     }
 
@@ -107,23 +107,21 @@ void EditView::RunInput() {
 
     app.input.BindMouseButton(GLFW_MOUSE_BUTTON_RIGHT, MOUSE_PRESSED,
                               [&app, this]() {
+                                  ImVec2 mousePos = ImGui::GetMousePos();
 
-        ImVec2 mousePos = ImGui::GetMousePos();
+                                  if (mousePos.x >= imageMin.x && mousePos.x <= imageMax.x &&
+                                      mousePos.y >= imageMin.y && mousePos.y <= imageMax.y) {
 
-        if (mousePos.x >= imageMin.x && mousePos.x <= imageMax.x &&
-            mousePos.y >= imageMin.y && mousePos.y <= imageMax.y) {
+                                      float posX = app.inputManager.getMouseDeltaX();
+                                      float posY = app.inputManager.getMouseDeltaY();
 
-            float posX = app.inputManager.getMouseDeltaX();
-            float posY = app.inputManager.getMouseDeltaY();
-
-            app.camera->Move(-posX, posY);
-        }
-    });
+                                      app.camera->Move(-posX, posY);
+                                  }
+                              });
 
     app.input.BindScroll([&app](double xOffset, double yOffset) {
         app.camera->Zoom(yOffset);
     });
-
 }
 
 void EditView::ShowGizmo() {
@@ -150,10 +148,10 @@ void EditView::ShowGizmo() {
         selectedEntity->setRotation(rotation.z);
         selectedEntity->setScale(glm::vec2(scale.x, scale.y));
 
-        ImGuizmo::RecomposeMatrixFromComponents(glm::value_ptr(transform->modelMatrix),
-                                                glm::value_ptr(translation),
+        ImGuizmo::RecomposeMatrixFromComponents(glm::value_ptr(translation),
                                                 glm::value_ptr(rotation),
-                                                glm::value_ptr(scale));
+                                                glm::value_ptr(scale),
+                                                glm::value_ptr(transform->modelMatrix));
     }
 
     if (currentGuizmoOperation != ImGuizmo::SCALE) {
@@ -181,7 +179,7 @@ void EditView::ShowGizmo() {
 void EditView::ShowColliderBounds() {
     auto comp = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::ColliderBase>();
 
-    if (!comp || !comp->showingBounds) { return; } // Collider component does not exist, or not showing bounds. Do not continue
+    if (!comp || !comp->showingBounds) { return; }// Collider component does not exist, or not showing bounds. Do not continue
 
     auto* transform = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
 

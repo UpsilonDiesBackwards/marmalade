@@ -51,8 +51,8 @@ public:
     Renderable renderable;
     Marmalade::ECS::ComponentManager componentManager{};
 
-    Entity* parent{nullptr};
-    std::vector<std::unique_ptr<Entity>> children;
+    std::weak_ptr<Entity> parent;
+    std::vector<std::shared_ptr<Entity>> children;
 
     Entity(const std::string& name, const std::string& uuid, EntityFlags flags, bool withDefaultComponents = true);
 
@@ -69,11 +69,10 @@ public:
 
     void UpdateModelMatrix();
 
-    void AddChild(std::unique_ptr<Entity> child);
+    void AddChild(std::shared_ptr<Entity> parent, std::shared_ptr<Entity> child);
     void RemoveChild(Entity* child);
 
     bool HasParent() const;
-    void SetParent(Entity* newParent);
 
     void Render();
 };

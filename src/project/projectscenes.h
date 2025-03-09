@@ -53,7 +53,7 @@ namespace Marmalade::Project {
 
     private:
         nlohmann::json serializeEntity(const Entity* entity);
-        Entity deserializeEntity(const nlohmann::json& e);
+        std::shared_ptr<Entity> deserializeEntity(const nlohmann::json& e);
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectScenes::Component, name, uuid, data);

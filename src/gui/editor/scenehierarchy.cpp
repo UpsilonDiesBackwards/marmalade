@@ -42,7 +42,7 @@ void SceneHierarchy::Show() {
 
     int index = 0;
     for (auto& entity: entities) {
-        displayEntity(entity.get(), index);
+        displayEntity(entity, index);
         index++;
     }
 
@@ -65,8 +65,8 @@ void SceneHierarchy::Show() {
     showRenamePopup();
     showDeletePopup();
 
-    if (_selected && ImGui::IsKeyPressed(ImGuiKey_Escape)) { // If entity is selected AND escaped is pressed...
-        _selected = nullptr; // ...then deselect the current entity
+    if (_selected.lock() && ImGui::IsKeyPressed(ImGuiKey_Escape)) { // If entity is selected AND escaped is pressed...
+        _selected.reset(); // ...then deselect the current entity
     }
 
     ImGui::End();
@@ -75,7 +75,7 @@ void SceneHierarchy::Show() {
 void SceneHierarchy::DeselectEntity() {
     Application::GetInstance().editorGUI->details.inspectedEntity = nullptr;
     Application::GetInstance().editView->selectedEntity = nullptr;
-    _selected = nullptr;
+    _selected.reset();
 }
 
 void SceneHierarchy::createEntity(const std::string& name) {
@@ -87,15 +87,15 @@ void SceneHierarchy::createEntity(const std::string& name) {
     if (!name.empty()) {
         auto newEntity = std::make_unique<Entity>(name, EntityFlags::NONE);
 
-        if (_parent) {
-            _parent->AddChild(std::move(newEntity));
+        if (auto parentPtr = _parent.lock()) {
+            parentPtr->AddChild(parentPtr, std::move(newEntity));
         } else {
             Application::GetInstance().sceneManager.GetCurrentScene()->AddEntity(std::move(newEntity));
         }
     }
 }
 
-void SceneHierarchy::displayEntity(Entity* entity, int index) {
+void SceneHierarchy::displayEntity(std::shared_ptr<Entity> entity, int index) {
     std::string nodeLabel = entity->name.empty() ? "Unnamed Entity" : entity->name;
     nodeLabel += "##" + std::to_string(index);
 
@@ -110,14 +110,14 @@ void SceneHierarchy::displayEntity(Entity* entity, int index) {
 
         int i = 0;
         for (auto& entity: entity->children) {
-            displayEntity(entity.get(), i);
+            displayEntity(entity, i);
             i++;
         }
 
         Application::GetInstance().editorGUI->details.visible = true;
-        Application::GetInstance().editorGUI->details.inspectedEntity = _selected;
+        Application::GetInstance().editorGUI->details.inspectedEntity = _selected.lock().get();
 
-        Application::GetInstance().editView->selectedEntity = _selected;
+        Application::GetInstance().editView->selectedEntity = _selected.lock().get();
 
         ImGui::TreePop();
     }
@@ -126,8 +126,8 @@ void SceneHierarchy::displayEntity(Entity* entity, int index) {
 void SceneHierarchy::showCreatePopup() {
     if (ImGui::BeginPopupModal("Create Entity", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 
-        if (_parent) {
-            ImGui::Text("Creating child entity for %s", _parent->name.c_str());
+        if (auto parentPtr = _parent.lock()) {
+            ImGui::Text("Creating child entity for %s", parentPtr->name.c_str());
         }
 
         ImGui::InputText("Name", newName, IM_ARRAYSIZE(newName));
@@ -141,6 +141,8 @@ void SceneHierarchy::showCreatePopup() {
         ImGui::SameLine();
         if (ImGui::Button("Create")) {
             createEntity(newName);
+            DeselectEntity();
+
             memset(newName, 0, sizeof(newName));
             _isCreatingEntityChild = false;
             ImGui::CloseCurrentPopup();
@@ -160,7 +162,7 @@ void SceneHierarchy::showContextMenu() {
             _isCreatingEntityChild = true;
         }
 
-        if (_selected) {
+        if (auto selectedPtr = _selected.lock()) {
             if (ImGui::MenuItem("Rename")) {
                 _isRenaming = true;
             }
@@ -187,7 +189,7 @@ void SceneHierarchy::showRenamePopup() {
         ImGui::SameLine();
         if (ImGui::Button("Confirm")) {
             if (strlen(newName) > 0) {
-                _selected->name = newName;
+                _selected.lock()->name = newName;
                 _isRenaming = false;
                 memset(newName, 0, sizeof(newName));
                 ImGui::CloseCurrentPopup();
@@ -204,7 +206,7 @@ void SceneHierarchy::showRenamePopup() {
 void SceneHierarchy::showDeletePopup() {
     if (ImGui::BeginPopupModal("Delete Entity", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::TextColored(ImVec4(0.90f, 0.49f, 0.50f, 1.0f),
-                           "Are you sure you want to delete %s ?", _selected->name.c_str());
+                           "Are you sure you want to delete %s ?", _selected.lock()->name.c_str());
 
         if (ImGui::Button("Cancel")) {
             _isDeleting = false;
@@ -212,15 +214,13 @@ void SceneHierarchy::showDeletePopup() {
         }
         ImGui::SameLine();
         if (ImGui::Button("Confirm")) {
-            if (_selected->parent) {
-                _selected->parent->RemoveChild(_selected);
+            if (auto parentPtr = _selected.lock()->parent.lock()) {
+                parentPtr->RemoveChild(_selected.lock().get());
             } else {
-                Application::GetInstance().sceneManager.GetCurrentScene()->RemoveEntity(_selected);
+                Application::GetInstance().sceneManager.GetCurrentScene()->RemoveEntity(_selected.lock().get());
             }
 
-            Application::GetInstance().editorGUI->details.inspectedEntity = nullptr;
-            Application::GetInstance().editView->selectedEntity = nullptr;
-            _selected = nullptr;
+            DeselectEntity();
 
             _isDeleting = false;
             ImGui::CloseCurrentPopup();

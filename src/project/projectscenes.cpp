@@ -94,7 +94,7 @@ Scene Marmalade::Project::ProjectScenes::LoadScene(const std::string& fileName, 
                 entityFile >> entityJson;
                 entityFile.close();
 
-                scene.AddEntity(std::make_shared<Entity>(deserializeEntity(entityJson)));
+                scene.AddEntity(deserializeEntity(entityJson));
             }
         }
 
@@ -144,10 +144,10 @@ nlohmann::json Marmalade::Project::ProjectScenes::serializeEntity(const Entity* 
     return e;
 }
 
-Entity Marmalade::Project::ProjectScenes::deserializeEntity(const nlohmann::json& e) {
+std::shared_ptr<Entity> Marmalade::Project::ProjectScenes::deserializeEntity(const nlohmann::json& e) {
     std::string name = e["name"];
     std::string uuid = e["uuid"];
-    auto entity = Entity(name, uuid, EntityFlags::RENDERABLE, false);
+    auto entity = std::make_shared<Entity>(name, uuid, EntityFlags::RENDERABLE, false);
 
     // Deserialize components
     for (const auto& componentJson: e["components"]) {
@@ -155,12 +155,12 @@ Entity Marmalade::Project::ProjectScenes::deserializeEntity(const nlohmann::json
         auto factory = Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()[component.name].get();
 
         auto newComponent = factory->Create(component.uuid);
-        newComponent->Deserialize(component.data, &entity);
-        entity.componentManager.AddComponent(std::move(newComponent));// Add component
+        newComponent->Deserialize(component.data, entity.get());
+        entity->componentManager.AddComponent(std::move(newComponent));// Add component
     }
 
-    for (const auto &component : entity.componentManager.components) {
-        component->Setup(&entity);
+    for (const auto &component : entity->componentManager.components) {
+        component->Setup(entity.get());
     }
 
     // Deserialize children (recursive)
@@ -172,7 +172,7 @@ Entity Marmalade::Project::ProjectScenes::deserializeEntity(const nlohmann::json
                 entityFile >> childJson;
                 entityFile.close();
 
-                entity.AddChild(std::make_unique<Entity>(deserializeEntity(childJson)));
+                entity->AddChild(entity, deserializeEntity(childJson));
             }
         }
     }

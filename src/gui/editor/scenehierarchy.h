@@ -28,13 +28,13 @@ public:
     void DeselectEntity();
 
 private:
-    Entity* _parent{nullptr};
-    Entity* _selected{nullptr};
+    std::weak_ptr<Entity> _parent;
+    std::weak_ptr<Entity> _selected;
     bool _isCreatingEntityChild{false};
     bool _isDeleting{false};
     bool _isRenaming{false};
 
-    void displayEntity(Entity* entity, int index);
+    void displayEntity(std::shared_ptr<Entity> entity, int index);
     void showCreatePopup();
     void showRenamePopup();
     void showDeletePopup();

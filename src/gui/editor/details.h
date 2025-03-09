@@ -27,7 +27,7 @@
 namespace Marmalade::GUI {
     class Details : public Window {
     public:
-        Entity* inspectedEntity;
+        Entity* inspectedEntity{nullptr};
 
         void Draw() override;
     private:
