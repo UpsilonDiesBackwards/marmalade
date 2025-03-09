@@ -81,14 +81,21 @@ void Marmalade::GUI::ProjectBrowser::drawBottomBar() {
     float availableWindowWidth = ImGui::GetContentRegionAvail().x;
     float labelWidth = 7.0f;
     float sliderWidth = (availableWindowWidth - (labelWidth * 0.5) - 18.5f) * 0.3f;
+    float statusBarHeight = 26.0f;
 
     auto* project = Application::GetInstance().GetCurrentProject();
-
-    float statusBarHeight = 26.0f;
 
     ImGui::SetCursorPosY(ImGui::GetWindowHeight() - statusBarHeight);
 
     ImGui::BeginChild("BottomBar", ImVec2(0, statusBarHeight), false);
+
+    // View buttons
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+    if (ImGui::Button(ICON_CI_LAYOUT)) _displayMode = DisplayMode_TILES;
+    ImGui::SameLine();
+    ImGui::PopStyleVar();
+    if (ImGui::Button(ICON_CI_LIST_FLAT)) _displayMode = DisplayMode_LIST;
+    ImGui::SameLine();
 
     ImGui::PushItemWidth(sliderWidth);
     ImGui::SliderFloat("Size", &_thumbnailSize, 16, 512);
@@ -103,7 +110,7 @@ void Marmalade::GUI::ProjectBrowser::drawBottomBar() {
     ImGui::EndChild();
 }
 
-void Marmalade::GUI::ProjectBrowser::drawItem(Marmalade::GUI::DirectoryEntry item) {
+void Marmalade::GUI::ProjectBrowser::drawItemTile(Marmalade::GUI::DirectoryEntry item) {
     const std::filesystem::path path = item.Entry.path();
 
     GLuint textureId = item.Entry.is_directory() ? _textureCache["directory"] : _textureCache["document"];
@@ -136,6 +143,15 @@ void Marmalade::GUI::ProjectBrowser::drawItem(Marmalade::GUI::DirectoryEntry ite
         }
     }
 
+    if (ImGui::BeginItemTooltip()) {
+        if (!item.DisplayName.empty()) {
+            ImGui::Text("%s", item.DisplayName.c_str());
+        }
+        ImGui::Text("%s", item.Entry.path().filename().string().c_str());
+
+        ImGui::EndTooltip();
+    }
+
     std::string label = path.filename().string();
     if (!item.DisplayName.empty()) {
         label = item.DisplayName;
@@ -146,6 +162,22 @@ void Marmalade::GUI::ProjectBrowser::drawItem(Marmalade::GUI::DirectoryEntry ite
 
     ImGui::GetWindowDrawList()->AddRectFilled(curPos, ImVec2(curPos.x + textSize.x, curPos.y + textSize.y), getBackgroundColor(item.Type));
     ImGui::TextWrapped("%s", label.c_str());
+}
+
+void Marmalade::GUI::ProjectBrowser::drawItemList(Marmalade::GUI::DirectoryEntry item, int i) {
+    std::string label = item.Entry.path().filename().string();
+    if (!item.DisplayName.empty()) {
+        label = item.DisplayName;
+    }
+
+    ImGui::TableNextColumn();
+    bool isSelected = (_selectedRow == i);
+    if (ImGui::Selectable(label.c_str(), isSelected, ImGuiSelectableFlags_SpanAllColumns)) {
+        _selectedRow = (isSelected ? -1 : i);
+    }
+
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", item.Type == CommonDirectory_ASSETS ? "Asset" : "Other");
 }
 
 void Marmalade::GUI::ProjectBrowser::iterateFiles(std::function<void(DirectoryEntry)> item_callback) {
@@ -323,7 +355,7 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
     ImGui::SetNextWindowPos(ImVec2(256, 128), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(720, 380), ImGuiCond_FirstUseEver);
 
-    ImGui::Begin(ICON_CI_ZOOM_IN " Project Browser", &visible);
+    ImGui::Begin(ICON_CI_ZOOM_IN " Project Browser", &visible, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
     // Top bar
     drawTopBar();
@@ -360,9 +392,7 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
 
     int columnCount = std::max(1, int(panelWidth / cellSize));
 
-    ImGui::BeginChild("AssetList", ImVec2(0, -22), true);
-
-    ImGui::Columns(columnCount, nullptr, false);
+    ImGui::BeginChild("AssetListTiles", ImVec2(0, -22), true);
 
     if (mustLoadFiles) {
         _items.clear();
@@ -371,24 +401,57 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
         });
     }
 
-    for (const auto& item: _items) {
-        if ((item.Type == CommonDirectory_ASSETS && _showAssets)//
-            || (item.Type == CommonDirectory_DATA && _showData) //
-            || (item.Type == CommonDirectory_SRC && _showSrc)   //
-            || (item.Type == CommonDirectory_UNKNOWN)) {
+    bool continueDraw = true;
 
-            std::string filterText = _filterText;
-            if (filterText.empty() || Util::StringToLower(item.Entry.path().filename().string()).find(Util::StringToLower(filterText)) != std::string::npos) {
-                DirectoryEntry newItem = item;
-                processItem(newItem);
+    if (_displayMode == DisplayMode_TILES) {
+        ImGui::Columns(columnCount, nullptr, false);
+    } else if (_displayMode == DisplayMode_LIST) {
+        std::vector<GUI::Components::TableViewColumn> columns = {Components::TableViewColumn("Name"), Components::TableViewColumn("Type")};
 
-                drawItem(newItem);
-                ImGui::NextColumn();
+        continueDraw = ImGui::BeginTable("AssetListList", columns.size(), ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg);
+
+        if (continueDraw) {
+            for (const auto& col: columns) {
+                ImGui::TableSetupColumn(col.Name.c_str(), col.Flags, col.InitWidthOrWeight);
+            }
+
+            ImGui::TableHeadersRow();
+        }
+    }
+
+    int i = 0;
+    if (continueDraw) {
+        for (const auto& item: _items) {
+            if ((item.Type == CommonDirectory_ASSETS && _showAssets)//
+                || (item.Type == CommonDirectory_DATA && _showData) //
+                || (item.Type == CommonDirectory_SRC && _showSrc)   //
+                || (item.Type == CommonDirectory_UNKNOWN)) {
+
+                std::string filterText = _filterText;
+                if (filterText.empty() || Util::StringToLower(item.Entry.path().filename().string()).find(Util::StringToLower(filterText)) != std::string::npos) {
+                    DirectoryEntry newItem = item;
+                    processItem(newItem);
+
+                    if (_displayMode == DisplayMode_TILES) {
+                        drawItemTile(newItem);
+                        ImGui::NextColumn();
+                    } else if (_displayMode == DisplayMode_LIST) {
+                        ImGui::TableNextRow();
+
+                        drawItemList(newItem, i);
+
+                        i++;
+                    }
+                }
             }
         }
     }
 
-    ImGui::Columns(1);
+    if (_displayMode == DisplayMode_TILES) {
+        ImGui::Columns(1);
+    } else if (_displayMode == DisplayMode_LIST) {
+        if (continueDraw) ImGui::EndTable();
+    }
     ImGui::EndChild();
 
     // Bottom bar

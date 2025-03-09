@@ -41,6 +41,11 @@ namespace Marmalade::GUI {
         BrowserMode_FILES
     };
 
+    enum DisplayMode {
+        DisplayMode_TILES,
+        DisplayMode_LIST
+    };
+
     enum FileType {
         FileType_IMAGE,
         FileType_VIDEO,
@@ -79,6 +84,7 @@ namespace Marmalade::GUI {
 
     private:
         BrowserMode _mode = BrowserMode_PROJECT;
+        DisplayMode _displayMode = DisplayMode_TILES;
         float _thumbnailSize = 128.0f;
         float _thumbnailPadding = 8.0f;
 
@@ -86,6 +92,9 @@ namespace Marmalade::GUI {
         bool _showAssets = true;
         bool _showData = true;
         bool _showSrc = true;
+
+        // Only relevant for DisplayMode_LIST:
+        int _selectedRow = -1;
 
         char _filterText[512] = "";
 
@@ -105,7 +114,8 @@ namespace Marmalade::GUI {
 
         void drawTopBar();
         void drawBottomBar();
-        void drawItem(DirectoryEntry item);
+        void drawItemTile(Marmalade::GUI::DirectoryEntry item);
+        void drawItemList(Marmalade::GUI::DirectoryEntry item, int i);
 
         void iterateFiles(std::function<void(DirectoryEntry)> item_callback);
         FileType determineFileType(const std::filesystem::path& extension);
