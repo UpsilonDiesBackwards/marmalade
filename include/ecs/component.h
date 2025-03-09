@@ -43,6 +43,7 @@ namespace Marmalade::ECS {
 
         virtual void Display(Entity* entity) = 0;
         virtual void Apply(Entity* entity) = 0;
+        virtual void Setup(Entity *entity) = 0;
 
         virtual nlohmann::json Serialize(const Entity* entity) = 0;
         virtual void Deserialize(nlohmann::json json, Entity* entity) = 0;

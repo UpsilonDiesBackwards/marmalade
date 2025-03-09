@@ -47,6 +47,9 @@ void Marmalade::ECS::RigidBody::Apply(Entity* entity) {
     }
 }
 
+void Marmalade::ECS::RigidBody::Setup(Entity* entity) {
+}
+
 nlohmann::json Marmalade::ECS::RigidBody::Serialize(const Entity* entity) {
     nlohmann::json j;
     j["static"] = isStatic;

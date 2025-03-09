@@ -75,6 +75,9 @@ void Marmalade::ECS::BoxCollider::Apply(Entity* entity) {
     }
 }
 
+void Marmalade::ECS::BoxCollider::Setup(Entity* entity) {
+}
+
 nlohmann::json Marmalade::ECS::BoxCollider::Serialize(const Entity* entity) {
     nlohmann::json j;
     std::visit([&](auto &colliderData) {

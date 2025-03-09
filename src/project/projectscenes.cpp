@@ -159,6 +159,10 @@ Entity Marmalade::Project::ProjectScenes::deserializeEntity(const nlohmann::json
         entity.componentManager.AddComponent(std::move(newComponent));// Add component
     }
 
+    for (const auto &component : entity.componentManager.components) {
+        component->Setup(&entity);
+    }
+
     // Deserialize children (recursive)
     if (e.contains("entities")) {
         for (const auto& entityFileName: e["entities"]) {

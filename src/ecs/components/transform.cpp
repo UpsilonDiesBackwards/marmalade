@@ -94,6 +94,10 @@ void Marmalade::ECS::Transform::Apply(Entity* entity) {
 
 }
 
+void Marmalade::ECS::Transform::Setup(Entity* entity) {
+    entity->UpdateModelMatrix();
+}
+
 nlohmann::json Marmalade::ECS::Transform::Serialize(const Entity* entity) {
     nlohmann::json j;
     j["pos"]["x"] = pos.x;

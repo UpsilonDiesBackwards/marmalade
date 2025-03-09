@@ -31,6 +31,7 @@ namespace Marmalade::ECS {
     public:
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
+        void Setup(Entity* entity) override;
 
         nlohmann::json Serialize(const Entity* entity) override;
         void Deserialize(nlohmann::json json, Entity* entity) override;

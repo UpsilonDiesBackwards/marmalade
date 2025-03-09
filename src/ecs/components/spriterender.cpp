@@ -108,6 +108,9 @@ void Marmalade::ECS::SpriteRender::Display(Entity* entity) {
 void Marmalade::ECS::SpriteRender::Apply(Entity* entity) {
 }
 
+void Marmalade::ECS::SpriteRender::Setup(Entity* entity) {
+}
+
 nlohmann::json Marmalade::ECS::SpriteRender::Serialize(const Entity* entity) {
     nlohmann::json j;
     j["path"] = entity->renderable.texSettings.filePath;
