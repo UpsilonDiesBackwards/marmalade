@@ -55,6 +55,8 @@ namespace Marmalade::GUI {
         FileType_UNKNOWN
     };
 
+    static const char* FileTypes[] = {"Image", "Video", "Script", "Code", "Text", "Unknown"};
+
     enum CommonDirectory {
         CommonDirectory_ASSETS,
         CommonDirectory_DATA,
@@ -70,10 +72,11 @@ namespace Marmalade::GUI {
     struct DirectoryEntry {
         std::filesystem::directory_entry Entry;
         CommonDirectory Type;
+        FileType FileType{FileType_UNKNOWN};
         std::string DisplayName;
         std::function<void(DirectoryEntry)> ClickFunc{nullptr};
 
-        DirectoryEntry(std::filesystem::directory_entry  entry, CommonDirectory type) : Entry(std::move(entry)), Type(type) {}
+        DirectoryEntry(std::filesystem::directory_entry entry, CommonDirectory type) : Entry(std::move(entry)), Type(type) {}
     };
 
     class ProjectBrowser : public Window {
@@ -120,6 +123,11 @@ namespace Marmalade::GUI {
         void iterateFiles(std::function<void(DirectoryEntry)> item_callback);
         FileType determineFileType(const std::filesystem::path& extension);
         void processItem(DirectoryEntry& item);
+
+        unsigned int getTextureId(const DirectoryEntry& item);
+        void handleItemDoubleClick(const DirectoryEntry& item);
+        void handleDrag(const DirectoryEntry& item, const unsigned int textureId);
+        void displayTooltip(const DirectoryEntry& item);
         ImU32 getBackgroundColor(CommonDirectory type);
 
         GLuint loadTexture(std::string filename);

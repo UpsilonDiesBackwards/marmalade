@@ -113,44 +113,14 @@ void Marmalade::GUI::ProjectBrowser::drawBottomBar() {
 void Marmalade::GUI::ProjectBrowser::drawItemTile(Marmalade::GUI::DirectoryEntry item) {
     const std::filesystem::path path = item.Entry.path();
 
-    GLuint textureId = item.Entry.is_directory() ? _textureCache["directory"] : _textureCache["document"];
-
-    const auto fileType = determineFileType(path.extension());
-    if (fileType == FileType_IMAGE) {
-        textureId = _textureCache[path.string()];
-    }
+    unsigned int textureId = getTextureId(item);
 
     ImGui::ImageButton(path.string().c_str(), textureId, ImVec2(_thumbnailSize, _thumbnailSize),
                        ImVec2(0, 1), ImVec2(1, 0));
 
-    if (!item.Entry.is_directory()) {
-        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-            projectItem = ProjectItem{fileType, path.string()};
-            ImGui::SetDragDropPayload("PROJECT_BROWSER_FILE", &projectItem, sizeof(ProjectItem));
-            ImGui::Image(textureId, ImVec2(_thumbnailSize, _thumbnailSize));
-            ImGui::EndDragDropSource();
-        }
-    }
-
-    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-        if (item.Entry.is_directory()) {
-            _texturesLoaded = "";
-            _currentPath /= path.filename();
-        } else {
-            if (item.ClickFunc != nullptr) {
-                item.ClickFunc(item);
-            }
-        }
-    }
-
-    if (ImGui::BeginItemTooltip()) {
-        if (!item.DisplayName.empty()) {
-            ImGui::Text("%s", item.DisplayName.c_str());
-        }
-        ImGui::Text("%s", item.Entry.path().filename().string().c_str());
-
-        ImGui::EndTooltip();
-    }
+    handleDrag(item, textureId);
+    handleItemDoubleClick(item);
+    displayTooltip(item);
 
     std::string label = path.filename().string();
     if (!item.DisplayName.empty()) {
@@ -170,14 +140,20 @@ void Marmalade::GUI::ProjectBrowser::drawItemList(Marmalade::GUI::DirectoryEntry
         label = item.DisplayName;
     }
 
+    unsigned int textureId = getTextureId(item);
+
     ImGui::TableNextColumn();
     bool isSelected = (_selectedRow == i);
     if (ImGui::Selectable(label.c_str(), isSelected, ImGuiSelectableFlags_SpanAllColumns)) {
         _selectedRow = (isSelected ? -1 : i);
     }
 
+    handleDrag(item, textureId);
+    handleItemDoubleClick(item);
+    displayTooltip(item);
+
     ImGui::TableNextColumn();
-    ImGui::Text("%s", item.Type == CommonDirectory_ASSETS ? "Asset" : "Other");
+    ImGui::Text("%s", FileTypes[item.FileType]);
 }
 
 void Marmalade::GUI::ProjectBrowser::iterateFiles(std::function<void(DirectoryEntry)> item_callback) {
@@ -255,6 +231,8 @@ GLuint Marmalade::GUI::ProjectBrowser::loadTexture(std::string filename) {
 void Marmalade::GUI::ProjectBrowser::processItem(Marmalade::GUI::DirectoryEntry& item) {
     std::filesystem::path ext = item.Entry.path().extension();
 
+    item.FileType = determineFileType(ext);
+
     if (ext == ".json" || ext == ".marm") {
         // Parse JSON
         std::ifstream i(item.Entry.path());
@@ -298,6 +276,50 @@ void Marmalade::GUI::ProjectBrowser::processItem(Marmalade::GUI::DirectoryEntry&
         item.ClickFunc = [](const Marmalade::GUI::DirectoryEntry& item) {
             Util::DisplayFile(item.Entry.path().string());
         };
+    }
+}
+
+unsigned int Marmalade::GUI::ProjectBrowser::getTextureId(const Marmalade::GUI::DirectoryEntry& item) {
+    GLuint textureId = item.Entry.is_directory() ? _textureCache["directory"] : _textureCache["document"];
+    if (item.FileType == FileType_IMAGE) {
+        textureId = _textureCache[item.Entry.path().string()];
+    }
+
+    return textureId;
+}
+
+void Marmalade::GUI::ProjectBrowser::handleItemDoubleClick(const Marmalade::GUI::DirectoryEntry& item) {
+    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+        if (item.Entry.is_directory()) {
+            _texturesLoaded = "";
+            _currentPath /= item.Entry.path().filename();
+        } else {
+            if (item.ClickFunc != nullptr) {
+                item.ClickFunc(item);
+            }
+        }
+    }
+}
+
+void Marmalade::GUI::ProjectBrowser::handleDrag(const Marmalade::GUI::DirectoryEntry& item, unsigned int textureId) {
+    if (!item.Entry.is_directory()) {
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+            projectItem = ProjectItem{item.FileType, item.Entry.path().string()};
+            ImGui::SetDragDropPayload("PROJECT_BROWSER_FILE", &projectItem, sizeof(ProjectItem));
+            ImGui::Image(textureId, ImVec2(_thumbnailSize, _thumbnailSize), ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::EndDragDropSource();
+        }
+    }
+}
+
+void Marmalade::GUI::ProjectBrowser::displayTooltip(const Marmalade::GUI::DirectoryEntry& item) {
+    if (ImGui::BeginItemTooltip()) {
+        if (!item.DisplayName.empty()) {
+            ImGui::Text("%s", item.DisplayName.c_str());
+        }
+        ImGui::Text("%s", item.Entry.path().filename().string().c_str());
+
+        ImGui::EndTooltip();
     }
 }
 
@@ -408,9 +430,10 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
     } else if (_displayMode == DisplayMode_LIST) {
         std::vector<GUI::Components::TableViewColumn> columns = {Components::TableViewColumn("Name"), Components::TableViewColumn("Type")};
 
-        continueDraw = ImGui::BeginTable("AssetListList", columns.size(), ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg);
+        continueDraw = ImGui::BeginTable("AssetListList", columns.size(), ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY);
 
         if (continueDraw) {
+            ImGui::TableSetupScrollFreeze(0, 1);
             for (const auto& col: columns) {
                 ImGui::TableSetupColumn(col.Name.c_str(), col.Flags, col.InitWidthOrWeight);
             }
