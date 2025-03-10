@@ -20,6 +20,7 @@
 #include "application/application.h"
 #include "application/config.h"
 #include "application/recents.h"
+#include "application/pluginloader.h"
 #include "gui/windowmanager.h"
 
 #include <iostream>
@@ -56,6 +57,9 @@ int main(int argc, char** argv) {
     Application& application = Application::GetInstance(1920, 1080, "Marmalade Engine");
     application.Initialise();
 
+    // Load plugins
+    Marmalade::PluginLoader::GetInstance().LoadPlugins();
+
     if (project != nullptr) {
         // Open specified project
         if (application.OpenProject(project)) {
@@ -67,6 +71,7 @@ int main(int argc, char** argv) {
         application.Run();
     }
 
+    Marmalade::PluginLoader::GetInstance().UnloadPlugins();
     application.Terminate();
     return 0;
 }

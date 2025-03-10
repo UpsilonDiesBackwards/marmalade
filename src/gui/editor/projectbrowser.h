@@ -72,7 +72,7 @@ namespace Marmalade::GUI {
     struct DirectoryEntry {
         std::filesystem::directory_entry Entry;
         CommonDirectory Type;
-        FileType FileType{FileType_UNKNOWN};
+        FileType FileCategory{FileType_UNKNOWN};
         std::string DisplayName;
         std::function<void(DirectoryEntry)> ClickFunc{nullptr};
 

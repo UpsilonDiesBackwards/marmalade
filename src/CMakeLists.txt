@@ -14,6 +14,8 @@ list(APPEND ENGINE_SRC
         application/recents.h
         application/util.cpp
         application/util.h
+        application/pluginloader.cpp
+        application/pluginloader.h
 
         graphics/viewport.cpp
         graphics/renderable.cpp

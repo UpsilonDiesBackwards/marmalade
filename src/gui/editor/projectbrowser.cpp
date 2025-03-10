@@ -153,7 +153,7 @@ void Marmalade::GUI::ProjectBrowser::drawItemList(Marmalade::GUI::DirectoryEntry
     displayTooltip(item);
 
     ImGui::TableNextColumn();
-    ImGui::Text("%s", FileTypes[item.FileType]);
+    ImGui::Text("%s", FileTypes[item.FileCategory]);
 }
 
 void Marmalade::GUI::ProjectBrowser::iterateFiles(std::function<void(DirectoryEntry)> item_callback) {
@@ -231,7 +231,7 @@ GLuint Marmalade::GUI::ProjectBrowser::loadTexture(std::string filename) {
 void Marmalade::GUI::ProjectBrowser::processItem(Marmalade::GUI::DirectoryEntry& item) {
     std::filesystem::path ext = item.Entry.path().extension();
 
-    item.FileType = determineFileType(ext);
+    item.FileCategory = determineFileType(ext);
 
     if (ext == ".json" || ext == ".marm") {
         // Parse JSON
@@ -281,7 +281,7 @@ void Marmalade::GUI::ProjectBrowser::processItem(Marmalade::GUI::DirectoryEntry&
 
 unsigned int Marmalade::GUI::ProjectBrowser::getTextureId(const Marmalade::GUI::DirectoryEntry& item) {
     GLuint textureId = item.Entry.is_directory() ? _textureCache["directory"] : _textureCache["document"];
-    if (item.FileType == FileType_IMAGE) {
+    if (item.FileCategory == FileType_IMAGE) {
         textureId = _textureCache[item.Entry.path().string()];
     }
 
@@ -304,7 +304,7 @@ void Marmalade::GUI::ProjectBrowser::handleItemDoubleClick(const Marmalade::GUI:
 void Marmalade::GUI::ProjectBrowser::handleDrag(const Marmalade::GUI::DirectoryEntry& item, unsigned int textureId) {
     if (!item.Entry.is_directory()) {
         if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-            projectItem = ProjectItem{item.FileType, item.Entry.path().string()};
+            projectItem = ProjectItem{item.FileCategory, item.Entry.path().string()};
             ImGui::SetDragDropPayload("PROJECT_BROWSER_FILE", &projectItem, sizeof(ProjectItem));
             ImGui::Image(textureId, ImVec2(_thumbnailSize, _thumbnailSize), ImVec2(0, 1), ImVec2(1, 0));
             ImGui::EndDragDropSource();
