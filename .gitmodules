@@ -32,3 +32,6 @@
 [submodule "vendor/imguizmo"]
 	path = vendor/imguizmo
 	url = https://github.com/CedricGuillemet/ImGuizmo.git
+[submodule "vendor/imgui_markdown"]
+	path = vendor/imgui_markdown
+	url = https://github.com/enkisoftware/imgui_markdown.git
