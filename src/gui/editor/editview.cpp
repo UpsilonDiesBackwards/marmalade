@@ -22,7 +22,7 @@
 #include "glad/glad.h"
 
 #include "../../application/application.h"
-#include "ecs/components/physics/colliderbase.h"
+#include "ecs/components/physics2d/colliderbase.h"
 
 #include "ImGuizmo.h"
 
@@ -166,7 +166,6 @@ void EditView::ShowGizmo() {
 
     ImGuizmo::SetOrthographic(true);
     ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
-
     ImGuizmo::SetRect(app.framebuffer->position.x, app.framebuffer->position.y,
                       app.framebuffer->width, app.framebuffer->height);
 
@@ -175,6 +174,9 @@ void EditView::ShowGizmo() {
                          currentGuizmoOperation, currentGuizmoMode,
                          glm::value_ptr(transform->modelMatrix));
 }
+
+
+
 
 void EditView::ShowColliderBounds() {
     auto comp = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::ColliderBase>();

@@ -18,9 +18,9 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ecs/components/physics/boxcollider.h"
+#include "ecs/components/physics2d/boxcollider.h"
 
-#include "ecs/components/physics/rigidbody.h"
+#include "ecs/components/physics2d/rigidbody.h"
 
 #include <imgui.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -31,24 +31,28 @@ void Marmalade::ECS::BoxCollider::Display(Entity* entity) {
     float rotation = entity->getRotation();
 
     if (rotation == 0.0f || rotation == 360.f) {
-        if (!std::holds_alternative<AABBData>(data)) {
-            OBBData prevData = std::get<OBBData>(data);
-            data = AABBData{prevData.size, prevData.offset};
+        if (!std::holds_alternative<AABBDataBox>(data)) {
+            OBBDataBox prevData = std::get<OBBDataBox>(data);
+            data = AABBDataBox{prevData.size, prevData.offset};
         }
-    } else if (!std::holds_alternative<OBBData>(data)) {
-        AABBData prevData = std::get<AABBData>(data);
+    } else if (!std::holds_alternative<OBBDataBox>(data)) {
+        AABBDataBox prevData = std::get<AABBDataBox>(data);
 
         glm::vec2 uX = glm::vec2(cos(rotation), sin(rotation));
         glm::vec2 uY = glm::vec2(-uX.y, uX.x);
 
 
-        data = OBBData{prevData.size, prevData.offset, rotation,
+        data = OBBDataBox{prevData.size, prevData.offset, rotation,
                        prevData.offset, {uX, uY}, prevData.size * 0.5f};
     }
 
     std::visit([&](auto &colliderData) {
-        ImGui::DragFloat2("Size", glm::value_ptr(colliderData.size), 0.1f);
-        ImGui::DragFloat2("Offset", glm::value_ptr(colliderData.offset), 0.1f);
+        using T = std::decay_t<decltype(colliderData)>;
+
+        if constexpr (std::is_same_v<T, AABBDataBox> || std::is_same_v<T, OBBDataBox>) {
+            ImGui::DragFloat2("Size", glm::value_ptr(colliderData.size), 0.1f);
+            ImGui::DragFloat2("Offset", glm::value_ptr(colliderData.offset), 0.1f);
+        }
     }, data);
 
     ImGui::Checkbox("Draw Bounds", &showingBounds);
@@ -60,13 +64,13 @@ void Marmalade::ECS::BoxCollider::Apply(Entity* entity) {
 
         if (!other->componentManager.GetComponentOfType<BoxCollider>()) { return; }
 
-        if (auto* obbData = std::get_if<OBBData>(&data)) {
-            OBBData prevData = std::get<OBBData>(data);
+        if (auto* obbData = std::get_if<OBBDataBox>(&data)) {
+            OBBDataBox prevData = std::get<OBBDataBox>(data);
 
             glm::vec2 uX = glm::vec2(cos(entity->getRotation()), -sin(entity->getRotation()));
             glm::vec2 uY = glm::vec2(sin(entity->getRotation()), cos(entity->getRotation()));
 
-            data = OBBData{prevData.size, prevData.offset, entity->getRotation(),
+            data = OBBDataBox{prevData.size, prevData.offset, entity->getRotation(),
                            CalculateOBBCentrePoint(entity->getPosition(), prevData.offset),
                            {uX, uY}, prevData.size * 0.5f};
         }
@@ -81,11 +85,13 @@ void Marmalade::ECS::BoxCollider::Setup(Entity* entity) {
 nlohmann::json Marmalade::ECS::BoxCollider::Serialize(const Entity* entity) {
     nlohmann::json j;
     std::visit([&](auto &colliderData) {
-        j["size"]["x"] = colliderData.size.x;
-        j["size"]["y"] = colliderData.size.y;
-
-        j["offset"]["x"] = colliderData.offset.x;
-        j["offset"]["y"] = colliderData.offset.y;
+        using T = std::decay_t<decltype(colliderData)>;
+        if constexpr (std::is_same_v<T, AABBDataBox> || std::is_same_v<T, OBBDataBox>) {
+            j["size"]["x"] = colliderData.size.x;
+            j["size"]["y"] = colliderData.size.y;
+            j["offset"]["x"] = colliderData.offset.x;
+            j["offset"]["y"] = colliderData.offset.y;
+        }
     }, data);
 
     return j;
@@ -93,11 +99,13 @@ nlohmann::json Marmalade::ECS::BoxCollider::Serialize(const Entity* entity) {
 
 void Marmalade::ECS::BoxCollider::Deserialize(nlohmann::json json, Entity* entity) {
     std::visit([&](auto &colliderData) {
-        colliderData.size.x = json["size"]["x"].get<float>();
-        colliderData.size.y = json["size"]["y"].get<float>();
-
-        colliderData.offset.x = json["offset"]["x"].get<float>();
-        colliderData.offset.y = json["offset"]["y"].get<float>();
+        using T = std::decay_t<decltype(colliderData)>;
+        if constexpr (std::is_same_v<T, AABBDataBox> || std::is_same_v<T, OBBDataBox>) {
+            colliderData.size.x = json["size"]["x"].get<float>();
+            colliderData.size.y = json["size"]["y"].get<float>();
+            colliderData.offset.x = json["offset"]["x"].get<float>();
+            colliderData.offset.y = json["offset"]["y"].get<float>();
+        }
     }, data);
 }
 
@@ -107,11 +115,11 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
     glm::vec2 posA = self->getPosition();
     glm::vec2 posB = other->getPosition();
 
-    auto* aabbA = GetCollisionData<AABBData>();
-    auto* aabbB = other->componentManager.GetComponentOfType<BoxCollider>()->GetCollisionData<AABBData>();
+    auto* aabbA = GetCollisionData<AABBDataBox>();
+    auto* aabbB = other->componentManager.GetComponentOfType<BoxCollider>()->GetCollisionData<AABBDataBox>();
 
-    auto* obbA = GetCollisionData<OBBData>();
-    auto* obbB = other->componentManager.GetComponentOfType<BoxCollider>()->GetCollisionData<OBBData>();
+    auto* obbA = GetCollisionData<OBBDataBox>();
+    auto* obbB = other->componentManager.GetComponentOfType<BoxCollider>()->GetCollisionData<OBBDataBox>();
 
     if (aabbA && aabbB) {
         if (IntersectsAABB(*other->componentManager.GetComponentOfType<ColliderBase>(), posA, posB)) {
@@ -132,8 +140,8 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
 }
 
 bool Marmalade::ECS::BoxCollider::IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
-    auto* aabbA = GetCollisionData<AABBData>();
-    auto* aabbB = std::get_if<AABBData>(&other.data);
+    auto* aabbA = GetCollisionData<AABBDataBox>();
+    auto* aabbB = std::get_if<AABBDataBox>(&other.data);
 
     if (!aabbA || !aabbB) return false;
 
@@ -148,8 +156,8 @@ bool Marmalade::ECS::BoxCollider::IntersectsAABB(const ColliderBase& other, cons
 }
 
 bool Marmalade::ECS::BoxCollider::IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
-    auto* obbA = GetCollisionData<OBBData>();
-    auto* obbB = std::get_if<OBBData>(&other.data);
+    auto* obbA = GetCollisionData<OBBDataBox>();
+    auto* obbB = std::get_if<OBBDataBox>(&other.data);
 
     if (!obbA || !obbB) return false;
 
@@ -190,7 +198,7 @@ bool Marmalade::ECS::BoxCollider::IntersectsOBB(const ColliderBase& other, const
 }
 
 void Marmalade::ECS::BoxCollider::ShowBounds(const glm::vec2& entityPosition, Transform transform) {
-    if (auto* aabbData = std::get_if<AABBData>(&data)) {
+    if (auto* aabbData = std::get_if<AABBDataBox>(&data)) {
         glm::vec2 min = entityPosition + aabbData->offset;
         glm::vec2 max = min + aabbData->size;
 
@@ -201,7 +209,7 @@ void Marmalade::ECS::BoxCollider::ShowBounds(const glm::vec2& entityPosition, Tr
                 screenMin, screenMax,
                 ImGui::GetColorU32(IM_COL32(255, 255, 255, 255)), 0.0f, 0.0f, 2.0f
         );
-    } else if (auto* obbData = std::get_if<OBBData>(&data)) {
+    } else if (auto* obbData = std::get_if<OBBDataBox>(&data)) {
         obbData->c = entityPosition + obbData->offset;
 
         float theta = glm::radians(transform.rotation);

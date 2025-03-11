@@ -18,7 +18,7 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ecs/components/physics/rigidbody.h"
+#include "ecs/components/physics2d/rigidbody.h"
 
 #include <imgui.h>
 
@@ -26,14 +26,14 @@ void Marmalade::ECS::RigidBody::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
 
     ImGui::Checkbox("Static", &isStatic);
-    ImGui::DragFloat2("Velocity", &velocity.x, 0.1f);
-    ImGui::DragFloat("Gravity", &gravity, 0.1f);
-    ImGui::DragFloat("Mass", &mass, 0.1f);
+    ImGui::DragFloat2("Velocity", &body.velocity.x, 0.1f);
+    ImGui::DragFloat("Gravity", &body.gravity, 0.1f);
+    ImGui::DragFloat("Mass", &body.mass, 0.1f);
 }
 
 void Marmalade::ECS::RigidBody::Apply(Entity* entity) {
     if (isStatic) {
-        velocity *= 0.0f;
+        body.velocity *= 0.0f;
         return;
     }
 
@@ -53,28 +53,28 @@ void Marmalade::ECS::RigidBody::Setup(Entity* entity) {
 nlohmann::json Marmalade::ECS::RigidBody::Serialize(const Entity* entity) {
     nlohmann::json j;
     j["static"] = isStatic;
-    j["velocity"]["x"] = velocity.x;
-    j["velocity"]["y"] = velocity.y;
-    j["gravity"] = gravity;
-    j["mass"] = mass;
+    j["velocity"]["x"] = body.velocity.x;
+    j["velocity"]["y"] = body.velocity.y;
+    j["gravity"] = body.gravity;
+    j["mass"] = body.mass;
 
     return j;
 }
 
 void Marmalade::ECS::RigidBody::Deserialize(nlohmann::json json, Entity* entity) {
     isStatic = json["static"].get<bool>();
-    velocity.x = json["velocity"]["x"].get<float>();
-    velocity.y = json["velocity"]["y"].get<float>();
-    gravity = json["gravity"].get<float>();
-    mass = json["mass"].get<float>();
+    body.velocity.x = json["velocity"]["x"].get<float>();
+    body.velocity.y = json["velocity"]["y"].get<float>();
+    body.gravity = json["gravity"].get<float>();
+    body.mass = json["mass"].get<float>();
 }
 
 void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float time) {
-    if (glm::length(velocity) < 0.01f) {
-        velocity = glm::vec2(0.0f);
+    if (glm::length(body.velocity) < 0.01f) {
+        body.velocity = glm::vec2(0.0f);
     }
 
-    velocity.y += gravity * time;
+    body.velocity.y += body.gravity * time;
 
     // Collision queue
     while (!collisionQueue.empty()) {
@@ -84,11 +84,11 @@ void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float time) {
         Collide(event.self, event.other, event.normal);
 
         if (event.normal.y < 0 && event.other->componentManager.GetComponentOfType<RigidBody>()->isStatic) {
-            velocity.y = 0;
+            body.velocity.y = 0;
         }
     }
 
-    momentum = mass * velocity;
+    momentum = body.mass * body.velocity;
 
     glm::vec2 newPos = entity->getPosition() + momentum * time;
     entity->setPosition(newPos);
@@ -116,16 +116,16 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::
 
     glm::vec2 selfSize, otherSize;
 
-    if (std::holds_alternative<AABBData>(selfCollider->data)) {
-        selfSize = std::get<AABBData>(selfCollider->data).size;
-    } else if (std::holds_alternative<OBBData>(selfCollider->data)) {
-        selfSize = std::get<OBBData>(selfCollider->data).size;
+    if (std::holds_alternative<AABBDataBox>(selfCollider->data)) {
+        selfSize = std::get<AABBDataBox>(selfCollider->data).size;
+    } else if (std::holds_alternative<OBBDataBox>(selfCollider->data)) {
+        selfSize = std::get<OBBDataBox>(selfCollider->data).size;
     }
 
-    if (std::holds_alternative<AABBData>(otherCollider->data)) {
-        otherSize = std::get<AABBData>(otherCollider->data).size;
-    } else if (std::holds_alternative<OBBData>(otherCollider->data)) {
-        otherSize = std::get<OBBData>(otherCollider->data).size;
+    if (std::holds_alternative<AABBDataBox>(otherCollider->data)) {
+        otherSize = std::get<AABBDataBox>(otherCollider->data).size;
+    } else if (std::holds_alternative<OBBDataBox>(otherCollider->data)) {
+        otherSize = std::get<OBBDataBox>(otherCollider->data).size;
     }
 
     glm::vec2 overlapDist = self->getPosition() - other->getPosition();
@@ -136,12 +136,12 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::
     self->setPosition(self->getPosition() + correction);
 
     if (!otherRigidBody || otherRigidBody->isStatic) {
-        velocity -= glm::dot(velocity, normal) * normal;
+        body.velocity -= glm::dot(body.velocity, normal) * normal;
         return;
     }
 
-    glm::vec2 combinedVelocities = velocity - otherRigidBody->velocity;
-    float impulse = 2.0f * glm::dot(combinedVelocities, normal) / (mass + otherRigidBody->mass);
+    glm::vec2 combinedVelocities = body.velocity - otherRigidBody->body.velocity;
+    float impulse = 2.0f * glm::dot(combinedVelocities, normal) / (body.mass + otherRigidBody->body.mass);
     glm::vec2 vectorImpulse = normal * impulse;
 
     ApplyImpulse(vectorImpulse);
@@ -150,7 +150,7 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::
 
 
 void Marmalade::ECS::RigidBody::ApplyImpulse(glm::vec2 impulse) {
-    if (mass == 0 || isStatic) return;
+    if (body.mass == 0 || isStatic) return;
 
-    velocity += impulse / mass;
+    body.velocity += impulse / body.mass;
 }

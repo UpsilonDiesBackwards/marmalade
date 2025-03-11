@@ -18,9 +18,12 @@ list(APPEND ENGINE_API
         ecs/componentmanager.h
         ecs/components/transform.h
         ecs/components/spriterender.h
-        ecs/components/physics/rigidbody.h
-        ecs/components/physics/boxcollider.h
-        ecs/components/physics/colliderbase.h
+
+        ecs/components/physics2d/rigidbody.h
+        ecs/components/physics2d/colliderbase.h
+        ecs/components/physics2d/colliderdata.h
+        ecs/components/physics2d/boxcollider.h
+        ecs/components/physics2d/circlecollider.h
 
         engineapi.h
         plugin.h
