@@ -140,6 +140,7 @@ add_executable(marmalade
         ${IMGUI_SRC}
         ${IMGUIZMO_SRC}
         vendor/imguifiledialog/ImGuiFileDialog.cpp
+        vendor/imgui_markdown/imgui_markdown.h
 )
 
 add_subdirectory(include)
@@ -171,6 +172,7 @@ target_include_directories(marmalade PRIVATE
         vendor/glfw-3.4/include
         vendor/imgui
         vendor/imguifiledialog
+        vendor/imgui_markdown
         vendor/imguizmo
         vendor/glm/glm
         ${LUA_INCLUDE_DIR}
