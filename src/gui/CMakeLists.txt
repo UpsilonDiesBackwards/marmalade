@@ -3,6 +3,8 @@ list(APPEND ENGINE_SRC_GUI
         components/util.h
         components/tableview.h
         components/selectablelistview.h
+        components/markdownparser.cpp
+        components/markdownparser.h
 
         dialogs/about.cpp
         dialogs/about.h

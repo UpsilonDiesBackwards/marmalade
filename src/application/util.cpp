@@ -76,13 +76,16 @@ void Marmalade::Util::OpenLink(const std::string& link) {
     DisplayFile(link);
 }
 
-GLuint Marmalade::Util::LoadGuiTexture(std::string path) {
-    int width, height, channels;
-    unsigned char* data = ::stbi_load(path.c_str(), &width, &height, &channels, 4);
+GLuint Marmalade::Util::LoadGuiTexture(std::string path, int* width, int* height) {
+    int imgWidth, imgHeight, channels;
+    unsigned char* data = ::stbi_load(path.c_str(), &imgWidth, &imgHeight, &channels, 4);
     if (!data) {
         spdlog::error("Failed to load texture: {}", path);
         return 0;
     }
+
+    if (width != nullptr) *width = imgWidth;
+    if (height != nullptr) *height = imgHeight;
 
     GLuint textureID;
     glGenTextures(1, &textureID);
@@ -93,7 +96,7 @@ GLuint Marmalade::Util::LoadGuiTexture(std::string path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     stbi_image_free(data);

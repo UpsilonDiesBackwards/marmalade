@@ -41,6 +41,7 @@ namespace Marmalade::GUI {
         std::string Repo{};
         std::vector<std::string> Authors{};
         std::vector<std::string> Keywords{};
+        std::filesystem::path LocalPath{};
         bool Selected{false};
 
         void SetSelected(bool selected) {
@@ -52,7 +53,7 @@ namespace Marmalade::GUI {
         }
 
         Package() = default;
-        Package(std::string name, std::string repo, std::vector<std::string> authors, const std::vector<std::string>& keywords) : Name(std::move(name)), Repo(std::move(repo)), Authors(std::move(authors)), Keywords(keywords) {}
+        Package(std::string name, std::string repo, std::vector<std::string> authors, const std::vector<std::string>& keywords, std::filesystem::path localPath) : Name(std::move(name)), Repo(std::move(repo)), Authors(std::move(authors)), Keywords(keywords), LocalPath(std::move(localPath)) {}
     };
 
     class PackageManagerListView : public Components::SelectableListView<Package> {
@@ -118,6 +119,9 @@ namespace Marmalade::GUI {
         std::unordered_map<std::string, std::vector<const Package*>> _keywordIndex{};
 
         std::vector<Package> _allPackages{};
+
+        // For link confirmation
+        std::string _currentUrl{};
 
         void drawLeftPane(PackageManagerTab tab);
         void drawRightPane(PackageManagerTab tab);

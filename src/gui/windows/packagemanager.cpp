@@ -19,10 +19,14 @@
 
 #include "packagemanager.h"
 
+#include "../../application/util.h"
+#include "../components/markdownparser.h"
+
 #include <sstream>
 #include <thread>
 #include <filesystem>
 #include <fstream>
+#include <utility>
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -217,7 +221,58 @@ void PackageManager::drawLeftPane(PackageManagerTab tab) {
 }
 
 void PackageManager::drawRightPane(PackageManagerTab tab) {
-    ImGui::Text("Package details");
+    auto selectedItem = _listView.GetHighlightedItem();
+    if (selectedItem == nullptr) {
+        ImGui::Text("No selected package");
+    } else {
+        if (selectedItem->IsSelected()) {
+            if (ImGui::Button("Unmark")) {
+                selectedItem->SetSelected(false);
+            }
+        } else {
+            if (ImGui::Button("Mark to Install")) {
+                selectedItem->SetSelected(true);
+            }
+        }
+
+        ImGui::Text("%s", selectedItem->Name.c_str());
+
+        auto readmePath = selectedItem->LocalPath / "README.md";
+        if (std::filesystem::exists(readmePath)) {
+            std::ifstream readmeFile(readmePath);
+            std::stringstream buffer;
+            buffer << readmeFile.rdbuf();
+
+            auto& currentUrl = _currentUrl;
+
+            Components::MarkdownParser mdParser(buffer.str(), Components::MarkdownParserOptions{
+                                                                      .BaseDir = selectedItem->LocalPath,
+                                                                      .ImgMaxWidth = 200,
+                                                                      .ImgMaxHeight = 500,
+                                                                      .LinkCallback = [&currentUrl](std::string url) {
+                                                                          currentUrl = std::move(url);
+                                                                          ImGui::OpenPopup("Open Link?##PackageManagerOpenLink");
+                                                                      }});
+            mdParser.Render();
+        } else {
+            ImGui::Text("No README provided");
+        }
+    }
+
+    if (ImGui::BeginPopupModal("Open Link?##PackageManagerOpenLink", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Text("Open this link?");
+        ImGui::Text("%s", _currentUrl.c_str());
+
+        if (ImGui::Button("Yes")) {
+            Marmalade::Util::OpenLink(_currentUrl);
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("No")) ImGui::CloseCurrentPopup();
+
+        ImGui::EndPopup();
+    }
 }
 
 void PackageManager::drawSplit(PackageManagerTab tab, float bottom_bar_height) {
@@ -476,7 +531,7 @@ void PackageManager::buildIndex(const Repository& config_repo) {
             if (!std::filesystem::is_directory(packageDir)) continue;
             spdlog::debug("Found package: {}", packageDir.path().filename().string());
 
-            std::filesystem::path packageJsonPath = packageDir.path() / "package.json";
+            std::filesystem::path packageJsonPath = packageDir.path() / "info.json";
             if (!std::filesystem::exists(packageJsonPath)) continue;
 
             try {
@@ -488,7 +543,7 @@ void PackageManager::buildIndex(const Repository& config_repo) {
                     std::string packageName = packageData["name"];
                 }
 
-                Package package{packageData["name"], config_repo.name, packageData["authors"], packageData["keywords"]};
+                Package package{packageData["name"], config_repo.name, packageData["authors"], packageData["keywords"], packageDir.path()};
 
                 _packagesByName[package.Name] = package;
                 for (const std::string& keyword: package.Keywords) {
@@ -513,7 +568,7 @@ void PackageManager::buildIndex(const Repository& config_repo) {
     }();
 
     _allPackages.clear();
-    for (auto &package : _packagesByName) {
+    for (auto& package: _packagesByName) {
         _allPackages.push_back(package.second);
     }
 

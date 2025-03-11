@@ -35,7 +35,7 @@ namespace Marmalade {
 
         static void OpenLink(const std::string& link);
 
-        static GLuint LoadGuiTexture(std::string path);
+        static GLuint LoadGuiTexture(std::string path, int* width = nullptr, int* height = nullptr);
     };
 }
 
