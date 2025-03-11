@@ -19,8 +19,8 @@
 
 #include <scene/entity.h>
 
-#include "ecs/components/physics/boxcollider.h"
-#include "ecs/components/physics/rigidbody.h"
+#include "ecs/components/physics2d/boxcollider.h"
+#include "ecs/components/physics2d/rigidbody.h"
 
 #include "../application/util.h"
 
@@ -42,7 +42,7 @@ Entity::Entity(const std::string& name, const std::string& uuid, EntityFlags fla
 
         // Temporary
         componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Sprite Render", Marmalade::Util::GenerateUUIDv4()));
-        componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("BoxCollider", Marmalade::Util::GenerateUUIDv4()));
+//        componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("BoxCollider", Marmalade::Util::GenerateUUIDv4()));
         componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Rigidbody", Marmalade::Util::GenerateUUIDv4()));
     }
 

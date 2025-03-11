@@ -38,6 +38,14 @@ namespace Marmalade::ECS {
      * ....if it's not already attached?
      * */
 
+    struct Body {
+
+        glm::vec2 velocity = {0.0f, 0.0f};
+        float mass = 1.0f;
+        float gravity = -9.81f;
+        float elasticity = 0.0f;
+    };
+
     struct CollisionEvent {
         Entity* self;
         Entity* other = nullptr;
@@ -49,9 +57,9 @@ namespace Marmalade::ECS {
         std::queue<CollisionEvent> collisionQueue;
 
         bool isStatic = true;
-        glm::vec2 velocity = {0.0f, 0.0f};
-        float mass = 1.0f;
-        float gravity = -9.81f;
+
+        // Perhaps make this a struct?
+        Body body;
 
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
@@ -68,7 +76,6 @@ namespace Marmalade::ECS {
 
         RigidBody() {
             name = "Rigidbody";
-            dependencies = {"BoxCollider"};
         }
     private:
         // Accumulator for phys updates

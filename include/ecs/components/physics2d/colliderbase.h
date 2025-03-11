@@ -25,32 +25,17 @@
 
 #include "../../../../src/application/application.h"
 
+#include "colliderdata.h"
+
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
 #include <variant>
 
 namespace Marmalade::ECS {
-    struct AABBData {
-        glm::vec2 size;
-        glm::vec2 offset;
-    };
-
-    struct OBBData {
-        glm::vec2 size;
-        glm::vec2 offset;
-
-        float rotation;
-
-        glm::vec2 c; // Centre point;
-
-        glm::vec2 u[2]; // Local x, y axes
-        glm::vec2 e; // Half-width
-    };
-
     class ColliderBase : public Component {
     public:
-        std::variant<AABBData, OBBData> data;
+        std::variant<AABBDataBox, OBBDataBox, AABBDataCircle> data;
 
         bool showingBounds{false};
 
