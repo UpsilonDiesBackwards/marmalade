@@ -90,6 +90,11 @@ void Marmalade::GUI::Components::MarkdownParser::linkCallback(ImGui::MarkdownLin
     auto* options = static_cast<MarkdownParserOptions*>(data.userData);
     auto url = std::string(data.link).substr(0, data.linkLength);
 
+    if (data.isImage) {
+        // Images need a full path
+        url = (options->BaseDir / url).string();
+    }
+
     if (options->LinkCallback != nullptr) {
         options->LinkCallback(url);
     } else {
