@@ -25,6 +25,7 @@
 #include "recents.h"
 #include "util.h"
 #include "../project/projectmanager.h"
+#include "../gui/fontmanager.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>// Only for docking API
@@ -109,17 +110,8 @@ void Application::Initialise() {
     if (Marmalade::Config::engineConfig.viewports) {
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     }
-    ImFont* font = io.Fonts->AddFontFromFileTTF("res/fonts/Cabin/static/Cabin-Regular.ttf", 16);
 
-    static const ImWchar icons_ranges[] = {ICON_MIN_CI, ICON_MAX_16_CI, 0};
-
-    ImFontConfig icons_config;
-    icons_config.MergeMode = true;
-    icons_config.PixelSnapH = true;
-    float font_size = 16.0f;
-    icons_config.GlyphMinAdvanceX = font_size;
-    icons_config.GlyphOffset.y = 3.0f;
-    io.Fonts->AddFontFromFileTTF("res/fonts/codicon.ttf", font_size, &icons_config, icons_ranges);
+    Marmalade::GUI::FontManager::GetInstance().InitFonts();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);

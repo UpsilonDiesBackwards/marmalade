@@ -49,6 +49,8 @@ namespace Marmalade {
         std::string themeFile{"editorstyle.txt"};
         bool showWelcomeScreen{true};
         long long backgroundColor = 8589934591;
+        float scaleFactor{1.0f};
+        bool useSystemScaleFactor{true};
 
         spdlog::level::level_enum logLevel{spdlog::level::info};
 
@@ -84,7 +86,7 @@ namespace Marmalade {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::ProjectBrowserConfig, colorAssets, colorData, colorSrc);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, version, viewports, themeFile, showWelcomeScreen, backgroundColor, logLevel, defaultProjectPath, repos, projectBrowser);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, version, viewports, themeFile, showWelcomeScreen, backgroundColor, scaleFactor, useSystemScaleFactor, logLevel, defaultProjectPath, repos, projectBrowser);
 }
 
 #endif

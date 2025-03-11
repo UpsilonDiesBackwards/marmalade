@@ -60,6 +60,17 @@ void Marmalade::GUI::Preferences::drawGeneralAppearancePane() {
     if (ImGui::ColorEdit4("Background Color", &backgroundCol.x)) {
         Config::engineConfig.backgroundColor = ImGui::ColorConvertFloat4ToU32(backgroundCol);
     }
+
+    ImGui::BeginDisabled(Config::engineConfig.useSystemScaleFactor);
+    ImGui::SetNextItemWidth(150.0f);
+    ImGui::DragFloat("Scale Factor", &Config::engineConfig.scaleFactor, 0.1f, 0.0f, 5.0f);
+    ImGui::EndDisabled();
+
+    ImGui::SameLine();
+    ImGui::Checkbox("Use System", &Config::engineConfig.useSystemScaleFactor);
+
+    ImGui::SameLine();
+    requiresRestartWarning();
 }
 
 void Marmalade::GUI::Preferences::drawGeneralProjectsPane() {
