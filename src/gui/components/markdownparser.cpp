@@ -20,14 +20,50 @@
 #include "markdownparser.h"
 
 #include "../../application/util.h"
+#include "../fontmanager.h"
 
 void Marmalade::GUI::Components::MarkdownParser::Render() {
     ImGui::MarkdownConfig config{
             .linkCallback = &linkCallback,
             .imageCallback = &imageCallback,
-            .userData = &_options};
+            .userData = &_options,
+            .formatCallback = &formatCallback};
 
     ImGui::Markdown(_markdown.c_str(), _markdown.length(), config);
+}
+
+void Marmalade::GUI::Components::MarkdownParser::formatCallback(const ImGui::MarkdownFormatInfo& info, bool start) {
+    ImGui::defaultMarkdownFormatCallback(info, start);
+
+    switch (info.type) {
+        case ImGui::MarkdownFormatType::HEADING: {
+            switch (info.level) {
+                case 1:
+                    if (start) {
+                        ImGui::PushFont(Marmalade::GUI::FontManager::GetInstance().fontTitle);
+                    } else {
+                        ImGui::PopFont();
+                    }
+                    break;
+                case 2:
+                    if (start) {
+                        ImGui::PushFont(Marmalade::GUI::FontManager::GetInstance().fontHeading);
+                    } else {
+                        ImGui::PopFont();
+                    }
+                    break;
+                case 3:
+                    if (start) {
+                        ImGui::PushFont(Marmalade::GUI::FontManager::GetInstance().fontSubheading);
+                    } else {
+                        ImGui::PopFont();
+                    }
+                    break;
+            }
+        }
+        default:
+            break;
+    }
 }
 
 ImGui::MarkdownImageData Marmalade::GUI::Components::MarkdownParser::imageCallback(ImGui::MarkdownLinkCallbackData data) {

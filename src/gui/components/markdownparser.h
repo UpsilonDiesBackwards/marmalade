@@ -47,6 +47,7 @@ namespace Marmalade::GUI::Components {
         std::string _markdown;
         MarkdownParserOptions _options;
 
+        static void formatCallback(const ImGui::MarkdownFormatInfo& info, bool start);
         static ImGui::MarkdownImageData imageCallback(ImGui::MarkdownLinkCallbackData data);
         static void linkCallback(ImGui::MarkdownLinkCallbackData data);
 
