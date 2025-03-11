@@ -67,6 +67,7 @@ void SceneHierarchy::Show() {
 
     if (_selected.lock() && ImGui::IsKeyPressed(ImGuiKey_Escape)) { // If entity is selected AND escaped is pressed...
         _selected.reset(); // ...then deselect the current entity
+        DeselectEntity();
     }
 
     ImGui::End();
