@@ -202,32 +202,6 @@ Marmalade::GUI::FileType Marmalade::GUI::ProjectBrowser::determineFileType(const
     return FileType_UNKNOWN;
 }
 
-GLuint Marmalade::GUI::ProjectBrowser::loadTexture(std::string filename) {
-    int width, height, channels;
-    unsigned char* data = ::stbi_load(filename.c_str(), &width, &height, &channels, 4);
-    if (!data) {
-        spdlog::error("Failed to load texture: {}", filename);
-        return 0;
-    }
-
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    stbi_image_free(data);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return textureID;
-}
-
 void Marmalade::GUI::ProjectBrowser::processItem(Marmalade::GUI::DirectoryEntry& item) {
     std::filesystem::path ext = item.Entry.path().extension();
 
@@ -345,8 +319,8 @@ void Marmalade::GUI::ProjectBrowser::loadTextures() {
 
     _textureCache.clear();
 
-    _textureCache["directory"] = loadTexture("res/icons/ui/directory.png");
-    _textureCache["document"] = loadTexture("res/icons/ui/document.png");
+    _textureCache["directory"] = Util::LoadGuiTexture("res/icons/ui/directory.png");
+    _textureCache["document"] = Util::LoadGuiTexture("res/icons/ui/document.png");
 
     auto* project = Application::GetInstance().GetCurrentProject();
 
@@ -354,7 +328,7 @@ void Marmalade::GUI::ProjectBrowser::loadTextures() {
         if (item.Entry.is_directory()) return;
 
         if (determineFileType(item.Entry.path().extension()) == FileType_IMAGE) {
-            GLuint textureId = loadTexture(item.Entry.path().string());
+            GLuint textureId = Util::LoadGuiTexture(item.Entry.path().string());
             if (textureId != 0) {
                 _textureCache[item.Entry.path().string()] = textureId;
             }

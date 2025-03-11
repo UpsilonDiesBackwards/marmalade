@@ -20,6 +20,8 @@
 #ifndef MARMALADE_UTIL_H
 #define MARMALADE_UTIL_H
 
+#include <glad/glad.h>
+
 #include <string>
 
 namespace Marmalade {
@@ -30,6 +32,10 @@ namespace Marmalade {
         static std::string StringToLower(std::string str);
 
         static void DisplayFile(const std::string& path);
+
+        static void OpenLink(const std::string& link);
+
+        static GLuint LoadGuiTexture(std::string path);
     };
 }
 

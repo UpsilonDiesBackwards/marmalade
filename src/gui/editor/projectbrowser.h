@@ -130,7 +130,6 @@ namespace Marmalade::GUI {
         void displayTooltip(const DirectoryEntry& item);
         ImU32 getBackgroundColor(CommonDirectory type);
 
-        GLuint loadTexture(std::string filename);
         void loadTextures();
     };
 }

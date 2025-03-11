@@ -77,6 +77,14 @@ namespace Marmalade::GUI::Components {
             _listViewArea = listViewArea;
         }
 
+        T* GetHighlightedItem() {
+            if (_highlightedItem == -1 || _highlightedItem > items.size()) {
+                return nullptr;
+            }
+
+            return &items[_highlightedItem];
+        }
+
         /**
          * @brief Renders the list view UI in ImGui.
          *
@@ -97,10 +105,11 @@ namespace Marmalade::GUI::Components {
         virtual void RenderItem(const T& item, bool selected) = 0;
 
     private:
-        std::string _listViewId;  ///< Unique identifier for the list view.
-        ImVec2 _listViewArea;     ///< Size of the list view in ImGui.
+        std::string _listViewId;///< Unique identifier for the list view.
+        ImVec2 _listViewArea;   ///< Size of the list view in ImGui.
 
-        bool _globalDirty{false}; ///< Tracks if any items have changed selection state.
+        bool _globalDirty{false};///< Tracks if any items have changed selection state.
+        int _highlightedItem{-1};///< Stores the item which has been highlighted, not necessarily selected
     };
 
     /**
@@ -124,12 +133,23 @@ namespace Marmalade::GUI::Components {
                 bool selected = item.IsSelected();
                 bool temp = selected;
                 bool dirty = false;
+                ImVec2 start = ImGui::GetCursorScreenPos();
 
                 if (ImGui::Checkbox("", &temp)) {
                     dirty = true;
                 }
 
                 RenderItem(item, selected);
+
+                ImVec2 end = ImVec2(start.x + _listViewArea.x, ImGui::GetCursorScreenPos().y);
+
+                if (ImGui::IsMouseClicked(0) && ImGui::IsMouseHoveringRect(start, end)) {
+                    _highlightedItem = i;
+                }
+
+                if (_highlightedItem == i) {
+                    // TODO: Draw rect behind item
+                }
 
                 if (dirty) {
                     item.SetSelected(temp);

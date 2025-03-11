@@ -19,15 +19,19 @@
 
 #include "util.h"
 
+#include <stb/stb_image.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+#include <spdlog/spdlog.h>
+
 #include <iostream>
 #include <random>
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
-
-#ifdef _WIN32
-#include <Windows.h>
-#endif
 
 std::string Marmalade::Util::GenerateUUIDv4() {
     std::random_device rd;
@@ -66,4 +70,34 @@ void Marmalade::Util::DisplayFile(const std::string& path) {
     std::string command = "xdg-open " + path + " &";
     std::system(command.c_str());
 #endif
+}
+
+void Marmalade::Util::OpenLink(const std::string& link) {
+    DisplayFile(link);
+}
+
+GLuint Marmalade::Util::LoadGuiTexture(std::string path) {
+    int width, height, channels;
+    unsigned char* data = ::stbi_load(path.c_str(), &width, &height, &channels, 4);
+    if (!data) {
+        spdlog::error("Failed to load texture: {}", path);
+        return 0;
+    }
+
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    stbi_image_free(data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    return textureID;
 }
