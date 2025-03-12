@@ -76,11 +76,14 @@ namespace Marmalade::ECS {
 
         RigidBody() {
             name = "Rigidbody";
+            name = "Rigid Body";
+            categories = {"Physics"};
         }
+
     private:
         // Accumulator for phys updates
         float _accumulator = 0.0f;
-        const float fixedTimeStep = 1.0f / 60.0f; // Target is 60 updates per second
+        const float fixedTimeStep = 1.0f / 60.0f;// Target is 60 updates per second
 
         glm::vec2 momentum;
     };

@@ -40,10 +40,11 @@ namespace Marmalade::ECS {
         bool allowMultiple{false};
 
         std::vector<std::string> dependencies{};
+        std::vector<std::string> categories{};
 
         virtual void Display(Entity* entity) = 0;
         virtual void Apply(Entity* entity) = 0;
-        virtual void Setup(Entity *entity) = 0;
+        virtual void Setup(Entity* entity) = 0;
 
         virtual nlohmann::json Serialize(const Entity* entity) = 0;
         virtual void Deserialize(nlohmann::json json, Entity* entity) = 0;
@@ -69,6 +70,13 @@ namespace Marmalade::ECS {
         }
     };
 
+    struct RegisteredComponent {
+        std::string Name;
+        std::unique_ptr<IComponentFactory> Factory;
+        std::vector<std::string> Dependencies{};
+        std::vector<std::string> Categories{};
+    };
+
     class ComponentRegistry {
     public:
         static ComponentRegistry& Instance() {
@@ -77,32 +85,49 @@ namespace Marmalade::ECS {
         }
 
         template<typename T>
-        void RegisterComponent(const std::string& name) {
-            _registry[name] = std::make_unique<ComponentFactory<T>>();
+        void RegisterComponent(const std::string& name, const std::vector<std::string> dependencies, const std::vector<std::string> categories) {
+            _registry[name] = RegisteredComponent{
+                    .Name = name,
+                    .Factory = std::make_unique<ComponentFactory<T>>(),
+                    .Dependencies = std::move(dependencies),
+                    .Categories = std::move(categories)};
         }
 
         [[nodiscard]] std::unique_ptr<Component> CreateComponent(const std::string& name, const std::string& uuid) {
             auto it = _registry.find(name);
             if (it != _registry.end()) {
-                return it->second->Create(uuid);
+                return it->second.Factory->Create(uuid);
             }
             return nullptr;
         }
 
-        std::unordered_map<std::string, std::unique_ptr<IComponentFactory>>& GetRegisteredComponents() {
+        std::unordered_map<std::string, RegisteredComponent>& GetRegisteredComponents() {
             return _registry;
         }
 
+        void BuildCategoryTree() {
+            _categoryTree.clear();
+            for (auto& [name, component] : _registry) {
+                for (const std::string& category : component.Categories) {
+                    _categoryTree[category].push_back(&component);
+                }
+            }
+        }
+
+        std::unordered_map<std::string, std::vector<RegisteredComponent*>>& GetCategoryTree() {
+            return _categoryTree;
+        }
+
     private:
-        std::unordered_map<std::string, std::unique_ptr<IComponentFactory>> _registry;
+        std::unordered_map<std::string, RegisteredComponent> _registry;
+        std::unordered_map<std::string, std::vector<RegisteredComponent*>> _categoryTree;
     };
 
-#define REGISTER_COMPONENT(TYPE)                                            \
-    static bool TYPE##_registered = [] {                                    \
-        ComponentRegistry::Instance().RegisterComponent<TYPE>(TYPE().name); \
-        return true;                                                        \
+#define REGISTER_COMPONENT(TYPE)                                                                                    \
+    static bool TYPE##_registered = [] {                                                                            \
+        ComponentRegistry::Instance().RegisterComponent<TYPE>(TYPE().name, TYPE().dependencies, TYPE().categories); \
+        return true;                                                                                                \
     }()
-
 }
 
 #endif

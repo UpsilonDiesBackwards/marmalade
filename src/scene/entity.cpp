@@ -41,9 +41,9 @@ Entity::Entity(const std::string& name, const std::string& uuid, EntityFlags fla
         componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Transform", Marmalade::Util::GenerateUUIDv4()));
 
         // Temporary
-        componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Sprite Render", Marmalade::Util::GenerateUUIDv4()));
-        componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("BoxCollider", Marmalade::Util::GenerateUUIDv4()));
-        componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Rigidbody", Marmalade::Util::GenerateUUIDv4()));
+        componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Texture Renderer", Marmalade::Util::GenerateUUIDv4()));
+        componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Box Collider", Marmalade::Util::GenerateUUIDv4()));
+        componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Rigid Body", Marmalade::Util::GenerateUUIDv4()));
     }
 
     Render();
@@ -61,7 +61,7 @@ void Entity::Render() {
     }
 
     if (RENDERABLE) {
-        bool hasTexture = componentManager.GetComponentOfType<Marmalade::ECS::SpriteRender>();
+        bool hasTexture = componentManager.GetComponentOfType<Marmalade::ECS::TextureRenderer>();
 
         renderable.Draw(transform->modelMatrix, hasTexture);
     }

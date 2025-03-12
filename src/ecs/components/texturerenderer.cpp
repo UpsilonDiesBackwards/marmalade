@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <ecs/components/spriterender.h>
+#include <ecs/components/texturerenderer.h>
 
 #include "../../application/config.h"
 #include "../../application/application.h"
@@ -29,7 +29,7 @@
 
 #include <spdlog/spdlog.h>
 
-void Marmalade::ECS::SpriteRender::Display(Entity* entity) {
+void Marmalade::ECS::TextureRenderer::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
 
     GLuint textureID = entity->renderable.GetTexture();
@@ -105,13 +105,13 @@ void Marmalade::ECS::SpriteRender::Display(Entity* entity) {
 
 }
 
-void Marmalade::ECS::SpriteRender::Apply(Entity* entity) {
+void Marmalade::ECS::TextureRenderer::Apply(Entity* entity) {
 }
 
-void Marmalade::ECS::SpriteRender::Setup(Entity* entity) {
+void Marmalade::ECS::TextureRenderer::Setup(Entity* entity) {
 }
 
-nlohmann::json Marmalade::ECS::SpriteRender::Serialize(const Entity* entity) {
+nlohmann::json Marmalade::ECS::TextureRenderer::Serialize(const Entity* entity) {
     nlohmann::json j;
     j["path"] = entity->renderable.texSettings.filePath;
     j["minFilter"] = entity->renderable.texSettings.minFilter;
@@ -120,7 +120,7 @@ nlohmann::json Marmalade::ECS::SpriteRender::Serialize(const Entity* entity) {
     return j;
 }
 
-void Marmalade::ECS::SpriteRender::Deserialize(nlohmann::json json, Entity* entity) {
+void Marmalade::ECS::TextureRenderer::Deserialize(nlohmann::json json, Entity* entity) {
     entity->renderable.SetTexture(json["path"]);
     entity->renderable.texSettings.minFilter = json["minFilter"].get<int>();
     entity->renderable.texSettings.magFilter = json["magFilter"].get<int>();

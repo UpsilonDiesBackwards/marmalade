@@ -152,7 +152,7 @@ std::shared_ptr<Entity> Marmalade::Project::ProjectScenes::deserializeEntity(con
     // Deserialize components
     for (const auto& componentJson: e["components"]) {
         auto component = componentJson.get<Component>();
-        auto factory = Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()[component.name].get();
+        auto factory = Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()[component.name].Factory.get();
 
         auto newComponent = factory->Create(component.uuid);
         newComponent->Deserialize(component.data, entity.get());

@@ -27,9 +27,10 @@ namespace Marmalade::ECS {
     class CircleCollider : public ColliderBase {
     public:
         CircleCollider() {
-            name = "CircleCollider",
+            name = "Circle Collider",
             allowMultiple = true,
-            data = AABBDataCircle{0.5f, {0.0f, 0.0f} };
+            data = AABBDataCircle{0.5f, {0.0f, 0.0f}};
+            categories = {"Physics"};
         }
 
         void Display(Entity* entity) override;

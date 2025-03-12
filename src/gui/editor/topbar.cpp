@@ -25,11 +25,13 @@
 #include "../../project/projectmanager.h"
 #include "../windowmanager.h"
 
-#include "imgui.h"
+#include <ecs/component.h>
 
-#include "ImGuiFileDialog.h"
+#include <imgui.h>
 
-#include "IconsCodicons.h"
+#include <ImGuiFileDialog.h>
+
+#include <IconsCodicons.h>
 
 void Marmalade::GUI::TopBar::Show() {
     static bool showStyleEditor = false;
@@ -64,7 +66,42 @@ void Marmalade::GUI::TopBar::Show() {
             ImGui::EndMenu();
         }
 
-        if (ImGui::Button("Save")) {
+        if (ImGui::BeginMenu("Entity")) {
+            auto* inspectedEntity = Application::GetInstance().editorGUI->details.inspectedEntity;
+            if (inspectedEntity == nullptr) {
+                ImGui::MenuItem("No entity selected", nullptr, nullptr, false);
+            } else {
+                if (ImGui::BeginMenu("Add Component")) {
+                    if (ImGui::BeginMenu("All")) {
+                        for (const auto& [_, component]: Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()) {
+                            if (ImGui::MenuItem(component.Name.c_str())) {
+                                inspectedEntity->componentManager.AddComponent(component.Factory->Create(Util::GenerateUUIDv4()));
+                            }
+                        }
+                        ImGui::EndMenu();
+                    }
+                    for (const auto& [category, components]: Marmalade::ECS::ComponentRegistry::Instance().GetCategoryTree()) {
+                        if (ImGui::BeginMenu(category.c_str())) {
+                            for (const auto& component: components) {
+                                if (ImGui::MenuItem(component->Name.c_str())) {
+                                    inspectedEntity->componentManager.AddComponent(component->Factory->Create(Util::GenerateUUIDv4()));
+                                }
+                            }
+                            ImGui::EndMenu();
+                        }
+                    }
+
+                    ImGui::Separator();
+
+                    if (ImGui::MenuItem("Add Component...")) {
+                        Application::GetInstance().editorGUI->details.SetAddingComponent(true);
+                    }
+
+                    ImGui::EndMenu();
+                }
+            }
+
+            ImGui::EndMenu();
         }
 
         if (ImGui::BeginMenu("Settings")) {

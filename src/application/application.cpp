@@ -127,6 +127,9 @@ void Application::Initialise() {
     Marmalade::ECS::Transform defaultTransform;
     Entity* newEntity = new Entity("New Entity", EntityFlags::RENDERABLE);
     sceneManager.GetCurrentScene()->AddEntity(std::shared_ptr<Entity>(newEntity));
+
+    // Build component category tree
+    Marmalade::ECS::ComponentRegistry::Instance().BuildCategoryTree();
 }
 
 void Application::Run() {

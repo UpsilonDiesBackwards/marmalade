@@ -27,7 +27,7 @@
 #include <nlohmann/json.hpp>
 
 namespace Marmalade::ECS {
-    class SpriteRender : public Component {
+    class TextureRenderer : public Component {
     public:
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
@@ -36,10 +36,14 @@ namespace Marmalade::ECS {
         nlohmann::json Serialize(const Entity* entity) override;
         void Deserialize(nlohmann::json json, Entity* entity) override;
 
-        SpriteRender() { name = "Sprite Render"; allowMultiple = false; }
+        TextureRenderer() {
+            name = "Texture Renderer";
+            allowMultiple = false;
+            categories = {"General"};
+        }
     };
 
-    REGISTER_COMPONENT(SpriteRender);
+    REGISTER_COMPONENT(TextureRenderer);
 }
 
 #endif

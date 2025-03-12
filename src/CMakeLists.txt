@@ -43,7 +43,7 @@ list(APPEND ENGINE_SRC
 list(APPEND ENGINE_SRC # ECS
         ecs/componentmanager.cpp
         ecs/components/transform.cpp
-        ecs/components/spriterender.cpp
+        ecs/components/texturerenderer.cpp
 
         ecs/components/physics2d/rigidbody.cpp
         ecs/components/physics2d/boxcollider.cpp

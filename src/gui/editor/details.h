@@ -30,6 +30,9 @@ namespace Marmalade::GUI {
         Entity* inspectedEntity{nullptr};
 
         void Draw() override;
+
+        void SetAddingComponent(bool adding) { _isAddingComponent = adding; }
+
     private:
         Marmalade::ECS::Component* _selectedComponent;
 

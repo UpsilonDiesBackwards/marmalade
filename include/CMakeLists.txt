@@ -17,7 +17,7 @@ list(APPEND ENGINE_API
 
         ecs/componentmanager.h
         ecs/components/transform.h
-        ecs/components/spriterender.h
+        ecs/components/texturerenderer.h
 
         ecs/components/physics2d/rigidbody.h
         ecs/components/physics2d/colliderbase.h

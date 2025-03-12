@@ -47,6 +47,7 @@ namespace Marmalade::ECS {
             name = "Transform";
             isMutable = false;
             allowMultiple = false;
+            categories = {"General"};
         }
     };
 

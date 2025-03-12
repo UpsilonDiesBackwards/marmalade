@@ -40,9 +40,10 @@ namespace Marmalade::ECS {
     class BoxCollider : public ColliderBase {
     public:
         BoxCollider() {
-            name = "BoxCollider",
+            name = "Box Collider",
             allowMultiple = true,
-            data = AABBDataBox{{1.0f, 1.0f}, {0.0f, 0.0f} };
+            data = AABBDataBox{{1.0f, 1.0f}, {0.0f, 0.0f}};
+            categories = {"Physics"};
         }
 
         void Display(Entity* entity) override;

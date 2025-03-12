@@ -99,9 +99,9 @@ void Marmalade::GUI::Details::ShowAddPopup() {
     if (ImGui::BeginPopupModal("Add Component", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::Text("Choose component: ");
 
-        for (const auto& [name, factory]: Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()) {
+        for (const auto& [name, component]: Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()) {
             if (ImGui::Button(name.c_str())) {
-                inspectedEntity->componentManager.AddComponent(factory->Create(Util::GenerateUUIDv4()));// Add component
+                inspectedEntity->componentManager.AddComponent(component.Factory->Create(Util::GenerateUUIDv4()));// Add component
 
                 _isAddingComponent = false;
                 ImGui::CloseCurrentPopup();
