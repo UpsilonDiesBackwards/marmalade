@@ -44,6 +44,11 @@ void Marmalade::GUI::ProjectSettings::Draw() {
             ImGui::EndTabItem();
         }
 
+        if (ImGui::BeginTabItem("Graphics")) {
+            drawGraphicsSettings();
+            ImGui::EndTabItem();
+        }
+
         if (ImGui::BeginTabItem("Build")) {
             drawBuildSettings();
             ImGui::EndTabItem();
@@ -94,6 +99,28 @@ void Marmalade::GUI::ProjectSettings::drawProjectSettings() {
     if (ImGui::InputText("Version", projectVersionC, IM_ARRAYSIZE(projectVersionC))) {
         currentProject->settings.version = projectVersionC;
     }
+}
+
+void Marmalade::GUI::ProjectSettings::drawGraphicsSettings() {
+    Application& app = Application::GetInstance();
+    auto currentProject = app.GetCurrentProject();
+
+    ImGui::Checkbox("Enable MSAA", &currentProject->settings.msaaEnabled);
+
+    if (!currentProject->settings.msaaEnabled) {
+        currentProject->settings.msaaSampleCount = 0;
+        app.framebuffer->Refresh();
+    }
+
+    static int sampleValues[] = {2, 4, 8};
+    static int sampleIndex = 1;
+
+    if (ImGui::SliderInt("MSAA Sample Count", &sampleIndex, 0, IM_ARRAYSIZE(sampleValues) - 1)) {
+        currentProject->settings.msaaSampleCount = sampleValues[sampleIndex];
+        app.framebuffer->Refresh();
+    }
+    ImGui::SameLine();
+    ImGui::Text("(Value: %d)", sampleValues[sampleIndex]);
 }
 
 void Marmalade::GUI::ProjectSettings::drawBuildSettings() {

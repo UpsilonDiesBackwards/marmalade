@@ -29,16 +29,17 @@ public:
 
     ImVec2 position;
 
-    int sampleCount = 16; // MSAA sample count. not a const because we want this to be editable by user
+    int sampleCount = 4;
 
     MultiSampledFramebuffer();
     ~MultiSampledFramebuffer();
 
     void Bind();
     void Unbind();
-    void Resize(int width, int height);
-
     void Resolve();
+
+    void Resize(int width, int height);
+    void Refresh();
 
     unsigned int GetTexture() const;
     unsigned int GetFBO() const;

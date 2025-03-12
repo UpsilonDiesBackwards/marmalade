@@ -27,13 +27,21 @@
 namespace Marmalade::Project {
     struct ProjectSettings {
         std::string type{"Marmalade::Project"};
+
+        // Project
         std::string productName{"Marmalade Project"};
         std::string companyName{"Example Company"};
         std::string description{"A Marmalade Project"};
         std::string version{"v0.0.1"};
+
+        // Graphics
+        bool msaaEnabled = true;
+        int msaaSampleCount = 8;
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectSettings, type, productName, companyName, description, version)
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectSettings,
+                                       type, productName, companyName, description, version,
+                                       msaaEnabled, msaaSampleCount)
 }
 
 #endif

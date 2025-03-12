@@ -30,6 +30,7 @@ namespace Marmalade::GUI {
         void Draw() override;
     private:
         void drawProjectSettings();
+        void drawGraphicsSettings();
         void drawBuildSettings();
         void drawDebugSettings();
     };
