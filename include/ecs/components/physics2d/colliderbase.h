@@ -23,9 +23,9 @@
 
 #include "ecs/component.h"
 
-#include "../../../../src/application/application.h"
-
 #include "colliderdata.h"
+
+#include "../../../../src/application/application.h"
 
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>

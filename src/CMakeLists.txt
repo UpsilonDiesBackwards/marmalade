@@ -46,6 +46,7 @@ list(APPEND ENGINE_SRC # ECS
         ecs/components/texturerenderer.cpp
 
         ecs/components/physics2d/rigidbody.cpp
+        ecs/components/physics2d/colliderdata.cpp
         ecs/components/physics2d/boxcollider.cpp
         ecs/components/physics2d/circlecollider.cpp
 )

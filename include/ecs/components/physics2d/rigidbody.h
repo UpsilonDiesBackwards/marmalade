@@ -39,8 +39,9 @@ namespace Marmalade::ECS {
      * */
 
     struct Body {
-
+        glm::vec2 centreOfMass = {0.0f, 0.0f};
         glm::vec2 velocity = {0.0f, 0.0f};
+        glm::vec2 angularVelocity = {0.0f, 0.0f};
         float mass = 1.0f;
         float gravity = -9.81f;
         float elasticity = 0.0f;
@@ -72,7 +73,13 @@ namespace Marmalade::ECS {
 
         void Collide(Entity* self, Entity* other, const glm::vec2 normal);
 
-        void ApplyImpulse(glm::vec2 impulse);
+        void ApplyImpulse(glm::vec2 point, glm::vec2 impulse, Entity* self);
+        void ApplyImpulseLinear(glm::vec2 impulse);
+        void ApplyImpulseAngular(float dL, Entity* self);
+
+        glm::vec2 GetCentreOfMass() { return body.centreOfMass; }
+        glm::mat3 GetInertiaTensor(Entity* self);
+        glm::mat2 GetInverseInertiaTensor(Entity* self);
 
         RigidBody() {
             name = "Rigid Body";

@@ -120,19 +120,11 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::
     auto* otherCollider = other->componentManager.GetComponentOfType<ColliderBase>();
     auto* otherRigidBody = other->componentManager.GetComponentOfType<RigidBody>();
 
-    glm::vec2 selfSize, otherSize;
+    ColliderInfo selfInfo = GetColliderInfo(selfCollider);
+    ColliderInfo otherInfo = GetColliderInfo(otherCollider);
 
-    if (std::holds_alternative<AABBDataBox>(selfCollider->data)) { // We want to get the owning entities size to calculate the half size later...
-        selfSize = std::get<AABBDataBox>(selfCollider->data).size;
-    } else if (std::holds_alternative<OBBDataBox>(selfCollider->data)) {
-        selfSize = std::get<OBBDataBox>(selfCollider->data).size;
-    }
-
-    if (std::holds_alternative<AABBDataBox>(otherCollider->data)) { //... alongside the other entities size
-        otherSize = std::get<AABBDataBox>(otherCollider->data).size;
-    } else if (std::holds_alternative<OBBDataBox>(otherCollider->data)) {
-        otherSize = std::get<OBBDataBox>(otherCollider->data).size;
-    }
+    glm::vec2 selfSize = selfInfo.size.value_or(glm::vec2(0.0f));
+    glm::vec2 otherSize = otherInfo.size.value_or(glm::vec2(0.0f));
 
     // Calculate elasticity using the owning and other entities elasticity values
     float selfElasticity = body.elasticity;
@@ -149,9 +141,9 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::
     glm::vec2 penetrationDepth = (selfSize / 2.0f + otherSize / 2.0f) - glm::abs(self->getPosition() - other->getPosition());
     glm::vec2 correction = normal * glm::max(glm::vec2(0), penetrationDepth) * 0.37f; //... and then use it to calculate a correction value
 
-    ApplyImpulse(vectorImpulse); // Apply an impulse to self...
+    ApplyImpulseLinear(vectorImpulse); // Apply an impulse to self...
     if (!otherRigidBody->isStatic) { //... and if the other entity is NOT static, ...
-        otherRigidBody->ApplyImpulse(-vectorImpulse); //... then apply the opposite vector impulse (we abide by the third law of motion here)
+        otherRigidBody->ApplyImpulseLinear(-vectorImpulse); //... then apply the opposite vector impulse (we abide by the third law of motion here)
     }
 
     const float velocityThreshold = 0.0f; // If the velocity is less than the threshold, then set the velocity to zero
@@ -172,8 +164,84 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::
     }
 }
 
-void Marmalade::ECS::RigidBody::ApplyImpulse(glm::vec2 impulse) {
+void Marmalade::ECS::RigidBody::ApplyImpulse(glm::vec2 point, glm::vec2 impulse, Entity* self) {
+    if (body.mass == 0.0f) return;
+
+    ApplyImpulseLinear(impulse);
+
+    glm::vec2 position = GetCentreOfMass();
+
+    glm::vec2 r = point - self->getPosition();
+    float dL = r.x * impulse.y - r.y * impulse.x;
+
+    ApplyImpulseAngular(dL, self);
+}
+
+void Marmalade::ECS::RigidBody::ApplyImpulseLinear(glm::vec2 impulse) {
     if (body.mass == 0 || isStatic) return;
 
     body.velocity += impulse / body.mass; // Apply impulse velocity
+}
+
+void Marmalade::ECS::RigidBody::ApplyImpulseAngular(float dL, Entity* self) {
+    if (body.mass == 0.0f) return;
+
+    float invInertia = GetInverseInertiaTensor(self)[0][0];
+
+    body.angularVelocity += invInertia * dL;
+
+    const float maxAngularSpeed = 30.0f;
+    if (glm::sqrt(glm::length(body.angularVelocity)) > maxAngularSpeed) {
+        body.angularVelocity = glm::sign(body.angularVelocity) * maxAngularSpeed;
+    }
+}
+
+glm::mat3 Marmalade::ECS::RigidBody::GetInertiaTensor(Entity* self) {
+    // Get the collider component
+    auto* collider = self->componentManager.GetComponentOfType<ColliderBase>();
+    ColliderInfo colliderInfo = GetColliderInfo(collider);
+
+    glm::mat3 inertiaTensor = glm::mat3(0.0f);
+
+    std::visit([&](auto&& colliderData) {
+        using T = std::decay_t<decltype(colliderData)>;
+
+        if constexpr (std::is_same_v<T, AABBDataCircle>) {
+            float radius = colliderData.radius;
+            float inertia = (0.5f) * body.mass * (radius * radius);
+
+            inertiaTensor = glm::mat3{
+                    inertia, 0.0f, 0.0f,
+                    0.0f, inertia, 0.0f,
+                    0.0f, 0.0f, inertia,
+            };
+        } else if constexpr (std::is_same_v<T, AABBDataBox> || std::is_same_v<T, OBBDataBox>) {
+            float width = colliderData.size.x;
+            float height = colliderData.size.y;
+
+            float inertiaZ = (1.0f / 12.0f) * body.mass * (width * width + height * height);
+
+            inertiaTensor = glm::mat3{
+                    0.0f, 0.0f, 0.0f,
+                    0.0f, 0.0f, 0.0f,
+                    0.0f, 0.0f, inertiaZ
+            };
+        }
+    }, collider->data);
+
+    return inertiaTensor;
+}
+
+glm::mat2 Marmalade::ECS::RigidBody::GetInverseInertiaTensor(Entity* self) {
+    glm::mat3 inertia = GetInertiaTensor(self);
+    float inverseInertia = glm::inverse(inertia)[2][2] * body.mass;
+    glm::mat2 orient = glm::mat2(
+            cos(self->getRotation()), -sin(self->getRotation()),
+            sin(self->getRotation()), cos(self->getRotation())
+    );
+
+    glm::mat2 invInertiaMat = glm::mat2(inverseInertia, 0, 0, inverseInertia);
+    glm::mat2 worldInvInertia = orient * invInertiaMat * glm::transpose(orient);
+
+    return worldInvInertia;
 }
