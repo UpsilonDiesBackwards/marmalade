@@ -130,6 +130,9 @@ void Application::Initialise() {
 
     // Build component category tree
     Marmalade::ECS::ComponentRegistry::Instance().BuildCategoryTree();
+    for (const auto& component: Marmalade::Config::engineConfig.favouriteComponents) {
+        Marmalade::ECS::ComponentRegistry::Instance().SetFavourite(component);
+    }
 }
 
 void Application::Run() {

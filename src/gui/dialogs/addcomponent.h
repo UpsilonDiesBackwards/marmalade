@@ -17,33 +17,28 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_DETAILS_H
-#define MARMALADE_DETAILS_H
+#ifndef MARMALADE_ADDCOMPONENT_H
+#define MARMALADE_ADDCOMPONENT_H
 
 #include "../window.h"
 
-#include "../dialogs/addcomponent.h"
-
-#include "scene/entity.h"
+#include <string>
 
 namespace Marmalade::GUI {
-    class Details : public Window {
+    class AddComponentDialog : public Window {
     public:
-        Entity* inspectedEntity{nullptr};
-
         void Draw() override;
 
-        void SetAddingComponent(bool adding) { _addComponentDialog.visible = adding; }
-
     private:
-        Marmalade::ECS::Component* _selectedComponent;
+        std::string _selectedTab = "Favourites";
 
-        bool _isRemovingComponent{false};
+        void drawLeftPane();
+        void drawRightPane();
+        void drawSplit();
 
-        AddComponentDialog _addComponentDialog{};
-
-        void ShowRemovePopup();
+        void addRow(const std::string& category);
     };
 }
+
 
 #endif

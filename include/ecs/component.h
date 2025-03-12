@@ -39,6 +39,7 @@ namespace Marmalade::ECS {
         bool isMutable{true};
         bool allowMultiple{false};
 
+        std::string description{};
         std::vector<std::string> dependencies{};
         std::vector<std::string> categories{};
 
@@ -72,6 +73,7 @@ namespace Marmalade::ECS {
 
     struct RegisteredComponent {
         std::string Name;
+        std::string Description;
         std::unique_ptr<IComponentFactory> Factory;
         std::vector<std::string> Dependencies{};
         std::vector<std::string> Categories{};
@@ -85,9 +87,10 @@ namespace Marmalade::ECS {
         }
 
         template<typename T>
-        void RegisterComponent(const std::string& name, const std::vector<std::string> dependencies, const std::vector<std::string> categories) {
+        void RegisterComponent(const std::string& name, const std::string& description, const std::vector<std::string> dependencies, const std::vector<std::string> categories) {
             _registry[name] = RegisteredComponent{
                     .Name = name,
+                    .Description = description,
                     .Factory = std::make_unique<ComponentFactory<T>>(),
                     .Dependencies = std::move(dependencies),
                     .Categories = std::move(categories)};
@@ -107,8 +110,8 @@ namespace Marmalade::ECS {
 
         void BuildCategoryTree() {
             _categoryTree.clear();
-            for (auto& [name, component] : _registry) {
-                for (const std::string& category : component.Categories) {
+            for (auto& [name, component]: _registry) {
+                for (const std::string& category: component.Categories) {
                     _categoryTree[category].push_back(&component);
                 }
             }
@@ -118,15 +121,34 @@ namespace Marmalade::ECS {
             return _categoryTree;
         }
 
+        void SetFavourite(const std::string& name, bool favourite = true) {
+            if (_registry.find(name) == _registry.end()) {
+                // No component exists with that name
+                return;
+            }
+
+            auto* component = &_registry[name];
+            if (favourite) {
+                _favourites.push_back(component);
+            } else {
+                _favourites.erase(std::remove(_favourites.begin(), _favourites.end(), component), _favourites.end());
+            }
+        }
+
+        std::vector<RegisteredComponent*>& GetFavorites() {
+            return _favourites;
+        }
+
     private:
         std::unordered_map<std::string, RegisteredComponent> _registry;
         std::unordered_map<std::string, std::vector<RegisteredComponent*>> _categoryTree;
+        std::vector<RegisteredComponent*> _favourites;
     };
 
-#define REGISTER_COMPONENT(TYPE)                                                                                    \
-    static bool TYPE##_registered = [] {                                                                            \
-        ComponentRegistry::Instance().RegisterComponent<TYPE>(TYPE().name, TYPE().dependencies, TYPE().categories); \
-        return true;                                                                                                \
+#define REGISTER_COMPONENT(TYPE)                                                                                                        \
+    static bool TYPE##_registered = [] {                                                                                                \
+        ComponentRegistry::Instance().RegisterComponent<TYPE>(TYPE().name, TYPE().description, TYPE().dependencies, TYPE().categories); \
+        return true;                                                                                                                    \
     }()
 }
 

@@ -58,6 +58,8 @@ namespace Marmalade {
         std::vector<Repository> repos{};
 
         ProjectBrowserConfig projectBrowser{};
+
+        std::vector<std::string> favouriteComponents{};
     };
 
     class Config {
@@ -86,7 +88,7 @@ namespace Marmalade {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::ProjectBrowserConfig, colorAssets, colorData, colorSrc);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, version, viewports, themeFile, showWelcomeScreen, backgroundColor, scaleFactor, useSystemScaleFactor, logLevel, defaultProjectPath, repos, projectBrowser);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, version, viewports, themeFile, showWelcomeScreen, backgroundColor, scaleFactor, useSystemScaleFactor, logLevel, defaultProjectPath, repos, projectBrowser, favouriteComponents);
 }
 
 #endif

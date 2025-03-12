@@ -72,6 +72,14 @@ void Marmalade::GUI::TopBar::Show() {
                 ImGui::MenuItem("No entity selected", nullptr, nullptr, false);
             } else {
                 if (ImGui::BeginMenu("Add Component")) {
+                    if (ImGui::BeginMenu("Favourites")) {
+                        for (const auto& component: Marmalade::ECS::ComponentRegistry::Instance().GetFavorites()) {
+                            if (ImGui::MenuItem(component->Name.c_str())) {
+                                inspectedEntity->componentManager.AddComponent(component->Factory->Create(Util::GenerateUUIDv4()));
+                            }
+                        }
+                        ImGui::EndMenu();
+                    }
                     if (ImGui::BeginMenu("All")) {
                         for (const auto& [_, component]: Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()) {
                             if (ImGui::MenuItem(component.Name.c_str())) {
@@ -80,6 +88,7 @@ void Marmalade::GUI::TopBar::Show() {
                         }
                         ImGui::EndMenu();
                     }
+                    ImGui::Separator();
                     for (const auto& [category, components]: Marmalade::ECS::ComponentRegistry::Instance().GetCategoryTree()) {
                         if (ImGui::BeginMenu(category.c_str())) {
                             for (const auto& component: components) {

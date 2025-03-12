@@ -23,6 +23,8 @@
 #include <glad/glad.h>
 
 #include <string>
+#include <vector>
+#include <unordered_map>
 
 namespace Marmalade {
     class Util {
@@ -36,8 +38,24 @@ namespace Marmalade {
         static void OpenLink(const std::string& link);
 
         static GLuint LoadGuiTexture(std::string path, int* width = nullptr, int* height = nullptr);
+
+        template<typename T>
+        static inline bool Contains(const std::vector<T>& vec, const T& item) {
+            return std::find(vec.begin(), vec.end(), item) != vec.end();
+        }
+
+        template<typename K, typename V>
+        static inline std::vector<V*> GetValuePointers(std::unordered_map<K, V>& map) {
+            std::vector<V*> values;
+            values.reserve(map.size());
+
+            for (auto& [key, value]: map) {
+                values.push_back(&value);
+            }
+
+            return values;
+        }
     };
 }
-
 
 #endif

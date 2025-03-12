@@ -75,7 +75,6 @@ namespace Marmalade::ECS {
         void ApplyImpulse(glm::vec2 impulse);
 
         RigidBody() {
-            name = "Rigidbody";
             name = "Rigid Body";
             categories = {"Physics"};
         }

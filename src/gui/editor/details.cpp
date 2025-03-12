@@ -28,7 +28,7 @@
 void Marmalade::GUI::Details::Draw() {
     ImGui::Begin(ICON_CI_SEARCH " Details", &visible);
 
-    if (!inspectedEntity) { // Do not draw if there is no entity selected
+    if (!inspectedEntity) {// Do not draw if there is no entity selected
         visible = false;
         ImGui::End();
         return;
@@ -42,7 +42,7 @@ void Marmalade::GUI::Details::Draw() {
 
         comp->Display(inspectedEntity);
 
-        if (comp->isMutable) { // If entity is mutable then allow it to be removed
+        if (comp->isMutable) {// If entity is mutable then allow it to be removed
             if (ImGui::Button(ICON_CI_TRASHCAN " Remove")) {
                 _isRemovingComponent = true;
                 _selectedComponent = comp.get();
@@ -55,19 +55,15 @@ void Marmalade::GUI::Details::Draw() {
 
     ImGui::SetCursorPosX((ImGui::GetWindowSize().x - 125) * 0.5f);
     if (ImGui::Button(ICON_CI_PLUS " Add Component")) {
-        _isAddingComponent = true;
+        _addComponentDialog.visible = true;
     }
 
     if (_isRemovingComponent) {
         ImGui::OpenPopup("Remove Component");
     }
 
-    if (_isAddingComponent) {
-        ImGui::OpenPopup("Add Component");
-    }
-
     ShowRemovePopup();
-    ShowAddPopup();
+    _addComponentDialog.Draw();
 
     ImGui::End();
 }
@@ -88,28 +84,6 @@ void Marmalade::GUI::Details::ShowRemovePopup() {
             inspectedEntity->componentManager.RemoveComponent(_selectedComponent);
             _selectedComponent = nullptr;
             _isRemovingComponent = false;
-            ImGui::CloseCurrentPopup();
-        }
-
-        ImGui::EndPopup();
-    }
-}
-
-void Marmalade::GUI::Details::ShowAddPopup() {
-    if (ImGui::BeginPopupModal("Add Component", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-        ImGui::Text("Choose component: ");
-
-        for (const auto& [name, component]: Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()) {
-            if (ImGui::Button(name.c_str())) {
-                inspectedEntity->componentManager.AddComponent(component.Factory->Create(Util::GenerateUUIDv4()));// Add component
-
-                _isAddingComponent = false;
-                ImGui::CloseCurrentPopup();
-            }
-        }
-
-        if (ImGui::Button("Close")) {
-            _isAddingComponent = false;
             ImGui::CloseCurrentPopup();
         }
 
