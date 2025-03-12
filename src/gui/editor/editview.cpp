@@ -19,14 +19,15 @@
 
 #include "editview.h"
 
-#include "glad/glad.h"
-
 #include "../../application/application.h"
-#include "ecs/components/physics2d/colliderbase.h"
 
-#include "ImGuizmo.h"
+#include <ecs/components/physics2d/colliderbase.h>
 
-#include "imgui.h"
+#include <glad/glad.h>
+
+#include <imgui.h>
+
+#include <ImGuizmo.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -76,6 +77,8 @@ void EditView::Render() {
                        ImVec2(windowPos.x + windowSize.x, windowPos.y + windowSize.y),
                        ImVec2(0, 1), ImVec2(1, 0));
 
+    // FIXME: Frame buffer image doesn't take into account tab bar, and bottom bar.
+    // ...    Hence leaves a dead area in the bottom of the window when scrolling.
     imageMin = ImGui::GetWindowPos();
     imageMax = ImVec2(imageMin.x + windowSize.x, imageMin.y + windowSize.y);
 
@@ -119,8 +122,14 @@ void EditView::RunInput() {
                                   }
                               });
 
-    app.input.BindScroll([&app](double xOffset, double yOffset) {
-        app.camera->Zoom(yOffset);
+    app.input.BindScroll([&app, this](double xOffset, double yOffset) {
+        auto mousePos = ImGui::GetMousePos();
+
+        // Check if mouse is in bounds
+        bool withinBounds = (mousePos.x >= imageMin.x && mousePos.x <= imageMax.x) &&
+                            (mousePos.y >= imageMin.y && mousePos.y <= imageMax.y);
+
+        if (withinBounds) app.camera->Zoom(yOffset);
     });
 }
 
@@ -174,8 +183,6 @@ void EditView::ShowGizmo() {
                          currentGuizmoOperation, currentGuizmoMode,
                          glm::value_ptr(transform->modelMatrix));
 }
-
-
 
 
 void EditView::ShowColliderBounds() {
