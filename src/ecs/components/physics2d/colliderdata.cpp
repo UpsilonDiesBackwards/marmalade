@@ -18,7 +18,8 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ecs/components/physics2d/colliderdata.h"
+#include <ecs/components/physics2d/colliderdata.h>
+#include <ecs/components/physics2d/colliderbase.h>
 
 Marmalade::ECS::ColliderInfo Marmalade::ECS::GetColliderInfo(const ColliderBase* collider) {
     ColliderInfo info;

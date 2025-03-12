@@ -24,7 +24,7 @@
 #include <glm/glm.hpp>
 #include <glm/vec2.hpp>
 
-#include "colliderbase.h"
+#include <optional>
 
 namespace Marmalade::ECS {
 struct AABBDataBox {
@@ -64,4 +64,4 @@ struct ColliderInfo {
     ColliderInfo GetColliderInfo(const ColliderBase* collider);
 }
 
-#endif // MARMALADE_COLLIDERDATA_H
+#endif
