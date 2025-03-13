@@ -24,6 +24,9 @@
 #include <glm/glm.hpp>
 #include <glm/vec2.hpp>
 
+#include <optional>
+
+namespace Marmalade::ECS {
 struct AABBDataBox {
     glm::vec2 size;
     glm::vec2 offset;
@@ -32,13 +35,10 @@ struct AABBDataBox {
 struct OBBDataBox {
     glm::vec2 size;
     glm::vec2 offset;
-
     float rotation;
-
-    glm::vec2 c; // Centre point;
-
-    glm::vec2 u[2]; // Local x, y axes
-    glm::vec2 e; // Half-width
+    glm::vec2 c;  // Center point
+    glm::vec2 u[2];  // Local x, y axes
+    glm::vec2 e;  // Half-width
 };
 
 struct AABBDataCircle {
@@ -46,4 +46,22 @@ struct AABBDataCircle {
     glm::vec2 offset;
 };
 
-#endif//MARMALADE_COLLIDERDATA_H
+struct ColliderInfo {
+    std::optional<glm::vec2> offset;
+
+    // Sizes
+    std::optional<glm::vec2> size;
+    std::optional<float> radius;
+
+    // OBB Specific
+    std::optional<float> rotation;
+    std::optional<glm::vec2> center;
+    std::optional<glm::vec2> axes[2];
+    std::optional<glm::vec2> halfWidth;
+};
+
+    class ColliderBase;
+    ColliderInfo GetColliderInfo(const ColliderBase* collider);
+}
+
+#endif

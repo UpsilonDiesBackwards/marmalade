@@ -94,4 +94,3 @@ float Marmalade::ECS::CircleCollider::WorldRadiusToScreenScale(float radius) {
 
     return glm::distance(glmScreenStart, glmScreenEnd);
 }
-

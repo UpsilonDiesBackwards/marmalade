@@ -22,12 +22,10 @@
 #define MARMALADE_COLLIDERBASE_H
 
 #include "ecs/component.h"
-
 #include "../../../../src/application/application.h"
 
 #include "colliderdata.h"
 
-#include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
 #include <variant>
@@ -75,4 +73,4 @@ namespace Marmalade::ECS {
     };
 }
 
-#endif//MARMALADE_COLLIDERBASE_H
+#endif

@@ -22,6 +22,7 @@
 
 #include <glad/glad.h>
 
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <unordered_map>
