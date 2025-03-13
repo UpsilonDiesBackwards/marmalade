@@ -127,7 +127,7 @@ void Marmalade::GUI::TopBar::Show() {
             ImGui::MenuItem(ICON_CI_FILE_TEXT " Log", nullptr, &WindowManager::GetInstance().log.visible);
 
             if (ImGui::MenuItem(ICON_CI_SAVE " Save Layout")) {
-                Application::GetInstance().styleManager.SaveStyle((Marmalade::Config::GetConfigDirectory() / Marmalade::Config::engineConfig.themeFile).string());
+                Application::GetInstance().styleManager.SaveStyle((Marmalade::Config::GetConfigDirectory() / Marmalade::Config::engineConfig.appearance.themeFile).string());
 
                 ImGui::OpenPopup("LayoutSavePopup");
             }

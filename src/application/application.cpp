@@ -79,6 +79,26 @@ void Application::Initialise() {
         std::cout << "Window Created" << std::endl;
     glfwWindowHint(GLFW_SAMPLES, 4);
 
+    int monitorNum = Marmalade::Config::engineConfig.windowPos.monitor;
+    if (monitorNum > -1) {
+        // Full screen
+        int count = 0;
+        GLFWmonitor** monitors = glfwGetMonitors(&count);
+        glfwSetWindowMonitor(window, monitors[monitorNum], 0, 0, width, height, GLFW_DONT_CARE);
+    } else {
+        int x = Marmalade::Config::engineConfig.windowPos.x;
+        int y = Marmalade::Config::engineConfig.windowPos.y;
+
+        int configWidth = Marmalade::Config::engineConfig.windowPos.width;
+        int configHeight = Marmalade::Config::engineConfig.windowPos.height;
+
+        glfwSetWindowPos(window, x, y);
+        glfwSetWindowSize(window, configWidth, configHeight);
+
+        if (Marmalade::Config::engineConfig.windowPos.maximised) glfwMaximizeWindow(window);
+    }
+
+
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
@@ -96,18 +116,17 @@ void Application::Initialise() {
     ImGui_ImplOpenGL3_Init("#version 430");
 
     // Load ImGui custom style
-
     if (!std::filesystem::exists(Marmalade::Config::GetConfigDirectory() / "editorstyle.txt")) {
         std::filesystem::copy_file("res/config/editorstyle.txt", Marmalade::Config::GetConfigDirectory() / "editorstyle.txt");
     }
 
-    styleManager.LoadStyle((Marmalade::Config::GetConfigDirectory() / Marmalade::Config::engineConfig.themeFile).string());
+    styleManager.LoadStyle((Marmalade::Config::GetConfigDirectory() / Marmalade::Config::engineConfig.appearance.themeFile).string());
 
     ImGuiIO& io = ImGui::GetIO();
     io.IniFilename = imguiIniPathStr.c_str();
     io.ConfigWindowsMoveFromTitleBarOnly = true;
     io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable;
-    if (Marmalade::Config::engineConfig.viewports) {
+    if (Marmalade::Config::engineConfig.appearance.viewports) {
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     }
 
@@ -138,7 +157,7 @@ void Application::Initialise() {
 void Application::Run() {
     profiler.Update();
 
-    ImVec4 backgroundCol = ImGui::ColorConvertU32ToFloat4(Marmalade::Config::engineConfig.backgroundColor);
+    ImVec4 backgroundCol = ImGui::ColorConvertU32ToFloat4(Marmalade::Config::engineConfig.appearance.backgroundColor);
     glClearColor(backgroundCol.x, backgroundCol.y, backgroundCol.z, backgroundCol.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -255,4 +274,28 @@ void Application::SetCurrentProject(std::unique_ptr<Marmalade::Project::Project>
 
 Marmalade::Project::Project* Application::GetCurrentProject() {
     return currentProject.get();
+}
+
+void Application::OnClose() {
+    glfwGetWindowPos(window,
+                     &Marmalade::Config::engineConfig.windowPos.x,
+                     &Marmalade::Config::engineConfig.windowPos.y);
+    glfwGetWindowSize(window,
+                      &Marmalade::Config::engineConfig.windowPos.width,
+                      &Marmalade::Config::engineConfig.windowPos.height);
+
+    int monitorCount = 0;
+    GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
+    GLFWmonitor* monitor = glfwGetWindowMonitor(window);
+    if (monitor == nullptr) {
+        Marmalade::Config::engineConfig.windowPos.monitor = -1;
+    } else {
+        for (int i = 0; i < monitorCount; i++) {
+            if (monitors[i] == monitor) {
+                Marmalade::Config::engineConfig.windowPos.monitor = i;
+            }
+        }
+    }
+
+    Marmalade::Config::SaveEngineConfig();
 }

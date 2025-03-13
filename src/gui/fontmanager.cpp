@@ -38,8 +38,8 @@ Marmalade::GUI::FontManager& Marmalade::GUI::FontManager::GetInstance() {
 void Marmalade::GUI::FontManager::InitFonts() {
     auto& io = ImGui::GetIO();
 
-    auto scaleFactor = Config::engineConfig.scaleFactor;
-    if (Config::engineConfig.useSystemScaleFactor) scaleFactor = getMonitorScale();
+    auto scaleFactor = Config::engineConfig.appearance.scaleFactor;
+    if (Config::engineConfig.appearance.useSystemScaleFactor) scaleFactor = getMonitorScale();
 
     fontTitle = io.Fonts->AddFontFromFileTTF("res/fonts/Cabin/static/Cabin-Regular.ttf", 34 * scaleFactor);
     fontHeading = io.Fonts->AddFontFromFileTTF("res/fonts/Cabin/static/Cabin-Regular.ttf", 28 * scaleFactor);

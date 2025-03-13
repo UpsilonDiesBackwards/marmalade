@@ -36,6 +36,24 @@ namespace Marmalade {
         int depth{1};// Local repos do not work with shallow clone
     };
 
+    struct AppearanceConfig {
+        bool viewports{true};
+        std::string themeFile{"editorstyle.txt"};
+        bool showWelcomeScreen{true};
+        long long backgroundColor = 8589934591;
+        float scaleFactor{1.0f};
+        bool useSystemScaleFactor{true};
+    };
+
+    struct WindowPosConfig {
+        int monitor{0};
+        int x{0};
+        int y{0};
+        int width{800};
+        int height{600};
+        bool maximised{true};
+    };
+
     struct ProjectBrowserConfig {
         long long colorAssets = 4279242858;
         long long colorData = 4281109100;
@@ -45,12 +63,8 @@ namespace Marmalade {
     struct EngineConfig {
         int version{CONFIG_VERSION};
 
-        bool viewports{true};
-        std::string themeFile{"editorstyle.txt"};
-        bool showWelcomeScreen{true};
-        long long backgroundColor = 8589934591;
-        float scaleFactor{1.0f};
-        bool useSystemScaleFactor{true};
+        AppearanceConfig appearance;
+        WindowPosConfig windowPos;
 
         spdlog::level::level_enum logLevel{spdlog::level::info};
 
@@ -86,9 +100,13 @@ namespace Marmalade {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::Repository, name, gitUrl, depth);
 
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::AppearanceConfig, viewports, themeFile, showWelcomeScreen, backgroundColor, scaleFactor, useSystemScaleFactor);
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::WindowPosConfig, monitor, x, y, width, height, maximised);
+
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::ProjectBrowserConfig, colorAssets, colorData, colorSrc);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, version, viewports, themeFile, showWelcomeScreen, backgroundColor, scaleFactor, useSystemScaleFactor, logLevel, defaultProjectPath, repos, projectBrowser, favouriteComponents);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, version, appearance, windowPos, logLevel, defaultProjectPath, repos, projectBrowser, favouriteComponents);
 }
 
 #endif

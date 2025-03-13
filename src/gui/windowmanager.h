@@ -37,7 +37,7 @@ namespace Marmalade::GUI {
     public:
         static WindowManager& GetInstance();
 
-        WelcomeScreen welcomeScreen{Config::engineConfig.showWelcomeScreen};
+        WelcomeScreen welcomeScreen{Config::engineConfig.appearance.showWelcomeScreen};
         PackageManager packageManager{};
         Log log{true};
         ProjectWizard projectWizard{};

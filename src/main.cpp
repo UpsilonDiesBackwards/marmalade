@@ -27,7 +27,7 @@
 
 int main(int argc, char** argv) {
     bool sameDirConfig{false};
-    char *project = nullptr;
+    char* project = nullptr;
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -70,6 +70,8 @@ int main(int argc, char** argv) {
     while (!glfwWindowShouldClose(application.getWindow())) {
         application.Run();
     }
+
+    application.OnClose();
 
     Marmalade::PluginLoader::GetInstance().UnloadPlugins();
     application.Terminate();

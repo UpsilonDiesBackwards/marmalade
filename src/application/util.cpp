@@ -104,3 +104,31 @@ GLuint Marmalade::Util::LoadGuiTexture(std::string path, int* width, int* height
 
     return textureID;
 }
+
+void Marmalade::Util::ConstrainImageSize(int maxWidth, int maxHeight, int& imgWidth, int& imgHeight) {
+    float aspectRatio = imgWidth / imgHeight;
+
+    float newWidth = imgWidth;
+    float newHeight = imgHeight;
+
+    if (maxHeight != -1 && imgHeight > maxHeight) {
+        // Scale by height if the height exceeds the max height
+        newHeight = maxHeight;
+        newWidth = newHeight * aspectRatio;
+    }
+
+    if (maxWidth != -1 && imgWidth > maxWidth) {
+        // Scale by width if the width exceeds the max width
+        newWidth = maxWidth;
+        newHeight = newWidth / aspectRatio;
+    }
+
+    // If both dimensions are less than the max sizes, use the original size
+    if (maxWidth != -1 && imgWidth <= maxWidth && maxHeight != -1 && imgHeight <= maxHeight) {
+        newWidth = imgWidth;
+        newHeight = imgHeight;
+    }
+
+    imgWidth = newWidth;
+    imgHeight = newHeight;
+}

@@ -98,6 +98,8 @@ public:
     void SetCurrentProject(std::unique_ptr<Marmalade::Project::Project>& project);
     Marmalade::Project::Project* GetCurrentProject();
 
+    void OnClose();
+
 private:
     Application(int width, int height, const char* title);
 

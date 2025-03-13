@@ -22,10 +22,11 @@
 
 #include <glad/glad.h>
 
-#include <algorithm>
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <algorithm>
+#include <sstream>
 
 namespace Marmalade {
     class Util {
@@ -39,6 +40,8 @@ namespace Marmalade {
         static void OpenLink(const std::string& link);
 
         static GLuint LoadGuiTexture(std::string path, int* width = nullptr, int* height = nullptr);
+
+        static void ConstrainImageSize(int maxWidth, int maxHeight, int& imgWidth, int& imgHeight);
 
         template<typename T>
         static inline bool Contains(const std::vector<T>& vec, const T& item) {
@@ -55,6 +58,18 @@ namespace Marmalade {
             }
 
             return values;
+        }
+
+        template<typename T>
+        static inline std::string JoinVector(const std::vector<T>& vec, std::string sep = ", ") {
+            std::ostringstream oss;
+            for (size_t i = 0; i < vec.size(); ++i) {
+                oss << vec[i];
+                if (i != vec.size() - 1) {
+                    oss << sep;
+                }
+            }
+            return oss.str();
         }
     };
 }

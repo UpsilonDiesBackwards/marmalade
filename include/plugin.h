@@ -28,6 +28,6 @@
 #define PLUGIN_EXPORT __attribute__((visibility("default")))
 #endif
 
-typedef void (*PluginMainFunc)(EngineAPI engineApi);
+typedef void (*PluginMainFunc)(struct EngineAPI engineApi);
 
 #endif

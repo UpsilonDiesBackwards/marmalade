@@ -43,31 +43,31 @@ void Marmalade::GUI::Preferences::drawGeneralLoggingPane() {
 }
 
 void Marmalade::GUI::Preferences::drawGeneralAppearancePane() {
-    ImGui::Checkbox("ImGui Viewports", &Marmalade::Config::engineConfig.viewports);
+    ImGui::Checkbox("ImGui Viewports", &Marmalade::Config::engineConfig.appearance.viewports);
     ImGui::SameLine();
     requiresRestartWarning();
 
     static char themeFileC[512];
-    strncpy(themeFileC, Config::engineConfig.themeFile.c_str(), sizeof(themeFileC));
+    strncpy(themeFileC, Config::engineConfig.appearance.themeFile.c_str(), sizeof(themeFileC));
 
     if (ImGui::InputText("Theme File", themeFileC, sizeof(themeFileC))) {
-        Config::engineConfig.themeFile = themeFileC;
+        Config::engineConfig.appearance.themeFile = themeFileC;
     }
     ImGui::SameLine();
     requiresRestartWarning();
 
-    static auto backgroundCol = ImGui::ColorConvertU32ToFloat4(Config::engineConfig.backgroundColor);
+    static auto backgroundCol = ImGui::ColorConvertU32ToFloat4(Config::engineConfig.appearance.backgroundColor);
     if (ImGui::ColorEdit4("Background Color", &backgroundCol.x)) {
-        Config::engineConfig.backgroundColor = ImGui::ColorConvertFloat4ToU32(backgroundCol);
+        Config::engineConfig.appearance.backgroundColor = ImGui::ColorConvertFloat4ToU32(backgroundCol);
     }
 
-    ImGui::BeginDisabled(Config::engineConfig.useSystemScaleFactor);
+    ImGui::BeginDisabled(Config::engineConfig.appearance.useSystemScaleFactor);
     ImGui::SetNextItemWidth(150.0f);
-    ImGui::DragFloat("Scale Factor", &Config::engineConfig.scaleFactor, 0.1f, 0.0f, 5.0f);
+    ImGui::DragFloat("Scale Factor", &Config::engineConfig.appearance.scaleFactor, 0.1f, 0.0f, 5.0f);
     ImGui::EndDisabled();
 
     ImGui::SameLine();
-    ImGui::Checkbox("Use System", &Config::engineConfig.useSystemScaleFactor);
+    ImGui::Checkbox("Use System", &Config::engineConfig.appearance.useSystemScaleFactor);
 
     ImGui::SameLine();
     requiresRestartWarning();
@@ -81,7 +81,7 @@ void Marmalade::GUI::Preferences::drawGeneralProjectsPane() {
         Config::engineConfig.defaultProjectPath = defaultProjectPathC;
     }
 
-    ImGui::Checkbox("Show Welcome Screen on Startup", &Marmalade::Config::engineConfig.showWelcomeScreen);
+    ImGui::Checkbox("Show Welcome Screen on Startup", &Marmalade::Config::engineConfig.appearance.showWelcomeScreen);
 }
 
 void Marmalade::GUI::Preferences::selectableTreeNode(const char* title, const char* id) {
