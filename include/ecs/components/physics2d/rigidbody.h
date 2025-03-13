@@ -84,6 +84,9 @@ namespace Marmalade::ECS {
         RigidBody() {
             name = "Rigid Body";
             categories = {"Physics"};
+            description =
+                    "Adds a 2D Rigid Body component\n"
+                    "Allows an entity to be a physical object within the game world and to be affected by gravity, elasticity, and other parameters";
         }
 
     private:

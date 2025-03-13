@@ -48,6 +48,9 @@ namespace Marmalade::ECS {
             isMutable = false;
             allowMultiple = false;
             categories = {"General"};
+            description =
+                    "Transform Component\n"
+                    "Primary component for entities. Adds the ability to change the transform of an entity";
         }
     };
 

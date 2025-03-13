@@ -44,6 +44,9 @@ namespace Marmalade::ECS {
             allowMultiple = true,
             data = AABBDataBox{{1.0f, 1.0f}, {0.0f, 0.0f}};
             categories = {"Physics"};
+            description =
+                    "Adds 2D box shaped collision bounds component\n"
+                    "Supports both AABB and OBB collision detection based on entity orientation";
         }
 
         void Display(Entity* entity) override;

@@ -40,6 +40,9 @@ namespace Marmalade::ECS {
             name = "Texture Renderer";
             allowMultiple = false;
             categories = {"General"};
+            description =
+                    "Adds a texture renderer component\n"
+                    "Renders a texture to the screen";
         }
     };
 
