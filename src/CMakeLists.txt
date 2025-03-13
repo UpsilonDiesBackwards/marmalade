@@ -12,6 +12,8 @@ list(APPEND ENGINE_SRC
         application/config.h
         application/recents.cpp
         application/recents.h
+        application/plugins.cpp
+        application/plugins.h
         application/util.cpp
         application/util.h
         application/pluginloader.cpp
@@ -32,12 +34,16 @@ list(APPEND ENGINE_SRC
         scene/scene.cpp
         scene/scenemanager.cpp
 
+        packages/package.cpp
+        packages/package.h
+
         project/project.cpp
         project/project.h
         project/projectsettings.h
         project/projectmanager.h
         project/projectscenes.cpp
         project/projectscenes.h
+        project/projectpackages.h
 )
 
 list(APPEND ENGINE_SRC # ECS

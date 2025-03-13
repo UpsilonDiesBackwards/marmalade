@@ -49,7 +49,7 @@ void PackageManagerListView::SetupListView(std::string id, ImVec2 area) {
     SetListViewArea(area);
 }
 
-void PackageManagerListView::RenderItem(const Package& item, bool selected) {
+void PackageManagerListView::RenderItem(const Packages::Package& item, bool selected) {
     ImGui::SameLine();
     ImGui::Text("%s - %s", item.Name.c_str(), item.Repo.c_str());
 
@@ -179,7 +179,7 @@ void PackageManager::drawLeftPane(PackageManagerTab tab) {
     float search_bar_height = ImGui::GetItemRectSize().y;
 
     std::string query = search_str;
-    std::unordered_map<std::string, Package> packages{};
+    std::unordered_map<std::string, Packages::Package> packages{};
     if (!query.empty()) {
         // Split query
         std::istringstream queryStream(query);
@@ -340,7 +340,10 @@ void PackageManager::drawBottomBar(float height) {
     ImGui::PopStyleColor();
 
     ImGui::SameLine(window_width - 50);
+
+    ImGui::BeginDisabled(!_listView.GetGlobalDirty());
     ImGui::Button("Apply");
+    ImGui::EndDisabled();
 
     ImGui::EndChild();
 }
@@ -543,7 +546,7 @@ void PackageManager::buildIndex(const Repository& config_repo) {
                     std::string packageName = packageData["name"];
                 }
 
-                Package package{packageData["name"], config_repo.name, packageData["authors"], packageData["keywords"], packageDir.path()};
+                Packages::Package package{packageData["name"], config_repo.name, packageData["authors"], packageData["keywords"], packageDir.path()};
 
                 _packagesByName[package.Name] = package;
                 for (const std::string& keyword: package.Keywords) {
@@ -560,7 +563,7 @@ void PackageManager::buildIndex(const Repository& config_repo) {
     indexJson["index"] = [&]() {
         std::unordered_map<std::string, std::vector<std::string>> transformed;
         for (const auto& [key, pkgPtrs]: _keywordIndex) {
-            for (const Package* pkgPtr: pkgPtrs) {
+            for (const Packages::Package* pkgPtr: pkgPtrs) {
                 if (pkgPtr) transformed[key].push_back(pkgPtr->Name);
             }
         }

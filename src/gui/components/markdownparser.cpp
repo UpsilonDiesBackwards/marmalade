@@ -73,7 +73,7 @@ ImGui::MarkdownImageData Marmalade::GUI::Components::MarkdownParser::imageCallba
     int width, height;
     ImTextureID image = Marmalade::Util::LoadGuiTexture((options->BaseDir / imgPath).string(), &width, &height);
 
-    resizeImage(options->ImgMaxWidth, options->ImgMaxHeight, width, height);
+    Util::ConstrainImageSize(options->ImgMaxWidth, options->ImgMaxHeight, width, height);
 
     ImGui::MarkdownImageData imageData{
             .isValid = true,
@@ -100,14 +100,4 @@ void Marmalade::GUI::Components::MarkdownParser::linkCallback(ImGui::MarkdownLin
     } else {
         Util::OpenLink(url);
     }
-}
-
-void Marmalade::GUI::Components::MarkdownParser::resizeImage(int maxWidth, int maxHeight, int& imgWidth, int& imgHeight) {
-    float scaleX = (float) maxWidth / imgWidth;
-    float scaleY = (float) maxHeight / imgHeight;
-
-    float scale = std::min(scaleX, scaleY);
-
-    imgWidth *= scale;
-    imgHeight *= scale;
 }

@@ -103,13 +103,6 @@ void Marmalade::Project::Project::SaveProjectMarmalade() {
     o.close();
 }
 
-void Marmalade::Project::Project::SaveProjectSettings() {
-    std::ofstream o(basePath / projectMarmalade.paths.settings);
-    nlohmann::json new_settings = settings;
-    o << new_settings.dump(2);
-    o.close();
-}
-
 void Marmalade::Project::Project::LoadProjectSettings() {
     std::ifstream i(basePath / projectMarmalade.paths.settings);
     if (i.fail()) {
@@ -121,4 +114,31 @@ void Marmalade::Project::Project::LoadProjectSettings() {
     auto data = nlohmann::json::parse(i);
     settings = data.template get<ProjectSettings>();
     i.close();
+}
+
+void Marmalade::Project::Project::SaveProjectSettings() {
+    std::ofstream o(basePath / projectMarmalade.paths.settings);
+    nlohmann::json new_settings = settings;
+    o << new_settings.dump(2);
+    o.close();
+}
+
+void Marmalade::Project::Project::LoadProjectPackages() {
+    std::ifstream i(basePath / projectMarmalade.paths.packages);
+    if (i.fail()) {
+        // File doesn't exist!
+        spdlog::error("Failed to load project packages, file does not exist!");
+        return;
+    }
+
+    auto data = nlohmann::json::parse(i);
+    packages = data.template get<ProjectPackages>();
+    i.close();
+}
+
+void Marmalade::Project::Project::SaveProjectPackages() {
+    std::ofstream o(basePath / projectMarmalade.paths.packages);
+    nlohmann::json new_packages = packages;
+    o << new_packages.dump(2);
+    o.close();
 }

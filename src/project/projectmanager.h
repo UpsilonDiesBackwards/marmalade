@@ -30,6 +30,7 @@ namespace Marmalade::Project {
             P project(name, filePath);
             project.CreateEmptyProject(creationOptions);
             project.SaveProjectSettings();
+            project.SaveProjectPackages();
             return project;
         }
 
@@ -37,12 +38,14 @@ namespace Marmalade::Project {
             P project(filePath);
             project.LoadProjectMarmalade();
             project.LoadProjectSettings();
+            project.LoadProjectPackages();
             return project;
         }
 
         static void SaveProject(P* project) {
             project->SaveProjectMarmalade();
             project->SaveProjectSettings();
+            project->SaveProjectPackages();
         }
     };
 }

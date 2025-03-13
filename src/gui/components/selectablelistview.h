@@ -104,6 +104,8 @@ namespace Marmalade::GUI::Components {
          */
         virtual void RenderItem(const T& item, bool selected) = 0;
 
+        bool GetGlobalDirty() { return _globalDirty;};
+
     private:
         std::string _listViewId;///< Unique identifier for the list view.
         ImVec2 _listViewArea;   ///< Size of the list view in ImGui.

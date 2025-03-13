@@ -20,6 +20,7 @@
 #include "application/application.h"
 #include "application/config.h"
 #include "application/recents.h"
+#include "application/plugins.h"
 #include "application/pluginloader.h"
 #include "gui/windowmanager.h"
 
@@ -53,6 +54,7 @@ int main(int argc, char** argv) {
     Marmalade::Config::SetConfigDirectory(sameDirConfig);
     Marmalade::Config::LoadEngineConfig();
     Marmalade::Recents::LoadRecents();
+    Marmalade::Plugins::LoadPlugins();
 
     Application& application = Application::GetInstance(1920, 1080, "Marmalade Engine");
     application.Initialise();

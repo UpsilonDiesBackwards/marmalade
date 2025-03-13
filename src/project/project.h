@@ -22,6 +22,7 @@
 
 #include "projectsettings.h"
 #include "projectscenes.h"
+#include "projectpackages.h"
 
 #include "../gui/wizards/projectwizard.h"
 
@@ -31,6 +32,7 @@ namespace Marmalade::Project {
 
     struct ProjectPaths {
         std::string settings{"settings.marm"};
+        std::string packages{"package-settings.marm"};
         std::vector<std::string> scenes;
     };
 
@@ -49,6 +51,7 @@ namespace Marmalade::Project {
 
         ProjectSettings settings;
         ProjectMarmalade projectMarmalade;
+        ProjectPackages packages;
 
         ProjectScenes scenes;
 
@@ -62,6 +65,9 @@ namespace Marmalade::Project {
 
         void LoadProjectSettings();
         void SaveProjectSettings();
+
+        void LoadProjectPackages();
+        void SaveProjectPackages();
 
     private:
         std::vector<std::string> baseDirectories = {// Directories auto-created when the project is made
@@ -77,7 +83,7 @@ namespace Marmalade::Project {
                 "package-settings.marm"};
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectPaths, settings, scenes)
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectPaths, settings, packages, scenes)
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectMarmalade, type, name, uuid, paths)
 }
 

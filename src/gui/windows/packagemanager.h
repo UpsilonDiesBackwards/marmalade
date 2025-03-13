@@ -24,6 +24,7 @@
 #include "../../application/config.h"
 #include "../components/tableview.h"
 #include "../components/selectablelistview.h"
+#include "../../packages/package.h"
 
 #include <string>
 #include <mutex>
@@ -36,33 +37,13 @@
 
 namespace Marmalade::GUI {
 
-    struct Package {
-        std::string Name{};
-        std::string Repo{};
-        std::vector<std::string> Authors{};
-        std::vector<std::string> Keywords{};
-        std::filesystem::path LocalPath{};
-        bool Selected{false};
-
-        void SetSelected(bool selected) {
-            Selected = selected;
-        }
-
-        bool IsSelected() {
-            return Selected;
-        }
-
-        Package() = default;
-        Package(std::string name, std::string repo, std::vector<std::string> authors, const std::vector<std::string>& keywords, std::filesystem::path localPath) : Name(std::move(name)), Repo(std::move(repo)), Authors(std::move(authors)), Keywords(keywords), LocalPath(std::move(localPath)) {}
-    };
-
-    class PackageManagerListView : public Components::SelectableListView<Package> {
+    class PackageManagerListView : public Components::SelectableListView<Packages::Package> {
     public:
-        explicit PackageManagerListView(std::vector<Package>& items) : SelectableListView(items, {}, {}) {}
+        explicit PackageManagerListView(std::vector<Packages::Package>& items) : SelectableListView(items, {}, {}) {}
 
         void SetupListView(std::string id, ImVec2 area);
 
-        void RenderItem(const Package& item, bool selected) override;
+        void RenderItem(const Packages::Package& item, bool selected) override;
     };
 
     enum PackageManagerTab {
@@ -115,10 +96,10 @@ namespace Marmalade::GUI {
         bool _progressIndeterminate{false};
         std::string _progressText{};
 
-        std::unordered_map<std::string, Package> _packagesByName{};
-        std::unordered_map<std::string, std::vector<const Package*>> _keywordIndex{};
+        std::unordered_map<std::string, Packages::Package> _packagesByName{};
+        std::unordered_map<std::string, std::vector<const Packages::Package*>> _keywordIndex{};
 
-        std::vector<Package> _allPackages{};
+        std::vector<Packages::Package> _allPackages{};
 
         // For link confirmation
         std::string _currentUrl{};
@@ -139,8 +120,6 @@ namespace Marmalade::GUI {
 
         PackageManagerListView _listView{_allPackages};
     };
-
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::GUI::Package, Name, Repo, Authors, Keywords);
 }
 
 
