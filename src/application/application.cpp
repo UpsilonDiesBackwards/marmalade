@@ -248,7 +248,7 @@ bool Application::OpenProject(const std::filesystem::path& path) {
 void Application::SetCurrentProject(std::unique_ptr<Marmalade::Project::Project>& project) {// Change the current projects and update the window title to inc project name
     currentProject = std::move(project);
 
-    std::string windowTitle = std::string(title) + " // " + currentProject->name;
+    std::string windowTitle = std::string(title) + " - " + currentProject->projectMarmalade.name;
 
     glfwSetWindowTitle(window, windowTitle.c_str());
 }
