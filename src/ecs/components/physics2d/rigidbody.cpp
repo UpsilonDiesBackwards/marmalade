@@ -21,14 +21,16 @@
 #include "ecs/components/physics2d/rigidbody.h"
 
 #include <imgui.h>
+#include <glm/gtx/string_cast.hpp>
 
 void Marmalade::ECS::RigidBody::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
 
     ImGui::Checkbox("Static", &isStatic);
+    ImGui::DragFloat2("Centre of Mass", &body.centreOfMass.x, 0.1f);
     ImGui::DragFloat2("Velocity", &body.velocity.x, 0.1f);
     ImGui::DragFloat("Gravity", &body.gravity, 0.1f);
-    ImGui::DragFloat("Mass", &body.mass, 0.1f);
+    ImGui::DragFloat("Mass", &body.mass, 0.1f, 0.1f);
     ImGui::DragFloat("Elasticity", &body.elasticity, 0.0f);
 }
 
@@ -89,7 +91,7 @@ void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float time) {
         CollisionEvent event = collisionQueue.front();
         collisionQueue.pop();
 
-        Collide(event.self, event.other, event.normal); // Call 'Collide()' using the current collision event's data
+        Collide(event.self, event.other, event.normal, event.ptOnA_WorldSpace, event.ptOnB_WorldSpace); // Call 'Collide()' using the current collision event's data
 
         if (event.normal.y < 0 && event.other->componentManager.GetComponentOfType<RigidBody>()->isStatic) { // If the normal is 0 or the other is static...
             body.velocity.y = 0; //... set velocity to 0
@@ -102,18 +104,7 @@ void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float time) {
     entity->setPosition(newPos);
 }
 
-/*
-     * This function is still very rudimentary and does not currently provide accurate physics collision.
-     * currently when a moving (non-static) rigidbody collides with a stationary (static) rigidbody the
-     * non-static entity will "bounce" on the surface of the static rigidbody. This is most likely due to
-     * the collision normal being incorrectly computed in the Colliders.
-     *
-     * It seems that different collision detection methods have their own way of calculating a collision
-     * normal.
-     *
-     * TODO: We should eventually add rotational force for when a rigidbody falls of the corner of a rb
-     * */
-void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::vec2 normal) {
+void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::vec2 normal, glm::vec2 ptOnA, glm::vec2 ptOnB) {
     if (isStatic) return;
 
     auto* selfCollider = self->componentManager.GetComponentOfType<ColliderBase>();
@@ -131,22 +122,40 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::
     float otherElasticity = otherRigidBody->body.elasticity;
     float elasticity = selfElasticity * otherElasticity;
 
-    glm::vec2 combinedVelocities = body.velocity - otherRigidBody->body.velocity; // Combine the velocities of the two objects
+    glm::vec2 ra = ptOnA - GetCentreOfMass();
+    glm::vec2 rb = ptOnB - GetCentreOfMass();
+
+    float crossRA_N = ra.x * normal.y - ra.y * normal.x;
+    float crossRB_N = rb.x * normal.y - rb.y * normal.x;
+
+    glm::vec2 angularA = GetInverseInertiaTensor(self) * crossRA_N * glm::vec2(-ra.y, ra.x);
+    glm::vec2 angularB = GetInverseInertiaTensor(other) * crossRB_N * glm::vec2(-ra.y, ra.x);
+
+    float angularFactor = glm::dot(angularA + angularB, normal);
+
+    glm::vec2 selfVelocity = body.velocity + body.angularVelocity * glm::vec2(-ra.y, ra.x);
+    glm::vec2 otherVelocity = otherRigidBody->body.velocity + otherRigidBody->body.angularVelocity * glm::vec2(-ra.y, ra.x);
+
+    glm::vec2 combinedVelocities = selfVelocity - otherVelocity; // Combine the velocities of the two objects
 
     // Calculate the base impulse...
-    float impulse = -(1.0f + elasticity) * glm::dot(combinedVelocities, normal) / (body.mass + otherRigidBody->body.mass);
+    float impulse = -(1.0f + elasticity) * glm::dot(combinedVelocities, normal) / (body.mass + otherRigidBody->body.mass + angularFactor);
     glm::vec2 vectorImpulse = normal * impulse; //... then use it, and the normal to calculate the vector impulse
 
     // Calculate the collision penetration depth...
     glm::vec2 penetrationDepth = (selfSize / 2.0f + otherSize / 2.0f) - glm::abs(self->getPosition() - other->getPosition());
     glm::vec2 correction = normal * glm::max(glm::vec2(0), penetrationDepth) * 0.37f; //... and then use it to calculate a correction value
 
-    ApplyImpulseLinear(vectorImpulse); // Apply an impulse to self...
+    glm::vec2 contactPoint = self->getPosition() + normal * (selfSize * 0.5f);
+    glm::vec2 r = contactPoint - self->getPosition();
+    float torqueImpulse = r.x * vectorImpulse.y - r.y * vectorImpulse.x;
+
+    ApplyImpulse(contactPoint, vectorImpulse, self); // Apply an impulse to self...
     if (!otherRigidBody->isStatic) { //... and if the other entity is NOT static, ...
-        otherRigidBody->ApplyImpulseLinear(-vectorImpulse); //... then apply the opposite vector impulse (we abide by the third law of motion here)
+        otherRigidBody->ApplyImpulse(contactPoint, -vectorImpulse, self); //... then apply the opposite vector impulse (we abide by the third law of motion here)
     }
 
-    const float velocityThreshold = 0.0f; // If the velocity is less than the threshold, then set the velocity to zero
+    const float velocityThreshold = FLT_EPSILON; // If the velocity is less than the threshold, then set the velocity to zero
     if (glm::length(body.velocity) < velocityThreshold) {
         body.velocity = glm::vec2(0.0f);
     }
@@ -189,6 +198,7 @@ void Marmalade::ECS::RigidBody::ApplyImpulseAngular(float dL, Entity* self) {
     float invInertia = GetInverseInertiaTensor(self)[0][0];
 
     body.angularVelocity += invInertia * dL;
+    spdlog::info("angular velocity: {}, {}", body.angularVelocity[0], body.angularVelocity[1]);
 
     const float maxAngularSpeed = 30.0f;
     if (glm::sqrt(glm::length(body.angularVelocity)) > maxAngularSpeed) {
@@ -196,40 +206,26 @@ void Marmalade::ECS::RigidBody::ApplyImpulseAngular(float dL, Entity* self) {
     }
 }
 
-glm::mat3 Marmalade::ECS::RigidBody::GetInertiaTensor(Entity* self) {
-    // Get the collider component
+float Marmalade::ECS::RigidBody::GetInertiaTensor(Entity* self) {
     auto* collider = self->componentManager.GetComponentOfType<ColliderBase>();
     ColliderInfo colliderInfo = GetColliderInfo(collider);
 
-    glm::mat3 inertiaTensor = glm::mat3(0.0f);
+    float inertia = 0.0f;
 
     std::visit([&](auto&& colliderData) {
         using T = std::decay_t<decltype(colliderData)>;
 
         if constexpr (std::is_same_v<T, AABBDataCircle>) {
             float radius = colliderData.radius;
-            float inertia = (0.5f) * body.mass * (radius * radius);
-
-            inertiaTensor = glm::mat3{
-                    inertia, 0.0f, 0.0f,
-                    0.0f, inertia, 0.0f,
-                    0.0f, 0.0f, inertia,
-            };
+            inertia = 0.5f * body.mass * (radius * radius);
         } else if constexpr (std::is_same_v<T, AABBDataBox> || std::is_same_v<T, OBBDataBox>) {
             float width = colliderData.size.x;
             float height = colliderData.size.y;
-
-            float inertiaZ = (1.0f / 12.0f) * body.mass * (width * width + height * height);
-
-            inertiaTensor = glm::mat3{
-                    0.0f, 0.0f, 0.0f,
-                    0.0f, 0.0f, 0.0f,
-                    0.0f, 0.0f, inertiaZ
-            };
+            inertia = (1.0f / 12.0f) * body.mass * (width * width + height * height);
         }
     }, collider->data);
 
-    return inertiaTensor;
+    return inertia;
 }
 
 glm::mat2 Marmalade::ECS::RigidBody::GetInverseInertiaTensor(Entity* self) {

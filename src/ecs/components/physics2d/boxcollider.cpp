@@ -125,7 +125,11 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
         if (IntersectsAABB(*other->componentManager.GetComponentOfType<ColliderBase>(), posA, posB)) {
             if (auto* rb = self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
                 glm::vec2 collisionNorm = glm::normalize(posA - posB);
-                rb->collisionQueue.push({self, other, collisionNorm});
+
+                glm::vec2 ptOnA_WorldSpace = self->getPosition() + collisionNorm * aabbA->size;
+                glm::vec2 ptOnB_WorldSpace = other->getPosition() - collisionNorm * aabbB->size;
+
+                rb->collisionQueue.push({self, other, collisionNorm, ptOnA_WorldSpace, ptOnB_WorldSpace});
             }
         }
     } else if (obbA && obbB) {
@@ -133,7 +137,11 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
             if (auto* rb = self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
 
                 glm::vec2 collisionNorm = glm::normalize(posB - posA);
-                rb->collisionQueue.push({self, other, collisionNorm});
+
+                glm::vec2 ptOnA_WorldSpace = self->getPosition() + collisionNorm * obbA->size;
+                glm::vec2 ptOnB_WorldSpace = other->getPosition() - collisionNorm * obbB->size;
+
+                rb->collisionQueue.push({self, other, collisionNorm, ptOnA_WorldSpace, ptOnB_WorldSpace});
             }
         }
     }
