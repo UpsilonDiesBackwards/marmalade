@@ -20,6 +20,7 @@
 #ifndef MARMALADE_GUI_WINDOWMANAGER_H
 #define MARMALADE_GUI_WINDOWMANAGER_H
 
+#include "../application/config/engineconfig.h"
 #include "window.h"
 #include "windows/welcomescreen.h"
 #include "windows/packagemanager.h"
@@ -29,6 +30,7 @@
 #include "settings/settings.h"
 #include "editor/projectbrowser.h"
 #include "dialogs/about.h"
+#include "dialogs/configerror.h"
 
 #include <vector>
 
@@ -37,7 +39,7 @@ namespace Marmalade::GUI {
     public:
         static WindowManager& GetInstance();
 
-        WelcomeScreen welcomeScreen{Config::engineConfig.appearance.showWelcomeScreen};
+        WelcomeScreen welcomeScreen{EngineConfig::GetStoredConfig().appearance.showWelcomeScreen};
         PackageManager packageManager{};
         Log log{true};
         ProjectWizard projectWizard{};
@@ -45,12 +47,14 @@ namespace Marmalade::GUI {
         ProjectSettings settings{};
         ProjectBrowser projectBrowser{true};
         About about{};
+        ConfigErrorDialog configErrorDlg{};
 
         std::vector<Window*> windows{};
 
         bool showDebugWindow = false;
 
         void ToggleDebugWindow();
+
     private:
         WindowManager();
     };

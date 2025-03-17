@@ -33,6 +33,7 @@ Marmalade::GUI::WindowManager::WindowManager() {
     windows.push_back(&settings);
     windows.push_back(&projectBrowser);
     windows.push_back(&about);
+    windows.push_back(&configErrorDlg);
 }
 
 void Marmalade::GUI::WindowManager::ToggleDebugWindow() {
