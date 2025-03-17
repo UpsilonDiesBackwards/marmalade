@@ -196,9 +196,6 @@ void Marmalade::ECS::RigidBody::ApplyImpulse(glm::vec2 point, glm::vec2 impulse,
     glm::vec2 r = point - position;
     float torque = -glm::cross(glm::vec3(r, 0), glm::vec3(impulse, 0)).z * 0.2f;
 
-    glm::vec2 r = point - self->getPosition();
-    float dL = r.x * impulse.y - r.y * impulse.x;
-
     ApplyImpulseAngular(torque, self);
 }
 

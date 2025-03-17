@@ -20,7 +20,7 @@
 #include "topbar.h"
 
 #include "../../application/application.h"
-#include "../../application/recents.h"
+#include "../../application/config/recents.h"
 #include "../../application/util.h"
 #include "../../project/projectmanager.h"
 #include "../../application/config/configutil.h"

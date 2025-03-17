@@ -8,10 +8,10 @@ list(APPEND ENGINE_SRC
         application/profiler.h
         application/guilogsink.cpp
         application/guilogsink.h
-        application/recents.cpp
-        application/recents.h
-        application/plugins.cpp
-        application/plugins.h
+        application/config/recents.cpp
+        application/config/recents.h
+        application/config/plugins.cpp
+        application/config/plugins.h
         application/util.cpp
         application/util.h
         application/pluginloader.cpp

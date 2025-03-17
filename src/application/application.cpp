@@ -23,7 +23,7 @@
 
 #include "config/engineconfig.h"
 #include "config/configutil.h"
-#include "recents.h"
+#include "config/recents.h"
 #include "util.h"
 #include "../project/projectmanager.h"
 #include "../gui/fontmanager.h"
@@ -253,8 +253,8 @@ void Application::SetupLogger() {
 bool Application::OpenProject(const std::filesystem::path& path) {
     try {
         auto project = std::make_unique<Marmalade::Project::Project>(Marmalade::Project::ProjectManager<>::OpenProject(path));
-        Marmalade::Recents::AddRecentProject(Marmalade::RecentProject{project->projectMarmalade.name, project->projectMarmalade.uuid, path.string()});
-        Marmalade::Recents::SaveRecents();
+        Marmalade::Recents::GetInstance().AddRecentProject(Marmalade::RecentProject{project->projectMarmalade.name, project->projectMarmalade.uuid, path.string()});
+        Marmalade::Recents::GetInstance().SaveConfig();
 
         SetCurrentProject(project);
     } catch (const std::exception& ex) {

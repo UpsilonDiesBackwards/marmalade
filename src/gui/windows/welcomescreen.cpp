@@ -20,8 +20,7 @@
 #include "welcomescreen.h"
 
 #include "../../application/application.h"
-#include "../../application/recents.h"
-#include "../../project/projectmanager.h"
+#include "../../application/config/recents.h"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -72,7 +71,7 @@ void Marmalade::GUI::WelcomeScreen::drawRightPane() {
 
     if (ImGui::BeginListBox("WelcomeScreenRightList", ImGui::GetContentRegionAvail())) {
         int i = 0;
-        for (auto& item: Recents::recentsConfig.projects) {
+        for (auto& item: Recents::GetStoredConfig().projects) {
             ImGui::PushID(("WelcomeScreenRightList" + std::to_string(i)).c_str());
 
             bool selected = (rightPaneSelected == i);

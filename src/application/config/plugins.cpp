@@ -19,29 +19,9 @@
 
 #include "plugins.h"
 
-#include "config/configutil.h"
+#include "configutil.h"
 
-#include <fstream>
-
-Marmalade::PluginsConfig Marmalade::Plugins::pluginsConfig{};
-
-void Marmalade::Plugins::LoadPlugins() {
-    std::ifstream i(ConfigUtil::GetConfigDirectory() / "plugins.json");
-    if (i.fail()) {
-        // File doesn't exist
-        pluginsConfig = {};
-        SavePlugins();
-        return;
-    }
-
-    auto data = nlohmann::json::parse(i);
-    pluginsConfig = data.template get<PluginsConfig>();
-    i.close();
-}
-
-void Marmalade::Plugins::SavePlugins() {
-    std::ofstream o(ConfigUtil::GetConfigDirectory() / "plugins.json");
-    nlohmann::json new_config = pluginsConfig;
-    o << new_config.dump(2);
-    o.close();
+Marmalade::Plugins::Plugins() : Config<PluginsConfig>(ConfigUtil::GetConfigDirectory() / "plugins.json") {
+    version = PLUGINS_VERSION;
+    useGui = false;
 }

@@ -20,9 +20,13 @@
 #ifndef MARMALADE_RECENTS_H
 #define MARMALADE_RECENTS_H
 
+#include "config.h"
+
 #include <nlohmann/json.hpp>
 
 #include <vector>
+
+#define RECENTS_VERSION 1
 
 namespace Marmalade {
 
@@ -37,17 +41,19 @@ namespace Marmalade {
     };
 
     struct RecentsConfig {
+        int version{RECENTS_VERSION};
         std::vector<RecentProject> projects{};
     };
 
-    class Recents {
+    class Recents : public Config<RecentsConfig> {
     public:
-        static RecentsConfig recentsConfig;
+        explicit Recents();
 
-        static void LoadRecents();
-        static void SaveRecents();
+        CONFIG_SINGLETON(Recents)
 
-        static void AddRecentProject(RecentProject project);
+        CONFIG_DECL_GET_FUNC(Recents)
+
+        void AddRecentProject(RecentProject project);
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::RecentProject, name, uuid, path);

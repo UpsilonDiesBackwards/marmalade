@@ -22,8 +22,7 @@
 #include "../../project/project.h"
 #include "../../project/projectmanager.h"
 #include "../../application/application.h"
-#include "../../application/recents.h"
-#include "../../application/config/engineconfig.h"
+#include "../../application/config/recents.h"
 
 #include <spdlog/spdlog.h>
 
@@ -162,8 +161,8 @@ void Marmalade::GUI::ProjectWizard::CreateProject() {
 
         auto project = std::make_unique<Marmalade::Project::Project>(Marmalade::Project::ProjectManager<>::CreateProject(projectName, projectPath / "project.marmalade", creationOptions));
 
-        Recents::AddRecentProject(RecentProject{project->projectMarmalade.name, project->projectMarmalade.uuid, projectPath.string()});
-        Recents::SaveRecents();
+        Recents::GetInstance().AddRecentProject(RecentProject{project->projectMarmalade.name, project->projectMarmalade.uuid, projectPath.string()});
+        Recents::GetInstance().SaveConfig();
 
         // Create the project and set it to the current project
         Application::GetInstance().SetCurrentProject(project);

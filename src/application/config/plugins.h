@@ -20,24 +20,29 @@
 #ifndef MARMALADE_PLUGINS_H
 #define MARMALADE_PLUGINS_H
 
-#include "../packages/package.h"
+#include "config.h"
+#include "../../packages/package.h"
 
 #include <nlohmann/json.hpp>
 
 #include <vector>
 
+#define PLUGINS_VERSION 1
+
 namespace Marmalade {
 
     struct PluginsConfig {
+        int version{PLUGINS_VERSION};
         std::vector<Packages::PackageReference> plugins{};
     };
 
-    class Plugins {
+    class Plugins : public Config<PluginsConfig> {
     public:
-        static PluginsConfig pluginsConfig;
+        explicit Plugins();
 
-        static void LoadPlugins();
-        static void SavePlugins();
+        CONFIG_SINGLETON(Plugins)
+
+        CONFIG_DECL_GET_FUNC(Plugins)
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::PluginsConfig, plugins);

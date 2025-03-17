@@ -19,8 +19,8 @@
 
 #include "application/application.h"
 #include "application/config/configutil.h"
-#include "application/recents.h"
-#include "application/plugins.h"
+#include "application/config/recents.h"
+#include "application/config/plugins.h"
 #include "application/pluginloader.h"
 #include "gui/windowmanager.h"
 
@@ -55,8 +55,12 @@ int main(int argc, char** argv) {
     if (!Marmalade::EngineConfig::GetInstance().LoadConfig()) {
         return 1;
     }
-    Marmalade::Recents::LoadRecents();
-    Marmalade::Plugins::LoadPlugins();
+    if (!Marmalade::Recents::GetInstance().LoadConfig()) {
+        Marmalade::Recents::GetInstance().RecreateConfig();
+    }
+    if (!Marmalade::Plugins::GetInstance().LoadConfig()) {
+        Marmalade::Plugins::GetInstance().RecreateConfig();
+    }
 
     Application& application = Application::GetInstance(1920, 1080, "Marmalade Engine");
     application.Initialise();
