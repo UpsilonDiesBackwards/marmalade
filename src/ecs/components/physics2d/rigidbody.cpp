@@ -1,4 +1,3 @@
-
 /*
  Marmalade - Lightweight Game Engine
  Copyright (C) 2025 Tayler Parsons
@@ -124,16 +123,20 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::
     float otherElasticity = otherRigidBody->body.elasticity;
     float elasticity = selfElasticity * otherElasticity;
 
+    if (glm::abs(normal.y) > 0.99f) { // Set ptOnA/B.x as centre of mass.x
+        ptOnA.x = GetCentreOfMass().x;
+        ptOnB.x = otherRigidBody->GetCentreOfMass().x;
+    }
+
     glm::vec2 ra = ptOnA - GetCentreOfMass();
-    glm::vec2 rb = ptOnB - GetCentreOfMass();
+    glm::vec2 rb = ptOnB - otherRigidBody->GetCentreOfMass();
 
     float crossRA_N = ra.x * normal.y - ra.y * normal.x;
     float crossRB_N = rb.x * normal.y - rb.y * normal.x;
 
-    glm::vec2 angularA = GetInverseInertiaTensor(self) * crossRA_N * glm::vec2(-ra.y, ra.x);
-    glm::vec2 angularB = GetInverseInertiaTensor(other) * crossRB_N * glm::vec2(-ra.y, ra.x);
-
-    float angularFactor = glm::dot(angularA + angularB, normal);
+    float angularA = GetInverseInertiaTensor(self) * (crossRA_N * crossRA_N);
+    float angularB = GetInverseInertiaTensor(other) * (crossRB_N * crossRB_N);
+    float angularFactor = (angularA + angularB); // Calculate angular factor
 
     glm::vec2 selfVelocity = body.velocity + body.angularVelocity * glm::vec2(-ra.y, ra.x);
     glm::vec2 otherVelocity = otherRigidBody->body.velocity + otherRigidBody->body.angularVelocity * glm::vec2(-ra.y, ra.x);
@@ -148,9 +151,8 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::
     glm::vec2 penetrationDepth = (selfSize / 2.0f + otherSize / 2.0f) - glm::abs(self->getPosition() - other->getPosition());
     glm::vec2 correction = normal * glm::max(glm::vec2(0), penetrationDepth) * 0.37f; //... and then use it to calculate a correction value
 
-    glm::vec2 contactPoint = self->getPosition() + normal * (selfSize * 0.5f);
-    glm::vec2 r = contactPoint - self->getPosition();
-    float torqueImpulse = r.x * vectorImpulse.y - r.y * vectorImpulse.x;
+    glm::vec2 perpendicular = glm::normalize(glm::vec2(-normal.y, normal.x)) * 0.1f;
+    glm::vec2 contactPoint = self->getPosition() + normal * (selfSize * 0.5f) + perpendicular;
 
     ApplyImpulse(contactPoint, vectorImpulse, self); // Apply an impulse to self...
     if (!otherRigidBody->isStatic) { //... and if the other entity is NOT static, ...
@@ -173,6 +175,11 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::
         self->setPosition(self->getPosition() + correction * selfMove);
         other->setPosition(other->getPosition() + correction * otherMove);
     }
+
+    // Set angular velocity to zero (TODO: Object should rest flush on the object. This just stops it.)
+    if (glm::abs(normal.y) > 0.99f && otherRigidBody->isStatic) {
+        body.angularVelocity = 0.0f;
+    }
 }
 
 void Marmalade::ECS::RigidBody::ApplyImpulse(glm::vec2 point, glm::vec2 impulse, Entity* self) {
@@ -180,12 +187,15 @@ void Marmalade::ECS::RigidBody::ApplyImpulse(glm::vec2 point, glm::vec2 impulse,
 
     ApplyImpulseLinear(impulse);
 
+    // Use Centre of Mass to determine the torque
     glm::vec2 position = GetCentreOfMass();
+    glm::vec2 r = point - position;
+    float torque = -glm::cross(glm::vec3(r, 0), glm::vec3(impulse, 0)).z * 0.2f;
 
     glm::vec2 r = point - self->getPosition();
     float dL = r.x * impulse.y - r.y * impulse.x;
 
-    ApplyImpulseAngular(dL, self);
+    ApplyImpulseAngular(torque, self);
 }
 
 void Marmalade::ECS::RigidBody::ApplyImpulseLinear(glm::vec2 impulse) {
@@ -197,13 +207,14 @@ void Marmalade::ECS::RigidBody::ApplyImpulseLinear(glm::vec2 impulse) {
 void Marmalade::ECS::RigidBody::ApplyImpulseAngular(float dL, Entity* self) {
     if (body.mass == 0.0f) return;
 
-    float invInertia = GetInverseInertiaTensor(self)[0][0];
+    float invInertia = GetInverseInertiaTensor(self);
 
-    body.angularVelocity += invInertia * dL;
-    spdlog::info("angular velocity: {}, {}", body.angularVelocity[0], body.angularVelocity[1]);
+    if (glm::abs(dL) > FLT_EPSILON) { body.angularVelocity += invInertia * dL; }
 
     const float maxAngularSpeed = 30.0f;
     if (glm::sqrt(glm::length(body.angularVelocity)) > maxAngularSpeed) {
+    const float maxAngularSpeed = 15.0f; // Limit angular speed to prevent it going haywire
+    if (glm::sqrt(glm::length(body.angularVelocity)) > maxAngularSpeed) { // Set angular velocity
         body.angularVelocity = glm::sign(body.angularVelocity) * maxAngularSpeed;
     }
 }
@@ -214,6 +225,7 @@ float Marmalade::ECS::RigidBody::GetInertiaTensor(Entity* self) {
 
     float inertia = 0.0f;
 
+    // Set inertia using data from used collider type
     std::visit([&](auto&& colliderData) {
         using T = std::decay_t<decltype(colliderData)>;
 
@@ -223,23 +235,14 @@ float Marmalade::ECS::RigidBody::GetInertiaTensor(Entity* self) {
         } else if constexpr (std::is_same_v<T, AABBDataBox> || std::is_same_v<T, OBBDataBox>) {
             float width = colliderData.size.x;
             float height = colliderData.size.y;
-            inertia = (1.0f / 12.0f) * body.mass * (width * width + height * height);
+            inertia = (1.0f / 12.0f) * body.mass * (width * width + height * height); // this line
         }
     }, collider->data);
 
     return inertia;
 }
 
-glm::mat2 Marmalade::ECS::RigidBody::GetInverseInertiaTensor(Entity* self) {
-    glm::mat3 inertia = GetInertiaTensor(self);
-    float inverseInertia = glm::inverse(inertia)[2][2] * body.mass;
-    glm::mat2 orient = glm::mat2(
-            cos(self->getRotation()), -sin(self->getRotation()),
-            sin(self->getRotation()), cos(self->getRotation())
-    );
-
-    glm::mat2 invInertiaMat = glm::mat2(inverseInertia, 0, 0, inverseInertia);
-    glm::mat2 worldInvInertia = orient * invInertiaMat * glm::transpose(orient);
-
-    return worldInvInertia;
+float Marmalade::ECS::RigidBody::GetInverseInertiaTensor(Entity* self) {
+    float inertia = GetInertiaTensor(self);
+    return (inertia > 0.0f) ? (1.0f / inertia) : 0.0f;
 }
