@@ -253,7 +253,7 @@ void Application::SetupLogger() {
 bool Application::OpenProject(const std::filesystem::path& path) {
     try {
         auto project = std::make_unique<Marmalade::Project::Project>(Marmalade::Project::ProjectManager<>::OpenProject(path));
-        Marmalade::Recents::GetInstance().AddRecentProject(Marmalade::RecentProject{project->projectMarmalade.name, project->projectMarmalade.uuid, path.string()});
+        Marmalade::Recents::GetInstance().AddRecentProject(Marmalade::RecentProject{project->projectMarmalade->storedConfig.name, project->projectMarmalade->storedConfig.uuid, path.string()});
         Marmalade::Recents::GetInstance().SaveConfig();
 
         SetCurrentProject(project);
@@ -268,7 +268,7 @@ bool Application::OpenProject(const std::filesystem::path& path) {
 void Application::SetCurrentProject(std::unique_ptr<Marmalade::Project::Project>& project) {// Change the current projects and update the window title to inc project name
     currentProject = std::move(project);
 
-    std::string windowTitle = std::string(title) + " - " + currentProject->projectMarmalade.name;
+    std::string windowTitle = std::string(title) + " - " + currentProject->projectMarmalade->storedConfig.name;
 
     glfwSetWindowTitle(window, windowTitle.c_str());
 }

@@ -65,7 +65,7 @@ void EditorViews::Show() {
                 const std::string fileName = Marmalade::Project::ProjectScenes::GetSceneFileName(scene->GetUuid());
                 project->scenes.RegisterScene(fileName);
                 project->scenes.SaveScene(fileName, scene);
-                project->SaveProjectMarmalade();
+                project->projectMarmalade->SaveConfig();
             }
         }
 

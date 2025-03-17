@@ -40,7 +40,7 @@ std::filesystem::path Marmalade::Project::ProjectScenes::GetEntityDirectory() {
 
 void Marmalade::Project::ProjectScenes::RegisterScene(const std::string& fileName) {
     auto project = Application::GetInstance().GetCurrentProject();
-    auto& scenes = project->projectMarmalade.paths.scenes;
+    auto& scenes = project->projectMarmalade->storedConfig.paths.scenes;
 
     if (std::find(scenes.begin(), scenes.end(), fileName) == scenes.end()) {
         scenes.push_back(fileName);
@@ -107,7 +107,7 @@ Scene Marmalade::Project::ProjectScenes::LoadScene(const std::string& fileName, 
 void Marmalade::Project::ProjectScenes::UnregisterScene(const std::string& fileName) {
     auto project = Application::GetInstance().GetCurrentProject();
 
-    auto& scenes = project->projectMarmalade.paths.scenes;
+    auto& scenes = project->projectMarmalade->storedConfig.paths.scenes;
 
     scenes.erase(std::remove_if(scenes.begin(), scenes.end(),
                                 [&fileName](const std::string& filePath) {
@@ -159,7 +159,7 @@ std::shared_ptr<Entity> Marmalade::Project::ProjectScenes::deserializeEntity(con
         entity->componentManager.AddComponent(std::move(newComponent));// Add component
     }
 
-    for (const auto &component : entity->componentManager.components) {
+    for (const auto& component: entity->componentManager.components) {
         component->Setup(entity.get());
     }
 
@@ -182,7 +182,7 @@ std::shared_ptr<Entity> Marmalade::Project::ProjectScenes::deserializeEntity(con
 
 std::vector<Scene> Marmalade::Project::ProjectScenes::GetScenes() {
     auto project = Application::GetInstance().GetCurrentProject();
-    auto& scenePaths = project->projectMarmalade.paths.scenes;
+    auto& scenePaths = project->projectMarmalade->storedConfig.paths.scenes;
 
     std::vector<Scene> scenes{};
     for (const auto& path: scenePaths) {

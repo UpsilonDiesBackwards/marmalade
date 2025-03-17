@@ -20,6 +20,7 @@
 #ifndef MARMALADE_PROJECT_PROJECT_H
 #define MARMALADE_PROJECT_PROJECT_H
 
+#include "projectfile.h"
 #include "projectsettings.h"
 #include "projectscenes.h"
 #include "projectpackages.h"
@@ -30,19 +31,6 @@
 
 namespace Marmalade::Project {
 
-    struct ProjectPaths {
-        std::string settings{"settings.marm"};
-        std::string packages{"package-settings.marm"};
-        std::vector<std::string> scenes;
-    };
-
-    struct ProjectMarmalade {
-        std::string type{"Marmalade::Project"};
-        std::string name{"A Marmalade Project"};
-        std::string uuid{};
-        ProjectPaths paths{};
-    };
-
     class Project {
     public:
         std::string name;
@@ -50,7 +38,7 @@ namespace Marmalade::Project {
         std::filesystem::path filePath;// Where the project is stored / project.marmalade file path
 
         ProjectSettings settings;
-        ProjectMarmalade projectMarmalade;
+        std::shared_ptr<ProjectFile> projectMarmalade;
         ProjectPackages packages;
 
         ProjectScenes scenes;
@@ -59,9 +47,6 @@ namespace Marmalade::Project {
         Project(std::string name, const std::filesystem::path& filePath);
 
         void CreateEmptyProject(ProjectCreationOptions creationOptions);
-
-        void LoadProjectMarmalade();
-        void SaveProjectMarmalade();
 
         void LoadProjectSettings();
         void SaveProjectSettings();
@@ -82,9 +67,6 @@ namespace Marmalade::Project {
                 "settings.marm",
                 "package-settings.marm"};
     };
-
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectPaths, settings, packages, scenes)
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectMarmalade, type, name, uuid, paths)
 }
 
 #endif

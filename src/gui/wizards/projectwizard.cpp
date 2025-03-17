@@ -161,7 +161,7 @@ void Marmalade::GUI::ProjectWizard::CreateProject() {
 
         auto project = std::make_unique<Marmalade::Project::Project>(Marmalade::Project::ProjectManager<>::CreateProject(projectName, projectPath / "project.marmalade", creationOptions));
 
-        Recents::GetInstance().AddRecentProject(RecentProject{project->projectMarmalade.name, project->projectMarmalade.uuid, projectPath.string()});
+        Recents::GetInstance().AddRecentProject(RecentProject{project->projectMarmalade->storedConfig.name, project->projectMarmalade->storedConfig.uuid, projectPath.string()});
         Recents::GetInstance().SaveConfig();
 
         // Create the project and set it to the current project

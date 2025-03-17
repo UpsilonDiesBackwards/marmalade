@@ -42,6 +42,8 @@ list(APPEND ENGINE_SRC
 
         project/project.cpp
         project/project.h
+        project/projectfile.cpp
+        project/projectfile.h
         project/projectsettings.h
         project/projectmanager.h
         project/projectscenes.cpp

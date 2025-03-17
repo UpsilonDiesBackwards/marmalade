@@ -17,35 +17,9 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_PLUGINS_H
-#define MARMALADE_PLUGINS_H
+#include "projectfile.h"
 
-#include "config.h"
-#include "../../packages/package.h"
-
-#include <nlohmann/json.hpp>
-
-#include <vector>
-
-#define PLUGINS_VERSION 1
-
-namespace Marmalade {
-
-    struct PluginsConfig {
-        int version{PLUGINS_VERSION};
-        std::vector<Packages::PackageReference> plugins{};
-    };
-
-    class Plugins : public Config<PluginsConfig> {
-    public:
-        explicit Plugins();
-
-        CONFIG_SINGLETON(Plugins)
-
-        CONFIG_DECL_GET_FUNC(Plugins)
-    };
-
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::PluginsConfig, version, plugins);
+Marmalade::Project::ProjectFile::ProjectFile(const std::filesystem::path& filePath) : Config<ProjectMarmalade>(filePath) {
+    version = PROJECT_FILE_VERSION;
+    useGui = true;
 }
-
-#endif

@@ -58,7 +58,7 @@ namespace Marmalade {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::RecentProject, name, uuid, path);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::RecentsConfig, projects);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::RecentsConfig, version, projects);
 }
 
 

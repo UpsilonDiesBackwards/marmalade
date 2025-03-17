@@ -21,6 +21,7 @@
 #define MARMALADE_PROJECT_PROJECTMANAGER_H
 
 #include "project.h"
+#include "../gui/windowmanager.h"
 
 namespace Marmalade::Project {
     template<typename P = Project>
@@ -36,14 +37,14 @@ namespace Marmalade::Project {
 
         static P OpenProject(const std::filesystem::path& filePath) {
             P project(filePath);
-            project.LoadProjectMarmalade();
+            project.projectMarmalade->LoadConfig(&GUI::WindowManager::GetInstance().configErrorDlg);
             project.LoadProjectSettings();
             project.LoadProjectPackages();
             return project;
         }
 
         static void SaveProject(P* project) {
-            project->SaveProjectMarmalade();
+            project->projectMarmalade->SaveConfig();
             project->SaveProjectSettings();
             project->SaveProjectPackages();
         }

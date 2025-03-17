@@ -155,6 +155,10 @@ namespace Marmalade {
         virtual void PrepareConfigRecreation() {};
         virtual void EndConfigRecreation() {};
 
+        TConfig* operator->() {
+            return &storedConfig;
+        }
+
     private:
         std::map<int, std::function<void(nlohmann::json&)>> _migrations{};
 
