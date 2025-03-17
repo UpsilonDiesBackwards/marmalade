@@ -17,31 +17,23 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "plugins.h"
+#ifndef MARMALADE_GUI_CONFIGERROR_H
+#define MARMALADE_GUI_CONFIGERROR_H
 
-#include "config/configutil.h"
+#include "../window.h"
 
-#include <fstream>
+#include <string>
+#include <functional>
 
-Marmalade::PluginsConfig Marmalade::Plugins::pluginsConfig{};
+namespace Marmalade::GUI {
+    class ConfigErrorDialog : public Window {
+    public:
+        std::string fileName{};
+        std::string errorMsg{};
+        std::function<void()> recreateConfigCallback{nullptr};
 
-void Marmalade::Plugins::LoadPlugins() {
-    std::ifstream i(ConfigUtil::GetConfigDirectory() / "plugins.json");
-    if (i.fail()) {
-        // File doesn't exist
-        pluginsConfig = {};
-        SavePlugins();
-        return;
-    }
-
-    auto data = nlohmann::json::parse(i);
-    pluginsConfig = data.template get<PluginsConfig>();
-    i.close();
+        void Draw() override;
+    };
 }
 
-void Marmalade::Plugins::SavePlugins() {
-    std::ofstream o(ConfigUtil::GetConfigDirectory() / "plugins.json");
-    nlohmann::json new_config = pluginsConfig;
-    o << new_config.dump(2);
-    o.close();
-}
+#endif

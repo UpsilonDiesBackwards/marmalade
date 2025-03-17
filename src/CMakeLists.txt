@@ -8,8 +8,6 @@ list(APPEND ENGINE_SRC
         application/profiler.h
         application/guilogsink.cpp
         application/guilogsink.h
-        application/config.cpp
-        application/config.h
         application/recents.cpp
         application/recents.h
         application/plugins.cpp
@@ -18,6 +16,11 @@ list(APPEND ENGINE_SRC
         application/util.h
         application/pluginloader.cpp
         application/pluginloader.h
+        application/config/config.h
+        application/config/configutil.h
+        application/config/configutil.cpp
+        application/config/engineconfig.cpp
+        application/config/engineconfig.h
 
         graphics/viewport.cpp
         graphics/renderable.cpp

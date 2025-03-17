@@ -21,7 +21,8 @@
 
 #include "application.h"
 
-#include "config.h"
+#include "config/engineconfig.h"
+#include "config/configutil.h"
 #include "recents.h"
 #include "util.h"
 #include "../project/projectmanager.h"
@@ -57,7 +58,7 @@ Application::~Application() {
 void Application::Initialise() {
     SetupLogger();
 
-    static std::filesystem::path imguiIniPath = Marmalade::Config::GetConfigDirectory() / "imgui.ini";
+    static std::filesystem::path imguiIniPath = Marmalade::ConfigUtil::GetConfigDirectory() / "imgui.ini";
     static std::string imguiIniPathStr = imguiIniPath.string();
 
     std::ifstream imguiIni(imguiIniPath);
@@ -79,23 +80,23 @@ void Application::Initialise() {
         std::cout << "Window Created" << std::endl;
     glfwWindowHint(GLFW_SAMPLES, 4);
 
-    int monitorNum = Marmalade::Config::engineConfig.windowPos.monitor;
+    int monitorNum = Marmalade::EngineConfig::GetStoredConfig().windowPos.monitor;
     if (monitorNum > -1) {
         // Full screen
         int count = 0;
         GLFWmonitor** monitors = glfwGetMonitors(&count);
         glfwSetWindowMonitor(window, monitors[monitorNum], 0, 0, width, height, GLFW_DONT_CARE);
     } else {
-        int x = Marmalade::Config::engineConfig.windowPos.x;
-        int y = Marmalade::Config::engineConfig.windowPos.y;
+        int x = Marmalade::EngineConfig::GetStoredConfig().windowPos.x;
+        int y = Marmalade::EngineConfig::GetStoredConfig().windowPos.y;
 
-        int configWidth = Marmalade::Config::engineConfig.windowPos.width;
-        int configHeight = Marmalade::Config::engineConfig.windowPos.height;
+        int configWidth = Marmalade::EngineConfig::GetStoredConfig().windowPos.width;
+        int configHeight = Marmalade::EngineConfig::GetStoredConfig().windowPos.height;
 
         glfwSetWindowPos(window, x, y);
         glfwSetWindowSize(window, configWidth, configHeight);
 
-        if (Marmalade::Config::engineConfig.windowPos.maximised) glfwMaximizeWindow(window);
+        if (Marmalade::EngineConfig::GetStoredConfig().windowPos.maximised) glfwMaximizeWindow(window);
     }
 
 
@@ -116,17 +117,17 @@ void Application::Initialise() {
     ImGui_ImplOpenGL3_Init("#version 430");
 
     // Load ImGui custom style
-    if (!std::filesystem::exists(Marmalade::Config::GetConfigDirectory() / "editorstyle.txt")) {
-        std::filesystem::copy_file("res/config/editorstyle.txt", Marmalade::Config::GetConfigDirectory() / "editorstyle.txt");
+    if (!std::filesystem::exists(Marmalade::ConfigUtil::GetConfigDirectory() / "editorstyle.txt")) {
+        std::filesystem::copy_file("res/config/editorstyle.txt", Marmalade::ConfigUtil::GetConfigDirectory() / "editorstyle.txt");
     }
 
-    styleManager.LoadStyle((Marmalade::Config::GetConfigDirectory() / Marmalade::Config::engineConfig.appearance.themeFile).string());
+    styleManager.LoadStyle((Marmalade::ConfigUtil::GetConfigDirectory() / Marmalade::EngineConfig::GetStoredConfig().appearance.themeFile).string());
 
     ImGuiIO& io = ImGui::GetIO();
     io.IniFilename = imguiIniPathStr.c_str();
     io.ConfigWindowsMoveFromTitleBarOnly = true;
     io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable;
-    if (Marmalade::Config::engineConfig.appearance.viewports) {
+    if (Marmalade::EngineConfig::GetStoredConfig().appearance.viewports) {
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     }
 
@@ -149,7 +150,7 @@ void Application::Initialise() {
 
     // Build component category tree
     Marmalade::ECS::ComponentRegistry::Instance().BuildCategoryTree();
-    for (const auto& component: Marmalade::Config::engineConfig.favouriteComponents) {
+    for (const auto& component: Marmalade::EngineConfig::GetStoredConfig().favouriteComponents) {
         Marmalade::ECS::ComponentRegistry::Instance().SetFavourite(component);
     }
 }
@@ -157,7 +158,7 @@ void Application::Initialise() {
 void Application::Run() {
     profiler.Update();
 
-    ImVec4 backgroundCol = ImGui::ColorConvertU32ToFloat4(Marmalade::Config::engineConfig.appearance.backgroundColor);
+    ImVec4 backgroundCol = ImGui::ColorConvertU32ToFloat4(Marmalade::EngineConfig::GetStoredConfig().appearance.backgroundColor);
     glClearColor(backgroundCol.x, backgroundCol.y, backgroundCol.z, backgroundCol.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -236,7 +237,7 @@ void Application::SetupLogger() {
     auto maxFiles = maxLogFiles;
 
     auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    auto engineLogPath = Marmalade::Config::GetConfigDirectory() / "engine-log.txt";
+    auto engineLogPath = Marmalade::ConfigUtil::GetConfigDirectory() / "engine-log.txt";
     auto fileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
             engineLogPath.string(), maxSize, maxFiles);
 
@@ -246,7 +247,7 @@ void Application::SetupLogger() {
                                               spdlog::sinks_init_list{consoleSink, fileSink, guiSink});
     spdlog::register_logger(logger);
     spdlog::set_default_logger(logger);
-    spdlog::set_level(Marmalade::Config::engineConfig.logLevel);
+    spdlog::set_level(Marmalade::EngineConfig::GetStoredConfig().logLevel);
 }
 
 bool Application::OpenProject(const std::filesystem::path& path) {
@@ -278,24 +279,24 @@ Marmalade::Project::Project* Application::GetCurrentProject() {
 
 void Application::OnClose() {
     glfwGetWindowPos(window,
-                     &Marmalade::Config::engineConfig.windowPos.x,
-                     &Marmalade::Config::engineConfig.windowPos.y);
+                     &Marmalade::EngineConfig::GetStoredConfig().windowPos.x,
+                     &Marmalade::EngineConfig::GetStoredConfig().windowPos.y);
     glfwGetWindowSize(window,
-                      &Marmalade::Config::engineConfig.windowPos.width,
-                      &Marmalade::Config::engineConfig.windowPos.height);
+                      &Marmalade::EngineConfig::GetStoredConfig().windowPos.width,
+                      &Marmalade::EngineConfig::GetStoredConfig().windowPos.height);
 
     int monitorCount = 0;
     GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
     GLFWmonitor* monitor = glfwGetWindowMonitor(window);
     if (monitor == nullptr) {
-        Marmalade::Config::engineConfig.windowPos.monitor = -1;
+        Marmalade::EngineConfig::GetStoredConfig().windowPos.monitor = -1;
     } else {
         for (int i = 0; i < monitorCount; i++) {
             if (monitors[i] == monitor) {
-                Marmalade::Config::engineConfig.windowPos.monitor = i;
+                Marmalade::EngineConfig::GetStoredConfig().windowPos.monitor = i;
             }
         }
     }
 
-    Marmalade::Config::SaveEngineConfig();
+    Marmalade::EngineConfig::GetInstance().SaveConfig();
 }

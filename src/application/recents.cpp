@@ -19,14 +19,14 @@
 
 #include "recents.h"
 
-#include "config.h"
+#include "config/configutil.h"
 
 #include <fstream>
 
 Marmalade::RecentsConfig Marmalade::Recents::recentsConfig{};
 
 void Marmalade::Recents::LoadRecents() {
-    std::ifstream i(Config::GetConfigDirectory() / "recents.json");
+    std::ifstream i(ConfigUtil::GetConfigDirectory() / "recents.json");
     if (i.fail()) {
         // File doesn't exist
         recentsConfig = {};
@@ -40,7 +40,7 @@ void Marmalade::Recents::LoadRecents() {
 }
 
 void Marmalade::Recents::SaveRecents() {
-    std::ofstream o(Config::GetConfigDirectory() / "recents.json");
+    std::ofstream o(ConfigUtil::GetConfigDirectory() / "recents.json");
     nlohmann::json new_config = recentsConfig;
     o << new_config.dump(2);
     o.close();

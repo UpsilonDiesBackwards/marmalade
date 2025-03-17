@@ -19,14 +19,14 @@
 
 #include "preferences.h"
 
-#include "../../application/config.h"
+#include "../../application/config/engineconfig.h"
 
-#include "imgui.h"
-#include "imgui_internal.h"
+#include <imgui.h>
+#include <imgui_internal.h>
 
-#include "IconsCodicons.h"
+#include <IconsCodicons.h>
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 
 Marmalade::GUI::Preferences::Preferences() : Window() {
     _panes = {
@@ -37,37 +37,37 @@ Marmalade::GUI::Preferences::Preferences() : Window() {
 }
 
 void Marmalade::GUI::Preferences::drawGeneralLoggingPane() {
-    ImGui::Combo("Log Level", reinterpret_cast<int*>(&Config::engineConfig.logLevel), getLogLevels, nullptr, spdlog::level::n_levels);
+    ImGui::Combo("Log Level", reinterpret_cast<int*>(&EngineConfig::GetStoredConfig().logLevel), getLogLevels, nullptr, spdlog::level::n_levels);
     ImGui::SameLine();
     requiresRestartWarning();
 }
 
 void Marmalade::GUI::Preferences::drawGeneralAppearancePane() {
-    ImGui::Checkbox("ImGui Viewports", &Marmalade::Config::engineConfig.appearance.viewports);
+    ImGui::Checkbox("ImGui Viewports", &EngineConfig::GetStoredConfig().appearance.viewports);
     ImGui::SameLine();
     requiresRestartWarning();
 
     static char themeFileC[512];
-    strncpy(themeFileC, Config::engineConfig.appearance.themeFile.c_str(), sizeof(themeFileC));
+    strncpy(themeFileC, EngineConfig::GetStoredConfig().appearance.themeFile.c_str(), sizeof(themeFileC));
 
     if (ImGui::InputText("Theme File", themeFileC, sizeof(themeFileC))) {
-        Config::engineConfig.appearance.themeFile = themeFileC;
+        EngineConfig::GetStoredConfig().appearance.themeFile = themeFileC;
     }
     ImGui::SameLine();
     requiresRestartWarning();
 
-    static auto backgroundCol = ImGui::ColorConvertU32ToFloat4(Config::engineConfig.appearance.backgroundColor);
+    static auto backgroundCol = ImGui::ColorConvertU32ToFloat4(EngineConfig::GetStoredConfig().appearance.backgroundColor);
     if (ImGui::ColorEdit4("Background Color", &backgroundCol.x)) {
-        Config::engineConfig.appearance.backgroundColor = ImGui::ColorConvertFloat4ToU32(backgroundCol);
+        EngineConfig::GetStoredConfig().appearance.backgroundColor = ImGui::ColorConvertFloat4ToU32(backgroundCol);
     }
 
-    ImGui::BeginDisabled(Config::engineConfig.appearance.useSystemScaleFactor);
+    ImGui::BeginDisabled(EngineConfig::GetStoredConfig().appearance.useSystemScaleFactor);
     ImGui::SetNextItemWidth(150.0f);
-    ImGui::DragFloat("Scale Factor", &Config::engineConfig.appearance.scaleFactor, 0.1f, 0.0f, 5.0f);
+    ImGui::DragFloat("Scale Factor", &EngineConfig::GetStoredConfig().appearance.scaleFactor, 0.1f, 0.0f, 5.0f);
     ImGui::EndDisabled();
 
     ImGui::SameLine();
-    ImGui::Checkbox("Use System", &Config::engineConfig.appearance.useSystemScaleFactor);
+    ImGui::Checkbox("Use System", &EngineConfig::GetStoredConfig().appearance.useSystemScaleFactor);
 
     ImGui::SameLine();
     requiresRestartWarning();
@@ -75,13 +75,13 @@ void Marmalade::GUI::Preferences::drawGeneralAppearancePane() {
 
 void Marmalade::GUI::Preferences::drawGeneralProjectsPane() {
     static char defaultProjectPathC[512];
-    strncpy(defaultProjectPathC, Config::engineConfig.defaultProjectPath.c_str(), sizeof(defaultProjectPathC));
+    strncpy(defaultProjectPathC, EngineConfig::GetStoredConfig().defaultProjectPath.c_str(), sizeof(defaultProjectPathC));
 
     if (ImGui::InputText("Default Project Path", defaultProjectPathC, sizeof(defaultProjectPathC))) {
-        Config::engineConfig.defaultProjectPath = defaultProjectPathC;
+        EngineConfig::GetStoredConfig().defaultProjectPath = defaultProjectPathC;
     }
 
-    ImGui::Checkbox("Show Welcome Screen on Startup", &Marmalade::Config::engineConfig.appearance.showWelcomeScreen);
+    ImGui::Checkbox("Show Welcome Screen on Startup", &Marmalade::EngineConfig::GetStoredConfig().appearance.showWelcomeScreen);
 }
 
 void Marmalade::GUI::Preferences::selectableTreeNode(const char* title, const char* id) {
@@ -111,7 +111,7 @@ void Marmalade::GUI::Preferences::drawRightPane() {
     ImGui::SetCursorPos(ImVec2(area.x - 60.0f, area.y - 30.0f));
 
     if (ImGui::Button("Save")) {
-        Marmalade::Config::SaveEngineConfig();
+        Marmalade::EngineConfig::GetInstance().SaveConfig();
 
         for (auto& pane: _panes) {
             if (pane.second.SaveFunc) {
@@ -167,20 +167,20 @@ void Marmalade::GUI::Preferences::Draw() {
 }
 
 void Marmalade::GUI::Preferences::drawGeneralProjectBrowserPane() {
-    static auto assetsCol = ImGui::ColorConvertU32ToFloat4(Config::engineConfig.projectBrowser.colorAssets);
-    static auto dataCol = ImGui::ColorConvertU32ToFloat4(Config::engineConfig.projectBrowser.colorData);
-    static auto srcCol = ImGui::ColorConvertU32ToFloat4(Config::engineConfig.projectBrowser.colorSrc);
+    static auto assetsCol = ImGui::ColorConvertU32ToFloat4(EngineConfig::GetStoredConfig().projectBrowser.colorAssets);
+    static auto dataCol = ImGui::ColorConvertU32ToFloat4(EngineConfig::GetStoredConfig().projectBrowser.colorData);
+    static auto srcCol = ImGui::ColorConvertU32ToFloat4(EngineConfig::GetStoredConfig().projectBrowser.colorSrc);
 
     if (ImGui::ColorEdit4("Assets", &assetsCol.x)) {
-        Config::engineConfig.projectBrowser.colorAssets = ImGui::ColorConvertFloat4ToU32(assetsCol);
+        EngineConfig::GetStoredConfig().projectBrowser.colorAssets = ImGui::ColorConvertFloat4ToU32(assetsCol);
     }
 
     if (ImGui::ColorEdit4("Data", &dataCol.x)) {
-        Config::engineConfig.projectBrowser.colorData = ImGui::ColorConvertFloat4ToU32(dataCol);
+        EngineConfig::GetStoredConfig().projectBrowser.colorData = ImGui::ColorConvertFloat4ToU32(dataCol);
     }
 
     if (ImGui::ColorEdit4("Src", &srcCol.x)) {
-        Config::engineConfig.projectBrowser.colorSrc = ImGui::ColorConvertFloat4ToU32(srcCol);
+        EngineConfig::GetStoredConfig().projectBrowser.colorSrc = ImGui::ColorConvertFloat4ToU32(srcCol);
     }
 }
 

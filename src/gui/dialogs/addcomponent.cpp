@@ -76,11 +76,12 @@ void Marmalade::GUI::AddComponentDialog::drawRightPane() {
             if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
                 // Toggle favourite
                 ECS::ComponentRegistry::Instance().SetFavourite(component->Name, !isFavourite);
-                Config::engineConfig.favouriteComponents.clear();
+                EngineConfig::GetStoredConfig().favouriteComponents.clear();
                 for (const auto* comp: favourites) {
-                    Config::engineConfig.favouriteComponents.push_back(comp->Name);
+                    EngineConfig::GetStoredConfig().favouriteComponents.push_back(comp->Name);
                 }
-                Config::SaveEngineConfig();
+
+                EngineConfig::GetInstance().SaveConfig();
             }
 
             ImGui::TextWrapped("%s", component->Description.c_str());

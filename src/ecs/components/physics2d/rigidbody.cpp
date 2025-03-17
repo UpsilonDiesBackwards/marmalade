@@ -21,6 +21,8 @@
 #include "ecs/components/physics2d/rigidbody.h"
 
 #include <imgui.h>
+
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 
 void Marmalade::ECS::RigidBody::Display(Entity* entity) {

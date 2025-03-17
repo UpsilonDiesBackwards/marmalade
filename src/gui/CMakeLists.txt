@@ -10,6 +10,8 @@ list(APPEND ENGINE_SRC_GUI
         dialogs/about.h
         dialogs/addcomponent.cpp
         dialogs/addcomponent.h
+        dialogs/configerror.cpp
+        dialogs/configerror.h
 
         editor/details.cpp
         editor/details.h

@@ -18,7 +18,7 @@
  */
 
 #include "application/application.h"
-#include "application/config.h"
+#include "application/config/configutil.h"
 #include "application/recents.h"
 #include "application/plugins.h"
 #include "application/pluginloader.h"
@@ -51,8 +51,10 @@ int main(int argc, char** argv) {
         std::cout << "No chosen project" << std::endl;
     }
 
-    Marmalade::Config::SetConfigDirectory(sameDirConfig);
-    Marmalade::Config::LoadEngineConfig();
+    Marmalade::ConfigUtil::SetConfigDirectory(sameDirConfig);
+    if (!Marmalade::EngineConfig::GetInstance().LoadConfig()) {
+        return 1;
+    }
     Marmalade::Recents::LoadRecents();
     Marmalade::Plugins::LoadPlugins();
 

@@ -17,31 +17,25 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "plugins.h"
+#include "engineconfig.h"
 
-#include "config/configutil.h"
+#include "configutil.h"
 
-#include <fstream>
+Marmalade::EngineConfig::EngineConfig() : Config<EngineConfigStruct>(ConfigUtil::GetConfigDirectory() / "settings.json") {
+    version = CONFIG_VERSION;
+    useGui = false;
 
-Marmalade::PluginsConfig Marmalade::Plugins::pluginsConfig{};
-
-void Marmalade::Plugins::LoadPlugins() {
-    std::ifstream i(ConfigUtil::GetConfigDirectory() / "plugins.json");
-    if (i.fail()) {
-        // File doesn't exist
-        pluginsConfig = {};
-        SavePlugins();
-        return;
-    }
-
-    auto data = nlohmann::json::parse(i);
-    pluginsConfig = data.template get<PluginsConfig>();
-    i.close();
+    AddMigration(1, migrateFromVersion1);
 }
 
-void Marmalade::Plugins::SavePlugins() {
-    std::ofstream o(ConfigUtil::GetConfigDirectory() / "plugins.json");
-    nlohmann::json new_config = pluginsConfig;
-    o << new_config.dump(2);
-    o.close();
+void Marmalade::EngineConfig::PrepareNewConfig() {
+    storedConfig.repos.push_back(Repository{"default", "https://github.com/UpsilonDiesBackwards/marmalade-pkgs.git", 1});
 }
+
+#pragma region Migrations
+
+void Marmalade::EngineConfig::migrateFromVersion1(nlohmann::json& data) {
+    // Stub here, when version is set to 2, add code here for adding extra keys
+}
+
+#pragma endregion

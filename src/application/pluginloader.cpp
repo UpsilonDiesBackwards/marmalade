@@ -19,7 +19,7 @@
 
 #include "pluginloader.h"
 
-#include "config.h"
+#include "config/configutil.h"
 
 #include <spdlog/spdlog.h>
 
@@ -37,7 +37,7 @@ void Marmalade::PluginLoader::LoadPlugins() {
     // TODO: e.g. compiled as PE .dll for Windows and ELF .so for Linux
     // TODO: Loader will choose what file to load depending on manifest (manifest needs to be loaded first)
 
-    auto configDir = Config::GetConfigDirectory();
+    auto configDir = ConfigUtil::GetConfigDirectory();
     auto pluginsDir = configDir / "plugins";
 
     if (!std::filesystem::exists(pluginsDir)) {

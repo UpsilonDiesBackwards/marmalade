@@ -300,11 +300,11 @@ void Marmalade::GUI::ProjectBrowser::displayTooltip(const Marmalade::GUI::Direct
 ImU32 Marmalade::GUI::ProjectBrowser::getBackgroundColor(Marmalade::GUI::CommonDirectory type) {
     switch (type) {
         case CommonDirectory_ASSETS:
-            return Config::engineConfig.projectBrowser.colorAssets;
+            return EngineConfig::GetStoredConfig().projectBrowser.colorAssets;
         case CommonDirectory_DATA:
-            return Config::engineConfig.projectBrowser.colorData;
+            return EngineConfig::GetStoredConfig().projectBrowser.colorData;
         case CommonDirectory_SRC:
-            return Config::engineConfig.projectBrowser.colorSrc;
+            return EngineConfig::GetStoredConfig().projectBrowser.colorSrc;
         default:
             return IM_COL32(0, 0, 0, 0);
     }

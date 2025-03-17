@@ -1,35 +1,34 @@
 /*
- * Marmalade - Lightweight Game Engine
- * Copyright (C) 2025 Tayler Parsons
- * Copyright (C) 2025 Ryan Bester
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ Marmalade - Lightweight Game Engine
+ Copyright (C) 2025 Tayler Parsons
+ Copyright (C) 2025 Ryan Bester
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_CONFIG_H
-#define MARMALADE_CONFIG_H
+#ifndef MARMALADE_ENGINECONFIG_H
+#define MARMALADE_ENGINECONFIG_H
+
+#include "config.h"
 
 #include <nlohmann/json.hpp>
 
 #include <spdlog/spdlog.h>
 
-#include <filesystem>
-
 #define CONFIG_VERSION 1
 
 namespace Marmalade {
-
     struct Repository {
         std::string name;
         std::string gitUrl{};
@@ -60,7 +59,7 @@ namespace Marmalade {
         long long colorSrc = 4284895275;
     };
 
-    struct EngineConfig {
+    struct EngineConfigStruct {
         int version{CONFIG_VERSION};
 
         AppearanceConfig appearance;
@@ -76,22 +75,18 @@ namespace Marmalade {
         std::vector<std::string> favouriteComponents{};
     };
 
-    class Config {
+    class EngineConfig : public Config<EngineConfigStruct> {
     public:
-        static EngineConfig engineConfig;
+        explicit EngineConfig();
 
-        static void SetConfigDirectory(bool sameDirConfig);
-        static std::filesystem::path GetConfigDirectory();
+        CONFIG_SINGLETON(EngineConfig)
 
-        static void LoadEngineConfig();
-        static void SaveEngineConfig();
+        CONFIG_DECL_GET_FUNC(EngineConfig)
+
+        void PrepareNewConfig() override;
 
     private:
-        static std::filesystem::path _configDir;
-
 #pragma region Migrations
-
-        static const std::map<int, std::function<void(nlohmann::json&)>> _migrations;
 
         static void migrateFromVersion1(nlohmann::json& data);
 
@@ -106,7 +101,7 @@ namespace Marmalade {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::ProjectBrowserConfig, colorAssets, colorData, colorSrc);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfig, version, appearance, windowPos, logLevel, defaultProjectPath, repos, projectBrowser, favouriteComponents);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfigStruct, version, appearance, windowPos, logLevel, defaultProjectPath, repos, projectBrowser, favouriteComponents);
 }
 
 #endif

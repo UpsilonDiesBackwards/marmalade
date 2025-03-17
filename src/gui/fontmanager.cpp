@@ -19,7 +19,7 @@
 
 #include "fontmanager.h"
 
-#include "../application/config.h"
+#include "../application/config/engineconfig.h"
 
 #include <glad/glad.h>
 
@@ -38,8 +38,8 @@ Marmalade::GUI::FontManager& Marmalade::GUI::FontManager::GetInstance() {
 void Marmalade::GUI::FontManager::InitFonts() {
     auto& io = ImGui::GetIO();
 
-    auto scaleFactor = Config::engineConfig.appearance.scaleFactor;
-    if (Config::engineConfig.appearance.useSystemScaleFactor) scaleFactor = getMonitorScale();
+    auto scaleFactor = EngineConfig::GetStoredConfig().appearance.scaleFactor;
+    if (EngineConfig::GetStoredConfig().appearance.useSystemScaleFactor) scaleFactor = getMonitorScale();
 
     fontTitle = io.Fonts->AddFontFromFileTTF("res/fonts/Cabin/static/Cabin-Regular.ttf", 34 * scaleFactor);
     fontHeading = io.Fonts->AddFontFromFileTTF("res/fonts/Cabin/static/Cabin-Regular.ttf", 28 * scaleFactor);

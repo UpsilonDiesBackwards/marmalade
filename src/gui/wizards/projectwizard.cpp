@@ -23,19 +23,20 @@
 #include "../../project/projectmanager.h"
 #include "../../application/application.h"
 #include "../../application/recents.h"
+#include "../../application/config/engineconfig.h"
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 
-#include "imgui.h"
+#include <imgui.h>
 
-#include "ImGuiFileDialog.h"
+#include <ImGuiFileDialog.h>
 
-#include "IconsCodicons.h"
+#include <IconsCodicons.h>
 
-#include "git2/repository.h"
-#include "git2/global.h"
-#include "git2/remote.h"
-#include "git2/errors.h"
+#include <git2/repository.h>
+#include <git2/global.h>
+#include <git2/remote.h>
+#include <git2/errors.h>
 
 #include <filesystem>
 
@@ -79,7 +80,7 @@ void Marmalade::GUI::ProjectWizard::Draw() {
 
     if (ImGui::Button(ICON_CI_FOLDER)) {// Create the ImGui File Dialog config and open it
         IGFD::FileDialogConfig config;
-        config.path = Config::engineConfig.defaultProjectPath;
+        config.path = EngineConfig::GetStoredConfig().defaultProjectPath;
         ImGuiFileDialog::Instance()->OpenDialog("ChooseProjectPath", "Choose Project Directory", nullptr, config);
     }
 

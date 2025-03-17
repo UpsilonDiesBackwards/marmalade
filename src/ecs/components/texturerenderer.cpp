@@ -19,7 +19,7 @@
 
 #include <ecs/components/texturerenderer.h>
 
-#include "../../application/config.h"
+#include "../../application/config/config.h"
 #include "../../application/application.h"
 
 #include <scene/entity.h>

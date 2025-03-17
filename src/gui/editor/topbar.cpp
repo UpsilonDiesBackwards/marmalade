@@ -23,6 +23,7 @@
 #include "../../application/recents.h"
 #include "../../application/util.h"
 #include "../../project/projectmanager.h"
+#include "../../application/config/configutil.h"
 #include "../windowmanager.h"
 
 #include <ecs/component.h>
@@ -46,7 +47,7 @@ void Marmalade::GUI::TopBar::Show() {
             }
             if (ImGui::MenuItem(ICON_CI_FOLDER_OPENED " Open Project")) {
                 IGFD::FileDialogConfig config;
-                config.path = Config::engineConfig.defaultProjectPath;
+                config.path = EngineConfig::GetStoredConfig().defaultProjectPath;
                 config.fileName = "project.marmalade";
                 config.flags = ImGuiFileDialogFlags_Modal;
                 ImGuiFileDialog::Instance()->OpenDialog("ChooseProject", "Choose Project File", ".marmalade", config);
@@ -127,7 +128,7 @@ void Marmalade::GUI::TopBar::Show() {
             ImGui::MenuItem(ICON_CI_FILE_TEXT " Log", nullptr, &WindowManager::GetInstance().log.visible);
 
             if (ImGui::MenuItem(ICON_CI_SAVE " Save Layout")) {
-                Application::GetInstance().styleManager.SaveStyle((Marmalade::Config::GetConfigDirectory() / Marmalade::Config::engineConfig.appearance.themeFile).string());
+                Application::GetInstance().styleManager.SaveStyle((Marmalade::ConfigUtil::GetConfigDirectory() / Marmalade::EngineConfig::GetStoredConfig().appearance.themeFile).string());
 
                 ImGui::OpenPopup("LayoutSavePopup");
             }

@@ -17,31 +17,20 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "plugins.h"
+#ifndef MARMALADE_CONFIGUTIL_H
+#define MARMALADE_CONFIGUTIL_H
 
-#include "config/configutil.h"
+#include <filesystem>
 
-#include <fstream>
+namespace Marmalade {
+    class ConfigUtil {
+    public:
+        static void SetConfigDirectory(bool sameDirConfig);
+        static std::filesystem::path GetConfigDirectory();
 
-Marmalade::PluginsConfig Marmalade::Plugins::pluginsConfig{};
-
-void Marmalade::Plugins::LoadPlugins() {
-    std::ifstream i(ConfigUtil::GetConfigDirectory() / "plugins.json");
-    if (i.fail()) {
-        // File doesn't exist
-        pluginsConfig = {};
-        SavePlugins();
-        return;
-    }
-
-    auto data = nlohmann::json::parse(i);
-    pluginsConfig = data.template get<PluginsConfig>();
-    i.close();
+    private:
+        static std::filesystem::path _configDir;
+    };
 }
 
-void Marmalade::Plugins::SavePlugins() {
-    std::ofstream o(ConfigUtil::GetConfigDirectory() / "plugins.json");
-    nlohmann::json new_config = pluginsConfig;
-    o << new_config.dump(2);
-    o.close();
-}
+#endif
