@@ -103,6 +103,10 @@ void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float time) {
 
     glm::vec2 newPos = entity->getPosition() + momentum * time; // Calculate the new desired position of the entity
     entity->setPosition(newPos);
+
+    float angularDisplacement = body.angularVelocity * time;
+
+    entity->setRotation(entity->getRotation() + (angularDisplacement * 5));
 }
 
 void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const glm::vec2 normal, glm::vec2 ptOnA, glm::vec2 ptOnB) {
@@ -211,8 +215,8 @@ void Marmalade::ECS::RigidBody::ApplyImpulseAngular(float dL, Entity* self) {
 
     if (glm::abs(dL) > FLT_EPSILON) { body.angularVelocity += invInertia * dL; }
 
-    const float maxAngularSpeed = 30.0f;
-    if (glm::sqrt(glm::length(body.angularVelocity)) > maxAngularSpeed) {
+//    spdlog::info("angular velocity: {}", body.angularVelocity);
+
     const float maxAngularSpeed = 15.0f; // Limit angular speed to prevent it going haywire
     if (glm::sqrt(glm::length(body.angularVelocity)) > maxAngularSpeed) { // Set angular velocity
         body.angularVelocity = glm::sign(body.angularVelocity) * maxAngularSpeed;
