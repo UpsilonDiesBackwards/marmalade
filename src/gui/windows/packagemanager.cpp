@@ -21,6 +21,8 @@
 
 #include "../../application/util.h"
 #include "../components/markdownparser.h"
+#include "../fontmanager.h"
+#include "../../application/config/configutil.h"
 
 #include <sstream>
 #include <thread>
@@ -95,7 +97,7 @@ bool RepositoriesTableView::DrawEditDialog(Marmalade::Repository* item) {
             item->depth = _tempDepth;
         }
 
-        Marmalade::Config::SaveEngineConfig();
+        EngineConfig::GetInstance().SaveConfig();
 
         return true;
     }
@@ -118,7 +120,7 @@ Components::TableView<Marmalade::Repository, std::vector<Marmalade::Repository>,
                                        return item->name == repo.name;
                                    }),
                     items.end());
-        Config::SaveEngineConfig();
+        EngineConfig::GetInstance().SaveConfig();
 
         return RemoveDialogResult_REMOVED;
     }
@@ -146,7 +148,7 @@ void PackageManager::Draw() {
     const float BOTTOM_BAR_HEIGHT = 22.0f;
 
     ImGui::SetNextWindowSize(ImVec2(1080, 720), ImGuiCond_FirstUseEver);
-    ImGui::Begin(ICON_CI_PACKAGE " Package Manager", &visible, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
+    ImGui::Begin(ICON_CI_PACKAGE " Package Manager", &visible, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
     if (ImGui::BeginTabBar("PackageManagerTabs")) {
         if (ImGui::BeginTabItem("All")) {
             drawSplit(PackageManagerTab_ALL, BOTTOM_BAR_HEIGHT);
@@ -248,7 +250,7 @@ void PackageManager::drawRightPane(PackageManagerTab tab) {
             Components::MarkdownParser mdParser(buffer.str(), Components::MarkdownParserOptions{
                                                                       .BaseDir = selectedItem->LocalPath,
                                                                       .ImgMaxWidth = 200,
-                                                                      .ImgMaxHeight = 500,
+                                                                      .ImgMaxHeight = -1,
                                                                       .LinkCallback = [&currentUrl](std::string url) {
                                                                           currentUrl = std::move(url);
                                                                           ImGui::OpenPopup("Open Link?##PackageManagerOpenLink");
@@ -395,10 +397,10 @@ void PackageManager::updateLocalDatabase() {
     _packagesByName.clear();
     _keywordIndex.clear();
 
-    for (const auto& repo: Marmalade::Config::engineConfig.repos) {
+    for (const auto& repo: Marmalade::EngineConfig::GetStoredConfig().repos) {
         bool no_err{false};
 
-        if (std::filesystem::exists(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / repo.name)) {
+        if (std::filesystem::exists(Marmalade::ConfigUtil::GetConfigDirectory() / LOCAL_REPO_PATH / repo.name)) {
             no_err = pullRepo(repo);
         } else {
             no_err = cloneRepo(repo);
@@ -429,7 +431,7 @@ bool PackageManager::cloneRepo(const Repository& config_repo) {
     clone_opts.fetch_opts.callbacks.transfer_progress = &fetch_progress;
     clone_opts.fetch_opts.depth = config_repo.depth;
 
-    int error = git_clone(&cloned_repo, config_repo.gitUrl.c_str(), (Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name).string().c_str(), &clone_opts);
+    int error = git_clone(&cloned_repo, config_repo.gitUrl.c_str(), (Marmalade::ConfigUtil::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name).string().c_str(), &clone_opts);
     if (error != 0) {
         handleGitError("clone");
         return false;
@@ -446,13 +448,13 @@ bool PackageManager::pullRepo(const Repository& config_repo) {
     spdlog::info("Beginning pull for {}", config_repo.name);
 
     // Delete index first
-    if (std::filesystem::remove(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name / INDEX_FILENAME)) {
+    if (std::filesystem::remove(Marmalade::ConfigUtil::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name / INDEX_FILENAME)) {
         spdlog::info("Index deleted successfully.");
     }
 
     spdlog::debug("Opening local repository");
     git_repository* repo = nullptr;
-    int error = git_repository_open(&repo, (Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name).string().c_str());
+    int error = git_repository_open(&repo, (Marmalade::ConfigUtil::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name).string().c_str());
     if (error != 0) {
         handleGitError("open");
         return false;
@@ -524,7 +526,7 @@ void PackageManager::buildIndex(const Repository& config_repo) {
 
     nlohmann::json indexJson;
 
-    for (const auto& letterDir: std::filesystem::directory_iterator(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name)) {
+    for (const auto& letterDir: std::filesystem::directory_iterator(Marmalade::ConfigUtil::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name)) {
         if (!std::filesystem::is_directory(letterDir)) continue;
         if (letterDir.path().filename().string() == ".git") continue;
 
@@ -577,16 +579,16 @@ void PackageManager::buildIndex(const Repository& config_repo) {
 
 
     // Write index.json
-    std::ofstream outFile(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name / INDEX_FILENAME);
+    std::ofstream outFile(Marmalade::ConfigUtil::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name / INDEX_FILENAME);
     outFile << indexJson;
 
     spdlog::info("Index built successfully.");
 }
 
 void PackageManager::deleteLocalDatabase() {
-    if (std::filesystem::exists(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH)) {
+    if (std::filesystem::exists(Marmalade::ConfigUtil::GetConfigDirectory() / LOCAL_REPO_PATH)) {
         try {
-            std::filesystem::remove_all(Marmalade::Config::GetConfigDirectory() / LOCAL_REPO_PATH);
+            std::filesystem::remove_all(Marmalade::ConfigUtil::GetConfigDirectory() / LOCAL_REPO_PATH);
             spdlog::info("Successfully deleted local database");
         } catch (const std::filesystem::filesystem_error& e) {
             spdlog::error("Failed to delete local database: {}", e.what());

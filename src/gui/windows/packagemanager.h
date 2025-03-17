@@ -21,7 +21,7 @@
 #define MARMALADE_PACKAGEMANAGER_H
 
 #include "../window.h"
-#include "../../application/config.h"
+#include "../../application/config/engineconfig.h"
 #include "../components/tableview.h"
 #include "../components/selectablelistview.h"
 #include "../../packages/package.h"
@@ -54,7 +54,7 @@ namespace Marmalade::GUI {
 
     class RepositoriesTableView : public Components::TableView<Repository> {
     public:
-        RepositoriesTableView() : TableView<Repository>(Config::engineConfig.repos, {Components::TableViewColumn("Name"), Components::TableViewColumn("URL")},
+        RepositoriesTableView() : TableView<Repository>(EngineConfig::GetStoredConfig().repos, {Components::TableViewColumn("Name"), Components::TableViewColumn("URL")},
                                                         "PackageManagerRepositoryTable", "Edit Repository", "Remove Repository") {};
 
         std::vector<std::string> RenderItem(const Repository& item) override;
