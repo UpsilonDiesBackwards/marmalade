@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "gameview.h"
+#include "gameviewport.h"
 
 #include "glad/glad.h"
 

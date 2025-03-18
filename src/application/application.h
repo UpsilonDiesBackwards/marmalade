@@ -22,11 +22,11 @@
 
 #include "../project/project.h"
 
-#include "../gui/editor/gameview.h"
+#include "../gui/editor/gameviewport.h"
 #include "../gui/windows/stylemanager.h"
-#include "../gui/editor/editview.h"
+#include "../gui/editor/editorviewport.h"
 #include "../gui/editor/topbar.h"
-#include "../gui/editor/editorviews.h"
+#include "../gui/editor/editor.h"
 #include "../gui/editor.h"
 #include "guilogsink.h"
 #include "profiler.h"

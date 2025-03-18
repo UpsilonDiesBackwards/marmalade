@@ -15,12 +15,12 @@ list(APPEND ENGINE_SRC_GUI
 
         editor/details.cpp
         editor/details.h
-        editor/editorviews.cpp
-        editor/editorviews.h
-        editor/editview.cpp
-        editor/editview.h
-        editor/gameview.cpp
-        editor/gameview.h
+        editor/editor.cpp
+        editor/editor.h
+        editor/editorviewport.cpp
+        editor/editorviewport.h
+        editor/gameviewport.cpp
+        editor/gameviewport.h
         editor/projectbrowser.cpp
         editor/projectbrowser.h
         editor/scenehierarchy.cpp

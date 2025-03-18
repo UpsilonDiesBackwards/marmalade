@@ -20,7 +20,7 @@
 #ifndef ENGINE_EDITOR_H
 #define ENGINE_EDITOR_H
 
-#include "editor/editorviews.h"
+#include "editor/editor.h"
 #include "editor/topbar.h"
 #include "editor/scenehierarchy.h"
 #include "editor/details.h"

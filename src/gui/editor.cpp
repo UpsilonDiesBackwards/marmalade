@@ -19,7 +19,7 @@
 
 #include "editor.h"
 
-#include "editor/editorviews.h"
+#include "editor/editor.h"
 
 void Editor::Render() {
     // Persistent UI
