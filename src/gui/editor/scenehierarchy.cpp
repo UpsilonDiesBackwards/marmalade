@@ -110,10 +110,14 @@ void SceneHierarchy::displayEntity(std::shared_ptr<Entity> entity, int index) {
         }
 
         if (ImGui::IsItemClicked()) {
-            _selected = entity;
-            Application::GetInstance().editorGUI->details.visible = true;
-            Application::GetInstance().editorGUI->details.inspectedEntity = _selected.lock().get();
-            Application::GetInstance().editView->selectedEntity = _selected.lock().get();
+            if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl)) {
+                DeselectEntity();
+            } else {
+                _selected = entity;
+                Application::GetInstance().editorGUI->details.visible = true;
+                Application::GetInstance().editorGUI->details.inspectedEntity = _selected.lock().get();
+                Application::GetInstance().editView->selectedEntity = _selected.lock().get();
+            }
         }
 
         int i = 0;
@@ -233,3 +237,16 @@ void SceneHierarchy::showDeletePopup() {
     }
 }
 
+void SceneHierarchy::SelectEntityByUuid(const std::string& uuid) {
+    auto currentScene = Application::GetInstance().sceneManager.GetCurrentScene();
+    std::vector<std::shared_ptr<Entity>>& entities = currentScene->GetEntities();
+
+    for (auto& entity : entities) {
+        if (entity->uuid == uuid) {
+            _selected = entity;
+            Application::GetInstance().editorGUI->details.visible = true;
+            Application::GetInstance().editorGUI->details.inspectedEntity = _selected.lock().get();
+            Application::GetInstance().editView->selectedEntity = _selected.lock().get();
+        }
+    }
+}

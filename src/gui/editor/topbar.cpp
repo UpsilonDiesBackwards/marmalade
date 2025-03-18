@@ -181,7 +181,12 @@ void Marmalade::GUI::TopBar::Show() {
                 Scene* scene = Application::GetInstance().sceneManager.GetCurrentScene().get();
                 Marmalade::Project::Project* project = Application::GetInstance().GetCurrentProject();
 
-                Application::GetInstance().editorGUI->sceneHierarchy.DeselectEntity();
+                // Save selected entity UUID
+                std::string entityUuid;
+                if (Application::GetInstance().editView->selectedEntity != nullptr) {
+                    entityUuid = Application::GetInstance().editView->selectedEntity->uuid;
+                    Application::GetInstance().editorGUI->sceneHierarchy.DeselectEntity();
+                }
 
                 const std::string fileName = Marmalade::Project::ProjectScenes::GetSceneFileName(scene->GetUuid());
                 auto newScene = project->scenes.LoadScene(fileName);
@@ -192,6 +197,11 @@ void Marmalade::GUI::TopBar::Show() {
 
                 // If 'Stop' is pressed, move back over to the edit view
                 Application::GetInstance().editorMode = EditorMode::EditorMode_EDIT;
+
+                // Reselect entity
+                if (!entityUuid.empty()) {
+                    Application::GetInstance().editorGUI->sceneHierarchy.SelectEntityByUuid(entityUuid);
+                }
             }
         } else {
             if (ImGui::Button("Play", editorButtonSize)) {

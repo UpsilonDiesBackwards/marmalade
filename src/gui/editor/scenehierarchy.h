@@ -26,6 +26,7 @@ class SceneHierarchy {
 public:
     void Show();
     void DeselectEntity();
+    void SelectEntityByUuid(const std::string& uuid);
 
 private:
     std::weak_ptr<Entity> _parent;
