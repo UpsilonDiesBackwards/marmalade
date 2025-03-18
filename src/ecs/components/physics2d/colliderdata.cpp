@@ -31,14 +31,14 @@ Marmalade::ECS::ColliderInfo Marmalade::ECS::GetColliderInfo(const ColliderBase*
             info.size = colliderData.size;
             info.offset = colliderData.offset;
         }
-        if constexpr (std::is_same_v<T, OBBDataBox>) {
+        if constexpr (std::is_same_v<T, OBBDataBox> || std::is_same_v<T, OBBDataCircle>) {
             info.rotation = colliderData.rotation;
             info.center = colliderData.c;
             info.axes[0] = colliderData.u[0];
             info.axes[1] = colliderData.u[1];
             info.halfWidth = colliderData.e;
         }
-        if constexpr (std::is_same_v<T, AABBDataCircle>) {
+        if constexpr (std::is_same_v<T, AABBDataCircle> || std::is_same_v<T, OBBDataCircle>) {
             info.radius = colliderData.radius;
             info.offset = colliderData.offset;
         }
