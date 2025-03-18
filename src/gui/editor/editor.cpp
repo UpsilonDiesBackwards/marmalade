@@ -31,62 +31,22 @@ void EditorViews::Show() {
     ImGui::SetNextWindowPos(ImVec2(763, 107), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(1011, 749), ImGuiCond_FirstUseEver);
     ImGui::Begin("Editor", nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse);
+
     if (ImGui::BeginTabBar("Views")) {
-        ImGui::SameLine(ImGui::GetContentRegionAvail().x - 40);
-        if (application.playState == PlayState::Play) {
-            if (ImGui::Button("Stop")) {
-                application.playState = PlayState::Stop;
-                std::cout << "Stop button clicked!" << std::endl;
-
-
-                auto& sceneManager = Application::GetInstance().sceneManager;
-                Scene* scene = Application::GetInstance().sceneManager.GetCurrentScene().get();
-                Marmalade::Project::Project* project = Application::GetInstance().GetCurrentProject();
-
-                Application::GetInstance().editorGUI->sceneHierarchy.DeselectEntity();
-
-                const std::string fileName = Marmalade::Project::ProjectScenes::GetSceneFileName(scene->GetUuid());
-                auto newScene = project->scenes.LoadScene(fileName);
-                Application::GetInstance().sceneManager.RemoveScene(sceneManager.GetCurrentScene());
-
-                Application::GetInstance().sceneManager.AddScene(std::make_shared<Scene>(newScene));
-                Application::GetInstance().sceneManager.SetCurrentScene(newScene.GetUuid());
-            }
-        } else {
-            if (ImGui::Button("Play")) {
-                application.playState = PlayState::Play;
-                std::cout << "Play button clicked!" << std::endl;
-
-                spdlog::info("Serializing scene...");
-
-                Scene* scene = Application::GetInstance().sceneManager.GetCurrentScene().get();
-                Marmalade::Project::Project* project = Application::GetInstance().GetCurrentProject();
-
-                const std::string fileName = Marmalade::Project::ProjectScenes::GetSceneFileName(scene->GetUuid());
-                project->scenes.RegisterScene(fileName);
-                project->scenes.SaveScene(fileName, scene);
-                project->projectMarmalade->SaveConfig();
-            }
-        }
-
         if (ImGui::BeginTabItem("Edit")) {
             Application::GetInstance().input.ClearAllInputEvents();
             Application::GetInstance().editView->RunInput();
-
             application.editView->Render();
-            Application::GetInstance().editorMode = EditorMode::EDIT;
-
             ImGui::EndTabItem();
         }
+
         if (ImGui::BeginTabItem("Game")) {
             Application::GetInstance().input.ClearAllInputEvents();
             Application::GetInstance().gameView->RunInput();
-
             application.gameView->Render();
-            Application::GetInstance().editorMode = EditorMode::GAME;
-
             ImGui::EndTabItem();
         }
+
         ImGui::EndTabBar();
     }
 
@@ -107,8 +67,8 @@ void EditorViews::Show() {
     ImGui::Text("Cursor: (X: %.1f, Y: %.1f ) (%.1f) | Play State: %s | Editor Mode: %s | Scene: %s",
                 (application.camera->GetPosition()[0]), application.camera->GetPosition()[1],
                 application.camera->GetZoom(),
-                (application.playState == PlayState::Play ? "Playing" : "Stopped"),
-                (application.editorMode == EditorMode::EDIT ? "Edit" : "Game"),
+                (application.playState == PlayState::PlayState_PLAY ? "Playing" : "Stopped"),
+                (application.editorMode == EditorMode::EditorMode_EDIT ? "Edit" : "Game"),
                 (application.sceneManager.GetCurrentScene()->GetName().c_str()));
 
     ImGui::End();

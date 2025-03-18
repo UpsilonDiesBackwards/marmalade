@@ -102,7 +102,7 @@ void EditView::RunInput() {
 
     Application& app = Application::GetInstance();
 
-    if (app.editorMode != EditorMode::EDIT) {
+    if (app.editorMode != EditorMode::EditorMode_EDIT) {
         app.input.UnbindMouseButton(GLFW_MOUSE_BUTTON_RIGHT, MOUSE_PRESSED);
         app.input.UnbindScroll();
         return;

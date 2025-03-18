@@ -153,11 +153,95 @@ void Marmalade::GUI::TopBar::Show() {
 
         if (WindowManager::GetInstance().showDebugWindow) ImGui::ShowDemoWindow();
 
-        float alignRight = ImGui::GetWindowWidth() - 170;
-        ImGui::SameLine(alignRight);
+        float windowWidth = ImGui::GetContentRegionAvail().x;
 
-        ImGui::Text("FPS: %d | (%.2f ms)", Application::GetInstance().profiler.GetCurrentFPS(),
-                    Application::GetInstance().profiler.GetCurrentFrameTime());
+        ImVec2 editorButtonSize(80, 0);
+        float buttonSpacing = 40.0f;
+
+        std::string fpsText = std::format(
+                "FPS: {} | ({:.2f} ms)",
+                Application::GetInstance().profiler.GetCurrentFPS(),
+                Application::GetInstance().profiler.GetCurrentFrameTime()
+        );
+
+        float fpsRegionWidth = 85.0f;
+        float rightMargin = 100.0f;
+
+        float totalButtonWidth = (editorButtonSize.x + editorButtonSize.x) * 3;
+        float totalWidth = (totalButtonWidth + fpsRegionWidth + rightMargin);
+
+        ImGui::SetCursorPosX(windowWidth - totalWidth + 550.0f);
+
+        if (Application::GetInstance().playState == PlayState::PlayState_PLAY || Application::GetInstance().playState == PlayState::PlayState_PAUSE) {
+            if (ImGui::Button("Stop", editorButtonSize)) {
+                Application::GetInstance().playState = PlayState::PlayState_STOP; // Change application play state
+
+                // Load scene again to revert any changes made in Play mode
+                auto& sceneManager = Application::GetInstance().sceneManager;
+                Scene* scene = Application::GetInstance().sceneManager.GetCurrentScene().get();
+                Marmalade::Project::Project* project = Application::GetInstance().GetCurrentProject();
+
+                Application::GetInstance().editorGUI->sceneHierarchy.DeselectEntity();
+
+                const std::string fileName = Marmalade::Project::ProjectScenes::GetSceneFileName(scene->GetUuid());
+                auto newScene = project->scenes.LoadScene(fileName);
+                Application::GetInstance().sceneManager.RemoveScene(sceneManager.GetCurrentScene());
+
+                Application::GetInstance().sceneManager.AddScene(std::make_shared<Scene>(newScene));
+                Application::GetInstance().sceneManager.SetCurrentScene(newScene.GetUuid());
+
+                // If 'Stop' is pressed, move back over to the edit view
+                Application::GetInstance().editorMode = EditorMode::EditorMode_EDIT;
+            }
+        } else {
+            if (ImGui::Button("Play", editorButtonSize)) {
+                Application::GetInstance().playState = PlayState::PlayState_PLAY;
+
+                // Serialise Scene
+                Scene* scene = Application::GetInstance().sceneManager.GetCurrentScene().get();
+                Marmalade::Project::Project* project = Application::GetInstance().GetCurrentProject();
+
+                const std::string fileName = Marmalade::Project::ProjectScenes::GetSceneFileName(scene->GetUuid());
+                project->scenes.RegisterScene(fileName);
+                project->scenes.SaveScene(fileName, scene);
+                project->projectMarmalade->SaveConfig();
+
+                // If 'Play' is pressed, move over to the game view
+                Application::GetInstance().editorMode = EditorMode::EditorMode_GAME;
+            }
+        }
+
+        // Only enable the Pause/Resume button game is in play / paused
+        bool isPlaying = (Application::GetInstance().playState == PlayState::PlayState_PLAY || Application::GetInstance().playState == PlayState::PlayState_PAUSE);
+        if (!isPlaying) { ImGui::BeginDisabled(); }
+
+        if (Application::GetInstance().playState == PlayState::PlayState_PAUSE) {
+            if (ImGui::Button("Resume", editorButtonSize)) {
+                Application::GetInstance().playState = PlayState::PlayState_PLAY;
+            }
+        } else {
+            if (ImGui::Button("Pause", editorButtonSize)) {
+                Application::GetInstance().playState = PlayState::PlayState_PAUSE;
+            }
+        }
+
+        if (!isPlaying) { ImGui::EndDisabled(); }
+
+        // Only enable the Step button game is in paused
+        bool isPaused = (Application::GetInstance().playState == PlayState::PlayState_PAUSE);
+        if (!isPaused) { ImGui::BeginDisabled(); }
+
+        if (ImGui::Button("Step", editorButtonSize)) { // Put the game in to play...
+            Application::GetInstance().playState = PlayState::PlayState_PLAY;
+            Application::GetInstance().SetStepFrame(); //... then immediately pause the game the next frame
+
+            spdlog::info("Stepped one frame");
+        }
+
+        if (!isPaused) { ImGui::EndDisabled(); }
+
+        ImGui::SetCursorPosX(windowWidth - fpsRegionWidth - rightMargin - -350.0f);
+        ImGui::Text("%s", fpsText.c_str());
 
         if (ImGuiFileDialog::Instance()->Display("ChooseProject")) {
             if (ImGuiFileDialog::Instance()->IsOk()) {

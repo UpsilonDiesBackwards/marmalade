@@ -46,7 +46,7 @@ void Marmalade::ECS::RigidBody::Apply(Entity* entity) {
     _accumulator += deltaTime;
 
     while (_accumulator >= fixedTimeStep) { // We use an accumulator to prevent jitteriness
-        if (Application::GetInstance().playState == PlayState::Play && !isStatic) { // If the object is NOT static, and the application is in play...
+        if (Application::GetInstance().playState == PlayState::PlayState_PLAY && !isStatic) { // If the object is NOT static, and the application is in play...
             UpdatePhysics(entity, fixedTimeStep); //... activate the physics
         }
         _accumulator -= fixedTimeStep;

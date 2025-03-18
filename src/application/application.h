@@ -43,13 +43,14 @@
 #include <spdlog/spdlog.h>
 
 enum PlayState {
-    Play,
-    Stop,
+    PlayState_PLAY,
+    PlayState_PAUSE,
+    PlayState_STOP,
 };
 
 enum EditorMode {
-    EDIT,
-    GAME,
+    EditorMode_EDIT,
+    EditorMode_GAME,
 };
 
 class Editor;
@@ -71,8 +72,8 @@ public:
     GLFWwindow* getWindow();
     Camera* getCamera();
 
-    PlayState playState = PlayState::Stop;
-    EditorMode editorMode = EditorMode::EDIT;
+    PlayState playState = PlayState::PlayState_STOP;
+    EditorMode editorMode = EditorMode::EditorMode_EDIT;
 
     MultiSampledFramebuffer* framebuffer;
 
@@ -100,6 +101,11 @@ public:
 
     void OnClose();
 
+    bool stepFrame = false;
+
+    void SetStepFrame() {
+        stepFrame = true;
+    }
 private:
     Application(int width, int height, const char* title);
 

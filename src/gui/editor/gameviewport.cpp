@@ -59,7 +59,7 @@ void GameView::Render() {
 
     Application::GetInstance().framebuffer->Unbind();
 
-    if (app.editorMode == EditorMode::EDIT) {
+    if (app.editorMode == EditorMode::EditorMode_EDIT) {
 
     }
 

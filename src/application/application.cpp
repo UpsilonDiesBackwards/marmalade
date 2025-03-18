@@ -174,6 +174,11 @@ void Application::Run() {
 
     editorGUI->Render();
 
+    if (stepFrame) { // Step one frame
+        playState = PlayState::PlayState_PAUSE;
+        stepFrame = false;
+    }
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
