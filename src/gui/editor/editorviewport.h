@@ -22,8 +22,9 @@
 
 #include "graphics/multisampledframebuffer.h"
 
-#include "imgui.h"
-#include "scene/entity.h"
+#include <scene/entity.h>
+
+#include <imgui.h>
 
 class EditView {
 public:

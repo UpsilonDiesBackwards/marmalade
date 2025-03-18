@@ -74,7 +74,7 @@ void Marmalade::ECS::CircleCollider::ShowBounds(const glm::vec2& entityPosition,
         glm::vec2 centre = entityPosition + aabbData->offset + glm::vec2(aabbData->radius, aabbData->radius);
         float radius = aabbData->radius;
 
-        ImVec2 screenCentre = WorldToScreenSpace(centre);
+        ImVec2 screenCentre = EditorViews::WorldToScreenSpace(centre);
         float screenRadius = WorldRadiusToScreenScale(radius);
 
         ImGui::GetWindowDrawList()->AddCircle(
@@ -86,8 +86,8 @@ void Marmalade::ECS::CircleCollider::ShowBounds(const glm::vec2& entityPosition,
 }
 
 float Marmalade::ECS::CircleCollider::WorldRadiusToScreenScale(float radius) {
-    ImVec2 screenStart = WorldToScreenSpace(glm::vec2(0.0f, 0.0f));
-    ImVec2 screenEnd = WorldToScreenSpace(glm::vec2(radius, 0.0f));
+    ImVec2 screenStart = EditorViews::WorldToScreenSpace(glm::vec2(0.0f, 0.0f));
+    ImVec2 screenEnd = EditorViews::WorldToScreenSpace(glm::vec2(radius, 0.0f));
 
     glm::vec2 glmScreenStart(screenStart.x, screenStart.y);
     glm::vec2 glmScreenEnd(screenEnd.x, screenEnd.y);

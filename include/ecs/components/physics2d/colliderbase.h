@@ -50,26 +50,6 @@ namespace Marmalade::ECS {
         }
 
         virtual void ShowBounds(const glm::vec2& entityPosition, Transform transform) = 0;
-
-        ImVec2 WorldToScreenSpace(const glm::vec2& world) {
-            Application& app = Application::GetInstance();
-
-            glm::vec2 framebufferSize = glm::vec2(app.framebuffer->width, app.framebuffer->height);
-            glm::vec2 framebufferPos = glm::vec2(app.framebuffer->position.x, app.framebuffer->position.y);
-
-            glm::vec4 worldPos = glm::vec4(world, 0.0f, 1.0f);
-
-            glm::vec4 clipSpace = app.camera->GetProjection() * app.camera->GetView() * worldPos;
-
-            if (clipSpace.w != 0.0f) {
-                clipSpace /= clipSpace.w;
-            }
-
-            float screenX = (clipSpace.x * 0.5f + 0.5f) * framebufferSize.x;
-            float screenY = (1.0f - (clipSpace.y * 0.5f + 0.5f)) * framebufferSize.y; // Flip Y
-
-            return ImVec2(screenX + framebufferPos.x, screenY + framebufferPos.y);
-        }
     };
 }
 

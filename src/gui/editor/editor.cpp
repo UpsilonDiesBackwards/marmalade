@@ -21,10 +21,6 @@
 
 #include "../../application/application.h"
 
-#include "imgui.h"
-
-#include <iostream>
-
 void EditorViews::Show() {
     Application& application = Application::GetInstance();
 
@@ -72,4 +68,43 @@ void EditorViews::Show() {
                 (application.sceneManager.GetCurrentScene()->GetName().c_str()));
 
     ImGui::End();
+}
+
+ImVec2 EditorViews::WorldToScreenSpace(const glm::vec2& world) {
+    Application& app = Application::GetInstance();
+
+    glm::vec2 framebufferSize = glm::vec2(app.framebuffer->width, app.framebuffer->height);
+    glm::vec2 framebufferPos = glm::vec2(app.framebuffer->position.x, app.framebuffer->position.y);
+
+    glm::vec4 worldPos = glm::vec4(world, 0.0f, 1.0f);
+
+    glm::vec4 clipSpace = app.camera->GetProjection() * app.camera->GetView() * worldPos;
+
+    if (clipSpace.w != 0.0f) {
+        clipSpace /= clipSpace.w;
+    }
+
+    float screenX = (clipSpace.x * 0.5f + 0.5f) * framebufferSize.x;
+    float screenY = (1.0f - (clipSpace.y * 0.5f + 0.5f)) * framebufferSize.y;// Flip Y
+
+    return {screenX + framebufferPos.x, screenY + framebufferPos.y};
+}
+
+glm::vec2 EditorViews::ScreenToWorldSpace(const ImVec2& screen) {
+    Application& app = Application::GetInstance();
+
+    glm::vec2 framebufferSize = glm::vec2(app.framebuffer->width, app.framebuffer->height);
+    glm::vec2 framebufferPos = glm::vec2(app.framebuffer->position.x, app.framebuffer->position.y);
+
+    float ndcX = ((screen.x - framebufferPos.x) / framebufferSize.x) * 2.0f - 1.0f;
+    float ndcY = (1.0f - (screen.y - framebufferPos.y) / framebufferSize.y) * 2.0f - 1.0f;
+
+    glm::vec4 clipSpace = glm::vec4(ndcX, ndcY, 0.0f, 1.0f);
+
+    glm::mat4 invProj = glm::inverse(app.camera->GetProjection());
+    glm::mat4 invView = glm::inverse(app.camera->GetView());
+
+    glm::vec4 worldPos = invView * invProj * clipSpace;
+
+    return glm::vec2(worldPos.x / worldPos.w, worldPos.y / worldPos.w);
 }

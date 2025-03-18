@@ -210,8 +210,8 @@ void Marmalade::ECS::BoxCollider::ShowBounds(const glm::vec2& entityPosition, Tr
         glm::vec2 min = entityPosition + aabbData->offset;
         glm::vec2 max = min + aabbData->size;
 
-        ImVec2 screenMin = WorldToScreenSpace(min);
-        ImVec2 screenMax = WorldToScreenSpace(max);
+        ImVec2 screenMin = EditorViews::WorldToScreenSpace(min);
+        ImVec2 screenMax = EditorViews::WorldToScreenSpace(max);
 
         ImGui::GetWindowDrawList()->AddRect(
                 screenMin, screenMax,
@@ -236,7 +236,7 @@ void Marmalade::ECS::BoxCollider::ShowBounds(const glm::vec2& entityPosition, Tr
 
         ImVec2 screenCorners[4];
         for (int i = 0; i < 4; ++i) {
-            screenCorners[i] = WorldToScreenSpace(rotatedCorners[i]);
+            screenCorners[i] = EditorViews::WorldToScreenSpace(rotatedCorners[i]);
         }
 
         ImGui::GetWindowDrawList()->AddQuad(

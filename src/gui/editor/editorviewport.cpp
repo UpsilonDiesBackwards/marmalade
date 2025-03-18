@@ -122,6 +122,32 @@ void EditView::RunInput() {
                                   }
                               });
 
+    // Select entities by holding ctrl
+    app.input.BindKey(GLFW_KEY_LEFT_CONTROL, KEY_DOWN, [&app]() {
+        ImVec2 mouseCoords = ImVec2(app.inputManager.getMouseX(), app.inputManager.getMouseY());
+        auto worldCoords = EditorViews::ScreenToWorldSpace(mouseCoords);
+
+        for (const auto& entity: app.sceneManager.GetCurrentScene()->GetEntities()) {
+            auto entityPos = entity->getPosition();
+            auto entityScale = entity->getScale();
+
+            glm::vec2 maxBounds = entityPos + entityScale;
+
+            bool withinBounds(worldCoords.x >= entityPos.x && worldCoords.x <= maxBounds.x &&
+                              worldCoords.y >= entityPos.y && worldCoords.y <= maxBounds.y);
+            if (withinBounds) {
+                auto screenMin = EditorViews::WorldToScreenSpace(entity->getPosition());
+                auto screenMax = EditorViews::WorldToScreenSpace(entity->getPosition() + entity->getScale());
+
+                ImGui::GetForegroundDrawList(ImGui::GetMainViewport())->AddRect(screenMin, screenMax, ImGui::GetColorU32(IM_COL32(255, 255, 255, 255)), 0.0f, ImDrawFlags_None, 1.0f);
+
+                if (app.inputManager.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+                    app.editorGUI->sceneHierarchy.SelectEntityByUuid(entity->uuid);
+                }
+            }
+        }
+    });
+
     app.input.BindScroll([&app, this](double xOffset, double yOffset) {
         auto mousePos = ImGui::GetMousePos();
 

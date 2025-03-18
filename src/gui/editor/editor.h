@@ -20,11 +20,16 @@
 #ifndef ENGINE_EDITORVIEWS_H
 #define ENGINE_EDITORVIEWS_H
 
-#include "../../include/graphics/multisampledframebuffer.h"
+#include <imgui.h>
+
+#include <glm/glm.hpp>
 
 class EditorViews {
 public:
     void Show();
+
+    static ImVec2 WorldToScreenSpace(const glm::vec2& world);
+    static glm::vec2 ScreenToWorldSpace(const ImVec2& screen);
 };
 
 #endif
