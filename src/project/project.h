@@ -55,17 +55,20 @@ namespace Marmalade::Project {
         void SaveProjectPackages();
 
     private:
-        std::vector<std::string> baseDirectories = {// Directories auto-created when the project is made
+        std::vector<std::string> baseDirectories = { // Directories auto-created when the project is made
                 "assets",
                 "windows",
-                "logs"};
+                "logs"
+        };
 
-        std::vector<std::string> baseFiles = {// Files auto-created when the project is made
+        std::vector<std::string> baseFiles = { // Files auto-created when the project is made
                 "project.marmalade",
+                "settings.marm",
+                "package-settings.marm",
+                "user.marm",
                 ".gitignore",
                 "README.md",
-                "settings.marm",
-                "package-settings.marm"};
+        };
     };
 }
 
