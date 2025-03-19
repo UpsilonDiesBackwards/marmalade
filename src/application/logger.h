@@ -23,9 +23,9 @@
 #include <spdlog/spdlog.h>
 
 #ifdef DEBUG
-#define LOG_IMPL(type, message, ...) spdlog::type("{}:{} " message, __FILE__, __LINE__, __VA_ARGS__)
+#define LOG_IMPL(type, message, ...) spdlog::type("{}:{} " message, __FILE__, __LINE__ __VA_OPT__(, __VA_ARGS__))
 #else
-#define LOG_IMPL(type, message, ...) spdlog::type(message, __VA_ARGS__)
+#define LOG_IMPL(type, message, ...) spdlog::type(message __VA_OPT__(, __VA_ARGS__))
 #endif
 
 #define LOG_TRACE(message, ...) LOG_IMPL(trace, message, __VA_ARGS__)
