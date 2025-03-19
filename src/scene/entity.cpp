@@ -19,17 +19,13 @@
 
 #include <scene/entity.h>
 
-#include "ecs/components/physics2d/boxcollider.h"
-#include "ecs/components/physics2d/rigidbody.h"
-
 #include "../application/util.h"
+#include "../application/logger.h"
 
 #include <graphics/texture.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext/matrix_transform.hpp>
-
-#include <spdlog/spdlog.h>
 
 Entity::Entity(const std::string& name, const std::string& uuid, EntityFlags flags, bool withDefaultComponents)
     : name(name), uuid(uuid), flags(flags), renderable(0, 0, 0, Texture::LoadTexture("")) {
@@ -127,7 +123,7 @@ void Entity::AddChild(std::shared_ptr<Entity> parent, std::shared_ptr<Entity> ch
     child->parent = parent;
     children.push_back(std::move(child));
 
-    spdlog::info("child: {}", this->children[0]->name);
+    LOG_INFO("child: {}", this->children[0]->name);
 }
 
 void Entity::RemoveChild(Entity* target) {

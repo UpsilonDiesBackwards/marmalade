@@ -128,7 +128,7 @@ void Marmalade::ECS::CircleCollider::Intersects(Entity* self, Entity* other) {
 
                 rb->collisionQueue.push({self, other, collisionNorm, ptOnA_WorldSpace, ptOnB_WorldSpace});
 
-                spdlog::info("COLLIDE!!");
+                LOG_INFO("COLLIDE!!");
             }
         }
     } else if (obbA && obbB) {
@@ -144,8 +144,6 @@ void Marmalade::ECS::CircleCollider::Intersects(Entity* self, Entity* other) {
 }
 
 bool Marmalade::ECS::CircleCollider::IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
-    spdlog::info("UwU");
-
     auto* aabbA = GetCollisionData<AABBDataCircle>();
     auto* aabbB = std::get_if<AABBDataCircle>(&other.data);
 

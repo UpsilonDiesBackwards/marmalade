@@ -21,6 +21,7 @@
 
 #include "application.h"
 
+#include "logger.h"
 #include "config/engineconfig.h"
 #include "config/configutil.h"
 #include "config/recents.h"
@@ -263,7 +264,7 @@ bool Application::OpenProject(const std::filesystem::path& path) {
 
         SetCurrentProject(project);
     } catch (const std::exception& ex) {
-        spdlog::error("Failed to open project: {}", ex.what());
+        LOG_ERROR("Failed to open project: {}", ex.what());
         return false;
     }
 

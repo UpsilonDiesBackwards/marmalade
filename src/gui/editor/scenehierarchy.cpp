@@ -163,6 +163,7 @@ void SceneHierarchy::showCreatePopup() {
         ImGui::EndPopup();
     }
 }
+
 void SceneHierarchy::showContextMenu() {
     if (ImGui::BeginPopupContextWindow("EntityRMBContextMenu", ImGuiPopupFlags_MouseButtonRight)) {
         if (ImGui::MenuItem("Create Entity")) {

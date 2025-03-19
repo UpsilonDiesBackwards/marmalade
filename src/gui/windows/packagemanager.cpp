@@ -37,8 +37,6 @@
 
 #include <git2.h>
 
-#include <spdlog/spdlog.h>
-
 #define LOCAL_REPO_PATH "local-repo"
 #define INDEX_FILENAME "index.json"
 
@@ -360,7 +358,7 @@ static int sideband_progress(const char* str, int len, void* payload) {
     auto* packageManager = static_cast<PackageManager*>(payload);
     packageManager->SetProgressText("Waiting for Remote");
 
-    spdlog::debug("Remote: {}", std::string_view(str, len));
+    LOG_DEBUG("Remote: {}", std::string_view(str, len));
     return 0;
 }
 
@@ -368,7 +366,7 @@ static int fetch_progress(const git_indexer_progress* stats, void* payload) {
     auto* packageManager = static_cast<PackageManager*>(payload);
     packageManager->SetProgressText("Fetching");
 
-    spdlog::debug("Fetch progress, {} / {}", stats->received_objects, stats->total_objects);
+    LOG_DEBUG("Fetch progress, {} / {}", stats->received_objects, stats->total_objects);
     return 0;
 }
 
@@ -376,21 +374,21 @@ static void checkout_progress(const char* path, size_t cur, size_t tot, void* pa
     auto* packageManager = static_cast<PackageManager*>(payload);
     packageManager->SetProgressText("Checking out");
 
-    spdlog::debug("Checkout progress: {} / {}", cur, tot);
+    LOG_DEBUG("Checkout progress: {} / {}", cur, tot);
 }
 
 void PackageManager::handleGitError(const std::string& operation) {
     const git_error* err = git_error_last();
     if (err) {
-        spdlog::error("GIT ERROR ({}): {}, {}", operation, err->klass, err->message);
+        LOG_ERROR("GIT ERROR ({}): {}, {}", operation, err->klass, err->message);
     } else {
-        spdlog::error("GIT ERROR ({}): no info", operation);
+        LOG_ERROR("GIT ERROR ({}): no info", operation);
     }
 }
 
 void PackageManager::updateLocalDatabase() {
     if (_dbOperationRunning.exchange(true)) {
-        spdlog::info("Another database operation is in progress. Skipping.");
+        LOG_INFO("Another database operation is in progress. Skipping.");
         return;
     }
 
@@ -445,14 +443,14 @@ bool PackageManager::cloneRepo(const Repository& config_repo) {
 bool PackageManager::pullRepo(const Repository& config_repo) {
     git_libgit2_init();
 
-    spdlog::info("Beginning pull for {}", config_repo.name);
+    LOG_INFO("Beginning pull for {}", config_repo.name);
 
     // Delete index first
     if (std::filesystem::remove(Marmalade::ConfigUtil::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name / INDEX_FILENAME)) {
-        spdlog::info("Index deleted successfully.");
+        LOG_INFO("Index deleted successfully.");
     }
 
-    spdlog::debug("Opening local repository");
+    LOG_DEBUG("Opening local repository");
     git_repository* repo = nullptr;
     int error = git_repository_open(&repo, (Marmalade::ConfigUtil::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name).string().c_str());
     if (error != 0) {
@@ -460,7 +458,7 @@ bool PackageManager::pullRepo(const Repository& config_repo) {
         return false;
     }
 
-    spdlog::debug("Looking up remote: origin");
+    LOG_DEBUG("Looking up remote: origin");
     git_remote* remote = nullptr;
     error = git_remote_lookup(&remote, repo, "origin");
     if (error != 0) {
@@ -469,7 +467,7 @@ bool PackageManager::pullRepo(const Repository& config_repo) {
         return false;
     }
 
-    spdlog::debug("Fetching from remote");
+    LOG_DEBUG("Fetching from remote");
     error = git_remote_fetch(remote, nullptr, nullptr, nullptr);
     if (error != 0) {
         handleGitError("fetch");
@@ -478,7 +476,7 @@ bool PackageManager::pullRepo(const Repository& config_repo) {
         return false;
     }
 
-    spdlog::debug("Retrieving current branch");
+    LOG_DEBUG("Retrieving current branch");
     git_reference* head = nullptr;
     error = git_repository_head(&head, repo);
     if (error != 0) {
@@ -488,7 +486,7 @@ bool PackageManager::pullRepo(const Repository& config_repo) {
         return false;
     }
 
-    spdlog::debug("Looking up current branch");
+    LOG_DEBUG("Looking up current branch");
     git_reference* branch = nullptr;
     error = git_branch_lookup(&branch, repo, git_reference_shorthand(head), GIT_BRANCH_LOCAL);
     if (error != 0) {
@@ -499,7 +497,7 @@ bool PackageManager::pullRepo(const Repository& config_repo) {
         return false;
     }
 
-    spdlog::debug("Retrieving latest upstream reference");
+    LOG_DEBUG("Retrieving latest upstream reference");
     git_reference* upstream = nullptr;
     error = git_branch_upstream(&upstream, branch);
     if (error != 0) {
@@ -517,12 +515,12 @@ bool PackageManager::pullRepo(const Repository& config_repo) {
     git_remote_free(remote);
     git_repository_free(repo);
 
-    spdlog::info("Pull complete");
+    LOG_INFO("Pull complete");
     return true;
 }
 
 void PackageManager::buildIndex(const Repository& config_repo) {
-    spdlog::info("Building index for {}...", config_repo.name);
+    LOG_INFO("Building index for {}...", config_repo.name);
 
     nlohmann::json indexJson;
 
@@ -530,11 +528,11 @@ void PackageManager::buildIndex(const Repository& config_repo) {
         if (!std::filesystem::is_directory(letterDir)) continue;
         if (letterDir.path().filename().string() == ".git") continue;
 
-        spdlog::debug("Scanning directory: {}", letterDir.path().filename().string());
+        LOG_DEBUG("Scanning directory: {}", letterDir.path().filename().string());
 
         for (const auto& packageDir: std::filesystem::directory_iterator(letterDir)) {
             if (!std::filesystem::is_directory(packageDir)) continue;
-            spdlog::debug("Found package: {}", packageDir.path().filename().string());
+            LOG_DEBUG("Found package: {}", packageDir.path().filename().string());
 
             std::filesystem::path packageJsonPath = packageDir.path() / "info.json";
             if (!std::filesystem::exists(packageJsonPath)) continue;
@@ -556,7 +554,7 @@ void PackageManager::buildIndex(const Repository& config_repo) {
                 }
 
             } catch (const std::exception& e) {
-                spdlog::error("Error reading {}: {}", packageJsonPath.string(), e.what());
+                LOG_ERROR("Error reading {}: {}", packageJsonPath.string(), e.what());
             }
         }
     }
@@ -582,18 +580,18 @@ void PackageManager::buildIndex(const Repository& config_repo) {
     std::ofstream outFile(Marmalade::ConfigUtil::GetConfigDirectory() / LOCAL_REPO_PATH / config_repo.name / INDEX_FILENAME);
     outFile << indexJson;
 
-    spdlog::info("Index built successfully.");
+    LOG_INFO("Index built successfully.");
 }
 
 void PackageManager::deleteLocalDatabase() {
     if (std::filesystem::exists(Marmalade::ConfigUtil::GetConfigDirectory() / LOCAL_REPO_PATH)) {
         try {
             std::filesystem::remove_all(Marmalade::ConfigUtil::GetConfigDirectory() / LOCAL_REPO_PATH);
-            spdlog::info("Successfully deleted local database");
+            LOG_INFO("Successfully deleted local database");
         } catch (const std::filesystem::filesystem_error& e) {
-            spdlog::error("Failed to delete local database: {}", e.what());
+            LOG_ERROR("Failed to delete local database: {}", e.what());
         }
     } else {
-        spdlog::info("Local database does not exist.");
+        LOG_INFO("Local database does not exist.");
     }
 }

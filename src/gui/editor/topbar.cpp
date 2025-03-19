@@ -25,6 +25,7 @@
 #include "../../project/projectmanager.h"
 #include "../../application/config/configutil.h"
 #include "../windowmanager.h"
+#include "../../application/logger.h"
 
 #include <ecs/component.h>
 
@@ -245,7 +246,7 @@ void Marmalade::GUI::TopBar::Show() {
             Application::GetInstance().playState = PlayState::PlayState_PLAY;
             Application::GetInstance().SetStepFrame(); //... then immediately pause the game the next frame
 
-            spdlog::info("Stepped one frame");
+            LOG_INFO("Stepped one frame");
         }
 
         if (!isPaused) { ImGui::EndDisabled(); }

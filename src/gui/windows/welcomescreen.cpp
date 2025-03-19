@@ -22,12 +22,10 @@
 #include "../../application/application.h"
 #include "../../application/config/recents.h"
 
-#include "imgui.h"
-#include "imgui_internal.h"
+#include <imgui.h>
+#include <imgui_internal.h>
 
-#include "IconsCodicons.h"
-
-#include "spdlog/spdlog.h"
+#include <IconsCodicons.h>
 
 void Marmalade::GUI::WelcomeScreen::Draw() {
     ImGui::SetNextWindowSize(ImVec2(700.0f, 400.0f), ImGuiCond_FirstUseEver);
@@ -129,9 +127,9 @@ void Marmalade::GUI::WelcomeScreen::drawSplit() {
 }
 
 void Marmalade::GUI::WelcomeScreen::createProject() {
-    spdlog::info("Create project");
+    LOG_INFO("Create project");
 }
 
 void Marmalade::GUI::WelcomeScreen::openProject() {
-    spdlog::info("Open project");
+    LOG_INFO("Open project");
 }

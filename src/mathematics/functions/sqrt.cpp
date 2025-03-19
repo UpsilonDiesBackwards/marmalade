@@ -17,14 +17,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <mathematics/functions/sqrt.h>
+#include "../../application/logger.h"
 
-#include <spdlog/spdlog.h>
+#include <mathematics/functions/sqrt.h>
 
 namespace Marmalade::Mathematics {
     double sqrt_babylonian(double s) {
         if (s < 0) {
-            spdlog::error("Can not get a square root of a negative number!");
+            LOG_ERROR("Can not get a square root of a negative number!");
         } else if (s == 0) {
             return 0;
         }

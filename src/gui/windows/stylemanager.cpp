@@ -19,9 +19,9 @@
 
 #include "stylemanager.h"
 
-#include "imgui.h"
+#include "../../application/logger.h"
 
-#include "spdlog/spdlog.h"
+#include <imgui.h>
 
 #include <iostream>
 #include <fstream>
@@ -182,5 +182,5 @@ void StyleManager::SaveStyle(const std::string& stylePath) {
     file << "CircleTessellationMaxError " << style.CircleTessellationMaxError << "\n";
 
     file.close();
-    spdlog::info("Style saved to: {}", stylePath);
+    LOG_INFO("Style saved to: {}", stylePath);
 }

@@ -4,6 +4,7 @@ add_subdirectory(gui)
 list(APPEND ENGINE_SRC
         application/application.cpp
         application/application.h
+        application/logger.h
         application/profiler.cpp
         application/profiler.h
         application/guilogsink.cpp

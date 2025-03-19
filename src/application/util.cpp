@@ -19,13 +19,14 @@
 
 #include "util.h"
 
+#include "logger.h"
+
 #include <stb/stb_image.h>
 
 #ifdef _WIN32
 #include <windows.h>
+#include <shellapi.h>
 #endif
-
-#include <spdlog/spdlog.h>
 
 #include <iostream>
 #include <random>
@@ -80,7 +81,7 @@ GLuint Marmalade::Util::LoadGuiTexture(std::string path, int* width, int* height
     int imgWidth, imgHeight, channels;
     unsigned char* data = ::stbi_load(path.c_str(), &imgWidth, &imgHeight, &channels, 4);
     if (!data) {
-        spdlog::error("Failed to load texture: {}", path);
+        LOG_ERROR("Failed to load texture: {}", path);
         return 0;
     }
 

@@ -24,8 +24,6 @@
 #include "../../application/application.h"
 #include "../../application/config/recents.h"
 
-#include <spdlog/spdlog.h>
-
 #include <imgui.h>
 
 #include <ImGuiFileDialog.h>
@@ -157,7 +155,7 @@ void Marmalade::GUI::ProjectWizard::CreateProject() {
     }
 
     if (std::filesystem::create_directory(projectPath)) {// Create the project directory
-        spdlog::info("Creating project: {}. Using Git: {}", projectName, creationOptions.initGitRepository);
+        LOG_INFO("Creating project: {}. Using Git: {}", projectName, creationOptions.initGitRepository);
 
         auto project = std::make_unique<Marmalade::Project::Project>(Marmalade::Project::ProjectManager<>::CreateProject(projectName, projectPath / "project.marmalade", creationOptions));
 
@@ -187,7 +185,7 @@ void Marmalade::GUI::ProjectWizard::InitialiseGitRepository(const char* repoPath
 
     error = git_repository_init_ext(&creationOptions.repo, repoPath, &options);// Create the repo
     if (error != 0) {
-        spdlog::error("Failed to initialise git repository: {}", git_error_last()->message);
+        LOG_ERROR("Failed to initialise git repository: {}", git_error_last()->message);
     }
 
     if (creationOptions.useDefaultGitIgnore) {// Use .gitignore template or not
@@ -206,7 +204,7 @@ void Marmalade::GUI::ProjectWizard::InitialiseGitRepository(const char* repoPath
             templIgnore.close();
             targetIgnore.close();
         } else {
-            spdlog::error("Failed copying .gitignore contents!");
+            LOG_ERROR("Failed copying .gitignore contents!");
         }
     }
 
@@ -237,7 +235,7 @@ void Marmalade::GUI::ProjectWizard::SetGitRemoteURL(ProjectCreationOptions creat
     int error;
     error = git_repository_open(&creationOptions.repo, repoFilePath.string().c_str());// Open the creationOptions repository
     if (error != 0) {
-        spdlog::error("Failed to open repository: {}", git_error_last()->message);
+        LOG_ERROR("Failed to open repository: {}", git_error_last()->message);
     }
 
     if (!strlen(creationOptions.remoteName.c_str()) == 0) {                                                                     // Check if user has defined a custom remoteName
@@ -247,7 +245,7 @@ void Marmalade::GUI::ProjectWizard::SetGitRemoteURL(ProjectCreationOptions creat
     }
 
     if (error != 0) {
-        spdlog::error("Failed to set remote URL: {}", git_error_last()->message);
+        LOG_ERROR("Failed to set remote URL: {}", git_error_last()->message);
     }
 
     git_libgit2_shutdown();

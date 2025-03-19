@@ -20,11 +20,14 @@
 #include "pluginloader.h"
 
 #include "config/configutil.h"
-
-#include <spdlog/spdlog.h>
+#include "logger.h"
 
 int Marmalade::EngineApiImpl::GetVersion() {
     return 1;
+}
+
+void Marmalade::EngineApiImpl::Print(char* str) {
+    LOG_INFO("From plugin: {}", str);
 }
 
 Marmalade::PluginLoader Marmalade::PluginLoader::GetInstance() {
@@ -50,7 +53,7 @@ void Marmalade::PluginLoader::LoadPlugins() {
     api.GetVersion = &EngineApiImpl::GetVersion;
 
     for (const auto& pluginFile: std::filesystem::directory_iterator(pluginsDir)) {
-        spdlog::info("Loading plugin: {}", pluginFile.path().filename().string());
+        LOG_INFO("Loading plugin: {}", pluginFile.path().filename().string());
 
         auto pluginLib = loadPluginLibrary(pluginFile.path());
         if (pluginLib == nullptr) continue;
@@ -63,7 +66,7 @@ void Marmalade::PluginLoader::LoadPlugins() {
 }
 
 void Marmalade::PluginLoader::UnloadPlugins() {
-    spdlog::info("Unloading plugins");
+    LOG_INFO("Unloading plugins");
     for (auto& plugin: _loadedPlugins) {
 #ifdef _WIN32
         FreeLibrary(plugin.library);
@@ -77,7 +80,7 @@ LIBRARY_TYPE Marmalade::PluginLoader::loadPluginLibrary(const std::filesystem::p
 #ifdef _WIN32
     HMODULE pluginLib = LoadLibrary(path.string().c_str());
     if (!pluginLib) {
-        spdlog::error("Failed to load plugin: {}", path.filename().string());
+        LOG_ERROR("Failed to load plugin: {}", path.filename().string());
         return nullptr;
     }
 
@@ -85,7 +88,7 @@ LIBRARY_TYPE Marmalade::PluginLoader::loadPluginLibrary(const std::filesystem::p
 #else
     void* pluginLib = dlopen(path.string().c_str(), RTLD_LAZY);
     if (!pluginLib) {
-        spdlog::error("Failed to load plugin: {}", path.filename().string());
+        LOG_ERROR("Failed to load plugin: {}", path.filename().string());
         return nullptr;
     }
 
@@ -97,7 +100,7 @@ void Marmalade::PluginLoader::callPluginMain(Plugin plugin, EngineAPI engineApi)
 #ifdef _WIN32
     auto pluginMain = (PluginMainFunc) GetProcAddress(plugin.library, "PluginMain");
     if (!pluginMain) {
-        spdlog::error("Failed to find function: PluginMain");
+        LOG_ERROR("Failed to find function: PluginMain");
         FreeLibrary(plugin.library);
         return;
     }
@@ -105,7 +108,7 @@ void Marmalade::PluginLoader::callPluginMain(Plugin plugin, EngineAPI engineApi)
     auto pluginMain = (PluginMainFunc) dlsym(plugin.library, "PluginMain");
     const char* error = dlerror();
     if (error) {
-        spdlog::error("Failed to find function: PluginMain");
+        LOG_ERROR("Failed to find function: PluginMain");
         dlclose(plugin.library);
         return;
     }

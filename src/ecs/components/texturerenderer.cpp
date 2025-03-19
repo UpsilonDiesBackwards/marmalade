@@ -21,13 +21,12 @@
 
 #include "../../application/config/config.h"
 #include "../../application/application.h"
+#include "../../application/logger.h"
 
 #include <scene/entity.h>
 
 #include <imgui.h>
 #include <ImGuiFileDialog.h>
-
-#include <spdlog/spdlog.h>
 
 void Marmalade::ECS::TextureRenderer::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
@@ -43,7 +42,7 @@ void Marmalade::ECS::TextureRenderer::Display(Entity* entity) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("PROJECT_BROWSER_FILE")) {
             auto projectItem = *(Marmalade::GUI::ProjectItem*) payload->Data;
             if (projectItem.Type != GUI::FileType_IMAGE) {
-                spdlog::error("Texture must be an image");
+                LOG_ERROR("Texture must be an image");
             } else {
                 entity->renderable.SetTexture(projectItem.Path);
             }

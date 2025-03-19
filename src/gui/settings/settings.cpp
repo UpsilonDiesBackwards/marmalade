@@ -20,12 +20,13 @@
 #include "settings.h"
 
 #include "../../application/application.h"
+#include "../../application/logger.h"
 #include "../../project/projectmanager.h"
 
-#include "imgui.h"
-#include "imgui_internal.h"
+#include <imgui.h>
+#include <imgui_internal.h>
 
-#include "IconsCodicons.h"
+#include <IconsCodicons.h>
 
 void Marmalade::GUI::ProjectSettings::Draw() {
     Application& app = Application::GetInstance();
@@ -34,7 +35,7 @@ void Marmalade::GUI::ProjectSettings::Draw() {
     ImGui::Begin(ICON_CI_SETTINGS " Project Settings", &visible, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
 
     if (app.GetCurrentProject() == nullptr) {
-        spdlog::error("Can not open project settings! A project is not currently opened.");
+        LOG_ERROR("Can not open project settings! A project is not currently opened.");
         return;
     };
 

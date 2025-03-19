@@ -21,8 +21,6 @@
 
 #include "../application/util.h"
 
-#include <spdlog/spdlog.h>
-
 #include <fstream>
 #include <filesystem>
 #include <utility>
@@ -47,10 +45,10 @@ void Marmalade::Project::Project::CreateEmptyProject(ProjectCreationOptions crea
             if (!std::filesystem::exists(path)) {
                 std::filesystem::create_directories(path);
             } else {
-                spdlog::error("Error creating directory '{}', already exists!", path.string().c_str());
+                LOG_ERROR("Error creating directory '{}', already exists!", path.string().c_str());
             }
         } catch (const std::exception& e) {
-            spdlog::error("Error creating directory '{}'", e.what());
+            LOG_ERROR("Error creating directory '{}'", e.what());
         }
     }
 
@@ -58,22 +56,22 @@ void Marmalade::Project::Project::CreateEmptyProject(ProjectCreationOptions crea
         std::filesystem::path path = basePath / file;
 
         if (path == basePath / ".gitignore" && !creationOptions.initGitRepository) {// Create / Skip .gitignore
-            spdlog::warn("Project created with Git disabled, skipping '.gitignore' creation");
+            LOG_WARN("Project created with Git disabled, skipping '.gitignore' creation");
             continue;// Git has not been enabled, skipping .gitignore
         }
 
         if (path == basePath / "README.md" && !creationOptions.createREADME) {// Create / Skip README.md
-            spdlog::warn("Project created without README.md");
+            LOG_WARN("Project created without README.md");
             continue;// README.md creation has not been enabled, skipping README.md
         }
 
         try {
             std::ofstream createdFile(path);
             if (!createdFile) {
-                spdlog::error("Error creating file: '{}'", file);
+                LOG_ERROR("Error creating file: '{}'", file);
             }
         } catch (const std::exception& e) {
-            spdlog::error("Error creating file '{}'", e.what());
+            LOG_ERROR("Error creating file '{}'", e.what());
         }
     }
 
@@ -87,7 +85,7 @@ void Marmalade::Project::Project::LoadProjectSettings() {
     std::ifstream i(basePath / projectMarmalade->storedConfig.paths.settings);
     if (i.fail()) {
         // File doesn't exist!
-        spdlog::error("Failed to load project settings, file does not exist!");
+        LOG_ERROR("Failed to load project settings, file does not exist!");
         return;
     }
 
@@ -107,7 +105,7 @@ void Marmalade::Project::Project::LoadProjectPackages() {
     std::ifstream i(basePath / projectMarmalade->storedConfig.paths.packages);
     if (i.fail()) {
         // File doesn't exist!
-        spdlog::error("Failed to load project packages, file does not exist!");
+        LOG_ERROR("Failed to load project packages, file does not exist!");
         return;
     }
 

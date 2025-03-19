@@ -20,12 +20,13 @@
 #include <ecs/componentmanager.h>
 
 #include "../application/util.h"
+#include "../application/logger.h"
 
 void Marmalade::ECS::ComponentManager::AddComponent(std::shared_ptr<Component> component) {
     if (!component->allowMultiple) {
         for (const auto& existing : components) {
             if (typeid(*component) == typeid(*existing)) {
-                spdlog::error("Can not add {}, component already exists", component->name);
+                LOG_ERROR("Can not add {}, component already exists", component->name);
                 return;
             }
         }
@@ -44,7 +45,7 @@ void Marmalade::ECS::ComponentManager::AddComponent(std::shared_ptr<Component> c
             auto newDependency = Marmalade::ECS::ComponentRegistry::Instance().CreateComponent(dependency, Util::GenerateUUIDv4());
             if (newDependency) {
                 components.push_back(std::move(newDependency));
-                spdlog::warn("Automatically add {} component as {} depends on it", dependency, component->name);
+                LOG_WARN("Automatically add {} component as {} depends on it", dependency, component->name);
             }
         }
     }
@@ -56,7 +57,7 @@ void Marmalade::ECS::ComponentManager::RemoveComponent(Component* component) {
     for (const auto& existing : components) { // Check for dependencies before removing a component
         for (const auto& dependency : existing->dependencies) {
             if (component->name == dependency) {
-                spdlog::error("Could not remove {} because its a dependency of {}", component->name, existing->name);
+                LOG_ERROR("Could not remove {} because its a dependency of {}", component->name, existing->name);
                 return;
             }
         }

@@ -21,10 +21,9 @@
 #define MARMALADE_CONFIG_H
 
 #include "../../gui/dialogs/configerror.h"
+#include "../logger.h"
 
 #include <nlohmann/json.hpp>
-
-#include <spdlog/spdlog.h>
 
 #include <concepts>
 #include <string>
@@ -108,7 +107,7 @@ namespace Marmalade {
                         currentVersion++;
                         migrated = true;
                     } else {
-                        spdlog::error("Unknown config migration for version {}", currentVersion);
+                        LOG_ERROR("Unknown config migration for version {}", currentVersion);
                         break;
                     }
                 }
@@ -135,7 +134,7 @@ namespace Marmalade {
         void RecreateConfig() {
             PrepareConfigRecreation();
 
-            spdlog::info("Recreate config");
+            LOG_INFO("Recreate config");
             // Reset config
             storedConfig = TConfig();
             SaveConfig();
@@ -175,8 +174,8 @@ namespace Marmalade {
                 };
                 errorDlg->visible = true;
             } else {
-                spdlog::error("Failed to load config file: {}. Delete the config file or fix the following:", filePath.filename().string());
-                spdlog::error(ex.what());
+                LOG_ERROR("Failed to load config file: {}. Delete the config file or fix the following:", filePath.filename().string());
+                LOG_ERROR("{}", ex.what());
             }
         }
     };
