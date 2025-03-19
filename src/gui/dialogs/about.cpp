@@ -19,6 +19,9 @@
 
 #include "about.h"
 
+#include "../../application/util.h"
+#include "../fontmanager.h"
+
 #include <imgui.h>
 
 #include <IconsCodicons.h>
@@ -47,10 +50,26 @@ std::vector<Marmalade::GUI::About::Package> Marmalade::GUI::About::loadPackages(
 void Marmalade::GUI::About::Draw() {
     ImGui::Begin(ICON_CI_INFO " About", &visible);
 
+    static int aboutTexId = Util::LoadGuiTexture("res/icons/logo/logo1920.png");
+
     if (ImGui::BeginTabBar("AboutTabs")) {
         if (ImGui::BeginTabItem("About")) {
+            ImGui::PushFont(FontManager::GetInstance().fontTitle);
             ImGui::Text("Marmalade Engine");
+            ImGui::PopFont();
+
             ImGui::Text("A lightweight 2D game engine");
+
+            ImGui::Image(aboutTexId, ImVec2(200, 200), ImVec2(0, 1), ImVec2(1, 0));
+
+            ImGui::Text("Copyright (C) 2025");
+
+            ImGui::PushFont(FontManager::GetInstance().fontSubheading);
+            ImGui::Text("Contributors:");
+            ImGui::PopFont();
+
+            ImGui::Text("Tayler Parsons");
+            ImGui::Text("Ryan Bester");
 
             ImGui::EndTabItem();
         }

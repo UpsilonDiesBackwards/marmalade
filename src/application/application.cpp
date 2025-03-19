@@ -41,6 +41,8 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 
+#include <stb/stb_image.h>
+
 #include <iostream>
 #include <fstream>
 
@@ -80,6 +82,11 @@ void Application::Initialise() {
     } else
         std::cout << "Window Created" << std::endl;
     glfwWindowHint(GLFW_SAMPLES, 4);
+
+    GLFWimage images[1];
+    images[0].pixels = stbi_load("res/icons/logo/logo192.png", &images[0].width, &images[0].height, 0, 4);
+    glfwSetWindowIcon(window, 1, images);
+    stbi_image_free(images[0].pixels);
 
     int monitorNum = Marmalade::EngineConfig::GetStoredConfig().windowPos.monitor;
     if (monitorNum > -1) {
