@@ -23,16 +23,36 @@
 #include <spdlog/spdlog.h>
 
 #ifdef DEBUG
-#define LOG_IMPL(type, message, ...) spdlog::type("{}:{} " message, __FILE__, __LINE__ __VA_OPT__(, __VA_ARGS__))
-#else
-#define LOG_IMPL(type, message, ...) spdlog::type(message __VA_OPT__(, __VA_ARGS__))
-#endif
 
-#define LOG_TRACE(message, ...) LOG_IMPL(trace, message, __VA_ARGS__)
-#define LOG_DEBUG(message, ...) LOG_IMPL(debug, message, __VA_ARGS__)
-#define LOG_INFO(message, ...) LOG_IMPL(info, message, __VA_ARGS__)
-#define LOG_WARN(message, ...) LOG_IMPL(warn, message, __VA_ARGS__)
-#define LOG_ERROR(message, ...) LOG_IMPL(error, message, __VA_ARGS__)
-#define LOG_CRITICAL(message, ...) LOG_IMPL(critical, message, __VA_ARGS__)
+#if defined(__cpp_va_opt) || !defined(_MSC_VER)
+
+#define LOG_IMPL(type, message, ...) spdlog::type("{}:{} " message, __FILE__, __LINE__ __VA_OPT__(, __VA_ARGS__))
+
+#else
+
+#define LOG_IMPL(type, message, ...) spdlog::type("{}:{} " message, __FILE__, __LINE__, __VA_ARGS__)
+
+#endif // __cpp_va_opt
+
+#else
+
+#if defined(__cpp_va_opt) || !defined(_MSC_VER)
+
+#define LOG_IMPL(type, message, ...) spdlog::type(message __VA_OPT__(, __VA_ARGS__))
+
+#else
+
+#define LOG_IMPL(type, message, ...) spdlog::type(message, __VA_ARGS__)
+
+#endif // __cpp_va_opt
+
+#endif // DEBUG
+
+#define LOG_TRACE(...) LOG_IMPL(trace, __VA_ARGS__)
+#define LOG_DEBUG(...) LOG_IMPL(debug, __VA_ARGS__)
+#define LOG_INFO(...) LOG_IMPL(info, __VA_ARGS__)
+#define LOG_WARN(...) LOG_IMPL(warn, __VA_ARGS__)
+#define LOG_ERROR(...) LOG_IMPL(error, __VA_ARGS__)
+#define LOG_CRITICAL(...) LOG_IMPL(critical, __VA_ARGS__)
 
 #endif
