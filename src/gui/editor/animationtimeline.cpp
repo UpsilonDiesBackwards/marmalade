@@ -20,8 +20,6 @@
 
 #include "animationtimeline.h"
 
-#include <spdlog/spdlog.h>
-
 #include <imgui.h>
 
 #include <IconsCodicons.h>

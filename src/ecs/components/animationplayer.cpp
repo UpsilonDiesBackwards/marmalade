@@ -18,7 +18,7 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ecs/components/animationplayer.h"
+#include <ecs/components/animationplayer.h>
 
 #include "../../application/config/engineconfig.h"
 
@@ -26,6 +26,12 @@
 #include <ImGuiFileDialog.h>
 
 #include <IconsCodicons.h>
+
+#ifdef _MSC_VER
+Marmalade::ECS::AnimationPlayer::AnimationPlayer() {
+    ANIMATION_PLAYER_CTOR_BODY
+}
+#endif
 
 void Marmalade::ECS::AnimationPlayer::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
@@ -116,7 +122,7 @@ void Marmalade::ECS::AnimationPlayer::showCreatePopup() {
             auto newSequence = std::make_unique<Animation::AnimationSequence>(newSequencePath, newSequenceName);
             animation = std::move(newSequence);
 
-            spdlog::debug("Created new animation: {}", animation->name);
+            LOG_DEBUG("Created new animation: {}", animation->name);
 
             memset(newSequenceName, 0, sizeof(newSequenceName));
             _isCreatingSequence = false;

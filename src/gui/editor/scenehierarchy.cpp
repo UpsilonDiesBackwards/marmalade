@@ -20,12 +20,12 @@
 #include "scenehierarchy.h"
 
 #include "../../application/application.h"
+#include <ecs/components/animationplayer.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/type_ptr.hpp>
 
-#include "imgui.h"
-#include "ecs/components/animationplayer.h"
+#include <imgui.h>
 
 #include <iostream>
 

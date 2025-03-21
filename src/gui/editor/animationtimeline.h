@@ -41,4 +41,4 @@ namespace Marmalade::GUI {
 }
 
 
-#endif//MARMALADE_ANIMATIONTIMELINE_H
+#endif

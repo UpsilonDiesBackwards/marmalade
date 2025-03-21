@@ -28,6 +28,24 @@
 namespace Marmalade::ECS {
     class AnimationPlayer : public Component {
     public:
+#define ANIMATION_PLAYER_CTOR_BODY         \
+    name = "Animation Player";             \
+    isMutable = true;                      \
+    allowMultiple = false;                 \
+    categories = {"Animation"};            \
+    description =                          \
+            "Animation Player Component\n" \
+            "Allows 2D animation sequencing and playing";
+
+        // MSVC is a very broken compiler and requires the constructor to be in the source file. But only for this component.
+        // All the other components are fine. And we want the definition to be in the header so this macro helps out.
+#ifdef _MSC_VER
+        AnimationPlayer();
+#else
+        AnimationPlayer(){
+                ANIMATION_PLAYER_CTOR_BODY}
+#endif
+
         std::unique_ptr<Marmalade::Animation::AnimationSequence> animation = nullptr;
 
         bool _isCreatingSequence{false};
@@ -39,19 +57,9 @@ namespace Marmalade::ECS {
         void Deserialize(nlohmann::json json, Entity* entity) override;
 
         void showCreatePopup();
-
-        AnimationPlayer() {
-            name = "Animation Player";
-            isMutable = true;
-            allowMultiple = false;
-            categories = {"Animation"};
-            description =
-                    "Animation Player Component\n"
-                    "Allows 2D animation sequencing and playing";
-        }
     };
 
     REGISTER_COMPONENT(AnimationPlayer);
 }
 
-#endif//MARMALADE_ANIMATIONPLAYER_H
+#endif
