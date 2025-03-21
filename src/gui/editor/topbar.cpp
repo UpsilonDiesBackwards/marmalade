@@ -243,9 +243,7 @@ void Marmalade::GUI::TopBar::Show() {
         if (!isPaused) { ImGui::BeginDisabled(); }
 
         if (ImGui::Button("Step", editorButtonSize)) { // Put the game in to play...
-            Application::GetInstance().playState = PlayState::PlayState_PLAY;
-            Application::GetInstance().SetStepFrame(); //... then immediately pause the game the next frame
-
+            Application::GetInstance().playState = PlayState::PlayState_STEP;
             LOG_INFO("Stepped one frame");
         }
 

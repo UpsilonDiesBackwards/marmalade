@@ -29,23 +29,26 @@
 #include "../gui/editor/editor.h"
 #include "../gui/editor.h"
 #include "guilogsink.h"
+
 #include "profiler.h"
+
+#include <GLFW/glfw3.h>
 
 #include <scene/entity.h>
 #include <graphics/multisampledframebuffer.h>
 #include <io/inputmanager.h>
 #include <io/input.h>
 #include <graphics/viewport.h>
-#include <scene/scenemanager.h>
 
-#include <GLFW/glfw3.h>
+#include <scene/scenemanager.h>
 
 #include <spdlog/spdlog.h>
 
 enum PlayState {
     PlayState_PLAY,
-    PlayState_PAUSE,
     PlayState_STOP,
+    PlayState_PAUSE,
+    PlayState_STEP
 };
 
 enum EditorMode {
@@ -102,10 +105,6 @@ public:
     void OnClose();
 
     bool stepFrame = false;
-
-    void SetStepFrame() {
-        stepFrame = true;
-    }
 private:
     Application(int width, int height, const char* title);
 

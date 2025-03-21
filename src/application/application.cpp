@@ -182,6 +182,11 @@ void Application::Run() {
 
     editorGUI->Render();
 
+    if (playState == PlayState::PlayState_STEP) {
+        playState = PlayState::PlayState_PLAY;
+        stepFrame = true;
+    }
+
     if (stepFrame) { // Step one frame
         playState = PlayState::PlayState_PAUSE;
         stepFrame = false;
