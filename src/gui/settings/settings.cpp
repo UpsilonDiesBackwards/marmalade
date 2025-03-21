@@ -113,15 +113,20 @@ void Marmalade::GUI::ProjectSettings::drawGraphicsSettings() {
         app.framebuffer->Refresh();
     }
 
-    static int sampleValues[] = {2, 4, 8};
-    static int sampleIndex = 1;
+    if (currentProject->settings.msaaEnabled) {
+        static int sampleValues[] = {2, 4, 8};
+        static int sampleIndex = 1;
 
-    if (ImGui::SliderInt("MSAA Sample Count", &sampleIndex, 0, IM_ARRAYSIZE(sampleValues) - 1)) {
-        currentProject->settings.msaaSampleCount = sampleValues[sampleIndex];
-        app.framebuffer->Refresh();
+        char label[32];
+        sprintf(label, "Samples: %d", sampleValues[sampleIndex]);
+
+        if (ImGui::SliderInt("MSAA Sample Count", &sampleIndex, 0, IM_ARRAYSIZE(sampleValues) - 1, label)) {
+            currentProject->settings.msaaSampleCount = sampleValues[sampleIndex];
+            app.framebuffer->Refresh();
+        }
+
+        ImGui::Separator();
     }
-    ImGui::SameLine();
-    ImGui::Text("(Value: %d)", sampleValues[sampleIndex]);
 }
 
 void Marmalade::GUI::ProjectSettings::drawBuildSettings() {
