@@ -25,10 +25,11 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "imgui.h"
+#include "ecs/components/animationplayer.h"
 
 #include <iostream>
 
-static char newName[128] = "";// New name to rename entity to
+static char newName[128] = ""; // New name to rename entity to
 
 void SceneHierarchy::Show() {
     Application& app = Application::GetInstance();
@@ -117,6 +118,11 @@ void SceneHierarchy::displayEntity(std::shared_ptr<Entity> entity, int index) {
                 Application::GetInstance().editorGUI->details.visible = true;
                 Application::GetInstance().editorGUI->details.inspectedEntity = _selected.lock().get();
                 Application::GetInstance().editView->selectedEntity = _selected.lock().get();
+
+                if (entity->componentManager.GetComponentOfType<Marmalade::ECS::AnimationPlayer>()) {
+                    Application::GetInstance().editorGUI->animationTimeline.animation =
+                            std::move(entity->componentManager.GetComponentOfType<Marmalade::ECS::AnimationPlayer>()->animation);
+                }
             }
         }
 
@@ -148,7 +154,7 @@ void SceneHierarchy::showCreatePopup() {
         ImGui::SameLine();
         if (ImGui::Button("Create")) {
             createEntity(newName);
-            DeselectEntity();
+//            DeselectEntity();
 
             memset(newName, 0, sizeof(newName));
             _isCreatingEntityChild = false;

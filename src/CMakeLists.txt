@@ -38,6 +38,8 @@ list(APPEND ENGINE_SRC
         scene/scene.cpp
         scene/scenemanager.cpp
 
+        animation/animation.cpp
+
         packages/package.cpp
         packages/package.h
 
@@ -61,6 +63,8 @@ list(APPEND ENGINE_SRC # ECS
         ecs/components/physics2d/colliderdata.cpp
         ecs/components/physics2d/boxcollider.cpp
         ecs/components/physics2d/circlecollider.cpp
+
+        ecs/components/animationplayer.cpp
 )
 
 list(APPEND ENGINE_SRC # Mathematics

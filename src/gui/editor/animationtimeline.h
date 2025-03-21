@@ -1,3 +1,4 @@
+
 /*
  Marmalade - Lightweight Game Engine
  Copyright (C) 2025 Tayler Parsons
@@ -17,27 +18,27 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "editor.h"
+#ifndef MARMALADE_ANIMATIONTIMELINE_H
+#define MARMALADE_ANIMATIONTIMELINE_H
 
-#include "editor/editor.h"
+#include "../window.h"
+#include "animation/animation.h"
 
-void Editor::Render() {
-    // Persistent UI
-    topBar.Show();
+#include <memory>
 
-    if (showEditorViews) {
-        editorViews.Show();
-    }
+namespace Marmalade::GUI {
+    class AnimationTimeline : public Window {
+    public:
+        std::unique_ptr<Marmalade::Animation::AnimationSequence> animation = nullptr;
 
-    if (showSceneHeirarchy) {
-        sceneHierarchy.Show();
-    }
+        int selectedFrameIndex = -1;
+        float timelineZoom = 1.0f;
 
-    if (showDetails) {
-        details.Show();
-    }
+        void Draw() override;
 
-    if (showAnimationTimeline) {
-        animationTimeline.Draw();
-    }
+        void DrawTimeline();
+    };
 }
+
+
+#endif//MARMALADE_ANIMATIONTIMELINE_H

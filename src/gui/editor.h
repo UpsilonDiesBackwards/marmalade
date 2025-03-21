@@ -21,21 +21,26 @@
 #define ENGINE_EDITOR_H
 
 #include "editor/editor.h"
+
 #include "editor/topbar.h"
 #include "editor/scenehierarchy.h"
 #include "editor/details.h"
+#include "editor/animationtimeline.h"
 
 class Editor {
 public:
-    Marmalade::GUI::TopBar topBar;
     EditorViews editorViews;
     SceneHierarchy sceneHierarchy;
+
+    Marmalade::GUI::TopBar topBar;
     Marmalade::GUI::Details details;
+    Marmalade::GUI::AnimationTimeline animationTimeline;
 
     // If `true` then ui element will be opened on startup
     bool showEditorViews = true;
     bool showSceneHeirarchy = true;
     bool showDetails = true;
+    bool showAnimationTimeline = true;
 
     void Render();
 };
