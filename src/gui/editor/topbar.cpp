@@ -124,6 +124,8 @@ void Marmalade::GUI::TopBar::Show() {
         }
 
         if (ImGui::BeginMenu("Window")) {
+            ImGui::MenuItem(ICON_CI_DEVICE_CAMERA_VIDEO " Animation", nullptr, &WindowManager::GetInstance().animationManager.visible);
+
             ImGui::MenuItem(ICON_CI_PACKAGE " Package Manager", nullptr, &WindowManager::GetInstance().packageManager.visible);
 
             ImGui::MenuItem(ICON_CI_FILE_TEXT " Log", nullptr, &WindowManager::GetInstance().log.visible);

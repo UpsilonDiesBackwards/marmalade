@@ -27,7 +27,9 @@ list(APPEND ENGINE_API
 
         ecs/components/animationplayer.h
 
-        animation/animation.h
+        animation/sequence.h
+        animation/animationdriver.h
+        animation/animationframe.h
 
         engineapi.h
         plugin.h

@@ -38,7 +38,8 @@ list(APPEND ENGINE_SRC
         scene/scene.cpp
         scene/scenemanager.cpp
 
-        animation/animation.cpp
+        animation/sequence.cpp
+        animation/animationdriver.cpp
 
         packages/package.cpp
         packages/package.h

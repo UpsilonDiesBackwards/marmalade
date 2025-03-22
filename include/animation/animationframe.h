@@ -18,27 +18,27 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_ANIMATIONTIMELINE_H
-#define MARMALADE_ANIMATIONTIMELINE_H
+#ifndef MARMALADE_ANIMATIONFRAME_H
+#define MARMALADE_ANIMATIONFRAME_H
 
-#include "../window.h"
-#include "animation/animation.h"
+#include <string>
+#include "nlohmann/json.hpp"
 
-#include <memory>
+#define FRAME_VERSION 1
 
-namespace Marmalade::GUI {
-    class AnimationTimeline : public Window {
-    public:
-        std::unique_ptr<Marmalade::Animation::AnimationSequence> animation = nullptr;
+namespace Marmalade::Animation {
+    struct Frame {
+        int version{ FRAME_VERSION };
 
-        int selectedFrameIndex = -1;
-        float timelineZoom = 1.0f;
+        std::string type{"Marmalade::Animation"};
 
-        void Draw() override;
+        std::string sprite;
+        float speed;
+        float offset[2];
 
-        void DrawTimeline();
+        // TODO: Animation events
     };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::Animation::Frame, sprite, speed, offset)
 }
-
-
-#endif
+#endif//MARMALADE_ANIMATIONFRAME_H

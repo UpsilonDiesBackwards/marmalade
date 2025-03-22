@@ -23,7 +23,7 @@
 
 #include "ecs/component.h"
 
-#include "animation/animation.h"
+#include "animation/sequence.h"
 
 namespace Marmalade::ECS {
     class AnimationPlayer : public Component {

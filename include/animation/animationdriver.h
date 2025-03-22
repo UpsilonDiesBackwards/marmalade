@@ -1,3 +1,4 @@
+
 /*
  Marmalade - Lightweight Game Engine
  Copyright (C) 2025 Tayler Parsons
@@ -17,30 +18,28 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef ENGINE_EDITOR_H
-#define ENGINE_EDITOR_H
+#ifndef MARMALADE_ANIMATIONDRIVER_H
+#define MARMALADE_ANIMATIONDRIVER_H
 
-#include "editor/editor.h"
+#include "sequence.h"
+#include <memory>
+#include <unordered_map>
 
-#include "editor/topbar.h"
-#include "editor/scenehierarchy.h"
-#include "editor/details.h"
+namespace Marmalade::Animation {
+    class AnimationDriver {
+        std::unordered_map<std::string, std::shared_ptr<AnimationSequence>> animations{};
+        std::shared_ptr<AnimationSequence> currentSequence = nullptr;
 
-class Editor {
-public:
-    EditorViews editorViews;
-    SceneHierarchy sceneHierarchy;
+        bool isPlaying{false};
+        float currentTime{0.0f};
 
-    Marmalade::GUI::TopBar topBar;
-    Marmalade::GUI::Details details;
+        void AddAnimation(const std::string& name, std::shared_ptr<AnimationSequence> sequence);
 
-    // If `true` then ui element will be opened on startup
-    bool showEditorViews = true;
-    bool showSceneHeirarchy = true;
-    bool showDetails = true;
+        void Play(const std::string& name);
+        void Stop();
 
-    void Render();
-};
+        void Update(float deltaTime);
+    };
+}
 
-
-#endif
+#endif//MARMALADE_ANIMATIONDRIVER_H

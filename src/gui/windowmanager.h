@@ -31,6 +31,7 @@
 #include "editor/projectbrowser.h"
 #include "dialogs/about.h"
 #include "dialogs/configerror.h"
+#include "windows/animation.h"
 
 #include <vector>
 
@@ -40,6 +41,8 @@ namespace Marmalade::GUI {
         static WindowManager& GetInstance();
 
         WelcomeScreen welcomeScreen{EngineConfig::GetStoredConfig().appearance.showWelcomeScreen};
+
+        AnimationTimeline animationManager{};
         PackageManager packageManager{};
         Log log{true};
         ProjectWizard projectWizard{};

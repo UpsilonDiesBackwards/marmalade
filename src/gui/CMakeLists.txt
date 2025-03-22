@@ -27,8 +27,8 @@ list(APPEND ENGINE_SRC_GUI
         editor/scenehierarchy.h
         editor/topbar.cpp
         editor/topbar.h
-        editor/animationtimeline.cpp
-        editor/animationtimeline.h
+        windows/animation.cpp
+        windows/animation.h
 
         log/log.cpp
         log/log.h

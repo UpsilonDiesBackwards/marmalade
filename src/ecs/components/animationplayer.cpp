@@ -96,7 +96,7 @@ void Marmalade::ECS::AnimationPlayer::Deserialize(nlohmann::json json, Entity* e
 void Marmalade::ECS::AnimationPlayer::showCreatePopup() {
     if (ImGui::BeginPopupModal("CreateSequence", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         static char newSequenceName[128] = "";
-        std::filesystem::path newSequencePath;
+        static std::filesystem::path newSequencePath;
 
         ImGui::InputText("Name", newSequenceName, IM_ARRAYSIZE(newSequenceName));
 
@@ -121,6 +121,8 @@ void Marmalade::ECS::AnimationPlayer::showCreatePopup() {
         if (ImGui::Button("Create")) {
             auto newSequence = std::make_unique<Animation::AnimationSequence>(newSequencePath, newSequenceName);
             animation = std::move(newSequence);
+
+            animation->SaveConfig();
 
             LOG_DEBUG("Created new animation: {}", animation->name);
 

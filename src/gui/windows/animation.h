@@ -18,14 +18,31 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "animation/animation.h"
+#ifndef MARMALADE_ANIMATION_H
+#define MARMALADE_ANIMATION_H
 
-Marmalade::Animation::AnimationSequence::AnimationSequence(std::filesystem::path filePath, const std::string& name)
-    : Config(filePath), name(name) {
+#include "../window.h"
+#include "animation/sequence.h"
 
-    useGui = true;
+#include <memory>
+
+namespace Marmalade::GUI {
+    class AnimationTimeline : public Window {
+    public:
+        std::unique_ptr<Marmalade::Animation::AnimationSequence> animation = nullptr;
+
+        int selectedFrameIndex = -1;
+        float timelineZoom = 1.0f;
+
+        void Draw() override;
+
+        void DrawTopSection(float topHeight);
+        void DrawNodeArea();
+        void DrawTimeline();
+        void DrawPreviewWindow();
+        void DrawInspector();
+
+        bool DrawSplitter(const char* id, float* size, float minSize, float maxSize, bool isVertical);
+    };
 }
-
-void Marmalade::Animation::AnimationSequence::Play() { }
-
-void Marmalade::Animation::AnimationSequence::Stop() { }
+#endif

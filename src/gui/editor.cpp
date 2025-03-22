@@ -36,8 +36,4 @@ void Editor::Render() {
     if (showDetails) {
         details.Show();
     }
-
-    if (showAnimationTimeline) {
-        animationTimeline.Draw();
-    }
 }

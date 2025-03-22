@@ -17,12 +17,13 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_ANIMATION_H
-#define MARMALADE_ANIMATION_H
+#ifndef MARMALADE_SEQUENCE_H
+#define MARMALADE_SEQUENCE_H
 
 #include "graphics/texture.h"
 
 #include "../../src/application/config/config.h"
+#include "animationframe.h"
 
 #include <vector>
 #include <glm/vec2.hpp>
@@ -30,35 +31,24 @@
 #define ANIMATION_VERSION 1
 
 namespace Marmalade::Animation {
-    struct Frame {
-        int version{ ANIMATION_VERSION };
-
-        std::string type{"Marmalade::Animation"};
-
-        Texture sprite;
-        float speed;
-        glm::vec2 offset;
-
-        // TODO: Animation events
-    };
-
     class AnimationSequence : public Config<Marmalade::Animation::Frame> {
     public:
-        std::string uuid{};
+        int version{ ANIMATION_VERSION };
 
+        std::string uuid{};
         std::string name{};
         float length;
 
         std::vector<Frame> frames{};
-        bool loop;
+        bool loop{false};
 
         void Play();
         void Stop();
 
         explicit AnimationSequence(std::filesystem::path filePath, const std::string& name);
-    };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::Animation::AnimationSequence, name, frames, loop)
+        void PrepareNewConfig() override;
+    };
 }
 
 

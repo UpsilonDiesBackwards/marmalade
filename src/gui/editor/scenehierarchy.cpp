@@ -21,6 +21,7 @@
 
 #include "../../application/application.h"
 #include <ecs/components/animationplayer.h>
+#include "../windowmanager.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/type_ptr.hpp>
@@ -120,7 +121,7 @@ void SceneHierarchy::displayEntity(std::shared_ptr<Entity> entity, int index) {
                 Application::GetInstance().editView->selectedEntity = _selected.lock().get();
 
                 if (entity->componentManager.GetComponentOfType<Marmalade::ECS::AnimationPlayer>()) {
-                    Application::GetInstance().editorGUI->animationTimeline.animation =
+                    Marmalade::GUI::WindowManager::GetInstance().animationManager.animation =
                             std::move(entity->componentManager.GetComponentOfType<Marmalade::ECS::AnimationPlayer>()->animation);
                 }
             }

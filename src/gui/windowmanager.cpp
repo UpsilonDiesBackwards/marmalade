@@ -26,6 +26,7 @@ Marmalade::GUI::WindowManager& Marmalade::GUI::WindowManager::GetInstance() {
 
 Marmalade::GUI::WindowManager::WindowManager() {
     windows.push_back(&welcomeScreen);
+    windows.push_back(&animationManager);
     windows.push_back(&packageManager);
     windows.push_back(&log);
     windows.push_back(&projectWizard);

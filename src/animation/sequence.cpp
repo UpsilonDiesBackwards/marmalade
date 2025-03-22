@@ -1,3 +1,4 @@
+
 /*
  Marmalade - Lightweight Game Engine
  Copyright (C) 2025 Tayler Parsons
@@ -17,30 +18,18 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef ENGINE_EDITOR_H
-#define ENGINE_EDITOR_H
+#include "animation/sequence.h"
 
-#include "editor/editor.h"
+Marmalade::Animation::AnimationSequence::AnimationSequence(std::filesystem::path filePath, const std::string& name)
+    : Config(filePath), name(name) {
 
-#include "editor/topbar.h"
-#include "editor/scenehierarchy.h"
-#include "editor/details.h"
+    useGui = true;
+}
 
-class Editor {
-public:
-    EditorViews editorViews;
-    SceneHierarchy sceneHierarchy;
+void Marmalade::Animation::AnimationSequence::Play() { }
 
-    Marmalade::GUI::TopBar topBar;
-    Marmalade::GUI::Details details;
+void Marmalade::Animation::AnimationSequence::Stop() { }
 
-    // If `true` then ui element will be opened on startup
-    bool showEditorViews = true;
-    bool showSceneHeirarchy = true;
-    bool showDetails = true;
-
-    void Render();
-};
-
-
-#endif
+void Marmalade::Animation::AnimationSequence::PrepareNewConfig() {
+    Config::PrepareNewConfig();
+}
