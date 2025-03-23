@@ -191,7 +191,7 @@ void Marmalade::GUI::ProjectWizard::InitialiseGitRepository(const char* repoPath
     if (creationOptions.useDefaultGitIgnore) {// Use .gitignore template or not
         std::filesystem::path targetIgnorePath = std::filesystem::path(projectFilePath) / projectName / ".gitignore";
 
-        std::ifstream templIgnore("../resources/templates/gitignore");// Template ignore
+        std::ifstream templIgnore("res/templates/gitignore");// Template ignore
         std::ofstream targetIgnore(targetIgnorePath);
 
         if (templIgnore.is_open() && targetIgnore.is_open()) {// If both files are open ...
