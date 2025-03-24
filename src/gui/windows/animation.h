@@ -22,6 +22,7 @@
 #define MARMALADE_ANIMATION_H
 
 #include "../window.h"
+#include "animation/animationdriver.h"
 #include "animation/sequence.h"
 
 #include <memory>
@@ -29,20 +30,34 @@
 namespace Marmalade::GUI {
     class AnimationTimeline : public Window {
     public:
+        std::unique_ptr<Marmalade::Animation::AnimationDriver> driver = nullptr;
         std::unique_ptr<Marmalade::Animation::AnimationSequence> animation = nullptr;
-
-        int selectedFrameIndex = -1;
-        float timelineZoom = 1.0f;
 
         void Draw() override;
 
+        void DrawSequenceSelector();
         void DrawTopSection(float topHeight);
         void DrawNodeArea();
-        void DrawTimeline();
         void DrawPreviewWindow();
         void DrawInspector();
 
+        void DrawTimeline();
+        void DrawRuler(float length, float zoom);
+        void DrawFrameMarkers(Marmalade::Animation::AnimationSequence* sequence, float zoom);
+        void DrawScrubber(float& playbackTime, float length, float zoom);
+        void CreatePlaybackControls(Marmalade::Animation::AnimationSequence& sequence, float deltaTime);
+
         bool DrawSplitter(const char* id, float* size, float minSize, float maxSize, bool isVertical);
+
+    private:
+        int _selectedFrameIndex = -1;
+        float _timelineZoom = 1.0f;
+        bool _isPlaying = false;
+        float playbackTime = 0.0f;
+        float scrubberPos = 0.0f;
+
+        const float MIN_ZOOM_THRESHOLD = 2.0f;
+        const float SCRUBBER_HEIGHT = 10.0f;
     };
 }
 #endif

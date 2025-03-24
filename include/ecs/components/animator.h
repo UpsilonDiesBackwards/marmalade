@@ -18,12 +18,15 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_ANIMATIONPLAYER_H
-#define MARMALADE_ANIMATIONPLAYER_H
+#ifndef MARMALADE_ANIMATOR_H
+#define MARMALADE_ANIMATOR_H
 
 #include "ecs/component.h"
 
 #include "animation/sequence.h"
+#include "animation/animationdriver.h"
+
+class Entity;
 
 namespace Marmalade::ECS {
     class AnimationPlayer : public Component {
@@ -46,9 +49,9 @@ namespace Marmalade::ECS {
                 ANIMATION_PLAYER_CTOR_BODY}
 #endif
 
-        std::unique_ptr<Marmalade::Animation::AnimationSequence> animation = nullptr;
-
-        bool _isCreatingSequence{false};
+        bool _isCreatingDriver = false;
+        std::unique_ptr<Marmalade::Animation::AnimationDriver> driver{nullptr};
+        std::filesystem::path driverPath;
 
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;

@@ -21,7 +21,7 @@
 #include "animation/sequence.h"
 
 Marmalade::Animation::AnimationSequence::AnimationSequence(std::filesystem::path filePath, const std::string& name)
-    : Config(filePath), name(name) {
+    : Config(filePath), name(name), filePath(std::move(filePath)) {
 
     useGui = true;
 }

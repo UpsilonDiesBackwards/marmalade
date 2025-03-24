@@ -37,13 +37,17 @@ namespace Marmalade::Animation {
 
         std::string uuid{};
         std::string name{};
-        float length;
+        float length = 1.0f;
+
+        std::filesystem::path filePath;
 
         std::vector<Frame> frames{};
         bool loop{false};
 
         void Play();
         void Stop();
+
+        std::filesystem::path GetFilePath() const { return filePath; }
 
         explicit AnimationSequence(std::filesystem::path filePath, const std::string& name);
 

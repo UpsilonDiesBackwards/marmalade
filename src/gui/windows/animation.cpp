@@ -20,9 +20,14 @@
 
 #include "animation.h"
 
+#include <glm/common.hpp>
+
 #include <imgui.h>
 
 #include "IconsCodicons.h"
+#include "../../application/application.h"
+#include "ImGuiFileDialog.h"
+#include "../windowmanager.h"
 
 void Marmalade::GUI::AnimationTimeline::Draw() {
     ImGui::Begin(ICON_CI_DEVICE_CAMERA_VIDEO " Animation Timeline", &visible, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
@@ -53,9 +58,42 @@ void Marmalade::GUI::AnimationTimeline::DrawTimeline() {
     ImGui::Text("Timeline");
     ImGui::Separator();
 
+    if (!driver) {
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No animation driver found, select a entity with an animator component with a driver");
+        return;
+    }
+
+    float availableWindowWidth = ImGui::GetContentRegionAvail().x;
+    float comboWidth = availableWindowWidth * 0.7f;
+    float sliderWidth = availableWindowWidth * 0.3f;
+
+    ImGui::PushItemWidth(comboWidth);
+    DrawSequenceSelector();
+    ImGui::PopItemWidth();
+
+    ImGui::SameLine();
+
+    ImGui::PushItemWidth(sliderWidth);
+    ImGui::SliderFloat("##ZoomSlider", &_timelineZoom, 0.1f, 20.0f, "Zoom: %.1fx");
+    ImGui::PopItemWidth();
+
     ImGui::BeginChild("Timeline", ImVec2(0, 0), true);
 
+    if (!animation) { ImGui::EndChild(); return; }
 
+    auto deltaTime = static_cast<float>(Application::GetInstance().profiler.GetDeltaTime());
+
+    CreatePlaybackControls(*animation, deltaTime);
+
+    ImGui::SameLine();
+
+    ImGui::InputFloat("##Duration", &animation->length, 0.1, 3600.0f, "Duration: %.1fx"); // Allow up to an hour-long animations
+
+    DrawRuler(animation->length, _timelineZoom);
+
+    DrawFrameMarkers(animation.get(), _timelineZoom);
+
+    DrawScrubber(playbackTime, animation->length, _timelineZoom);
 
     ImGui::EndChild();
 }
@@ -158,4 +196,153 @@ void Marmalade::GUI::AnimationTimeline::DrawTopSection(float topHeight) {
     ImGui::Columns(1);
 
     ImGui::EndChild();
+}
+
+void Marmalade::GUI::AnimationTimeline::DrawRuler(float length, float zoom) {
+    if (!animation) { return; }
+
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+
+    float timelineWidth = length * 100.0f * zoom;
+    float stepSize = (zoom >= MIN_ZOOM_THRESHOLD) ? 0.1f : 1.0f;
+    float labelStep = (zoom >= MIN_ZOOM_THRESHOLD) ? 0.5f : 1.0f;
+
+    for (float t = 0.0f; t <= length; t += stepSize) {
+        float xPos = cursorPos.x + t * 100.0f * zoom;
+        if (t - floor(t) < 0.0001f || zoom >= MIN_ZOOM_THRESHOLD) {
+            drawList->AddLine(ImVec2(xPos, cursorPos.y), ImVec2(xPos, cursorPos.y + 10), IM_COL32(200, 200, 200, 255), 1.0f);
+
+            if (fmod(t, labelStep) < 0.0001f) {
+                std::string label = (zoom >= MIN_ZOOM_THRESHOLD) ? std::to_string(static_cast<int>(t * 1000)) + "ms" : std::to_string(static_cast<int>(t)) + "s";
+                drawList->AddText(ImVec2(xPos + 2, cursorPos.y + 12), IM_COL32(255, 255, 255, 255), label.c_str());
+            }
+        }
+    }
+
+    ImGui::Dummy(ImVec2(timelineWidth, 30.0f));
+}
+
+void Marmalade::GUI::AnimationTimeline::DrawFrameMarkers(Marmalade::Animation::AnimationSequence* sequence, float zoom) {
+    if (!sequence || sequence->frames.empty()) return;
+
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+
+    for (int i = 0; i < sequence->frames.size(); ++i) {
+        float framePos = cursorPos.x + playbackTime * 100.0f * zoom;
+        drawList->AddLine(ImVec2(framePos, cursorPos.y), ImVec2(framePos, cursorPos.y + 30), IM_COL32(255, 200, 100, 255), 2.0f);
+    }
+}
+
+void Marmalade::GUI::AnimationTimeline::DrawScrubber(float& playbackTime, float length, float zoom) {
+    if (!animation) { return; }
+
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+
+    float scrubberX = cursorPos.x + playbackTime * 100.0f * zoom;
+
+    drawList->AddLine(ImVec2(scrubberX, cursorPos.y), ImVec2(scrubberX, cursorPos.y + 30.0f), IM_COL32(255, 0, 0, 255), 2.0f);
+    drawList->AddRectFilled(ImVec2(scrubberX - 5.0f, cursorPos.y + 30.0f), ImVec2(scrubberX + 5.0f, cursorPos.y + 30.0f + SCRUBBER_HEIGHT), IM_COL32(255, 0, 0, 255));
+
+    if (ImGui::IsMouseDragging(0) && ImGui::IsItemHovered()) {
+        float deltaX = ImGui::GetMouseDragDelta().x;
+        playbackTime += deltaX / (100.0f * zoom);
+        playbackTime = glm::clamp(playbackTime, 0.0f, length);
+    }
+}
+
+void Marmalade::GUI::AnimationTimeline::CreatePlaybackControls(Marmalade::Animation::AnimationSequence& sequence, float deltaTime) {
+    if (!animation) { return; }
+
+    if (ImGui::Button(_isPlaying ? ICON_CI_STOP " Stop" : ICON_CI_PLAY " Play")) {
+        _isPlaying = !_isPlaying;
+    }
+
+    if (!_isPlaying) {
+        playbackTime = 0.0f;
+    }
+
+    if (_isPlaying) {
+        playbackTime += deltaTime;
+        if (playbackTime > sequence.length) {
+            if (sequence.loop) {
+                playbackTime = 0.0f;
+            } else {
+                playbackTime = sequence.length;
+                _isPlaying = false;
+            }
+        }
+    }
+    ImGui::Text("Playback Time: %.2f / %.2f", playbackTime, sequence.length);
+}
+
+void Marmalade::GUI::AnimationTimeline::DrawSequenceSelector() {
+    static int selected = 0;
+    static std::vector<std::unique_ptr<Marmalade::Animation::AnimationSequence>> listedSequences;
+
+    listedSequences.clear();
+
+    for (const auto& [name, pathStr] : driver->storedConfig.sequences) {
+        std::filesystem::path path = pathStr;
+
+        if (std::filesystem::exists(path)) {
+            auto anim = std::make_unique<Marmalade::Animation::AnimationSequence>(path, name);
+            listedSequences.push_back(std::move(anim));
+        }
+    }
+
+    if (ImGui::BeginCombo("##SequenceSelector", listedSequences.empty() ? "No Animations available" : listedSequences[selected]->name.c_str())) {
+        for (int i = 0; i < listedSequences.size(); ++i) {
+            bool isSelected = (selected == i);
+
+            if (ImGui::Selectable(listedSequences[i]->name.c_str(), isSelected)) {
+                selected = i;
+                animation = std::move(listedSequences[i]);
+            }
+            if (isSelected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+
+        if (ImGui::Selectable(ICON_CI_PLUS "Create Animation")) {
+            IGFD::FileDialogConfig config;
+            config.path = EngineConfig::GetStoredConfig().defaultProjectPath;
+            config.flags = ImGuiFileDialogFlags_Modal;
+            ImGuiFileDialog::Instance()->OpenDialog("CreateAnimation", "Create New Animation", ".animseq", config);
+        }
+
+        if (ImGuiFileDialog::Instance()->Display("CreateAnimation")) {
+            if (ImGuiFileDialog::Instance()->IsOk()) {
+                std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
+                std::string animationName = ImGuiFileDialog::Instance()->GetCurrentFileName(true);
+
+                LOG_DEBUG("Creating new animation: {}", animationName);
+
+                auto newAnimation = std::make_shared<Marmalade::Animation::AnimationSequence>(filePath, animationName);
+                newAnimation->SaveConfig();
+
+                listedSequences.push_back(std::make_unique<Marmalade::Animation::AnimationSequence>(*newAnimation));
+                selected = listedSequences.size() - 1;
+                animation = std::make_unique<Marmalade::Animation::AnimationSequence>(*listedSequences[selected]);
+
+                if (driver) {
+                    driver->storedConfig.sequences[animationName] = filePath;
+
+                    driver->animations[animationName] = newAnimation;
+
+                    if (!driver->currentSequence) {
+                        driver->currentSequence = newAnimation;
+                        driver->storedConfig.currentSequence = animationName;
+                    }
+                    driver->SaveConfig();
+                }
+            }
+
+            ImGuiFileDialog::Instance()->Close();
+        }
+
+        ImGui::EndCombo();
+    }
 }

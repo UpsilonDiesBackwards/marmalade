@@ -25,7 +25,7 @@ list(APPEND ENGINE_API
         ecs/components/physics2d/boxcollider.h
         ecs/components/physics2d/circlecollider.h
 
-        ecs/components/animationplayer.h
+        ecs/components/animator.h
 
         animation/sequence.h
         animation/animationdriver.h

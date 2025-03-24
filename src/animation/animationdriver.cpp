@@ -20,6 +20,12 @@
 
 #include "animation/animationdriver.h"
 
+Marmalade::Animation::AnimationDriver::AnimationDriver(std::filesystem::path filePath, const std::string& name) :
+    Config(filePath), name(name) {
+
+    useGui = true;
+}
+
 void Marmalade::Animation::AnimationDriver::AddAnimation(const std::string& name, std::shared_ptr<AnimationSequence> sequence) {
     animations[name] = std::move(sequence);
 }
@@ -46,4 +52,37 @@ void Marmalade::Animation::AnimationDriver::Update(float deltaTime) {
     } else {
         Stop();
     }
+}
+
+void Marmalade::Animation::AnimationDriver::Deserialise(const nlohmann::json& json) {
+    storedConfig = json.get<AnimationDriverData>();
+
+    animations.clear();
+
+    for (const auto& [name, pathStr] : storedConfig.sequences) {
+        std::filesystem::path path = pathStr;
+        if (std::filesystem::exists(path)) {
+            auto anim = std::make_shared<AnimationSequence>(path, name);
+            animations[name] = anim;
+            LOG_DEBUG("Loaded animation '{}' from '{}'", name, path.string());
+        } else {
+            LOG_WARN("Animation '{}' path '{}' does not exist!", name, path.string());
+        }
+    }
+
+    if (!storedConfig.currentSequence.empty() && animations.count(storedConfig.currentSequence)) {
+        currentSequence = animations[storedConfig.currentSequence];
+        LOG_DEBUG("Set '{}' as the current sequence.", storedConfig.currentSequence);
+    } else {
+        currentSequence = nullptr;
+        LOG_WARN("No valid current sequence found.");
+    }
+
+    isPlaying = storedConfig.isPlaying;
+    currentTime = storedConfig.currentTime;
+}
+
+
+void Marmalade::Animation::AnimationDriver::PrepareNewConfig() {
+    Config::PrepareNewConfig();
 }

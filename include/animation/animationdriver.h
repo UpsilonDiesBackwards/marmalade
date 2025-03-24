@@ -25,13 +25,42 @@
 #include <memory>
 #include <unordered_map>
 
+#define ANIM_DRIVER_VERSION 1
+
 namespace Marmalade::Animation {
-    class AnimationDriver {
+    struct AnimationDriverData {
+        int version{ANIM_DRIVER_VERSION};
+
+        std::string uuid{};
+        std::string name{};
+
+        std::unordered_map<std::string, std::string> sequences{};
+        std::string currentSequence{};
+
+        bool isPlaying{false};
+        float currentTime{0.0f};
+    };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AnimationDriverData,
+                                       version, uuid, name,
+                                       sequences, currentSequence,
+                                       isPlaying, currentTime)
+
+    class AnimationDriver : public Config<AnimationDriverData> {
+    public:
+        int version{ ANIM_DRIVER_VERSION };
+
+        std::string uuid{};
+        std::string name;
+
         std::unordered_map<std::string, std::shared_ptr<AnimationSequence>> animations{};
         std::shared_ptr<AnimationSequence> currentSequence = nullptr;
 
         bool isPlaying{false};
         float currentTime{0.0f};
+
+        AnimationDriver() = default;
+        explicit AnimationDriver(std::filesystem::path filePath, const std::string& name);
 
         void AddAnimation(const std::string& name, std::shared_ptr<AnimationSequence> sequence);
 
@@ -39,6 +68,10 @@ namespace Marmalade::Animation {
         void Stop();
 
         void Update(float deltaTime);
+
+        void Deserialise(const nlohmann::json& json);
+
+        void PrepareNewConfig() override;
     };
 }
 

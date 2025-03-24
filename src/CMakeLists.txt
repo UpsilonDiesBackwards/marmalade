@@ -65,7 +65,7 @@ list(APPEND ENGINE_SRC # ECS
         ecs/components/physics2d/boxcollider.cpp
         ecs/components/physics2d/circlecollider.cpp
 
-        ecs/components/animationplayer.cpp
+        ecs/components/animator.cpp
 )
 
 list(APPEND ENGINE_SRC # Mathematics

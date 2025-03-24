@@ -20,7 +20,7 @@
 #include "scenehierarchy.h"
 
 #include "../../application/application.h"
-#include <ecs/components/animationplayer.h>
+#include <ecs/components/animator.h>
 #include "../windowmanager.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -120,9 +120,17 @@ void SceneHierarchy::displayEntity(std::shared_ptr<Entity> entity, int index) {
                 Application::GetInstance().editorGUI->details.inspectedEntity = _selected.lock().get();
                 Application::GetInstance().editView->selectedEntity = _selected.lock().get();
 
-                if (entity->componentManager.GetComponentOfType<Marmalade::ECS::AnimationPlayer>()) {
-                    Marmalade::GUI::WindowManager::GetInstance().animationManager.animation =
-                            std::move(entity->componentManager.GetComponentOfType<Marmalade::ECS::AnimationPlayer>()->animation);
+                auto animationPlayer = entity->componentManager.GetComponentOfType<Marmalade::ECS::AnimationPlayer>();
+
+                if (animationPlayer) {
+                    if (animationPlayer->driver) {
+                        Marmalade::GUI::WindowManager::GetInstance().animationManager.driver = std::move(animationPlayer->driver);
+                        LOG_INFO("Animation Driver set successfully.");
+                    } else {
+                        LOG_WARN("Selected entity has no animation driver.");
+                    }
+                } else {
+                    LOG_WARN("Selected entity does not have an AnimationPlayer component.");
                 }
             }
         }
