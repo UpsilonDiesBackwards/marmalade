@@ -98,7 +98,13 @@ void EditView::Resize(int width, int height) {
 }
 
 void EditView::RunInput() {
-    if (ImGuizmo::IsUsing()) { return; }
+    if (ImGuizmo::IsUsing() ||
+        ImGui::IsAnyItemActive() ||
+        ImGui::IsAnyItemFocused() ||
+        ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopup)) {
+
+        return;
+    }
 
     Application& app = Application::GetInstance();
 
@@ -168,9 +174,15 @@ void EditView::ShowGizmo() {
     static ImGuizmo::OPERATION currentGuizmoOperation(ImGuizmo::TRANSLATE);
     static ImGuizmo::MODE currentGuizmoMode(ImGuizmo::WORLD);
 
-    if (ImGui::IsKeyPressed(ImGuiKey_Q)) { currentGuizmoOperation = ImGuizmo::TRANSLATE; }
-    if (ImGui::IsKeyPressed(ImGuiKey_W)) { currentGuizmoOperation = ImGuizmo::ROTATE; }
-    if (ImGui::IsKeyPressed(ImGuiKey_E)) { currentGuizmoOperation = ImGuizmo::SCALE; }
+    if (!(ImGuizmo::IsUsing() ||
+          ImGui::IsAnyItemActive() ||
+          ImGui::IsAnyItemFocused() ||
+          ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopup))) {
+
+        if (ImGui::IsKeyPressed(ImGuiKey_Q)) { currentGuizmoOperation = ImGuizmo::TRANSLATE; }
+        if (ImGui::IsKeyPressed(ImGuiKey_W)) { currentGuizmoOperation = ImGuizmo::ROTATE; }
+        if (ImGui::IsKeyPressed(ImGuiKey_E)) { currentGuizmoOperation = ImGuizmo::SCALE; }
+    }
 
     if (ImGuizmo::IsUsing()) {
         glm::vec3 translation, scale, rotation;
@@ -209,7 +221,6 @@ void EditView::ShowGizmo() {
                          currentGuizmoOperation, currentGuizmoMode,
                          glm::value_ptr(transform->modelMatrix));
 }
-
 
 void EditView::ShowColliderBounds() {
     auto comp = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::ColliderBase>();
