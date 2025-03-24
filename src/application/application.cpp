@@ -35,6 +35,8 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <ImGuizmo.h>
 
+#include <imnodes.h>
+
 #include <IconsCodicons.h>
 
 #include <spdlog/spdlog.h>
@@ -123,6 +125,8 @@ void Application::Initialise() {
     ImGui::CreateContext();// Create ImGui Context
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 430");
+
+    ImNodes::CreateContext();
 
     // Load ImGui custom style
     if (!std::filesystem::exists(Marmalade::ConfigUtil::GetConfigDirectory() / "editorstyle.txt")) {
@@ -237,6 +241,8 @@ void Application::Terminate() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+
+    ImNodes::DestroyContext();
 
     glfwDestroyWindow(window);
     glfwTerminate();

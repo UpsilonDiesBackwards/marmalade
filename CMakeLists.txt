@@ -137,10 +137,14 @@ list(APPEND IMGUI_SRC
 
 file (GLOB IMGUIZMO_SRC "vendor/imguizmo/*.h" "vendor/imguizmo/*.cpp")
 
+# We can't do add_subdirectory, since the imgui header is undefined
+list(APPEND IMNODES_SRC vendor/imnodes/imnodes.h vendor/imnodes/imnodes_internal.h vendor/imnodes/imnodes.cpp)
+
 add_executable(marmalade
         vendor/glad/src/glad.c
         ${IMGUI_SRC}
         ${IMGUIZMO_SRC}
+        ${IMNODES_SRC}
         vendor/imguifiledialog/ImGuiFileDialog.cpp
         vendor/imgui_markdown/imgui_markdown.h
 )
@@ -183,6 +187,7 @@ target_include_directories(marmalade PRIVATE
         vendor/libgit2/include
         vendor/iconfontcppheaders
         vendor/spdlog/include
+        vendor/imnodes
 )
 
 target_include_directories(marmalade PRIVATE include)
