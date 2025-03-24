@@ -35,3 +35,6 @@
 [submodule "vendor/imgui_markdown"]
 	path = vendor/imgui_markdown
 	url = https://github.com/enkisoftware/imgui_markdown.git
+[submodule "vendor/imnodes"]
+	path = vendor/imnodes
+	url = https://github.com/Nelarius/imnodes.git
