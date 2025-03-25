@@ -25,13 +25,32 @@
 #include "animation/animationdriver.h"
 #include "animation/sequence.h"
 
+#include <imgui.h>
+
 #include <memory>
+#include <set>
 
 namespace Marmalade::GUI {
-    class AnimationTimeline : public Window {
+    struct SequenceNode {
+        int id;
+        std::string name;
+        ImVec2 position;
+    };
+
+    struct NodeTransition {
+        int startNodeID;
+        int targetNodeID;
+
+        float time;
+    };
+
+    class Animation : public Window {
     public:
         std::unique_ptr<Marmalade::Animation::AnimationDriver> driver = nullptr;
         std::unique_ptr<Marmalade::Animation::AnimationSequence> animation = nullptr;
+
+        std::vector<SequenceNode> nodes;
+        std::vector<NodeTransition> transitions;
 
         void Draw() override;
 
@@ -58,6 +77,14 @@ namespace Marmalade::GUI {
 
         const float MIN_ZOOM_THRESHOLD = 2.0f;
         const float SCRUBBER_HEIGHT = 10.0f;
+
+        std::set<const Marmalade::Animation::AnimationSequence*> createdNodes;
+        int nextNodeId = 1;
+
+        std::string RemoveFileExtention(std::string& fileName) {
+            std::filesystem::path path(fileName);
+            return path.stem().string();
+        }
     };
 }
 #endif

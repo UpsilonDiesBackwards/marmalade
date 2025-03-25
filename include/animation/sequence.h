@@ -47,8 +47,6 @@ namespace Marmalade::Animation {
         void Play();
         void Stop();
 
-        std::filesystem::path GetFilePath() const { return filePath; }
-
         explicit AnimationSequence(std::filesystem::path filePath, const std::string& name);
 
         void PrepareNewConfig() override;

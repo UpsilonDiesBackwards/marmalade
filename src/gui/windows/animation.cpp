@@ -23,13 +23,14 @@
 #include <glm/common.hpp>
 
 #include <imgui.h>
+#include <imnodes.h>
 
 #include "IconsCodicons.h"
 #include "../../application/application.h"
 #include "ImGuiFileDialog.h"
 #include "../windowmanager.h"
 
-void Marmalade::GUI::AnimationTimeline::Draw() {
+void Marmalade::GUI::Animation::Draw() {
     ImGui::Begin(ICON_CI_DEVICE_CAMERA_VIDEO " Animation Timeline", &visible, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
 
     static float topSectionHeight = 300.0f;
@@ -49,12 +50,84 @@ void Marmalade::GUI::AnimationTimeline::Draw() {
     ImGui::End();
 }
 
-void Marmalade::GUI::AnimationTimeline::DrawNodeArea() {
+void Marmalade::GUI::Animation::DrawNodeArea() {
     ImGui::Text("Node View");
     ImGui::Separator();
+
+    if (driver) {
+        for (const auto& anims : driver->animations) { // Create nodes for already existing and new nodes
+            const auto& animation = anims.second;
+
+            if (createdNodes.find(animation.get()) != createdNodes.end()) { // If node is already created, do not create it again
+                continue;
+            }
+
+            SequenceNode newNode;
+            newNode.id = nextNodeId++;
+            newNode.name = RemoveFileExtention(animation->name); // Remove the '.animseq' file extension from node name
+            newNode.position = ImVec2(200.0f, 100.0f);
+            nodes.push_back(newNode);
+
+            createdNodes.insert(animation.get());
+        }
+    }
+
+    if (nodes.empty()) {
+        ImGui::Text("No nodes created.");
+        return;
+    }
+
+    int startAttr, endAttr;
+    if (ImNodes::IsLinkCreated(&startAttr, &endAttr)) { // Create a new link from the start node to the end / target node
+        int startNodeId = startAttr / 2;
+        int endNodeId = endAttr / 2;
+
+        if (startNodeId != endNodeId) {
+            transitions.push_back({startNodeId, endNodeId});
+        }
+    }
+
+    int linkId;
+    if (ImNodes::IsLinkDestroyed(&linkId)) { // Destroy link from the start node to the end / target node
+        auto it = std::remove_if(transitions.begin(), transitions.end(),
+                                 [linkId](const NodeTransition& link) { return link.startNodeID == linkId ||
+                                                                               link.targetNodeID == linkId; });
+        transitions.erase(it, transitions.end());
+    }
+
+    ImNodes::BeginNodeEditor();
+
+    for (auto& node : nodes) {
+        if (node.id <= 0) {
+            LOG_ERROR("Invalid node ID: {}", node.id);
+            continue;
+        }
+
+        ImNodes::BeginNode(node.id);
+
+        ImNodes::BeginNodeTitleBar();
+        ImGui::TextUnformatted(node.name.c_str());
+        ImNodes::EndNodeTitleBar();
+
+        ImNodes::BeginInputAttribute(node.id * 2);
+        ImGui::Text("In");
+        ImNodes::EndInputAttribute();
+
+        ImNodes::BeginOutputAttribute(node.id * 2 + 1);
+        ImGui::Text("Out");
+        ImNodes::EndOutputAttribute();
+
+        ImNodes::EndNode();
+    }
+
+    for (auto& trans : transitions) { // Render node transition links
+        ImNodes::Link(trans.startNodeID, trans.startNodeID * 2 + 1, trans.targetNodeID * 2);
+    }
+
+    ImNodes::EndNodeEditor();
 }
 
-void Marmalade::GUI::AnimationTimeline::DrawTimeline() {
+void Marmalade::GUI::Animation::DrawTimeline() {
     ImGui::Text("Timeline");
     ImGui::Separator();
 
@@ -98,17 +171,21 @@ void Marmalade::GUI::AnimationTimeline::DrawTimeline() {
     ImGui::EndChild();
 }
 
-void Marmalade::GUI::AnimationTimeline::DrawPreviewWindow() {
+void Marmalade::GUI::Animation::DrawPreviewWindow() {
     ImGui::Text("Preview");
     ImGui::Separator();
+
+    // TODO
 }
 
-void Marmalade::GUI::AnimationTimeline::DrawInspector() {
+void Marmalade::GUI::Animation::DrawInspector() {
     ImGui::Text("Inspector");
     ImGui::Separator();
+
+    // TODO
 }
 
-bool Marmalade::GUI::AnimationTimeline::DrawSplitter(const char* id, float* size, float minSize, float maxSize, bool isVertical) {
+bool Marmalade::GUI::Animation::DrawSplitter(const char* id, float* size, float minSize, float maxSize, bool isVertical) {
     ImVec2 cursorPos = ImGui::GetCursorPos();
     float thickness = 5.0f;
 
@@ -153,7 +230,7 @@ bool Marmalade::GUI::AnimationTimeline::DrawSplitter(const char* id, float* size
     return resizing;
 }
 
-void Marmalade::GUI::AnimationTimeline::DrawTopSection(float topHeight) {
+void Marmalade::GUI::Animation::DrawTopSection(float topHeight) {
     static float rightPanelWidth = 350.0f;
     static float previewHeight = 90.0f;
 
@@ -198,22 +275,23 @@ void Marmalade::GUI::AnimationTimeline::DrawTopSection(float topHeight) {
     ImGui::EndChild();
 }
 
-void Marmalade::GUI::AnimationTimeline::DrawRuler(float length, float zoom) {
+void Marmalade::GUI::Animation::DrawRuler(float length, float zoom) {
     if (!animation) { return; }
 
     ImDrawList* drawList = ImGui::GetWindowDrawList();
     ImVec2 cursorPos = ImGui::GetCursorScreenPos();
 
     float timelineWidth = length * 100.0f * zoom;
+
     float stepSize = (zoom >= MIN_ZOOM_THRESHOLD) ? 0.1f : 1.0f;
     float labelStep = (zoom >= MIN_ZOOM_THRESHOLD) ? 0.5f : 1.0f;
 
-    for (float t = 0.0f; t <= length; t += stepSize) {
+    for (float t = 0.0f; t <= length + stepSize; t += stepSize) { // Draw ruler line with length appropriate to the zoom level
         float xPos = cursorPos.x + t * 100.0f * zoom;
         if (t - floor(t) < 0.0001f || zoom >= MIN_ZOOM_THRESHOLD) {
             drawList->AddLine(ImVec2(xPos, cursorPos.y), ImVec2(xPos, cursorPos.y + 10), IM_COL32(200, 200, 200, 255), 1.0f);
 
-            if (fmod(t, labelStep) < 0.0001f) {
+            if (fmod(t, labelStep) < 0.0001f) { // Draw time labels
                 std::string label = (zoom >= MIN_ZOOM_THRESHOLD) ? std::to_string(static_cast<int>(t * 1000)) + "ms" : std::to_string(static_cast<int>(t)) + "s";
                 drawList->AddText(ImVec2(xPos + 2, cursorPos.y + 12), IM_COL32(255, 255, 255, 255), label.c_str());
             }
@@ -223,37 +301,39 @@ void Marmalade::GUI::AnimationTimeline::DrawRuler(float length, float zoom) {
     ImGui::Dummy(ImVec2(timelineWidth, 30.0f));
 }
 
-void Marmalade::GUI::AnimationTimeline::DrawFrameMarkers(Marmalade::Animation::AnimationSequence* sequence, float zoom) {
+void Marmalade::GUI::Animation::DrawFrameMarkers(Marmalade::Animation::AnimationSequence* sequence, float zoom) {
     if (!sequence || sequence->frames.empty()) return;
 
     ImDrawList* drawList = ImGui::GetWindowDrawList();
     ImVec2 cursorPos = ImGui::GetCursorScreenPos();
 
-    for (int i = 0; i < sequence->frames.size(); ++i) {
+    for (int i = 0; i < sequence->frames.size(); ++i) { // Draw frame markers
         float framePos = cursorPos.x + playbackTime * 100.0f * zoom;
         drawList->AddLine(ImVec2(framePos, cursorPos.y), ImVec2(framePos, cursorPos.y + 30), IM_COL32(255, 200, 100, 255), 2.0f);
     }
 }
 
-void Marmalade::GUI::AnimationTimeline::DrawScrubber(float& playbackTime, float length, float zoom) {
+void Marmalade::GUI::Animation::DrawScrubber(float& playbackTime, float length, float zoom) {
     if (!animation) { return; }
 
     ImDrawList* drawList = ImGui::GetWindowDrawList();
     ImVec2 cursorPos = ImGui::GetCursorScreenPos();
 
+    float scrubberY = cursorPos.y - 30.0f;
     float scrubberX = cursorPos.x + playbackTime * 100.0f * zoom;
 
-    drawList->AddLine(ImVec2(scrubberX, cursorPos.y), ImVec2(scrubberX, cursorPos.y + 30.0f), IM_COL32(255, 0, 0, 255), 2.0f);
-    drawList->AddRectFilled(ImVec2(scrubberX - 5.0f, cursorPos.y + 30.0f), ImVec2(scrubberX + 5.0f, cursorPos.y + 30.0f + SCRUBBER_HEIGHT), IM_COL32(255, 0, 0, 255));
+    drawList->AddLine(ImVec2(scrubberX, scrubberY), ImVec2(scrubberX, scrubberY + 30.0f), IM_COL32(255, 0, 0, 255), 2.0f);
+    drawList->AddRectFilled(ImVec2(scrubberX - 5.0f, scrubberY + 30.0f), ImVec2(scrubberX + 5.0f, scrubberY + 30.0f + SCRUBBER_HEIGHT), IM_COL32(255, 0, 0, 255));
 
     if (ImGui::IsMouseDragging(0) && ImGui::IsItemHovered()) {
         float deltaX = ImGui::GetMouseDragDelta().x;
-        playbackTime += deltaX / (100.0f * zoom);
+        playbackTime += deltaX / (100.0f * zoom * 10.0f);
+
         playbackTime = glm::clamp(playbackTime, 0.0f, length);
     }
 }
 
-void Marmalade::GUI::AnimationTimeline::CreatePlaybackControls(Marmalade::Animation::AnimationSequence& sequence, float deltaTime) {
+void Marmalade::GUI::Animation::CreatePlaybackControls(Marmalade::Animation::AnimationSequence& sequence, float deltaTime) {
     if (!animation) { return; }
 
     if (ImGui::Button(_isPlaying ? ICON_CI_STOP " Stop" : ICON_CI_PLAY " Play")) {
@@ -278,7 +358,7 @@ void Marmalade::GUI::AnimationTimeline::CreatePlaybackControls(Marmalade::Animat
     ImGui::Text("Playback Time: %.2f / %.2f", playbackTime, sequence.length);
 }
 
-void Marmalade::GUI::AnimationTimeline::DrawSequenceSelector() {
+void Marmalade::GUI::Animation::DrawSequenceSelector() {
     static int selected = 0;
     static std::vector<std::unique_ptr<Marmalade::Animation::AnimationSequence>> listedSequences;
 
@@ -316,11 +396,12 @@ void Marmalade::GUI::AnimationTimeline::DrawSequenceSelector() {
         if (ImGuiFileDialog::Instance()->Display("CreateAnimation")) {
             if (ImGuiFileDialog::Instance()->IsOk()) {
                 std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
-                std::string animationName = ImGuiFileDialog::Instance()->GetCurrentFileName(true);
+                std::string animationNameWithExt = ImGuiFileDialog::Instance()->GetCurrentFileName(true);
+                std::string animationName = RemoveFileExtention(animationNameWithExt);
 
                 LOG_DEBUG("Creating new animation: {}", animationName);
 
-                auto newAnimation = std::make_shared<Marmalade::Animation::AnimationSequence>(filePath, animationName);
+                auto newAnimation = std::make_shared<Marmalade::Animation::AnimationSequence>(filePath, animationNameWithExt);
                 newAnimation->SaveConfig();
 
                 listedSequences.push_back(std::make_unique<Marmalade::Animation::AnimationSequence>(*newAnimation));
@@ -329,7 +410,6 @@ void Marmalade::GUI::AnimationTimeline::DrawSequenceSelector() {
 
                 if (driver) {
                     driver->storedConfig.sequences[animationName] = filePath;
-
                     driver->animations[animationName] = newAnimation;
 
                     if (!driver->currentSequence) {

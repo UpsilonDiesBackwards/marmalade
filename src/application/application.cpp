@@ -109,7 +109,6 @@ void Application::Initialise() {
         if (Marmalade::EngineConfig::GetStoredConfig().windowPos.maximised) glfwMaximizeWindow(window);
     }
 
-
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
@@ -127,6 +126,7 @@ void Application::Initialise() {
     ImGui_ImplOpenGL3_Init("#version 430");
 
     ImNodes::CreateContext();
+    ImNodes::StyleColorsDark();
 
     // Load ImGui custom style
     if (!std::filesystem::exists(Marmalade::ConfigUtil::GetConfigDirectory() / "editorstyle.txt")) {

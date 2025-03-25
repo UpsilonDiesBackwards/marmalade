@@ -42,7 +42,7 @@ namespace Marmalade::GUI {
 
         WelcomeScreen welcomeScreen{EngineConfig::GetStoredConfig().appearance.showWelcomeScreen};
 
-        AnimationTimeline animationManager{};
+        Animation animationManager{};
         PackageManager packageManager{};
         Log log{true};
         ProjectWizard projectWizard{};
