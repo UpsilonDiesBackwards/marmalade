@@ -34,6 +34,16 @@
 #include <iomanip>
 #include <algorithm>
 
+bool Marmalade::Util::IsDebuggerAttached() {
+#ifdef _WIN32
+    return IsDebuggerPresent();
+#elif __APPLE__
+    return false;
+#else
+    return false;
+#endif
+}
+
 std::string Marmalade::Util::GenerateUUIDv4() {
     std::random_device rd;
     std::mt19937 gen(rd());

@@ -154,6 +154,14 @@ void Marmalade::GUI::TopBar::Show() {
             ImGui::EndMenu();
         }
 
+#ifdef DEBUG
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Debug mode");
+
+        if (Util::IsDebuggerAttached()) {
+            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Debugger attached");
+        }
+#endif
+
         if (WindowManager::GetInstance().showDebugWindow) ImGui::ShowDemoWindow();
 
         float windowWidth = ImGui::GetContentRegionAvail().x;

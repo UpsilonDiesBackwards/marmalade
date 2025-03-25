@@ -31,6 +31,8 @@
 namespace Marmalade {
     class Util {
     public:
+        static bool IsDebuggerAttached();
+
         static std::string GenerateUUIDv4();
 
         static std::string StringToLower(std::string str);
