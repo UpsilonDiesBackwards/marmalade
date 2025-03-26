@@ -43,11 +43,14 @@ void Marmalade::ECS::RigidBody::Apply(Entity* entity) {
 
     auto deltaTime = static_cast<float>(Application::GetInstance().profiler.GetDeltaTime());
 
-    if (Application::GetInstance().playState == PlayState::PlayState_STEP) {
-        _accumulator = 0.0f;
+    if (Application::GetInstance().playState != PlayState::PlayState_STEP &&
+        Application::GetInstance().playState != PlayState::PlayState_PAUSE) {
+
+        _accumulator += deltaTime;
+    } else {
+        _accumulator += fixedTimeStep;
     }
 
-    _accumulator += deltaTime;
 
     while (_accumulator >= fixedTimeStep) { // We use an accumulator to prevent jitteriness
         if ((Application::GetInstance().playState == PlayState::PlayState_PLAY || // If the object is NOT static, and the application is in play or stepped...
