@@ -20,6 +20,9 @@
 
 #include "animation.h"
 
+#include "../../application/util.h"
+
+
 #include <glm/common.hpp>
 
 #include <imgui.h>
@@ -402,6 +405,7 @@ void Marmalade::GUI::Animation::DrawSequenceSelector() {
                 LOG_DEBUG("Creating new animation: {}", animationName);
 
                 auto newAnimation = std::make_shared<Marmalade::Animation::AnimationSequence>(filePath, animationNameWithExt);
+                newAnimation->uuid = Marmalade::Util::GenerateUUIDv4();
                 newAnimation->SaveConfig();
 
                 listedSequences.push_back(std::make_unique<Marmalade::Animation::AnimationSequence>(*newAnimation));

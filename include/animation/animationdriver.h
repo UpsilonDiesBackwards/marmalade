@@ -29,6 +29,7 @@
 
 namespace Marmalade::Animation {
     struct AnimationDriverData {
+        std::string type{"Marmalade::Animation::Driver"};
         int version{ANIM_DRIVER_VERSION};
 
         std::string uuid{};
@@ -36,15 +37,11 @@ namespace Marmalade::Animation {
 
         std::unordered_map<std::string, std::string> sequences{};
         std::string currentSequence{};
-
-        bool isPlaying{false};
-        float currentTime{0.0f};
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AnimationDriverData,
                                        version, uuid, name,
-                                       sequences, currentSequence,
-                                       isPlaying, currentTime)
+                                       sequences, currentSequence)
 
     class AnimationDriver : public Config<AnimationDriverData> {
     public:

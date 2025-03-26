@@ -77,12 +77,12 @@ void Marmalade::Animation::AnimationDriver::Deserialise(const nlohmann::json& js
         currentSequence = nullptr;
         LOG_WARN("No valid current sequence found.");
     }
-
-    isPlaying = storedConfig.isPlaying;
-    currentTime = storedConfig.currentTime;
 }
 
 
 void Marmalade::Animation::AnimationDriver::PrepareNewConfig() {
+    storedConfig.uuid = uuid;
+    storedConfig.name = name;
+
     Config::PrepareNewConfig();
 }

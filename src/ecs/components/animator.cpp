@@ -21,6 +21,7 @@
 #include <ecs/components/animator.h>
 
 #include "../../application/config/engineconfig.h"
+#include "../../application/util.h"
 
 #include <imgui.h>
 #include <ImGuiFileDialog.h>
@@ -127,8 +128,10 @@ void Marmalade::ECS::AnimationPlayer::showCreatePopup() {
         if (ImGui::Button("Create")) {
             if (!driverPath.empty()) {
                 driver = std::make_unique<Marmalade::Animation::AnimationDriver>(driverPath, driverName);
-                driver->name = driverName;
+                driver->storedConfig.name = driver->name;
+                driver->storedConfig.uuid = Marmalade::Util::GenerateUUIDv4();
                 driver->SaveConfig();
+
                 memset(driverName, 0, sizeof(driverName));
                 _isCreatingDriver = false;
                 ImGui::CloseCurrentPopup();

@@ -30,7 +30,7 @@ namespace Marmalade::Animation {
     struct Frame {
         int version{ FRAME_VERSION };
 
-        std::string type{"Marmalade::Animation"};
+        std::string type{"Marmalade::Animation::Frame"};
 
         std::string sprite;
         float speed;
