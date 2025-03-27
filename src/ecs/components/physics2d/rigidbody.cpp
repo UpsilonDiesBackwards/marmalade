@@ -41,12 +41,10 @@ void Marmalade::ECS::RigidBody::Apply(Entity* entity) {
         return;
     }
 
-    auto deltaTime = static_cast<float>(Application::GetInstance().profiler.GetDeltaTime());
-
     if (Application::GetInstance().playState != PlayState::PlayState_STEP &&
         Application::GetInstance().playState != PlayState::PlayState_PAUSE) {
 
-        _accumulator += deltaTime;
+        _accumulator = fixedTimeStep;
     } else {
         _accumulator += fixedTimeStep;
     }
@@ -238,7 +236,7 @@ float Marmalade::ECS::RigidBody::GetInertiaTensor(Entity* self) {
     std::visit([&](auto&& colliderData) {
         using T = std::decay_t<decltype(colliderData)>;
 
-        if constexpr (std::is_same_v<T, AABBDataCircle>) {
+        if constexpr (std::is_same_v<T, DataCircle>) {
             float radius = colliderData.radius;
             inertia = 0.5f * body.mass * (radius * radius);
         } else if constexpr (std::is_same_v<T, AABBDataBox> || std::is_same_v<T, OBBDataBox>) {

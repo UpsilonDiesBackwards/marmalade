@@ -33,7 +33,7 @@
 namespace Marmalade::ECS {
     class ColliderBase : public Component {
     public:
-        std::variant<AABBDataBox, OBBDataBox, AABBDataCircle, OBBDataCircle> data;
+        std::variant<AABBDataBox, OBBDataBox, DataCircle> data;
 
         bool showingBounds{false};
 

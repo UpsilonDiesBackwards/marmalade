@@ -41,18 +41,9 @@ struct OBBDataBox {
     glm::vec2 e;  // Half-width
 };
 
-struct AABBDataCircle {
+struct DataCircle {
     float radius;
     glm::vec2 offset;
-};
-
-struct OBBDataCircle {
-    float radius;
-    glm::vec2 offset;
-    float rotation;
-    glm::vec2 c;  // Center point
-    glm::vec2 u[2];  // Local x, y axes
-    glm::vec2 e;  // Half-width
 };
 
 struct ColliderInfo {

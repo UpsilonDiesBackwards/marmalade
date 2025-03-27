@@ -29,7 +29,7 @@ namespace Marmalade::ECS {
         CircleCollider() {
             name = "Circle Collider",
             allowMultiple = true,
-            data = AABBDataCircle{0.5f, {0.0f, 0.0f}};
+            data = DataCircle{0.5f, {0.0f, 0.0f}};
             categories = {"Physics"};
             description =
                     "Adds 2D circle shaped collision bounds component\n"
@@ -43,16 +43,21 @@ namespace Marmalade::ECS {
         void Deserialize(nlohmann::json json, Entity* entity) override;
 
         void Intersects(Entity* self, Entity* other) override;
-        bool IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override;
-        bool IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override;
-        glm::vec2 CalculateOBBCentrePoint(const glm::vec2& entityPosition, const glm::vec2& offset) override;
+
         void ShowBounds(const glm::vec2& entityPosition, Transform transform) override;
 
-        float WorldRadiusToScreenScale(float radius);
+        static float WorldRadiusToScreenScale(float radius);
+
+        bool IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override;
+        bool IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override {
+            return false;
+        }
+        glm::vec2 CalculateOBBCentrePoint(const glm::vec2& entityPosition, const glm::vec2& offset) override {
+            return glm::vec2();
+        }
     };
 
     REGISTER_COMPONENT(CircleCollider);
 }
-
 
 #endif//MARMALADE_CIRCLECOLLIDER_H
