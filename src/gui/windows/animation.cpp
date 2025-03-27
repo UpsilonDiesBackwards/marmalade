@@ -34,7 +34,7 @@
 #include "../windowmanager.h"
 
 void Marmalade::GUI::Animation::Draw() {
-    ImGui::Begin(ICON_CI_DEVICE_CAMERA_VIDEO " Animation Timeline", &visible, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
+    ImGui::Begin(ICON_CI_DEVICE_CAMERA_VIDEO " Animation", &visible, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
 
     static float topSectionHeight = 300.0f;
     float minHeight = 100.0f;
@@ -414,6 +414,8 @@ void Marmalade::GUI::Animation::DrawSequenceSelector() {
 
                 if (driver) {
                     driver->storedConfig.sequences[animationName] = filePath;
+                    driver->storedConfig.uuid = Util::GenerateUUIDv4();
+                    driver->storedConfig.name = animationName;
                     driver->animations[animationName] = newAnimation;
 
                     if (!driver->currentSequence) {

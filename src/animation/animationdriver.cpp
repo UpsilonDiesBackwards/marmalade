@@ -64,7 +64,7 @@ void Marmalade::Animation::AnimationDriver::Deserialise(const nlohmann::json& js
         if (std::filesystem::exists(path)) {
             auto anim = std::make_shared<AnimationSequence>(path, name);
             animations[name] = anim;
-            LOG_DEBUG("Loaded animation '{}' from '{}'", name, path.string());
+//            LOG_DEBUG("Loaded animation '{}' from '{}'", name, path.string());
         } else {
             LOG_WARN("Animation '{}' path '{}' does not exist!", name, path.string());
         }
@@ -72,7 +72,7 @@ void Marmalade::Animation::AnimationDriver::Deserialise(const nlohmann::json& js
 
     if (!storedConfig.currentSequence.empty() && animations.count(storedConfig.currentSequence)) {
         currentSequence = animations[storedConfig.currentSequence];
-        LOG_DEBUG("Set '{}' as the current sequence.", storedConfig.currentSequence);
+//        LOG_DEBUG("Set '{}' as the current sequence.", storedConfig.currentSequence);
     } else {
         currentSequence = nullptr;
         LOG_WARN("No valid current sequence found.");

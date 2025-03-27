@@ -129,8 +129,6 @@ void SceneHierarchy::displayEntity(std::shared_ptr<Entity> entity, int index) {
                     } else {
                         LOG_WARN("Selected entity has no animation driver.");
                     }
-                } else {
-                    LOG_WARN("Selected entity does not have an AnimationPlayer component.");
                 }
             }
         }
