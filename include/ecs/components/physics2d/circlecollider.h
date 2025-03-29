@@ -48,8 +48,16 @@ namespace Marmalade::ECS {
 
         static float WorldRadiusToScreenScale(float radius);
 
+        // Unused pure virtual methods
         bool IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override;
         bool IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override {
+            return false;
+        }
+        bool AABBIntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override {
+            return false;
+        }
+
+        bool TestAABBSeparation(const glm::vec2& axis, const glm::vec2& aabbCenter, const glm::vec2& aabbHalfSize, const glm::vec2& obbCenter, const glm::vec2* obbAxes, const glm::vec2& obbHalfSize, const glm::vec2& t) override {
             return false;
         }
         glm::vec2 CalculateOBBCentrePoint(const glm::vec2& entityPosition, const glm::vec2& offset) override {

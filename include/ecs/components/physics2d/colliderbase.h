@@ -41,7 +41,11 @@ namespace Marmalade::ECS {
 
         virtual bool IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) = 0;
         virtual bool IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) = 0;
+        virtual bool AABBIntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) = 0;
 
+        virtual bool TestAABBSeparation(const glm::vec2& axis, const glm::vec2& aabbCenter, const glm::vec2& aabbHalfSize,
+                                           const glm::vec2& obbCenter, const glm::vec2 obbAxes[2], const glm::vec2& obbHalfSize,
+                                           const glm::vec2& t) = 0;
         virtual glm::vec2 CalculateOBBCentrePoint(const glm::vec2& entityPosition, const glm::vec2& offset) = 0;
 
         template<typename T>

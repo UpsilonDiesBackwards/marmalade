@@ -60,9 +60,11 @@ namespace Marmalade::ECS {
 
         bool IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override;
         bool IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override;
+        bool AABBIntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override;
 
         void ShowBounds(const glm::vec2& entityPosition, Transform transform) override;
 
+        bool TestAABBSeparation(const glm::vec2& axis, const glm::vec2& aabbCenter, const glm::vec2& aabbHalfSize, const glm::vec2& obbCenter, const glm::vec2* obbAxes, const glm::vec2& obbHalfSize, const glm::vec2& t) override;
         glm::vec2 CalculateOBBCentrePoint(const glm::vec2& entityPosition, const glm::vec2& offset) override;
     };
 
