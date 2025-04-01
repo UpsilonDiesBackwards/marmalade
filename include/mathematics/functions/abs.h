@@ -18,32 +18,14 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_SQRT_H
-#define MARMALADE_SQRT_H
-
-#include "abs.h"
-
-#include <complex>
+#ifndef MARMALADE_ABS_H
+#define MARMALADE_ABS_H
 
 namespace Marmalade::Mathematics {
     template<typename T>
-    constexpr T Sqrt(T value) {
-        if (value < 0) {
-            static_assert("Cannot get a square root of a negative number");
-        }
-
-        int maxIterations = 50;
-        int iterations = 0;
-
-        T est =
-                value / 2.0f;
-        while (Mathematics::Abs(est * est - value) > 1e-6 && iterations < maxIterations) {
-            est = (est + value / est) / 2.0;
-            iterations++;
-        }
-
-        return est;
+    constexpr T Abs(T value) {
+        return (value < 0) ? -value : value;
     }
 }
 
-#endif//MARMALADE_SQRT_H
+#endif//MARMALADE_ABS_H

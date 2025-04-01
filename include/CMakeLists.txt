@@ -33,6 +33,11 @@ list(APPEND ENGINE_API
 
         engineapi.h
         plugin.h
+
+        mathematics/matrix.h
+        mathematics/vector.h
+        mathematics/functions/sqrt.h
+        mathematics/functions/abs.h
 )
 
 target_sources(marmalade PRIVATE ${ENGINE_API})

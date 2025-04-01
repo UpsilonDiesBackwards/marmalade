@@ -68,20 +68,4 @@ list(APPEND ENGINE_SRC # ECS
         ecs/components/animator.cpp
 )
 
-list(APPEND ENGINE_SRC # Mathematics
-        ../include/mathematics/mathematics.h
-
-        mathematics/types/vector2.cpp
-        ../include/mathematics/types/vector2.h
-        mathematics/types/vector3.cpp
-        ../include/mathematics/types/vector3.h
-        mathematics/types/vector4.cpp
-        ../include/mathematics/types/vector4.h
-        mathematics/types/matrix2x2.cpp
-        ../include/mathematics/types/matrix2x2.h
-
-        mathematics/functions/sqrt.cpp
-        ../include/mathematics/functions/sqrt.h
-)
-
 target_sources(marmalade PRIVATE ${ENGINE_SRC} main.cpp)
