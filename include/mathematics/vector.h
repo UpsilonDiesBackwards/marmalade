@@ -141,7 +141,7 @@ namespace Marmalade::Mathematics {
             return Marmalade::Mathematics::Sqrt(sum);
         }
 
-        Vector Normalise() {
+        Vector Normalise() const {
             float magnitude = Magnitude();
 
             Vector r;
