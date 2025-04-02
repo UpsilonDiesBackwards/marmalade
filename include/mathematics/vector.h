@@ -177,41 +177,22 @@ namespace Marmalade::Mathematics {
             return r;
         }
 
-        // TODO: It would be a good idea to rewrite this to support vectors of any dimension of n
-        template<std::size_t D = Columns, typename std::enable_if_t<D == 2, int> = 0>
-        Vector<2, T> Max(const Vector<2, T>& v) const {
-            Vector<2, T> r;
-            r.values[0] = (values[0] > v.values[0]) ? values[0] : v.values[0];
-            r.values[1] = (values[1] > v.values[1]) ? values[1] : v.values[1];
+        template<std::size_t C>
+        Vector Min(const Vector<C, T>& v) const {
+            Vector r;
+            for (size_t i = 0; i < Columns; ++i) {
+                r.values[i] = (values[i] < v.values[i]) ? values[i] : v.values[i];
+            }
 
             return r;
         }
 
-        template<std::size_t D = Columns, typename std::enable_if_t<D == 3, int> = 0>
-        Vector<3, T> Max(const Vector<3, T>& v) const {
-            Vector<3, T> r;
-            r.values[0] = (values[0] > v.values[0]) ? values[0] : v.values[0];
-            r.values[1] = (values[1] > v.values[1]) ? values[1] : v.values[1];
-            r.values[2] = (values[2] > v.values[2]) ? values[2] : v.values[2];
-
-            return r;
-        }
-
-        template<std::size_t D = Columns, typename std::enable_if_t<D == 2, int> = 0>
-        Vector<2, T> Min(const Vector<2, T>& v) const {
-            Vector<2, T> r;
-            r.values[0] = (values[0] < v.values[0]) ? values[0] : v.values[0];
-            r.values[1] = (values[1] < v.values[1]) ? values[1] : v.values[1];
-
-            return r;
-        }
-
-        template<std::size_t D = Columns, typename std::enable_if_t<D == 3, int> = 0>
-        Vector<3, T> Min(const Vector<3, T>& v) const {
-            Vector<3, T> r;
-            r.values[0] = (values[0] < v.values[0]) ? values[0] : v.values[0];
-            r.values[1] = (values[1] < v.values[1]) ? values[1] : v.values[1];
-            r.values[2] = (values[2] < v.values[2]) ? values[2] : v.values[2];
+        template<std::size_t C>
+        Vector Max(const Vector<C, T>& v) const {
+            Vector r;
+            for (size_t i = 0; i < Columns; ++i) {
+                r.values[i] = (values[i] > v.values[i]) ? values[i] : v.values[i];
+            }
 
             return r;
         }
