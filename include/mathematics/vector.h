@@ -118,6 +118,10 @@ namespace Marmalade::Mathematics {
             return result;
         }
 
+        float* ToPtr() {
+            return values;
+        }
+
         constexpr T Sqrt(T value);
         Vector sqrt() {
             Vector r;
