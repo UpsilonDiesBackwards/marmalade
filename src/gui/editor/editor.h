@@ -23,12 +23,13 @@
 #include <imgui.h>
 
 #include <glm/glm.hpp>
+#include "mathematics/vector.h"
 
 class EditorViews {
 public:
     void Show();
 
-    static ImVec2 WorldToScreenSpace(const glm::vec2& world);
+    static ImVec2 WorldToScreenSpace(const Marmalade::Mathematics::Vec2& world);
     static glm::vec2 ScreenToWorldSpace(const ImVec2& screen);
 };
 

@@ -70,24 +70,24 @@ void EditorViews::Show() {
     ImGui::End();
 }
 
-ImVec2 EditorViews::WorldToScreenSpace(const glm::vec2& world) {
+ImVec2 EditorViews::WorldToScreenSpace(const Marmalade::Mathematics::Vec2& world) {
     Application& app = Application::GetInstance();
 
-    glm::vec2 framebufferSize = glm::vec2(app.framebuffer->width, app.framebuffer->height);
-    glm::vec2 framebufferPos = glm::vec2(app.framebuffer->position.x, app.framebuffer->position.y);
+    Marmalade::Mathematics::Vec2 framebufferSize(static_cast<float>(app.framebuffer->width), static_cast<float>(app.framebuffer->height));
+    Marmalade::Mathematics::Vec2 framebufferPos(static_cast<float>(app.framebuffer->position.x), static_cast<float>(app.framebuffer->position.y));
 
-    glm::vec4 worldPos = glm::vec4(world, 0.0f, 1.0f);
+    Marmalade::Mathematics::Vec4 worldPos(world[0], world[1], 0.0f, 1.0f);
 
-    glm::vec4 clipSpace = app.camera->GetProjection() * app.camera->GetView() * worldPos;
+    Marmalade::Mathematics::Vec4 clipSpace = app.camera->GetProjection() * app.camera->GetView() * worldPos;
 
-    if (clipSpace.w != 0.0f) {
-        clipSpace /= clipSpace.w;
+    if (clipSpace[3] != 0.0f) {
+        clipSpace /= clipSpace[3];
     }
 
-    float screenX = (clipSpace.x * 0.5f + 0.5f) * framebufferSize.x;
-    float screenY = (1.0f - (clipSpace.y * 0.5f + 0.5f)) * framebufferSize.y;// Flip Y
+    float screenX = (clipSpace[0] * 0.5f + 0.5f) * framebufferSize[0];
+    float screenY = (1.0f - (clipSpace[1] * 0.5f + 0.5f)) * framebufferSize[1]; // Flip Y
 
-    return {screenX + framebufferPos.x, screenY + framebufferPos.y};
+    return {screenX + framebufferPos[0], screenY + framebufferPos[1]};
 }
 
 glm::vec2 EditorViews::ScreenToWorldSpace(const ImVec2& screen) {

@@ -24,8 +24,7 @@
 #include "../ecs/componentmanager.h"
 #include "../ecs/components/transform.h"
 #include "../ecs/components/texturerenderer.h"
-
-#include <glm/mat4x4.hpp>
+#include "mathematics/vector.h"
 
 #include <string>
 #include <vector>
@@ -58,14 +57,14 @@ public:
 
     Entity(const std::string& name, EntityFlags flags, bool withDefaultComponents = true);
 
-    glm::vec2 getPosition();
-    void setPosition(glm::vec2 newPos);
+    Marmalade::Mathematics::Vec2 getPosition();
+    void setPosition(Marmalade::Mathematics::Vec2 newPos);
 
     float getRotation();
     void setRotation(float newRot);
 
-    glm::vec2 getScale();
-    void setScale(glm::vec2 newScale);
+    Marmalade::Mathematics::Vec2 getScale();
+    void setScale(Marmalade::Mathematics::Vec2 newScale);
 
     void UpdateModelMatrix();
 

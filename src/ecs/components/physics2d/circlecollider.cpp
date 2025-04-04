@@ -33,7 +33,7 @@ void Marmalade::ECS::CircleCollider::Display(Entity* entity) {
 
         if constexpr (std::is_same_v<T, DataCircle>) {
             ImGui::DragFloat("Radius",&colliderData.radius, 0.1f);
-            ImGui::DragFloat2("Offset", glm::value_ptr(colliderData.offset), 0.1f);
+            ImGui::DragFloat2("Offset", colliderData.offset.ToPtr(), 0.1f);
         }
     }, data);
 
@@ -60,8 +60,8 @@ nlohmann::json Marmalade::ECS::CircleCollider::Serialize(const Entity* entity) {
         using T = std::decay_t<decltype(colliderData)>;
         if constexpr (std::is_same_v<T, DataCircle>) {
             j["radius"] = colliderData.radius;
-            j["offset"]["x"] = colliderData.offset.x;
-            j["offset"]["y"] = colliderData.offset.y;
+            j["offset"]["x"] = colliderData.offset[0];
+            j["offset"]["y"] = colliderData.offset[1];
         }
     }, data);
 
@@ -73,8 +73,8 @@ void Marmalade::ECS::CircleCollider::Deserialize(nlohmann::json json, Entity* en
         using T = std::decay_t<decltype(colliderData)>;
         if constexpr (std::is_same_v<T, DataCircle>) {
             colliderData.radius = json["radius"].get<float>();
-            colliderData.offset.x = json["offset"]["x"].get<float>();
-            colliderData.offset.y = json["offset"]["y"].get<float>();
+            colliderData.offset[0] = json["offset"]["x"].get<float>();
+            colliderData.offset[1] = json["offset"]["y"].get<float>();
         }
     }, data);
 }
@@ -85,20 +85,21 @@ void Marmalade::ECS::CircleCollider::Intersects(Entity* self, Entity* other) {
     auto* circleA = GetCollisionData<DataCircle>();
     auto* otherCollider = other->componentManager.GetComponentOfType<ColliderBase>();
 
-    glm::vec2 posA = self->getPosition() + circleA->offset;
-    glm::vec2 posB = other->getPosition();
+    Marmalade::Mathematics::Vec2 posA = self->getPosition() + circleA->offset;
+    Marmalade::Mathematics::Vec2 posB = other->getPosition();
 
     if (auto* circleCollider = other->componentManager.GetComponentOfType<CircleCollider>()) {
         if (auto* circleB = circleCollider->GetCollisionData<DataCircle>()) {
             posB += circleB->offset;
             float radii = circleA->radius + circleB->radius;
-            float distSq = glm::dot(posB - posA, posB - posA);
+            float distSq = (posB - posA).Dot(posB - posA);
 
             if (distSq <= radii * radii) {
                 if (auto* rb = self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
-                    glm::vec2 collisionNorm = glm::normalize(posB - posA);
-                    glm::vec2 ptOnA_WorldSpace = posA + collisionNorm * circleA->radius;
-                    glm::vec2 ptOnB_WorldSpace = posB - collisionNorm * circleB->radius;
+                    Marmalade::Mathematics::Vec2 norm = posA - posB;
+                    Marmalade::Mathematics::Vec2 collisionNorm = norm.Normalise();
+                    Marmalade::Mathematics::Vec2 ptOnA_WorldSpace = posA + collisionNorm * circleA->radius;
+                    Marmalade::Mathematics::Vec2 ptOnB_WorldSpace = posB - collisionNorm * circleB->radius;
 
                     rb->collisionQueue.push({self, other, collisionNorm, ptOnA_WorldSpace, ptOnB_WorldSpace});
                 }
@@ -108,26 +109,27 @@ void Marmalade::ECS::CircleCollider::Intersects(Entity* self, Entity* other) {
 
     if (IntersectsAABB(*otherCollider, posA, posB)) {
         if (auto* rb = self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
-            glm::vec2 closestPoint = glm::clamp(posA - posB - otherCollider->GetCollisionData<AABBDataBox>()->offset,
+            Marmalade::Mathematics::Vec2 closestPoint = glm::clamp(posA - posB - otherCollider->GetCollisionData<AABBDataBox>()->offset,
                                                 -otherCollider->GetCollisionData<AABBDataBox>()->size * 0.5f,
                                                 otherCollider->GetCollisionData<AABBDataBox>()->size * 0.5f) +
                                      posB + otherCollider->GetCollisionData<AABBDataBox>()->offset;
 
-            glm::vec2 collisionNorm = glm::normalize(posA - closestPoint);
-            glm::vec2 ptOnA_WorldSpace = posA - collisionNorm * circleA->radius;
-            glm::vec2 ptOnB_WorldSpace = closestPoint;
+            Marmalade::Mathematics::Vec2 norm = posA - closestPoint;
+            Marmalade::Mathematics::Vec2 collisionNorm = norm.Normalise();
+            Marmalade::Mathematics::Vec2 ptOnA_WorldSpace = posA - collisionNorm * circleA->radius;
+            Marmalade::Mathematics::Vec2 ptOnB_WorldSpace = closestPoint;
 
             rb->collisionQueue.push({self, other, collisionNorm, ptOnA_WorldSpace, ptOnB_WorldSpace});
         }
     }
 }
 
-void Marmalade::ECS::CircleCollider::ShowBounds(const glm::vec2& entityPosition, Transform transform) {
+void Marmalade::ECS::CircleCollider::ShowBounds(const Marmalade::Mathematics::Vec2& entityPosition, Transform transform) {
     if (auto* aabbData = std::get_if<DataCircle>(&data)) {
-        glm::vec2 centre = entityPosition + aabbData->offset + glm::vec2(aabbData->radius, aabbData->radius);
+        Marmalade::Mathematics::Vec2 centre = entityPosition + aabbData->offset + Marmalade::Mathematics::Vec2(aabbData->radius, aabbData->radius);
         float radius = aabbData->radius;
 
-        ImVec2 screenCentre = EditorViews::WorldToScreenSpace(centre);
+        ImVec2 screenCentre = EditorViews::WorldToScreenSpace(glm::vec2(centre[0], centre[1]));
         float screenRadius = WorldRadiusToScreenScale(radius);
 
         ImGui::GetWindowDrawList()->AddCircle(
@@ -138,13 +140,13 @@ void Marmalade::ECS::CircleCollider::ShowBounds(const glm::vec2& entityPosition,
     }
 }
 
-bool Marmalade::ECS::CircleCollider::IntersectsAABB(const Marmalade::ECS::ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
+bool Marmalade::ECS::CircleCollider::IntersectsAABB(const Marmalade::ECS::ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) {
     if (const auto* aabb = std::get_if<AABBDataBox>(&other.data)) {
-        glm::vec2 halfExtents = aabb->size * 0.5f;
+        Marmalade::Mathematics::Vec2 halfExtents = aabb->size * 0.5f;
 
-        glm::vec2 closestPoint = glm::clamp(posA - posB - aabb->offset, -halfExtents, halfExtents) + posB  + aabb->offset;
+        Marmalade::Mathematics::Vec2 closestPoint = (posA - posB - aabb->offset).Clamp(-halfExtents, halfExtents) + posB + aabb->offset;
 
-        float distSquared = glm::dot(closestPoint - posA, closestPoint - posA);
+        float distSquared = (closestPoint - posA).Dot(closestPoint - posA);
         float radiusSquared = std::get<DataCircle>(data).radius * std::get<DataCircle>(data).radius;
 
         return distSquared < radiusSquared;
@@ -154,11 +156,11 @@ bool Marmalade::ECS::CircleCollider::IntersectsAABB(const Marmalade::ECS::Collid
 }
 
 float Marmalade::ECS::CircleCollider::WorldRadiusToScreenScale(float radius) {
-    ImVec2 screenStart = EditorViews::WorldToScreenSpace(glm::vec2(0.0f, 0.0f));
-    ImVec2 screenEnd = EditorViews::WorldToScreenSpace(glm::vec2(radius, 0.0f));
+    Marmalade::Mathematics::Vec2 screenStart = EditorViews::WorldToScreenSpace(Marmalade::Mathematics::Vec2(0.0f, 0.0f));
+    Marmalade::Mathematics::Vec2 screenEnd = EditorViews::WorldToScreenSpace(Marmalade::Mathematics::Vec2(radius, 0.0f));
 
-    glm::vec2 glmScreenStart(screenStart.x, screenStart.y);
-    glm::vec2 glmScreenEnd(screenEnd.x, screenEnd.y);
+    Marmalade::Mathematics::Vec2 glmScreenStart(screenStart.x, screenStart.y);
+    Marmalade::Mathematics::Vec2 glmScreenEnd(screenEnd.x, screenEnd.y);
 
     return glm::distance(glmScreenStart, glmScreenEnd);
 }

@@ -34,6 +34,20 @@ namespace Marmalade::Mathematics {
         constexpr std::size_t getRows() const { return Rows; }
         constexpr std::size_t getColumns() const { return Columns; }
 
+        Matrix() {
+            for (size_t i = 0; i < Rows * Columns; ++i) {
+                values[i] = T(0);
+            }
+        }
+
+        template<typename... Args, typename = std::enable_if_t<(sizeof...(Args) == Columns * Columns)>>
+        Matrix(Args... args) {
+            T temp[] = { static_cast<T>(args)... };
+            for (size_t i = 0; i < Columns * Columns; ++i) {
+                values[i] = temp[i];
+            }
+        }
+
         template<std::size_t R, std::size_t C>
         Matrix operator+(const Matrix<R, C, T>& m) const {
             if (Rows != m.getRows() || Columns != m.getColumns()) {
@@ -105,6 +119,10 @@ namespace Marmalade::Mathematics {
             return result;
         }
 
+        float* GetValues() {
+            return values;
+        }
+
         Matrix Identity() {
             Matrix r;
 
@@ -115,27 +133,25 @@ namespace Marmalade::Mathematics {
             return r;
         }
 
-        template<std::size_t R>
-        Matrix<4, 4, T> Translate(const Marmalade::Mathematics::Vector<3, T>& translate) {
+        static Matrix<4, 4, T> Translate(const Vector<3, T>& translate) {
             Matrix<4, 4, T> r;
 
-            r.values[3] = translate.x;
-            r.values[7] = translate.y;
-            r.values[11] = translate.z;
+            r.values[3] = translate[0];
+            r.values[7] = translate[1];
+            r.values[11] = translate[2];
 
             return r;
         }
 
-        template<std::size_t R>
-        Matrix<4, 4, T> Scale(const Marmalade::Mathematics::Vector<3, T>& scale) {
-            Matrix<4, 4, T> result;
+        static Matrix<4, 4, T> Scale(const Vector<3, T>& scale) {
+            Matrix<4, 4, T> r;
 
-            result.values[0] = scale.x;
-            result.values[5] = scale.y;
-            result.values[10] = scale.z;
-            result.values[15] = 1;
+            r.values[0] = scale[0];
+            r.values[5] = scale[1];
+            r.values[10] = scale[2];
+            r.values[15] = 1;
 
-            return result;
+            return r;
         }
 
         Matrix<4, 4, T> Rotate(const Matrix<4, 4, T>& m, T angle, const Marmalade::Mathematics::Vector<3, T>& axis) {
@@ -175,7 +191,7 @@ namespace Marmalade::Mathematics {
     };
 
     using Mat2 = Matrix<2,2>;
-    using Mat3 = Matrix<4,4>;
+    using Mat3 = Matrix<3,3>;
     using Mat4 = Matrix<4,4>;
 }
 

@@ -21,6 +21,7 @@
 
 #include "../application/util.h"
 #include "../application/logger.h"
+#include "mathematics/matrix.h"
 
 #include <graphics/texture.h>
 
@@ -67,12 +68,12 @@ void Entity::Render() {
     }
 }
 
-glm::vec2 Entity::getPosition() {
+Marmalade::Mathematics::Vec2 Entity::getPosition() {
     auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
     return transform->pos;
 }
 
-void Entity::setPosition(glm::vec2 newPos) {
+void Entity::setPosition(Marmalade::Mathematics::Vec2 newPos) {
     auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
     transform->pos = newPos;
     UpdateModelMatrix();
@@ -89,12 +90,12 @@ void Entity::setRotation(float newRot) {
     UpdateModelMatrix();
 }
 
-glm::vec2 Entity::getScale() {
+Marmalade::Mathematics::Vec2 Entity::getScale() {
     auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
     return transform->scale;
 }
 
-void Entity::setScale(glm::vec2 newScale) {
+void Entity::setScale(Marmalade::Mathematics::Vec2 newScale) {
     auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
     transform->scale = newScale;
     UpdateModelMatrix();
@@ -103,12 +104,18 @@ void Entity::setScale(glm::vec2 newScale) {
 void Entity::UpdateModelMatrix() {
     auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
 
-    transform->modelMatrix = glm::mat4(1.0f);
+    transform->modelMatrix = transform->modelMatrix.Identity();
 
-    transform->modelMatrix = glm::translate(transform->modelMatrix, glm::vec3(transform->pos, 0.0f));
-    transform->modelMatrix = glm::rotate(transform->modelMatrix, glm::radians(transform->rotation),
-                                         glm::vec3(0.0f, 0.0f, 1.0f));
-    transform->modelMatrix = glm::scale(transform->modelMatrix, glm::vec3(transform->scale, 1.0f));
+    transform->modelMatrix = transform->modelMatrix.Translate(
+            Marmalade::Mathematics::Vec3(transform->pos[0], transform->pos[1], 0.0f));
+
+    transform->modelMatrix = transform->modelMatrix.Rotate(transform->modelMatrix,
+                                                           transform->rotation,
+                                                           Marmalade::Mathematics::Vec3(0.0f, 0.0f, 1.0f));
+
+    transform->modelMatrix = transform->modelMatrix.Scale(
+            Marmalade::Mathematics::Vec3(transform->scale[0], transform->scale[1], 1.0f));
+
 
     if (auto parentPtr = parent.lock()) {
         transform->modelMatrix = parentPtr->componentManager.GetComponentOfType<Marmalade::ECS::Transform>()->modelMatrix * transform->modelMatrix;

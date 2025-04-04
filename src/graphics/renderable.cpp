@@ -68,7 +68,7 @@ void Renderable::Initialise() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Renderable::Draw(glm::mat4 modelMatrix, bool renderTexture) {
+void Renderable::Draw(Marmalade::Mathematics::Mat4 modelMatrix, bool renderTexture) {
     if (!renderTexture || texture == 0) { return; }
 
     shaderProgram.Use();
@@ -88,7 +88,7 @@ void Renderable::Draw(glm::mat4 modelMatrix, bool renderTexture) {
     shaderProgram.SetMat4("projection", Application::GetInstance().camera->GetProjection());
 
     shaderProgram.SetMat4("view", Application::GetInstance().camera->GetView());
-    shaderProgram.SetMat4("model", modelMatrix);
+    shaderProgram.SetMat4f("model", modelMatrix.GetValues());
 
     glDrawElements(GL_TRIANGLES, sizeof(indices)/4, GL_UNSIGNED_INT, nullptr);
 

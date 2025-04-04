@@ -44,24 +44,24 @@ namespace Marmalade::ECS {
 
         void Intersects(Entity* self, Entity* other) override;
 
-        void ShowBounds(const glm::vec2& entityPosition, Transform transform) override;
+        void ShowBounds(const Marmalade::Mathematics::Vec2& entityPosition, Transform transform) override;
 
         static float WorldRadiusToScreenScale(float radius);
 
         // Unused pure virtual methods
-        bool IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override;
-        bool IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override {
+        bool IntersectsAABB(const ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) override;
+        bool IntersectsOBB(const ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) override {
             return false;
         }
-        bool AABBIntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) override {
+        bool AABBIntersectsOBB(const ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) override {
             return false;
         }
 
-        bool TestAABBSeparation(const glm::vec2& axis, const glm::vec2& aabbCenter, const glm::vec2& aabbHalfSize, const glm::vec2& obbCenter, const glm::vec2* obbAxes, const glm::vec2& obbHalfSize, const glm::vec2& t) override {
+        bool TestAABBSeparation(const Marmalade::Mathematics::Vec2& axis, const Marmalade::Mathematics::Vec2& aabbCenter, const Marmalade::Mathematics::Vec2& aabbHalfSize, const Marmalade::Mathematics::Vec2& obbCenter, const Marmalade::Mathematics::Vec2* obbAxes, const Marmalade::Mathematics::Vec2& obbHalfSize, const Marmalade::Mathematics::Vec2& t) override {
             return false;
         }
-        glm::vec2 CalculateOBBCentrePoint(const glm::vec2& entityPosition, const glm::vec2& offset) override {
-            return glm::vec2();
+        Marmalade::Mathematics::Vec2 CalculateOBBCentrePoint(const Marmalade::Mathematics::Vec2& entityPosition, const Marmalade::Mathematics::Vec2& offset) override {
+            return Marmalade::Mathematics::Vec2();
         }
     };
 

@@ -39,21 +39,21 @@ namespace Marmalade::ECS {
 
         virtual void Intersects(Entity* self, Entity* other) = 0;
 
-        virtual bool IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) = 0;
-        virtual bool IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) = 0;
-        virtual bool AABBIntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) = 0;
+        virtual bool IntersectsAABB(const ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) = 0;
+        virtual bool IntersectsOBB(const ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) = 0;
+        virtual bool AABBIntersectsOBB(const ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) = 0;
 
-        virtual bool TestAABBSeparation(const glm::vec2& axis, const glm::vec2& aabbCenter, const glm::vec2& aabbHalfSize,
-                                           const glm::vec2& obbCenter, const glm::vec2 obbAxes[2], const glm::vec2& obbHalfSize,
-                                           const glm::vec2& t) = 0;
-        virtual glm::vec2 CalculateOBBCentrePoint(const glm::vec2& entityPosition, const glm::vec2& offset) = 0;
+        virtual bool TestAABBSeparation(const Marmalade::Mathematics::Vec2& axis, const Marmalade::Mathematics::Vec2& aabbCenter, const Marmalade::Mathematics::Vec2& aabbHalfSize,
+                                           const Marmalade::Mathematics::Vec2& obbCenter, const Marmalade::Mathematics::Vec2 obbAxes[2], const Marmalade::Mathematics::Vec2& obbHalfSize,
+                                           const Marmalade::Mathematics::Vec2& t) = 0;
+        virtual Marmalade::Mathematics::Vec2 CalculateOBBCentrePoint(const Marmalade::Mathematics::Vec2& entityPosition, const Marmalade::Mathematics::Vec2& offset) = 0;
 
         template<typename T>
         T* GetCollisionData() {
             return std::get_if<T>(&data);
         }
 
-        virtual void ShowBounds(const glm::vec2& entityPosition, Transform transform) = 0;
+        virtual void ShowBounds(const Marmalade::Mathematics::Vec2& entityPosition, Transform transform) = 0;
     };
 }
 

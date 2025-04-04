@@ -65,7 +65,6 @@ glm::mat4 Camera::GetView() {
     return view_mat;
 }
 
-
 glm::vec2 Camera::GetPosition() const {
     return position;
 }

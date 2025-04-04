@@ -21,6 +21,7 @@
 #define ENGINE_RENDERABLE_H
 
 #include "shader.h"
+#include "mathematics/matrix.h"
 
 #include <glad/glad.h>
 
@@ -44,7 +45,7 @@ public:
     Renderable(unsigned int VAO, unsigned int VBO, unsigned int EBO, unsigned int texture);
 
     void Initialise(); // Buffer Setup
-    void Draw(glm::mat4 modelMatrix, bool renderTexture);
+    void Draw(Marmalade::Mathematics::Mat4 modelMatrix, bool renderTexture);
 
     void SetTexture(const std::string& filePath);
     unsigned int GetTexture();

@@ -22,6 +22,7 @@
 #define MARMALADE_VECTOR_H
 
 #include "mathematics/functions/sqrt.h"
+#include "matrix.h"
 
 #include <concepts>
 #include <format>
@@ -39,8 +40,22 @@ namespace Marmalade::Mathematics {
 
         constexpr std::size_t getColumns() const { return Columns; }
 
+        Vector() {
+            for (size_t i = 0; i < Columns; ++i) {
+                values[i] = T(0);
+            }
+        }
+
+        template<typename... Args, typename = std::enable_if_t<(sizeof...(Args) == Columns)>>
+        Vector(Args... args) {
+            T temp[] = { static_cast<T>(args)... };
+            for (size_t i = 0; i < Columns; ++i) {
+                values[i] = temp[i];
+            }
+        }
+
         template<std::size_t C>
-        Vector operator+(const Vector<C, T>& v) {
+        Vector operator+(const Vector<C, T>& v) const {
             if (Columns != v.getColumns()) {
                 static_assert(Columns == C, "Can not perform arithmetic on vectors of different sizes");
             }
@@ -54,7 +69,7 @@ namespace Marmalade::Mathematics {
         }
 
         template<std::size_t C>
-        Vector operator-(const Vector<C, T>& v) {
+        Vector operator-(const Vector<C, T>& v) const {
             if (Columns != v.getColumns()) {
                 static_assert(Columns == C, "Can not perform arithmetic on vectors of different sizes");
             }
@@ -68,7 +83,7 @@ namespace Marmalade::Mathematics {
         }
 
         template<std::size_t C>
-        Vector operator*(const Vector<C, T>& v) {
+        Vector operator*(const Vector<C, T>& v) const {
             if (Columns != v.getColumns()) {
                 static_assert(Columns == C, "Can not perform arithmetic on vectors of different sizes");
             }
@@ -81,8 +96,19 @@ namespace Marmalade::Mathematics {
             return r;
         }
 
+        Vector<4> operator*(const Marmalade::Mathematics::Matrix<4, 4>& mat, const Marmalade::Mathematics::Vector<4>& vec) {
+            Marmalade::Mathematics::Vector<4> result;
+            for (std::size_t i = 0; i < 4; ++i) {
+                result[i] = 0.0f;
+                for (std::size_t j = 0; j < 4; ++j) {
+                    result[i] += mat.values[i * 4 + j] * vec[j];
+                }
+            }
+            return result;
+        }
+
         template<std::size_t C>
-        Vector operator/(const Vector<C, T>& v) {
+        Vector operator/(const Vector<C, T>& v) const {
             if (Columns != v.getColumns()) {
                 static_assert(Columns == C, "Can not perform arithmetic on vectors of different sizes");
             }
@@ -92,6 +118,22 @@ namespace Marmalade::Mathematics {
                 r.values[i] = values[i] / v.values[i];
             }
 
+            return r;
+        }
+
+        Vector<4> operator/(const Marmalade::Mathematics::Vector<4>& vec, float scalar) {
+            Marmalade::Mathematics::Vector<4> result;
+            for (std::size_t i = 0; i < 4; ++i) {
+                result[i] = vec[i] / scalar;
+            }
+            return result;
+        }
+
+        Vector operator-() const {
+            Vector r;
+            for (std::size_t i = 0; i < Columns; ++i) {
+                r.values[i] = -values[i];
+            }
             return r;
         }
 
@@ -174,6 +216,17 @@ namespace Marmalade::Mathematics {
             r.values[0] = values[1] * v.values[2] - values[2] * v.values[1];
             r.values[1] = values[2] * v.values[0] - values[0] * v.values[2];
             r.values[2] = values[0] * v.values[1] - values[1] * v.values[0];
+            return r;
+        }
+
+        template<std::size_t C>
+        Vector<C, T> Clamp(const Vector<C, T>& min, const Vector<C, T>& max) const {
+            Vector<C, T> r;
+            for (std::size_t i = 0; i < Columns; ++i) {
+                if (values[i] < min[i]) r.values[i] = min[i];
+                else if (values[i] > max[i]) r.values[i] = max[i];
+                else r.values[i] = values[i];
+            }
             return r;
         }
 

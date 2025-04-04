@@ -21,6 +21,7 @@
 #include "ecs/components/physics2d/boxcollider.h"
 
 #include "ecs/components/physics2d/rigidbody.h"
+#include "mathematics/vector.h"
 
 #include <imgui.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -38,8 +39,8 @@ void Marmalade::ECS::BoxCollider::Display(Entity* entity) {
     } else if (!std::holds_alternative<OBBDataBox>(data)) {
         AABBDataBox prevData = std::get<AABBDataBox>(data);
 
-        glm::vec2 uX = glm::vec2(cos(rotation), sin(rotation));
-        glm::vec2 uY = glm::vec2(-uX.y, uX.x);
+        Marmalade::Mathematics::Vec2 uX = Marmalade::Mathematics::Vec2(cos(rotation), sin(rotation));
+        Marmalade::Mathematics::Vec2 uY = Marmalade::Mathematics::Vec2(-uX[0], uX[0] );
 
 
         data = OBBDataBox{prevData.size, prevData.offset, rotation,
@@ -50,8 +51,8 @@ void Marmalade::ECS::BoxCollider::Display(Entity* entity) {
         using T = std::decay_t<decltype(colliderData)>;
 
         if constexpr (std::is_same_v<T, AABBDataBox> || std::is_same_v<T, OBBDataBox>) {
-            ImGui::DragFloat2("Size", glm::value_ptr(colliderData.size), 0.1f);
-            ImGui::DragFloat2("Offset", glm::value_ptr(colliderData.offset), 0.1f);
+            ImGui::DragFloat2("Size", colliderData.size.ToPtr(), 0.1f);
+            ImGui::DragFloat2("Offset", colliderData.offset.ToPtr(), 0.1f);
         }
     }, data);
 
@@ -67,8 +68,8 @@ void Marmalade::ECS::BoxCollider::Apply(Entity* entity) {
         if (auto* obbData = std::get_if<OBBDataBox>(&data)) {
             OBBDataBox prevData = std::get<OBBDataBox>(data);
 
-            glm::vec2 uX = glm::vec2(cos(entity->getRotation()), -sin(entity->getRotation()));
-            glm::vec2 uY = glm::vec2(sin(entity->getRotation()), cos(entity->getRotation()));
+            Marmalade::Mathematics::Vec2 uX = Marmalade::Mathematics::Vec2(cos(entity->getRotation()), -sin(entity->getRotation()));
+            Marmalade::Mathematics::Vec2 uY = Marmalade::Mathematics::Vec2(sin(entity->getRotation()), cos(entity->getRotation()));
 
             data = OBBDataBox{prevData.size, prevData.offset, entity->getRotation(),
                            CalculateOBBCentrePoint(entity->getPosition(), prevData.offset),
@@ -87,10 +88,10 @@ nlohmann::json Marmalade::ECS::BoxCollider::Serialize(const Entity* entity) {
     std::visit([&](auto &colliderData) {
         using T = std::decay_t<decltype(colliderData)>;
         if constexpr (std::is_same_v<T, AABBDataBox> || std::is_same_v<T, OBBDataBox>) {
-            j["size"]["x"] = colliderData.size.x;
-            j["size"]["y"] = colliderData.size.y;
-            j["offset"]["x"] = colliderData.offset.x;
-            j["offset"]["y"] = colliderData.offset.y;
+            j["size"]["x"] = colliderData.size[0];
+            j["size"]["y"] = colliderData.size[0];
+            j["offset"]["x"] = colliderData.offset[0];
+            j["offset"]["y"] = colliderData.offset[0];
         }
     }, data);
 
@@ -101,10 +102,10 @@ void Marmalade::ECS::BoxCollider::Deserialize(nlohmann::json json, Entity* entit
     std::visit([&](auto &colliderData) {
         using T = std::decay_t<decltype(colliderData)>;
         if constexpr (std::is_same_v<T, AABBDataBox> || std::is_same_v<T, OBBDataBox>) {
-            colliderData.size.x = json["size"]["x"].get<float>();
-            colliderData.size.y = json["size"]["y"].get<float>();
-            colliderData.offset.x = json["offset"]["x"].get<float>();
-            colliderData.offset.y = json["offset"]["y"].get<float>();
+            colliderData.size[0] = json["size"]["x"].get<float>();
+            colliderData.size[0] = json["size"]["y"].get<float>();
+            colliderData.offset[0] = json["offset"]["x"].get<float>();
+            colliderData.offset[0] = json["offset"]["y"].get<float>();
         }
     }, data);
 }
@@ -112,8 +113,8 @@ void Marmalade::ECS::BoxCollider::Deserialize(nlohmann::json json, Entity* entit
 void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
     if (!self || !other) return;
 
-    glm::vec2 posA = self->getPosition();
-    glm::vec2 posB = other->getPosition();
+    Marmalade::Mathematics::Vec2 posA = self->getPosition();
+    Marmalade::Mathematics::Vec2 posB = other->getPosition();
 
     auto* aabbA = GetCollisionData<AABBDataBox>();
     auto* aabbB = other->componentManager.GetComponentOfType<BoxCollider>()->GetCollisionData<AABBDataBox>();
@@ -124,10 +125,11 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
     if (aabbA && aabbB) {
         if (IntersectsAABB(*other->componentManager.GetComponentOfType<ColliderBase>(), posA, posB)) {
             if (auto* rb = self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
-                glm::vec2 collisionNorm = glm::normalize(posA - posB);
+                Marmalade::Mathematics::Vec2 norm = posA - posB;
+                Marmalade::Mathematics::Vec2 collisionNorm = norm.Normalise();
 
-                glm::vec2 ptOnA_WorldSpace = self->getPosition() + collisionNorm * aabbA->size;
-                glm::vec2 ptOnB_WorldSpace = other->getPosition() - collisionNorm * aabbB->size;
+                Marmalade::Mathematics::Vec2 ptOnA_WorldSpace = self->getPosition() + collisionNorm * aabbA->size;
+                Marmalade::Mathematics::Vec2 ptOnB_WorldSpace = other->getPosition() - collisionNorm * aabbB->size;
 
                 rb->collisionQueue.push({self, other, collisionNorm, ptOnA_WorldSpace, ptOnB_WorldSpace});
             }
@@ -135,10 +137,11 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
     } else if (obbA && obbB) {
         if (IntersectsOBB(*other->componentManager.GetComponentOfType<ColliderBase>(), posA, posB)) {
             if (auto* rb = self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
-                glm::vec2 collisionNorm = glm::normalize(posB - posA);
+                Marmalade::Mathematics::Vec2 norm = posA - posB;
+                Marmalade::Mathematics::Vec2 collisionNorm = norm.Normalise();
 
-                glm::vec2 ptOnA_WorldSpace = self->getPosition() + collisionNorm * obbA->size;
-                glm::vec2 ptOnB_WorldSpace = other->getPosition() - collisionNorm * obbB->size;
+                Marmalade::Mathematics::Vec2 ptOnA_WorldSpace = self->getPosition() + collisionNorm * obbA->size;
+                Marmalade::Mathematics::Vec2 ptOnB_WorldSpace = other->getPosition() - collisionNorm * obbB->size;
 
                 rb->collisionQueue.push({self, other, collisionNorm, ptOnA_WorldSpace, ptOnB_WorldSpace});
             }
@@ -146,10 +149,11 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
     } else if (aabbA && obbB) {
         if (AABBIntersectsOBB(*other->componentManager.GetComponentOfType<ColliderBase>(), posA, posB)) {
             if (auto* rb = self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
-                glm::vec2 collisionNorm = glm::normalize(posB - posA);
+                Marmalade::Mathematics::Vec2 norm = posA - posB;
+                Marmalade::Mathematics::Vec2 collisionNorm = norm.Normalise();
 
-                glm::vec2 ptOnA_WorldSpace = self->getPosition() + collisionNorm * aabbA->size;
-                glm::vec2 ptOnB_WorldSpace = other->getPosition() - collisionNorm * obbB->size;
+                Marmalade::Mathematics::Vec2 ptOnA_WorldSpace = self->getPosition() + collisionNorm * aabbA->size;
+                Marmalade::Mathematics::Vec2 ptOnB_WorldSpace = other->getPosition() - collisionNorm * obbB->size;
 
                 rb->collisionQueue.push({self, other, collisionNorm, ptOnA_WorldSpace, ptOnB_WorldSpace});
             }
@@ -157,10 +161,11 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
     } else if (obbA && aabbB) {
         if (AABBIntersectsOBB(*other->componentManager.GetComponentOfType<ColliderBase>(), posA, posB)) {
             if (auto* rb = self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
-                glm::vec2 collisionNorm = glm::normalize(posB - posA);
+                Marmalade::Mathematics::Vec2 norm = posA - posB;
+                Marmalade::Mathematics::Vec2 collisionNorm = norm.Normalise();
 
-                glm::vec2 ptOnA_WorldSpace = self->getPosition() + collisionNorm * obbA->size;
-                glm::vec2 ptOnB_WorldSpace = other->getPosition() - collisionNorm * aabbB->size;
+                Marmalade::Mathematics::Vec2 ptOnA_WorldSpace = self->getPosition() + collisionNorm * obbA->size;
+                Marmalade::Mathematics::Vec2 ptOnB_WorldSpace = other->getPosition() - collisionNorm * aabbB->size;
 
                 rb->collisionQueue.push({self, other, collisionNorm, ptOnA_WorldSpace, ptOnB_WorldSpace});
             }
@@ -168,23 +173,23 @@ void Marmalade::ECS::BoxCollider::Intersects(Entity* self, Entity* other) {
     }
 }
 
-bool Marmalade::ECS::BoxCollider::IntersectsAABB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
+bool Marmalade::ECS::BoxCollider::IntersectsAABB(const ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) {
     auto* aabbA = GetCollisionData<AABBDataBox>();
     auto* aabbB = std::get_if<AABBDataBox>(&other.data);
 
     if (!aabbA || !aabbB) return false;
 
-    glm::vec2 minA = posA + aabbA->offset;
-    glm::vec2 maxA = minA + aabbA->size;
+    Marmalade::Mathematics::Vec2 minA = posA + aabbA->offset;
+    Marmalade::Mathematics::Vec2 maxA = minA + aabbA->size;
 
-    glm::vec2 minB = posB + aabbB->offset;
-    glm::vec2 maxB = minB + aabbB->size;
+    Marmalade::Mathematics::Vec2 minB = posB + aabbB->offset;
+    Marmalade::Mathematics::Vec2 maxB = minB + aabbB->size;
 
-    return (minA.x < maxB.x && maxA.x > minB.x &&
-            minA.y < maxB.y && maxA.y > minB.y);
+    return (minA[0]  < maxB[0]  && maxA[0]  > minB[0]  &&
+            minA[0] < maxB[0] && maxA[0] > minB[0]);
 }
 
-bool Marmalade::ECS::BoxCollider::IntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
+bool Marmalade::ECS::BoxCollider::IntersectsOBB(const ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) {
     auto* obbA = GetCollisionData<OBBDataBox>();
     auto* obbB = std::get_if<OBBDataBox>(&other.data);
 
@@ -195,13 +200,13 @@ bool Marmalade::ECS::BoxCollider::IntersectsOBB(const ColliderBase& other, const
 
     for (int i = 0; i < 2; ++i) {
         for (int j = 0; j < 2; ++j) {
-            R[i][j] = glm::dot(obbA->u[i], obbB->u[j]);
+            R[i][j] = obbA->u[i].Dot(obbB->u[j]);
         }
     }
 
     // Compute translation vector
-    glm::vec2 t = obbB->c - obbA->c;
-    t = glm::vec2(glm::dot(t, obbA->u[0]), glm::dot(t, obbA->u[1]));
+    Marmalade::Mathematics::Vec2 t = obbB->c - obbA->c;
+    t = Marmalade::Mathematics::Vec2(t.Dot(obbA->u[0]), t.Dot(obbA->u[1]));
 
     for (int i = 0; i < 2; ++i) {
         for (int j = 0; j < 2; ++j) {
@@ -226,30 +231,30 @@ bool Marmalade::ECS::BoxCollider::IntersectsOBB(const ColliderBase& other, const
     return true; // No separating axis found, OBBs intersecting
 }
 
-bool Marmalade::ECS::BoxCollider::AABBIntersectsOBB(const ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
+bool Marmalade::ECS::BoxCollider::AABBIntersectsOBB(const ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) {
     auto* aabb = GetCollisionData<AABBDataBox>();
     auto* obb = std::get_if<OBBDataBox>(&other.data);
 
     if (!aabb || !obb) return false;
 
-    glm::vec2 aabbCentre = posA + aabb->offset + aabb->size * 0.5f;
-    glm::vec2 aabbHalfSize = aabb->size * 0.5f;
+    Marmalade::Mathematics::Vec2 aabbCentre = posA + aabb->offset + aabb->size * 0.5f;
+    Marmalade::Mathematics::Vec2 aabbHalfSize = aabb->size * 0.5f;
 
-    glm::vec2 obbCentre = posB + obb->offset;
-    glm::vec2 obbAxes[2] = {obb->u[0], obb->u[1]};
-    glm::vec2 obbHalfSize = obb->e;
+    Marmalade::Mathematics::Vec2 obbCentre = posB + obb->offset;
+    Marmalade::Mathematics::Vec2 obbAxes[2] = {obb->u[0], obb->u[1]};
+    Marmalade::Mathematics::Vec2 obbHalfSize = obb->e;
 
-    glm::vec2 trans = obbCentre - aabbCentre;
+    Marmalade::Mathematics::Vec2 trans = obbCentre - aabbCentre;
 
-    glm::vec2 testingAxes[4] {
-            glm::vec2(1.0f, 0.0f),
-            glm::vec2(0.0f, 1.0f),
+    Marmalade::Mathematics::Vec2 testingAxes[4] {
+            Marmalade::Mathematics::Vec2(1.0f, 0.0f),
+            Marmalade::Mathematics::Vec2(0.0f, 1.0f),
             obbAxes[0],
             obbAxes[1]
     };
 
     for (int i = 0; i < 4; ++i) {
-        glm::vec2 axis = testingAxes[i];
+        Marmalade::Mathematics::Vec2 axis = testingAxes[i];
         if(!TestAABBSeparation(axis, aabbCentre, aabbHalfSize, obbCentre, obbAxes, obbHalfSize, trans)) {
             return false;
         }
@@ -258,10 +263,10 @@ bool Marmalade::ECS::BoxCollider::AABBIntersectsOBB(const ColliderBase& other, c
     return true;
 }
 
-void Marmalade::ECS::BoxCollider::ShowBounds(const glm::vec2& entityPosition, Transform transform) {
+void Marmalade::ECS::BoxCollider::ShowBounds(const Marmalade::Mathematics::Vec2& entityPosition, Transform transform) {
     if (auto* aabbData = std::get_if<AABBDataBox>(&data)) {
-        glm::vec2 min = entityPosition + aabbData->offset;
-        glm::vec2 max = min + aabbData->size;
+        Marmalade::Mathematics::Vec2 min = entityPosition + aabbData->offset;
+        Marmalade::Mathematics::Vec2 max = min + aabbData->size;
 
         ImVec2 screenMin = EditorViews::WorldToScreenSpace(min);
         ImVec2 screenMax = EditorViews::WorldToScreenSpace(max);
@@ -275,15 +280,15 @@ void Marmalade::ECS::BoxCollider::ShowBounds(const glm::vec2& entityPosition, Tr
 
         float theta = glm::radians(transform.rotation);
 
-        glm::vec2 corners[4] = {
-                {0, 0}, {obbData->size.x, 0}, {obbData->size.x, obbData->size.y}, {0, obbData->size.y}
+        Marmalade::Mathematics::Vec2 corners[4] = {
+                {0, 0}, {obbData->size[0] , 0}, {obbData->size[0] , obbData->size[0]}, {0, obbData->size[0]}
         };
 
-        glm::vec2 rotatedCorners[4];
+        Marmalade::Mathematics::Vec2 rotatedCorners[4];
         for (int i = 0; i < 4; ++i) {
-            rotatedCorners[i] = obbData->c + glm::vec2(
-                                                     corners[i].x * cos(theta) - corners[i].y * sin(theta),
-                                                     corners[i].x * sin(theta) + corners[i].y * cos(theta)
+            rotatedCorners[i] = obbData->c + Marmalade::Mathematics::Vec2(
+                                                     corners[i][0]  * cos(theta) - corners[i][0] * sin(theta),
+                                                     corners[i][0]  * sin(theta) + corners[i][0] * cos(theta)
                                              );
         }
 
@@ -299,18 +304,18 @@ void Marmalade::ECS::BoxCollider::ShowBounds(const glm::vec2& entityPosition, Tr
     }
 }
 
-bool Marmalade::ECS::BoxCollider::TestAABBSeparation(const glm::vec2& axis, const glm::vec2& aabbCenter, const glm::vec2& aabbHalfSize, const glm::vec2& obbCenter, const glm::vec2* obbAxes, const glm::vec2& obbHalfSize, const glm::vec2& t) {
-    float aabbProj = aabbHalfSize.x * glm::abs(glm::dot(glm::vec2(1, 0), axis)) +
-                           aabbHalfSize.y * glm::abs(glm::dot(glm::vec2(0, 1), axis));
+bool Marmalade::ECS::BoxCollider::TestAABBSeparation(const Marmalade::Mathematics::Vec2& axis, const Marmalade::Mathematics::Vec2& aabbCenter, const Marmalade::Mathematics::Vec2& aabbHalfSize, const Marmalade::Mathematics::Vec2& obbCenter, const Marmalade::Mathematics::Vec2* obbAxes, const Marmalade::Mathematics::Vec2& obbHalfSize, const Marmalade::Mathematics::Vec2& t) {
+    float aabbProj = aabbHalfSize[0]  * glm::abs(glm::dot(Marmalade::Mathematics::Vec2(1, 0), axis)) +
+                           aabbHalfSize[0] * glm::abs(glm::dot(Marmalade::Mathematics::Vec2(0, 1), axis));
 
-    float obbProj = obbHalfSize.x * glm::abs(glm::dot(obbAxes[0], axis)) +
-                          obbHalfSize.y * glm::abs(glm::dot(obbAxes[1], axis));
+    float obbProj = obbHalfSize[0]  * glm::abs(glm::dot(obbAxes[0], axis)) +
+                          obbHalfSize[0] * glm::abs(glm::dot(obbAxes[1], axis));
 
     float trans = glm::abs(glm::dot(t, axis));
 
     return trans > (aabbProj + obbProj);
 }
 
-glm::vec2 Marmalade::ECS::BoxCollider::CalculateOBBCentrePoint(const glm::vec2& entityPosition, const glm::vec2& offset) {
+Marmalade::Mathematics::Vec2 Marmalade::ECS::BoxCollider::CalculateOBBCentrePoint(const Marmalade::Mathematics::Vec2& entityPosition, const Marmalade::Mathematics::Vec2& offset) {
     return entityPosition + offset;
 }

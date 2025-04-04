@@ -45,16 +45,16 @@ void Marmalade::ECS::Transform::Display(Entity* entity) {
         DrawLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(sliderWidth);
-        if (ImGui::DragFloat(("##PosX" + std::to_string(entity->id)).c_str(), &transform->pos.x, 0.1f)) {
-            entity->setPosition(glm::vec2(transform->pos.x, transform->pos.y));
+        if (ImGui::DragFloat(("##PosX" + std::to_string(entity->id)).c_str(), &transform->pos[0], 0.1f)) {
+            entity->setPosition(Marmalade::Mathematics::Vec2(transform->pos[0], transform->pos[1]));
         }
 
         ImGui::SameLine();
         DrawLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(sliderWidth);
-        if (ImGui::DragFloat(("##PosY" + std::to_string(entity->id)).c_str(), &transform->pos.y, 0.1f)) {
-            entity->setPosition(glm::vec2(transform->pos.x, transform->pos.y));
+        if (ImGui::DragFloat(("##PosY" + std::to_string(entity->id)).c_str(), &transform->pos[1], 0.1f)) {
+            entity->setPosition(Marmalade::Mathematics::Vec2(transform->pos[0], transform->pos[1]));
         }
 
 
@@ -78,15 +78,15 @@ void Marmalade::ECS::Transform::Display(Entity* entity) {
         DrawLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(sliderWidth);
-        if (ImGui::DragFloat(("##ScaX" + std::to_string(entity->id)).c_str(), &transform->scale.x, 0.1f)) {
-            entity->setScale(glm::vec2(transform->scale.x, transform->scale.y));
+        if (ImGui::DragFloat(("##ScaX" + std::to_string(entity->id)).c_str(), &transform->scale[0], 0.1f)) {
+            entity->setScale(Marmalade::Mathematics::Vec2(transform->scale[0], transform->scale[0]));
         }
 
         ImGui::SameLine();
         DrawLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
         ImGui::SameLine();
-        if (ImGui::DragFloat(("##ScaY" + std::to_string(entity->id)).c_str(), &transform->scale.y, 0.1f)) {
-            entity->setScale(glm::vec2(transform->scale.x, transform->scale.y));
+        if (ImGui::DragFloat(("##ScaY" + std::to_string(entity->id)).c_str(), &transform->scale[1], 0.1f)) {
+            entity->setScale(Marmalade::Mathematics::Vec2(transform->scale[0], transform->scale[1]));
         }
 }
 
@@ -100,25 +100,25 @@ void Marmalade::ECS::Transform::Setup(Entity* entity) {
 
 nlohmann::json Marmalade::ECS::Transform::Serialize(const Entity* entity) {
     nlohmann::json j;
-    j["pos"]["x"] = pos.x;
-    j["pos"]["y"] = pos.y;
+    j["pos"]["x"] = pos[0];
+    j["pos"]["y"] = pos[1];
 
     j["rot"] = rotation;
 
-    j["scale"]["x"] = scale.x;
-    j["scale"]["y"] = scale.y;
+    j["scale"]["x"] = scale[0];
+    j["scale"]["y"] = scale[1];
 
     return j;
 }
 
 void Marmalade::ECS::Transform::Deserialize(nlohmann::json json, Entity* entity) {
-    pos.x = json["pos"]["x"].get<float>();
-    pos.y = json["pos"]["y"].get<float>();
+    pos[0] = json["pos"]["x"].get<float>();
+    pos[1] = json["pos"]["y"].get<float>();
 
     rotation = json["rot"].get<float>();
 
-    scale.x = json["scale"]["x"].get<float>();
-    scale.y = json["scale"]["y"].get<float>();
+    scale[0] = json["scale"]["x"].get<float>();
+    scale[1] = json["scale"]["y"].get<float>();
 }
 
 void DrawLabelWithBackground(const char* text, ImVec4 color) {
