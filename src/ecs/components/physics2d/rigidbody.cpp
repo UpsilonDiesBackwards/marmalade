@@ -21,9 +21,6 @@
 
 #include <imgui.h>
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/string_cast.hpp>
-
 void Marmalade::ECS::RigidBody::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
 
@@ -133,7 +130,7 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const Marma
     float otherElasticity = otherRigidBody->body.elasticity;
     float elasticity = selfElasticity * otherElasticity;
 
-    if (glm::abs(normal[1]) > 0.99f) { // Set ptOnA/B[0] as centre of mass[0]
+    if (Marmalade::Mathematics::Abs(normal[1]) > 0.99f) { // Set ptOnA/B[0] as centre of mass[0]
         ptOnA[0] = GetCentreOfMass()[0];
         ptOnB[0] = otherRigidBody->GetCentreOfMass()[0];
     }
@@ -158,10 +155,18 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const Marma
                     (body.mass + otherRigidBody->body.mass + angularFactor);
     Marmalade::Mathematics::Vec2 vectorImpulse = normal * impulse; //... then use it, and the normal to calculate the vector impulse
 
-    // Calculate the collision penetration depth...
-    Marmalade::Mathematics::Vec2 penetrationDepth =
-                    (selfSize / 2.0f + otherSize / 2.0f) - Marmalade::Mathematics::Abs(self->getPosition() - other->getPosition());
-    Marmalade::Mathematics::Vec2 correction = normal * penetrationDepth.Max(Marmalade::Mathematics::Vec2(0.0f, 0.0f)) * 0.37f;
+    Marmalade::Mathematics::Vec2 distance = self->getPosition() - other->getPosition();
+
+    float overlapX = (selfSize[0] / 2.0f + otherSize[0] / 2.0f) - std::abs(distance[0]);
+    float overlapY = (selfSize[1] / 2.0f + otherSize[1] / 2.0f) - std::abs(distance[1]);
+
+    overlapX = std::max(0.0f, overlapX);
+    overlapY = std::max(0.0f, overlapY);
+
+    float totalOverlap = overlapX * overlapY;
+    Marmalade::Mathematics::Vec2 penetrationDepth = totalOverlap > 0.0f ? distance.Normalise() * totalOverlap : Marmalade::Mathematics::Vec2(0.0f, 0.0f);
+
+    Marmalade::Mathematics::Vec2 correction = normal * penetrationDepth;
 
     Marmalade::Mathematics::Vec2 perpendicular = Marmalade::Mathematics::Vec2(-normal[1], normal[0]).Normalise() * 0.1f;
     Marmalade::Mathematics::Vec2 contactPoint = self->getPosition() + normal * (selfSize * 0.5f) + perpendicular;
@@ -189,7 +194,7 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const Marma
     }
 
     // Set angular velocity to zero (TODO: Object should rest flush on the object. This just stops it.)
-    if (glm::abs(normal[1]) > 0.99f && otherRigidBody->isStatic) {
+    if (Marmalade::Mathematics::Abs(normal[1]) > 0.99f && otherRigidBody->isStatic) {
         body.angularVelocity = 0.0f;
     }
 }
@@ -203,10 +208,7 @@ void Marmalade::ECS::RigidBody::ApplyImpulse(Marmalade::Mathematics::Vec2 point,
     Marmalade::Mathematics::Vec2 position = GetCentreOfMass();
     Marmalade::Mathematics::Vec2 r = point - position;
 
-    Marmalade::Mathematics::Vec3 rVec3(r[0], r[1], 0);
-    Marmalade::Mathematics::Vec3 impulseVec3(impulse[0], impulse[1], 0);
-    float torque = -rVec3.Cross(impulseVec3)[3] * 0.2f;
-
+    float torque = -r.Cross2D(r, impulse) * 0.2f;
 
     ApplyImpulseAngular(torque, self);
 }
@@ -222,13 +224,13 @@ void Marmalade::ECS::RigidBody::ApplyImpulseAngular(float dL, Entity* self) {
 
     float invInertia = GetInverseInertiaTensor(self);
 
-    if (glm::abs(dL) > FLT_EPSILON) { body.angularVelocity += invInertia * dL; }
+    if (Marmalade::Mathematics::Abs(dL) > FLT_EPSILON) { body.angularVelocity += invInertia * dL; }
 
 //    LOG_INFO("angular velocity: {}", body.angularVelocity);
 
     const float maxAngularSpeed = 15.0f; // Limit angular speed to prevent it going haywire
-    if (glm::sqrt(glm::length(body.angularVelocity)) > maxAngularSpeed) { // Set angular velocity
-        body.angularVelocity = glm::sign(body.angularVelocity) * maxAngularSpeed;
+    if (Marmalade::Mathematics::Abs(body.angularVelocity) > maxAngularSpeed) { // Set angular velocity
+        body.angularVelocity = std::copysign(maxAngularSpeed, body.angularVelocity);
     }
 }
 

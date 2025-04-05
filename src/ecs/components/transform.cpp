@@ -91,7 +91,6 @@ void Marmalade::ECS::Transform::Display(Entity* entity) {
 }
 
 void Marmalade::ECS::Transform::Apply(Entity* entity) {
-//    LOG_INFO("Model Matrix: {}", modelMatrix.ToString());
 }
 
 void Marmalade::ECS::Transform::Setup(Entity* entity) {

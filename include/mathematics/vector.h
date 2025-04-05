@@ -91,6 +91,15 @@ namespace Marmalade::Mathematics {
             return r;
         }
 
+        Vector operator-(float f) const {
+            Vector r;
+            for (std::size_t i = 0; i < Columns; ++i) {
+                r.values[i] = values[i] - f;
+            }
+            return r;
+        }
+
+
         template<std::size_t C>
         Vector operator*(const Vector<C, T>& v) const {
             if (Columns != v.getColumns()) {
@@ -255,6 +264,10 @@ namespace Marmalade::Mathematics {
             r.values[1] = values[2] * v.values[0] - values[0] * v.values[2];
             r.values[2] = values[0] * v.values[1] - values[1] * v.values[0];
             return r;
+        }
+
+        float Cross2D(const Marmalade::Mathematics::Vector<2>& v1, const Marmalade::Mathematics::Vector<2>& v2) {
+            return v1[0] * v2[1] - v1[1] * v2[0];
         }
 
         template<std::size_t C>

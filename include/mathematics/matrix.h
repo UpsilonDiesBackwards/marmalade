@@ -83,10 +83,15 @@ namespace Marmalade::Mathematics {
             }
 
             Matrix r;
-            for (std::size_t i = 0; i < Rows * Columns; ++i) {
-                r.values[i] = values[i] * m.values[i];
+            for (std::size_t row = 0; row < Rows; ++row) {
+                for (std::size_t col = 0; col < Columns; ++col) {
+                    T sum = static_cast<T>(0);
+                    for (std::size_t k = 0; k < Columns; ++k) {
+                        sum += (*this)(row, k) * m(k, col);
+                    }
+                    r(row, col) = sum;
+                }
             }
-
             return r;
         }
 
@@ -102,6 +107,14 @@ namespace Marmalade::Mathematics {
             }
 
             return r;
+        }
+
+        T& operator()(std::size_t row, std::size_t col) {
+            return values[col * Rows + row];
+        }
+
+        const T& operator()(std::size_t row, std::size_t col) const {
+            return values[col * Rows + row];
         }
 
         std::string ToString() {
@@ -123,70 +136,59 @@ namespace Marmalade::Mathematics {
             return values;
         }
 
-        Matrix Identity() {
+        const float* GetConstValues() const {
+            return values;
+        }
+
+        static Matrix Identity() {
             Matrix r;
-
-            for (size_t i = 0; i < Columns * Rows; ++i) {
-                r.values[i] = 1;
+            for (size_t col = 0; col < Columns; ++col) {
+                for (size_t row = 0; row < Rows; ++row) {
+                    r(col, row) = (row == col) ? 1 : 0;
+                }
             }
-
             return r;
         }
 
         static Matrix<4, 4, T> Translate(const Vector<3, T>& translate) {
-            Matrix<4, 4, T> r;
-
-            r.values[3] = translate[0];
-            r.values[7] = translate[1];
-            r.values[11] = translate[2];
-
+            Matrix<4, 4, T> r = Identity();
+            r.values[12] = translate[0];
+            r.values[13] = translate[1];
+            r.values[14] = translate[2];
             return r;
         }
 
         static Matrix<4, 4, T> Scale(const Vector<3, T>& scale) {
-            Matrix<4, 4, T> r;
-
+            Matrix<4, 4, T> r = Identity();
             r.values[0] = scale[0];
             r.values[5] = scale[1];
             r.values[10] = scale[2];
-            r.values[15] = 1;
 
             return r;
         }
 
-        Matrix<4, 4, T> Rotate(const Matrix<4, 4, T>& m, T angle, const Marmalade::Mathematics::Vector<3, T>& axis) {
+        static Matrix<4, 4, T> Rotate(T angle, const Vector<3, T>& axis) {
             T c = std::cos(angle);
             T s = std::sin(angle);
-            Marmalade::Mathematics::Vector<3, T> normAxis = axis.Normalise();
 
-            T x = normAxis[0];
-            T y = normAxis[1];
-            T z = normAxis[2];
+            Vector<3, T> normAxis = axis.Normalise();
+            T x = normAxis[0], y = normAxis[1], z = normAxis[2];
             T oneMinusC = 1 - c;
 
-            Matrix<4, 4, T> rot;
-
+            Matrix<4, 4, T> rot = Identity();
             rot.values[0] = c + x * x * oneMinusC;
             rot.values[1] = x * y * oneMinusC - z * s;
             rot.values[2] = x * z * oneMinusC + y * s;
-            rot.values[3] = 0;
 
             rot.values[4] = y * x * oneMinusC + z * s;
             rot.values[5] = c + y * y * oneMinusC;
             rot.values[6] = y * z * oneMinusC - x * s;
-            rot.values[7] = 0;
 
             rot.values[8] = z * x * oneMinusC - y * s;
             rot.values[9] = z * y * oneMinusC + x * s;
             rot.values[10] = c + z * z * oneMinusC;
-            rot.values[11] = 0;
 
-            rot.values[12] = 0;
-            rot.values[13] = 0;
-            rot.values[14] = 0;
-            rot.values[15] = 1;
-
-            return m * rot;
+            return rot;
         }
     };
 

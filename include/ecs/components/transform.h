@@ -36,7 +36,7 @@ namespace Marmalade::ECS {
         float rotation = 0.0f;
         Marmalade::Mathematics::Vec2 scale = {1.0f, 1.0f};
 
-        Marmalade::Mathematics::Mat4 modelMatrix = modelMatrix.Identity();
+        Marmalade::Mathematics::Mat4 modelMatrix;
 
         void Apply(Entity* entity) override;
         void Display(Entity* entity) override;
@@ -53,6 +53,8 @@ namespace Marmalade::ECS {
             description =
                     "Transform Component\n"
                     "Primary component for entities. Adds the ability to change the transform of an entity";
+
+            modelMatrix = Marmalade::Mathematics::Mat4::Identity();
         }
     };
 

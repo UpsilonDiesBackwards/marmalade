@@ -40,8 +40,7 @@ void Marmalade::ECS::BoxCollider::Display(Entity* entity) {
         AABBDataBox prevData = std::get<AABBDataBox>(data);
 
         Marmalade::Mathematics::Vec2 uX = Marmalade::Mathematics::Vec2(cos(rotation), sin(rotation));
-        Marmalade::Mathematics::Vec2 uY = Marmalade::Mathematics::Vec2(-uX[0], uX[0] );
-
+        Marmalade::Mathematics::Vec2 uY = Marmalade::Mathematics::Vec2(-uX[1], uX[0]);
 
         data = OBBDataBox{prevData.size, prevData.offset, rotation,
                        prevData.offset, {uX, uY}, prevData.size * 0.5f};
@@ -89,9 +88,9 @@ nlohmann::json Marmalade::ECS::BoxCollider::Serialize(const Entity* entity) {
         using T = std::decay_t<decltype(colliderData)>;
         if constexpr (std::is_same_v<T, AABBDataBox> || std::is_same_v<T, OBBDataBox>) {
             j["size"]["x"] = colliderData.size[0];
-            j["size"]["y"] = colliderData.size[0];
+            j["size"]["y"] = colliderData.size[1];
             j["offset"]["x"] = colliderData.offset[0];
-            j["offset"]["y"] = colliderData.offset[0];
+            j["offset"]["y"] = colliderData.offset[1];
         }
     }, data);
 
@@ -103,9 +102,9 @@ void Marmalade::ECS::BoxCollider::Deserialize(nlohmann::json json, Entity* entit
         using T = std::decay_t<decltype(colliderData)>;
         if constexpr (std::is_same_v<T, AABBDataBox> || std::is_same_v<T, OBBDataBox>) {
             colliderData.size[0] = json["size"]["x"].get<float>();
-            colliderData.size[0] = json["size"]["y"].get<float>();
+            colliderData.size[1] = json["size"]["y"].get<float>();
             colliderData.offset[0] = json["offset"]["x"].get<float>();
-            colliderData.offset[0] = json["offset"]["y"].get<float>();
+            colliderData.offset[1] = json["offset"]["y"].get<float>();
         }
     }, data);
 }
@@ -186,7 +185,7 @@ bool Marmalade::ECS::BoxCollider::IntersectsAABB(const ColliderBase& other, cons
     Marmalade::Mathematics::Vec2 maxB = minB + aabbB->size;
 
     return (minA[0]  < maxB[0]  && maxA[0]  > minB[0]  &&
-            minA[0] < maxB[0] && maxA[0] > minB[0]);
+            minA[1] < maxB[1] && maxA[1] > minB[1]);
 }
 
 bool Marmalade::ECS::BoxCollider::IntersectsOBB(const ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) {
@@ -281,14 +280,14 @@ void Marmalade::ECS::BoxCollider::ShowBounds(const Marmalade::Mathematics::Vec2&
         float theta = glm::radians(transform.rotation);
 
         Marmalade::Mathematics::Vec2 corners[4] = {
-                {0, 0}, {obbData->size[0] , 0}, {obbData->size[0] , obbData->size[0]}, {0, obbData->size[0]}
+                {0, 0}, {obbData->size[0] , 0}, {obbData->size[0] , obbData->size[1]}, {0, obbData->size[1]}
         };
 
         Marmalade::Mathematics::Vec2 rotatedCorners[4];
         for (int i = 0; i < 4; ++i) {
             rotatedCorners[i] = obbData->c + Marmalade::Mathematics::Vec2(
-                                                     corners[i][0]  * cos(theta) - corners[i][0] * sin(theta),
-                                                     corners[i][0]  * sin(theta) + corners[i][0] * cos(theta)
+                                                     corners[i][0] * cos(theta) - corners[i][1] * sin(theta),
+                                                     corners[i][0] * sin(theta) + corners[i][1] * cos(theta)
                                              );
         }
 

@@ -21,6 +21,7 @@
 
 #include "../application/util.h"
 #include "../application/logger.h"
+
 #include "mathematics/matrix.h"
 
 #include <graphics/texture.h>
@@ -104,17 +105,22 @@ void Entity::setScale(Marmalade::Mathematics::Vec2 newScale) {
 void Entity::UpdateModelMatrix() {
     auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
 
-    transform->modelMatrix = transform->modelMatrix.Identity();
+    transform->modelMatrix = Marmalade::Mathematics::Mat4::Identity();
 
-    transform->modelMatrix = transform->modelMatrix.Translate(
-            Marmalade::Mathematics::Vec3(transform->pos[0], transform->pos[1], 0.0f));
+    auto translation = Marmalade::Mathematics::Mat4::Translate(
+            Marmalade::Mathematics::Vec3(transform->pos[0], transform->pos[1], 0.0f)
+    );
 
-    transform->modelMatrix = transform->modelMatrix.Rotate(transform->modelMatrix,
-                                                           transform->rotation,
-                                                           Marmalade::Mathematics::Vec3(0.0f, 0.0f, 1.0f));
+    auto rotation = Marmalade::Mathematics::Mat4::Rotate(
+            transform->rotation,
+            Marmalade::Mathematics::Vec3(0.0f, 0.0f, 1.0f)
+    );
 
-    transform->modelMatrix = transform->modelMatrix.Scale(
-            Marmalade::Mathematics::Vec3(transform->scale[0], transform->scale[1], 1.0f));
+    auto scaling = Marmalade::Mathematics::Mat4::Scale(
+            Marmalade::Mathematics::Vec3(transform->scale[0], transform->scale[1], 1.0f)
+    );
+
+    transform->modelMatrix = translation * rotation * scaling;
 
     if (auto parentPtr = parent.lock()) {
         transform->modelMatrix = parentPtr->componentManager.GetComponentOfType<Marmalade::ECS::Transform>()->modelMatrix * transform->modelMatrix;
