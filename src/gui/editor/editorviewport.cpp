@@ -137,10 +137,10 @@ void EditView::RunInput() {
             auto entityPos = entity->getPosition();
             auto entityScale = entity->getScale();
 
-            glm::vec2 maxBounds = entityPos + entityScale;
+            Marmalade::Mathematics::Vec2 maxBounds = entityPos + entityScale;
 
-            bool withinBounds(worldCoords.x >= entityPos.x && worldCoords.x <= maxBounds.x &&
-                              worldCoords.y >= entityPos.y && worldCoords.y <= maxBounds.y);
+            bool withinBounds(worldCoords.x >= entityPos[0] && worldCoords.x <= maxBounds[0] &&
+                              worldCoords.y >= entityPos[1] && worldCoords.y <= maxBounds[1]);
             if (withinBounds) {
                 auto screenMin = EditorViews::WorldToScreenSpace(entity->getPosition());
                 auto screenMax = EditorViews::WorldToScreenSpace(entity->getPosition() + entity->getScale());
@@ -186,19 +186,19 @@ void EditView::ShowGizmo() {
 
     if (ImGuizmo::IsUsing()) {
         glm::vec3 translation, scale, rotation;
-        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform->modelMatrix),
+        ImGuizmo::DecomposeMatrixToComponents(transform->modelMatrix.GetValues(),
                                               glm::value_ptr(translation),
                                               glm::value_ptr(rotation),
                                               glm::value_ptr(scale));
 
-        selectedEntity->setPosition(glm::vec2(translation.x, translation.y));
+        selectedEntity->setPosition(Marmalade::Mathematics::Vec2(translation.x, translation.y));
         selectedEntity->setRotation(rotation.z);
-        selectedEntity->setScale(glm::vec2(scale.x, scale.y));
+        selectedEntity->setScale(Marmalade::Mathematics::Vec2(scale.x, scale.y));
 
         ImGuizmo::RecomposeMatrixFromComponents(glm::value_ptr(translation),
                                                 glm::value_ptr(rotation),
                                                 glm::value_ptr(scale),
-                                                glm::value_ptr(transform->modelMatrix));
+                                                transform->modelMatrix.GetValues());
     }
 
     if (currentGuizmoOperation != ImGuizmo::SCALE) {
@@ -219,7 +219,7 @@ void EditView::ShowGizmo() {
     ImGuizmo::Manipulate(glm::value_ptr(app.camera->GetView()),
                          glm::value_ptr(app.camera->GetProjection()),
                          currentGuizmoOperation, currentGuizmoMode,
-                         glm::value_ptr(transform->modelMatrix));
+                         transform->modelMatrix.GetValues());
 }
 
 void EditView::ShowColliderBounds() {

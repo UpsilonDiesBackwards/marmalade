@@ -70,6 +70,10 @@ void EditorViews::Show() {
     ImGui::End();
 }
 
+glm::vec4 ToGlmVec4(const Marmalade::Mathematics::Vector<4>& v) {
+    return glm::vec4(v[0], v[1], v[2], v[3]);
+}
+
 ImVec2 EditorViews::WorldToScreenSpace(const Marmalade::Mathematics::Vec2& world) {
     Application& app = Application::GetInstance();
 
@@ -78,7 +82,7 @@ ImVec2 EditorViews::WorldToScreenSpace(const Marmalade::Mathematics::Vec2& world
 
     Marmalade::Mathematics::Vec4 worldPos(world[0], world[1], 0.0f, 1.0f);
 
-    Marmalade::Mathematics::Vec4 clipSpace = app.camera->GetProjection() * app.camera->GetView() * worldPos;
+    glm::vec4 clipSpace = app.camera->GetProjection() * app.camera->GetView() * ToGlmVec4(worldPos);
 
     if (clipSpace[3] != 0.0f) {
         clipSpace /= clipSpace[3];

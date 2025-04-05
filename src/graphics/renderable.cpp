@@ -88,7 +88,9 @@ void Renderable::Draw(Marmalade::Mathematics::Mat4 modelMatrix, bool renderTextu
     shaderProgram.SetMat4("projection", Application::GetInstance().camera->GetProjection());
 
     shaderProgram.SetMat4("view", Application::GetInstance().camera->GetView());
-    shaderProgram.SetMat4f("model", modelMatrix.GetValues());
+    shaderProgram.SetMat4f("model", *modelMatrix.GetValues());
+
+    LOG_INFO("Model Matrix: {}", *modelMatrix.GetValues());
 
     glDrawElements(GL_TRIANGLES, sizeof(indices)/4, GL_UNSIGNED_INT, nullptr);
 

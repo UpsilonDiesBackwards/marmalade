@@ -21,10 +21,24 @@
 #ifndef MARMALADE_ABS_H
 #define MARMALADE_ABS_H
 
+#include "mathematics/vector.h"
+
 namespace Marmalade::Mathematics {
+    template<std::size_t C, typename T>
+    class Vector;
+
     template<typename T>
     constexpr T Abs(T value) {
         return (value < 0) ? -value : value;
+    }
+
+    template<std::size_t C, typename T>
+    Vector<C, T> Abs(const Vector<C, T>& v) {
+        Vector<C, T> r;
+        for (std::size_t i = 0; i < C; ++i) {
+            r[i] = Abs(v[i]);
+        }
+        return r;
     }
 }
 

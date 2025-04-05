@@ -116,7 +116,6 @@ void Entity::UpdateModelMatrix() {
     transform->modelMatrix = transform->modelMatrix.Scale(
             Marmalade::Mathematics::Vec3(transform->scale[0], transform->scale[1], 1.0f));
 
-
     if (auto parentPtr = parent.lock()) {
         transform->modelMatrix = parentPtr->componentManager.GetComponentOfType<Marmalade::ECS::Transform>()->modelMatrix * transform->modelMatrix;
     }

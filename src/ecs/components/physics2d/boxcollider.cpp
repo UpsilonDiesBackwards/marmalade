@@ -305,13 +305,14 @@ void Marmalade::ECS::BoxCollider::ShowBounds(const Marmalade::Mathematics::Vec2&
 }
 
 bool Marmalade::ECS::BoxCollider::TestAABBSeparation(const Marmalade::Mathematics::Vec2& axis, const Marmalade::Mathematics::Vec2& aabbCenter, const Marmalade::Mathematics::Vec2& aabbHalfSize, const Marmalade::Mathematics::Vec2& obbCenter, const Marmalade::Mathematics::Vec2* obbAxes, const Marmalade::Mathematics::Vec2& obbHalfSize, const Marmalade::Mathematics::Vec2& t) {
-    float aabbProj = aabbHalfSize[0]  * glm::abs(glm::dot(Marmalade::Mathematics::Vec2(1, 0), axis)) +
-                           aabbHalfSize[0] * glm::abs(glm::dot(Marmalade::Mathematics::Vec2(0, 1), axis));
+    float aabbProj = aabbHalfSize[0] * Marmalade::Mathematics::Abs(Marmalade::Mathematics::Vec2(1, 0).Dot(axis)) +
+                     aabbHalfSize[1] * Marmalade::Mathematics::Abs(Marmalade::Mathematics::Vec2(0, 1).Dot(axis));
 
-    float obbProj = obbHalfSize[0]  * glm::abs(glm::dot(obbAxes[0], axis)) +
-                          obbHalfSize[0] * glm::abs(glm::dot(obbAxes[1], axis));
+    float obbProj = obbHalfSize[0] * Marmalade::Mathematics::Abs(obbAxes[0].Dot(axis)) +
+                    obbHalfSize[1] * Marmalade::Mathematics::Abs(obbAxes[1].Dot(axis));
 
-    float trans = glm::abs(glm::dot(t, axis));
+
+    float trans = Marmalade::Mathematics::Abs(t.Dot(axis));
 
     return trans > (aabbProj + obbProj);
 }

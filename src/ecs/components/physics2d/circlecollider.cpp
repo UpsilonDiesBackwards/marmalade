@@ -109,10 +109,10 @@ void Marmalade::ECS::CircleCollider::Intersects(Entity* self, Entity* other) {
 
     if (IntersectsAABB(*otherCollider, posA, posB)) {
         if (auto* rb = self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
-            Marmalade::Mathematics::Vec2 closestPoint = glm::clamp(posA - posB - otherCollider->GetCollisionData<AABBDataBox>()->offset,
-                                                -otherCollider->GetCollisionData<AABBDataBox>()->size * 0.5f,
-                                                otherCollider->GetCollisionData<AABBDataBox>()->size * 0.5f) +
-                                     posB + otherCollider->GetCollisionData<AABBDataBox>()->offset;
+            Marmalade::Mathematics::Vec2 offset = otherCollider->GetCollisionData<AABBDataBox>()->offset;
+            Marmalade::Mathematics::Vec2 size = otherCollider->GetCollisionData<AABBDataBox>()->size;
+
+            Marmalade::Mathematics::Vec2 closestPoint = (posA - posB - offset).Clamp(-size * 0.5f, size * 0.5f) + posB + offset;
 
             Marmalade::Mathematics::Vec2 norm = posA - closestPoint;
             Marmalade::Mathematics::Vec2 collisionNorm = norm.Normalise();
@@ -129,7 +129,7 @@ void Marmalade::ECS::CircleCollider::ShowBounds(const Marmalade::Mathematics::Ve
         Marmalade::Mathematics::Vec2 centre = entityPosition + aabbData->offset + Marmalade::Mathematics::Vec2(aabbData->radius, aabbData->radius);
         float radius = aabbData->radius;
 
-        ImVec2 screenCentre = EditorViews::WorldToScreenSpace(glm::vec2(centre[0], centre[1]));
+        ImVec2 screenCentre = EditorViews::WorldToScreenSpace(Marmalade::Mathematics::Vec2(centre[0], centre[1]));
         float screenRadius = WorldRadiusToScreenScale(radius);
 
         ImGui::GetWindowDrawList()->AddCircle(
@@ -156,11 +156,11 @@ bool Marmalade::ECS::CircleCollider::IntersectsAABB(const Marmalade::ECS::Collid
 }
 
 float Marmalade::ECS::CircleCollider::WorldRadiusToScreenScale(float radius) {
-    Marmalade::Mathematics::Vec2 screenStart = EditorViews::WorldToScreenSpace(Marmalade::Mathematics::Vec2(0.0f, 0.0f));
-    Marmalade::Mathematics::Vec2 screenEnd = EditorViews::WorldToScreenSpace(Marmalade::Mathematics::Vec2(radius, 0.0f));
+    ImVec2 screenStart = EditorViews::WorldToScreenSpace(Marmalade::Mathematics::Vec2(0.0f, 0.0f));
+    ImVec2 screenEnd = EditorViews::WorldToScreenSpace(Marmalade::Mathematics::Vec2(radius, 0.0f));
 
-    Marmalade::Mathematics::Vec2 glmScreenStart(screenStart.x, screenStart.y);
-    Marmalade::Mathematics::Vec2 glmScreenEnd(screenEnd.x, screenEnd.y);
+    Marmalade::Mathematics::Vec2 glmScreenStart(screenStart[0], screenStart[1]);
+    Marmalade::Mathematics::Vec2 glmScreenEnd(screenEnd[0], screenEnd[1]);
 
-    return glm::distance(glmScreenStart, glmScreenEnd);
+    return glmScreenStart.Distance(glmScreenStart, glmScreenEnd);
 }

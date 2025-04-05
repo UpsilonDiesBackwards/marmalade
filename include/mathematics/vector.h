@@ -68,6 +68,15 @@ namespace Marmalade::Mathematics {
             return r;
         }
 
+        Vector operator+(const float f) const {
+            Vector r;
+            for (std::size_t i = 0; i < Columns; ++i) {
+                r.values[i] = values[i] + f;
+            }
+
+            return r;
+        }
+
         template<std::size_t C>
         Vector operator-(const Vector<C, T>& v) const {
             if (Columns != v.getColumns()) {
@@ -96,15 +105,12 @@ namespace Marmalade::Mathematics {
             return r;
         }
 
-        Vector<4> operator*(const Marmalade::Mathematics::Matrix<4, 4>& mat, const Marmalade::Mathematics::Vector<4>& vec) {
-            Marmalade::Mathematics::Vector<4> result;
-            for (std::size_t i = 0; i < 4; ++i) {
-                result[i] = 0.0f;
-                for (std::size_t j = 0; j < 4; ++j) {
-                    result[i] += mat.values[i * 4 + j] * vec[j];
-                }
+        Vector operator*(float f) const {
+            Vector r;
+            for (std::size_t i = 0; i < Columns; ++i) {
+                r.values[i] = values[i] * f;
             }
-            return result;
+            return r;
         }
 
         template<std::size_t C>
@@ -121,18 +127,34 @@ namespace Marmalade::Mathematics {
             return r;
         }
 
-        Vector<4> operator/(const Marmalade::Mathematics::Vector<4>& vec, float scalar) {
-            Marmalade::Mathematics::Vector<4> result;
-            for (std::size_t i = 0; i < 4; ++i) {
-                result[i] = vec[i] / scalar;
-            }
-            return result;
-        }
-
         Vector operator-() const {
             Vector r;
             for (std::size_t i = 0; i < Columns; ++i) {
                 r.values[i] = -values[i];
+            }
+            return r;
+        }
+
+        template<std::size_t C>
+        Vector& operator+=(const Vector<C, T>& v) {
+            static_assert(C == Columns, "Cannot += vectors of different dimensions");
+            for (std::size_t i = 0; i < Columns; ++i) {
+                values[i] += v[i];
+            }
+            return *this;
+        }
+
+        Vector& operator*=(T scalar) {
+            for (std::size_t i = 0; i < Columns; ++i) {
+                values[i] *= scalar;
+            }
+            return *this;
+        }
+
+        Vector operator/(T scalar) const {
+            Vector r;
+            for (std::size_t i = 0; i < Columns; ++i) {
+                r.values[i] = values[i] / scalar;
             }
             return r;
         }
@@ -164,6 +186,10 @@ namespace Marmalade::Mathematics {
             return values;
         }
 
+        glm::vec4 ToGlmVec4(const Marmalade::Mathematics::Vector<4>& v) {
+            return glm::vec4(v[0], v[1], v[2], v[3]);
+        }
+
         constexpr T Sqrt(T value);
         Vector sqrt() {
             Vector r;
@@ -182,6 +208,18 @@ namespace Marmalade::Mathematics {
 
             for (std::size_t i = 0; i < Columns; ++i) {
                 sum += values[i] * values[i];
+            }
+
+            return Marmalade::Mathematics::Sqrt(sum);
+        }
+
+        template<std::size_t C>
+        float Distance(const Vector<C, T>& a, const Vector<C, T>& b) {
+            float sum = 0.0f;
+
+            for (std::size_t i = 0; i < C; ++i) {
+                float diff = static_cast<float>(a[i] - b[i]);
+                sum += diff * diff;
             }
 
             return Marmalade::Mathematics::Sqrt(sum);

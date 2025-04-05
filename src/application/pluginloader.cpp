@@ -26,9 +26,9 @@ int Marmalade::EngineApiImpl::GetVersion() {
     return 1;
 }
 
-void Marmalade::EngineApiImpl::Print(char* str) {
-    LOG_INFO("From plugin: {}", str);
-}
+//void Marmalade::EngineApiImpl::Print(char* str) {
+//    LOG_INFO("From plugin: {}", str);
+//}
 
 Marmalade::PluginLoader Marmalade::PluginLoader::GetInstance() {
     static PluginLoader instance = PluginLoader();

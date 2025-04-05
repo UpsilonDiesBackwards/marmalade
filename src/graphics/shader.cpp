@@ -99,9 +99,9 @@ void Shader::SetMat4(const std::string& name, const glm::mat4& mat) const {
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
-void Shader::SetMat4f(const std::string& name, const float* value) const {
+void Shader::SetMat4f(const std::string& name, const float& value) const {
     int loc = glGetUniformLocation(ID, name.c_str());
-    glUniformMatrix4fv(loc, 1, GL_FALSE, value);
+    glUniformMatrix4fv(loc, 1, GL_FALSE, &value);
 }
 
 void Shader::GetError(unsigned int shader, std::string type) {
