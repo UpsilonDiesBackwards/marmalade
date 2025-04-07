@@ -23,7 +23,7 @@
 
 #include "ecs/component.h"
 
-#include <al.h>
+#include <AL/al.h>
 
 namespace Marmalade::ECS {
     class AudioPlayer : public Component {
