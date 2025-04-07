@@ -106,6 +106,12 @@ set(LUA_SRC_DIR "../lua/src/lua" CACHE PATH "Lua source directory")
 set(LUA_LIB "../lua/lib/Lua.lib" CACHE FILEPATH "Lua library file")
 
 find_package(OpenGL REQUIRED)
+
+if (WIN32)
+    # On Windows, run Core SDK installer from https://openal.org, and make sure to select "Install redist" too
+    set(OPENAL_LIBRARY "C:/Program Files (x86)/OpenAL 1.1 SDK/libs/Win64/OpenAL32.lib")
+    set(OPENAL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/vendor/openal-soft/include")
+endif ()
 find_package(OpenAL REQUIRED)
 
 if (NOT WIN32)
@@ -136,7 +142,7 @@ list(APPEND IMGUI_SRC
         vendor/imgui/backends/imgui_impl_opengl3.cpp
 )
 
-file (GLOB IMGUIZMO_SRC "vendor/imguizmo/*.h" "vendor/imguizmo/*.cpp")
+file(GLOB IMGUIZMO_SRC "vendor/imguizmo/*.h" "vendor/imguizmo/*.cpp")
 
 # We can't do add_subdirectory, since the imgui header is undefined
 list(APPEND IMNODES_SRC vendor/imnodes/imnodes.h vendor/imnodes/imnodes_internal.h vendor/imnodes/imnodes.cpp)
