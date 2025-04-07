@@ -41,3 +41,6 @@
 [submodule "vendor/openal-soft"]
 	path = vendor/openal-soft
 	url = https://github.com/kcat/openal-soft.git
+[submodule "misc/doxygen-awesome-css"]
+	path = misc/doxygen-awesome-css
+	url = https://github.com/jothepro/doxygen-awesome-css.git
