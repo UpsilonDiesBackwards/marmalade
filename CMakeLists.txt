@@ -106,6 +106,7 @@ set(LUA_SRC_DIR "../lua/src/lua" CACHE PATH "Lua source directory")
 set(LUA_LIB "../lua/lib/Lua.lib" CACHE FILEPATH "Lua library file")
 
 find_package(OpenGL REQUIRED)
+find_package(OpenAL REQUIRED)
 
 if (NOT WIN32)
     # If we're not on Windows, lua can be compiled automatically
@@ -167,6 +168,7 @@ target_link_libraries(marmalade PRIVATE
         glm::glm
         ${LUA_LIBRARIES}
         libgit2package
+        OpenAL::OpenAL
 )
 
 if (WIN32)
@@ -188,9 +190,9 @@ target_include_directories(marmalade PRIVATE
         vendor/iconfontcppheaders
         vendor/spdlog/include
         vendor/imnodes
+        vendor/openal-soft
 )
 
-target_include_directories(marmalade PRIVATE include)
 target_include_directories(marmalade PRIVATE include)
 
 target_link_directories(marmalade PRIVATE vendor/nativefiledialog/lib vendor/luaaa)

@@ -128,6 +128,23 @@ void Application::Initialise() {
     ImNodes::CreateContext();
     ImNodes::StyleColorsDark();
 
+    audioDevice = alcOpenDevice(nullptr);
+    if (audioDevice) {
+        LOG_INFO("Opening audio device: {}", alcGetString(audioDevice, ALC_DEFAULT_ALL_DEVICES_SPECIFIER));
+    }
+
+    audioContext = alcCreateContext(audioDevice, nullptr);
+    if (audioContext) {
+        std::cout << "Created OpenAL Context" << std::endl;
+    }
+
+    ALCenum alError = alcGetError(audioDevice);
+    if (alError != ALC_NO_ERROR) {
+        LOG_ERROR("OpenAL error: {}", alError);
+    }
+
+    alcMakeContextCurrent(audioContext);
+
     // Load ImGui custom style
     if (!std::filesystem::exists(Marmalade::ConfigUtil::GetConfigDirectory() / "editorstyle.txt")) {
         std::filesystem::copy_file("res/config/editorstyle.txt", Marmalade::ConfigUtil::GetConfigDirectory() / "editorstyle.txt");
@@ -243,6 +260,10 @@ void Application::Terminate() {
     ImGui::DestroyContext();
 
     ImNodes::DestroyContext();
+
+    alcMakeContextCurrent(nullptr);
+    alcDestroyContext(audioContext);
+    alcCloseDevice(audioDevice);
 
     glfwDestroyWindow(window);
     glfwTerminate();

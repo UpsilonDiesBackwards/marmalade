@@ -34,6 +34,9 @@
 
 #include <GLFW/glfw3.h>
 
+#include <AL/al.h>
+#include <AL/alc.h>
+
 #include <scene/entity.h>
 #include <graphics/multisampledframebuffer.h>
 #include <io/inputmanager.h>
@@ -96,6 +99,9 @@ public:
     Profiler profiler;
 
     std::shared_ptr<GuiLogSink> guiSink;
+
+    ALCdevice* audioDevice;
+    ALCcontext* audioContext;
 
     bool OpenProject(const std::filesystem::path& path);
 

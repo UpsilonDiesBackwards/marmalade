@@ -38,3 +38,6 @@
 [submodule "vendor/imnodes"]
 	path = vendor/imnodes
 	url = https://github.com/Nelarius/imnodes.git
+[submodule "vendor/openal-soft"]
+	path = vendor/openal-soft
+	url = https://github.com/kcat/openal-soft.git
