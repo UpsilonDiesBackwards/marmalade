@@ -175,7 +175,7 @@ void Marmalade::GUI::TopBar::Show() {
                 Application::GetInstance().profiler.GetCurrentFrameTime()
         );
 
-        float fpsRegionWidth = 85.0f;
+        float fpsRegionWidth = 5.0f;
         float rightMargin = 100.0f;
 
         float totalButtonWidth = (editorButtonSize.x + editorButtonSize.x) * 3;
