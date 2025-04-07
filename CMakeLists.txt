@@ -116,6 +116,13 @@ if (WIN32)
 endif ()
 find_package(OpenAL REQUIRED)
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+
+include_directories(${GTK3_INCLUDE_DIRS})
+link_directories(${GTK3_LIBRARY_DIRS})
+add_definitions(${GTK3_CFLAGS_OTHER})
+
 if (NOT WIN32)
     # If we're not on Windows, lua can be compiled automatically
     ExternalProject_Add(lua
@@ -211,4 +218,4 @@ target_include_directories(marmalade PRIVATE
 
 target_include_directories(marmalade PRIVATE include)
 
-target_link_directories(marmalade PRIVATE vendor/nativefiledialog/lib vendor/luaaa)
+target_link_directories(marmalade PRIVATE vendor/nativefiledialog/lib vendor/luaaa ${GTK3_LIBRARIES})
