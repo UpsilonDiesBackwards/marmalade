@@ -32,13 +32,26 @@
 #define LIBRARY_TYPE void*
 #endif
 
+#include <spdlog/logger.h>
+
 #include <vector>
 #include <filesystem>
+
+#define PLUGIN_LOG_FUNC(level)                                                        \
+    auto* spdlog_logger = reinterpret_cast<std::shared_ptr<spdlog::logger>*>(logger); \
+    char buffer[1024];                                                                \
+    va_list args;                                                                     \
+    va_start(args, fmt);                                                              \
+    vsnprintf(buffer, sizeof(buffer), fmt, args);                                     \
+    va_end(args);                                                                     \
+    spdlog_logger->get()->level("{}", buffer);
+
 
 namespace Marmalade {
     class Plugin {
     public:
         LIBRARY_TYPE library;
+        std::shared_ptr<spdlog::logger> logger;
     };
 
     class PluginLoader {
@@ -47,16 +60,29 @@ namespace Marmalade {
 
         void LoadPlugins();
         void UnloadPlugins();
+
     private:
         std::vector<Plugin> _loadedPlugins{};
 
         LIBRARY_TYPE loadPluginLibrary(const std::filesystem::path& path);
         void callPluginMain(Plugin plugin, EngineAPI engineApi);
+
+        std::shared_ptr<spdlog::logger> createPluginLogger(std::string pluginName);
     };
 
     class EngineApiImpl {
     public:
         static int GetVersion();
+    };
+
+    class PluginLoggerImpl {
+    public:
+        static void LogTrace(void* logger, const char* fmt, ...) { PLUGIN_LOG_FUNC(trace); }
+        static void LogDebug(void* logger, const char* fmt, ...) { PLUGIN_LOG_FUNC(debug); }
+        static void LogInfo(void* logger, const char* fmt, ...) { PLUGIN_LOG_FUNC(info); }
+        static void LogWarn(void* logger, const char* fmt, ...) { PLUGIN_LOG_FUNC(warn); }
+        static void LogError(void* logger, const char* fmt, ...) { PLUGIN_LOG_FUNC(error); }
+        static void LogCritical(void* logger, const char* fmt, ...) { PLUGIN_LOG_FUNC(critical); }
     };
 }
 

@@ -26,10 +26,6 @@ int Marmalade::EngineApiImpl::GetVersion() {
     return 1;
 }
 
-void Marmalade::EngineApiImpl::Print(char* str) {
-    LOG_INFO("From plugin: {}", str);
-}
-
 Marmalade::PluginLoader Marmalade::PluginLoader::GetInstance() {
     static PluginLoader instance = PluginLoader();
     return instance;
@@ -59,6 +55,20 @@ void Marmalade::PluginLoader::LoadPlugins() {
         if (pluginLib == nullptr) continue;
 
         Plugin plugin{pluginLib};
+
+        // TODO: Use plugin name from manifest
+        auto pluginName = pluginFile.path().filename().string();
+        plugin.logger = createPluginLogger(pluginName);
+        auto pluginLogger = PluginLogger{
+                .LogTrace = &PluginLoggerImpl::LogTrace,
+                .LogDebug = &PluginLoggerImpl::LogDebug,
+                .LogInfo = &PluginLoggerImpl::LogInfo,
+                .LogWarn = &PluginLoggerImpl::LogWarn,
+                .LogError = &PluginLoggerImpl::LogError,
+                .LogCritical = &PluginLoggerImpl::LogCritical,
+                ._logger = &plugin.logger};
+
+        api.Logger = &pluginLogger;
         callPluginMain(plugin, api);
 
         _loadedPlugins.push_back(plugin);
@@ -115,4 +125,13 @@ void Marmalade::PluginLoader::callPluginMain(Plugin plugin, EngineAPI engineApi)
 #endif
 
     pluginMain(engineApi);
+}
+
+std::shared_ptr<spdlog::logger> Marmalade::PluginLoader::createPluginLogger(std::string pluginName) {
+    auto root = spdlog::get("EngineLogger");
+    auto& sinks = root->sinks();
+    auto logger = std::make_shared<spdlog::logger>(pluginName, sinks.begin(), sinks.end());
+    logger->set_level(root->level());
+    spdlog::register_logger(logger);
+    return logger;
 }

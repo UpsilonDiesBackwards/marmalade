@@ -21,7 +21,43 @@
 #define MARMALADE_ENGINEAPI_H
 
 struct EngineAPI {
-    int (*GetVersion)();
+#ifdef _MSC_VER
+#define ENGINE_PROVIDED
+#define PLUGIN_PROVIDED
+#else
+#define ENGINE_PROVIDED __attribute__((annotate("engine_provided")))
+#define PLUGIN_PROVIDED __attribute__((annotate("plugin_provided")))
+#endif
+
+typedef enum {
+    MARM_RESULT_SUCCESS = 0,
+    MARM_RESULT_FAILURE = 1,
+} MarmResult;
+
+ENGINE_PROVIDED struct PluginLogger {
+    void (*LogTrace)(void* logger, const char* fmt, ...);
+    void (*LogDebug)(void* logger, const char* fmt, ...);
+    void (*LogInfo)(void* logger, const char* fmt, ...);
+    void (*LogWarn)(void* logger, const char* fmt, ...);
+    void (*LogError)(void* logger, const char* fmt, ...);
+    void (*LogCritical)(void* logger, const char* fmt, ...);
+    void* const _logger;
 };
+
+#ifndef ENGINE_BUILD
+#define LOG_TRACE(fmt, ...) engineApi.Logger->LogTrace(engineApi.Logger->_logger, fmt, __VA_ARGS__)
+#define LOG_DEBUG(fmt, ...) engineApi.Logger->LogDebug(engineApi.Logger->_logger, fmt, __VA_ARGS__)
+#define LOG_INFO(fmt, ...) engineApi.Logger->LogInfo(engineApi.Logger->_logger, fmt, __VA_ARGS__)
+#define LOG_WARN(fmt, ...) engineApi.Logger->LogWarn(engineApi.Logger->_logger, fmt, __VA_ARGS__)
+#define LOG_ERROR(fmt, ...) engineApi.Logger->LogError(engineApi.Logger->_logger, fmt, __VA_ARGS__)
+#define LOG_CRITICAL(fmt, ...) engineApi.Logger->LogCritical(engineApi.Logger->_logger, fmt, __VA_ARGS__)
+#endif
+
+
+ENGINE_PROVIDED struct EngineAPI {
+    int (*GetVersion)();
+    struct PluginLogger* Logger;
+};
+
 
 #endif

@@ -10,6 +10,7 @@ if (MSVC)
 endif ()
 
 add_compile_definitions($<IF:$<CONFIG:Debug>,DEBUG,>)
+add_definitions(-DENGINE_BUILD)
 
 option(USE_SYSTEM_GLFW "Use system-installed GLFW instead of bundled one" ON)
 option(USE_SYSTEM_GLM "Use system-installed GLM instead of bundled one" ON)
