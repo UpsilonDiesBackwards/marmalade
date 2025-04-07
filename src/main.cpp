@@ -25,21 +25,41 @@
 #include "gui/windowmanager.h"
 
 #include <iostream>
+#include <string>
+#include <vector>
 
+#ifdef _WIN32
+
+#include <windows.h>
+
+#define ARGC __argc
+#define ARGV __argv
+
+#else
+
+#define ARGC argc
+#define ARGV argv
+
+#endif
+
+#ifdef _WIN32
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+#else
 int main(int argc, char** argv) {
+#endif
     bool sameDirConfig{false};
     char* project = nullptr;
 
-    for (int i = 1; i < argc; ++i) {
-        std::string arg = argv[i];
+    for (int i = 1; i < ARGC; ++i) {
+        std::string arg = ARGV[i];
 
         if (arg == "--same-dir-config") {
             sameDirConfig = true;
         }
 
         if (arg == "--project") {
-            if (argc > i) {
-                project = argv[i + 1];
+            if (ARGC > i) {
+                project = ARGV[i + 1];
                 i++;
             }
         }

@@ -73,7 +73,7 @@ std::string Marmalade::Util::StringToLower(std::string str) {
 
 void Marmalade::Util::DisplayFile(const std::string& path) {
 #ifdef _WIN32
-    ShellExecute(nullptr, "open", path.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+    ShellExecuteA(nullptr, "open", path.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
 #elif __APPLE__
     std::string command = "open " + path + " &";
     std::system(command.c_str());

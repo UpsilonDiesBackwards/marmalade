@@ -20,7 +20,6 @@
 #ifndef MARMALADE_ENGINEAPI_H
 #define MARMALADE_ENGINEAPI_H
 
-struct EngineAPI {
 #ifdef _MSC_VER
 #define ENGINE_PROVIDED
 #define PLUGIN_PROVIDED

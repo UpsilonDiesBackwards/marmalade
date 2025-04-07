@@ -5,6 +5,7 @@ include(ExternalProject)
 set(CMAKE_CXX_STANDARD 20)
 
 if (MSVC)
+    add_definitions(-DUNICODE -D_UNICODE)
     add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
     add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 endif ()
@@ -148,7 +149,15 @@ file(GLOB IMGUIZMO_SRC "vendor/imguizmo/*.h" "vendor/imguizmo/*.cpp")
 # We can't do add_subdirectory, since the imgui header is undefined
 list(APPEND IMNODES_SRC vendor/imnodes/imnodes.h vendor/imnodes/imnodes_internal.h vendor/imnodes/imnodes.cpp)
 
+set(EXECUTABLE_TYPE "")
+if(WIN32)
+    set(EXECUTABLE_TYPE WIN32)
+elseif(APPLE)
+    set(EXECUTABLE_TYPE MACOSX_BUNDLE)
+endif()
+
 add_executable(marmalade
+        ${EXECUTABLE_TYPE}
         vendor/glad/src/glad.c
         ${IMGUI_SRC}
         ${IMGUIZMO_SRC}
