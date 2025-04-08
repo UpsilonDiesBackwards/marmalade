@@ -1,16 +1,21 @@
-// Copyright 2024 Ryan Bester, Tayler Parsons
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ Marmalade - Lightweight Game Engine
+ Copyright (C) 2025 Tayler Parsons
+ Copyright (C) 2025 Ryan Bester
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include "../msgbox.h"
 #include "../util.h"
@@ -23,7 +28,7 @@ using Result = Marmalade::GUI::NativeUI::MsgBox::Result;
 
 Result linuxCreateDialog(GtkWidget* wnd, const std::u16string& message, const std::u16string& title, Style style, Buttons buttons) {
     if (!gtk_init_check(nullptr, nullptr)) {
-        return Result::None;
+        return Result::Result_NONE;
     }
 
     GtkMessageType type;
@@ -33,25 +38,25 @@ Result linuxCreateDialog(GtkWidget* wnd, const std::u16string& message, const st
         case Style::Style_INFO:
             type = GTK_MESSAGE_INFO;
             break;
-        case Style::Style_Warning:
+        case Style::Style_WARNING:
             type = GTK_MESSAGE_WARNING;
             break;
-        case Style::Style_Error:
+        case Style::Style_ERROR:
             type = GTK_MESSAGE_ERROR;
             break;
-        case Style::Style_Question:
+        case Style::Style_QUESTION:
             type = GTK_MESSAGE_QUESTION;
             break;
     }
 
     switch (buttons) {
-        case Buttons::Style_OK:
+        case Buttons::Buttons_OK:
             btn = GTK_BUTTONS_OK;
             break;
-        case Buttons::Style_OKCancel:
+        case Buttons::Buttons_OK_CANCEL:
             btn = GTK_BUTTONS_OK_CANCEL;
             break;
-        case Buttons::Style_YesNo:
+        case Buttons::Buttons_YES_NO:
             btn = GTK_BUTTONS_YES_NO;
             break;
     }
@@ -74,20 +79,20 @@ Result linuxCreateDialog(GtkWidget* wnd, const std::u16string& message, const st
         case GTK_RESPONSE_OK:
             return Result::Result_OK;
         case GTK_RESPONSE_CANCEL:
-            return Result::Result_Cancel;
+            return Result::Result_CANCEL;
         case GTK_RESPONSE_YES:
-            return Result::Result_Yes;
+            return Result::Result_YES;
         case GTK_RESPONSE_NO:
-            return Result::Result_No;
+            return Result::Result_NO;
         default:
-            return Result::Result_None;
+            return Result::Result_NONE;
     }
 }
 
-Result Marmalade::GUI::NativeUI::MsgBox::show_message(const std::u16string& message, const std::u16string& title, Style style, Buttons buttons) {
+Result Marmalade::GUI::NativeUI::MsgBox::ShowMessage(const std::u16string& message, const std::u16string& title, Style style, Buttons buttons) {
     return linuxCreateDialog(nullptr, message, title, style, buttons);
 }
 
-Result Marmalade::GUI::NativeUI::MsgBox::show_message(const Marmalade::GUI::NativeUI::Window& window, const std::u16string& message, const std::u16string& title, Style style, Buttons buttons) {
-    return linuxCreateDialog(window.get_handle(), message, title, style, buttons);
+Result Marmalade::GUI::NativeUI::MsgBox::ShowMessage(const Marmalade::GUI::NativeUI::Window& window, const std::u16string& message, const std::u16string& title, Style style, Buttons buttons) {
+    return linuxCreateDialog(window.GetHandle(), message, title, style, buttons);
 }

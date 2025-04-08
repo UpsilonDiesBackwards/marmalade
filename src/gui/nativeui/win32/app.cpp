@@ -17,20 +17,10 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../util.h"
+#include "../app.h"
 
-#include <gtk-3.0/gtk/gtk.h>
-
-PLATFORM_STRING_TYPE Marmalade::GUI::NativeUI::Util::utf16ToPlatformStr(const std::u16string& utf16_str) {
-    GError* g_error = nullptr;
-    auto utf8_str = g_utf16_to_utf8(
-            reinterpret_cast<const gunichar2*>(utf16_str.c_str()), -1, nullptr,
-            nullptr, &g_error);
-
-    if (nullptr != g_error) {
-        g_error_free(g_error);
-        return nullptr;
+void Marmalade::GUI::NativeUI::App::Create(int argc, char **argv) {
+    if (_createCallback != nullptr) {
+        _createCallback(nullptr);
     }
-
-    return utf8_str;
 }

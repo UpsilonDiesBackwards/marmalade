@@ -24,6 +24,9 @@
 #include "application/pluginloader.h"
 #include "gui/windowmanager.h"
 
+#include "gui/nativeui/app.h"
+#include "gui/nativeui/window.h"
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -65,6 +68,18 @@ int main(int argc, char** argv) {
         }
     }
 
+    auto splashScreen = Marmalade::GUI::NativeUI::Window(Marmalade::GUI::NativeUI::Util::utf8ToUtf16Str("Marmalade Engine Startup"), 800, 600);
+
+    auto nativeApp = Marmalade::GUI::NativeUI::App();
+    nativeApp.SetCreateCallback([&splashScreen](app_handle_type_t app) {
+#if defined(__linux__)
+        splashScreen.SetApp(app);
+#endif
+        splashScreen.Create();
+        splashScreen.Show(true);
+    });
+    nativeApp.Create(1, new char*{ARGV[0]});
+
     if (project != nullptr) {
         std::cout << "Chosen project" << project << std::endl;
     } else {
@@ -95,6 +110,7 @@ int main(int argc, char** argv) {
         }
     }
 
+    splashScreen.Close();
     while (!glfwWindowShouldClose(application.getWindow())) {
         application.Run();
     }

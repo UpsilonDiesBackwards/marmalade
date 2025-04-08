@@ -116,12 +116,14 @@ if (WIN32)
 endif ()
 find_package(OpenAL REQUIRED)
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+if (UNIX AND NOT APPLE)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(GTK3 gtk+-3.0)
 
-include_directories(${GTK3_INCLUDE_DIRS})
-link_directories(${GTK3_LIBRARY_DIRS})
-add_definitions(${GTK3_CFLAGS_OTHER})
+    include_directories(${GTK3_INCLUDE_DIRS})
+    add_definitions(${GTK3_CFLAGS_OTHER})
+    link_directories(${GTK3_LIBRARY_DIRS})
+endif ()
 
 if (NOT WIN32)
     # If we're not on Windows, lua can be compiled automatically

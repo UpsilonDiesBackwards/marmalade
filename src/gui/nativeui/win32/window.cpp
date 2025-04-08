@@ -90,15 +90,17 @@ bool Marmalade::GUI::NativeUI::Window::Create() {
     return false;
 }
 
-bool Marmalade::GUI::NativeUI::Window::Show() {
+bool Marmalade::GUI::NativeUI::Window::Show(bool topmost) {
     ShowWindow(this->_handle, this->_cmd_show);
+    if (topmost) {
+        SetWindowPos(_handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    }
     return false;
 }
 
 LRESULT CALLBACK Marmalade::GUI::NativeUI::Window::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
         case WM_DESTROY:
-            PostQuitMessage(0);
             return 0;
         case WM_COMMAND:
             if (1 == HIWORD(wParam)) {
@@ -135,4 +137,8 @@ LRESULT CALLBACK Marmalade::GUI::NativeUI::Window::WndProc(HWND hWnd, UINT uMsg,
 
 Marmalade::GUI::NativeUI::Window Marmalade::GUI::NativeUI::Window::WrapGlfwWindow(GLFWwindow* window) {
     return {glfwGetWin32Window(window)};
+}
+
+void Marmalade::GUI::NativeUI::Window::Close() {
+    DestroyWindow(_handle);
 }

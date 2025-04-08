@@ -1,14 +1,7 @@
-if (UNIX AND NOT APPLE)
-    find_package(PkgConfig)
-    pkg_check_modules(GTK3 gtk+-3.0)
-
-    include_directories(${GTK3_INCLUDE_DIRS})
-    add_definitions(${GTK3_CFLAGS_OTHER})
-endif ()
-
 list(APPEND ENGINE_SRC_NATIVE_UI
         util.h
         util_generic.cpp
+        app.h
         msgbox.h
         window.h
         nativeobject.h
@@ -16,12 +9,14 @@ list(APPEND ENGINE_SRC_NATIVE_UI
 
 if (UNIX AND NOT APPLE)
     list(APPEND ENGINE_SRC_NATIVE_UI
+            linux/app.cpp
             linux/util.cpp
             linux/msgbox.cpp
             linux/window.cpp
     )
 elseif (WIN32)
     list(APPEND ENGINE_SRC_NATIVE_UI
+            win32/app.cpp
             win32/util.cpp
             win32/msgbox.cpp
             win32/window.cpp

@@ -17,20 +17,20 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../util.h"
+#include "../app.h"
 
-#include <gtk-3.0/gtk/gtk.h>
-
-PLATFORM_STRING_TYPE Marmalade::GUI::NativeUI::Util::utf16ToPlatformStr(const std::u16string& utf16_str) {
-    GError* g_error = nullptr;
-    auto utf8_str = g_utf16_to_utf8(
-            reinterpret_cast<const gunichar2*>(utf16_str.c_str()), -1, nullptr,
-            nullptr, &g_error);
-
-    if (nullptr != g_error) {
-        g_error_free(g_error);
-        return nullptr;
+static void activate(GtkApplication *app, gpointer user_data) {
+    auto* appObj = static_cast<Marmalade::GUI::NativeUI::App*>(user_data);
+    if (appObj->GetCreateCallback() != nullptr) {
+        appObj->GetCreateCallback()(app);
     }
+}
 
-    return utf8_str;
+void Marmalade::GUI::NativeUI::App::Create(int argc, char **argv) {
+    GtkApplication *app;
+
+    app = gtk_application_new("com.diesbackwards.marmalade", G_APPLICATION_DEFAULT_FLAGS);
+    g_signal_connect(app, "activate", G_CALLBACK(activate), (void *)this);
+    g_application_run(G_APPLICATION(app), argc, argv);
+    g_object_unref(app);
 }

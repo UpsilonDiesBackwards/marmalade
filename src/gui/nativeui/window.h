@@ -102,12 +102,14 @@ namespace Marmalade::GUI::NativeUI {
         ~Window();
 
 #else
-        void setApp(GtkApplication* app);
+        void SetApp(GtkApplication* app);
 #endif
 
         bool Create();
 
-        bool Show();
+        bool Show(bool topmost = false);
+
+        void Close();
 
     private:
         std::u16string _title;

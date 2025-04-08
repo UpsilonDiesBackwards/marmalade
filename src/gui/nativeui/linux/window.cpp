@@ -1,16 +1,21 @@
-// Copyright 2024 Ryan Bester, Tayler Parsons
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ Marmalade - Lightweight Game Engine
+ Copyright (C) 2025 Tayler Parsons
+ Copyright (C) 2025 Ryan Bester
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include <gtk-3.0/gtk/gtk.h>
 
@@ -33,11 +38,23 @@ bool Marmalade::GUI::NativeUI::Window::Create() {
     return true;
 }
 
-bool Marmalade::GUI::NativeUI::Window::Show() {
+bool Marmalade::GUI::NativeUI::Window::Show(bool topmost) {
     gtk_widget_show_all(_handle);
     return true;
 }
 
-void Marmalade::GUI::NativeUI::Window::set_app(GtkApplication* app) {
+void Marmalade::GUI::NativeUI::Window::SetApp(GtkApplication* app) {
     this->_app = app;
+}
+
+Marmalade::GUI::NativeUI::Window Marmalade::GUI::NativeUI::Window::WrapGlfwWindow(GLFWwindow* window) {
+    return {nullptr};
+}
+
+void Marmalade::GUI::NativeUI::Window::SetCreateCallback(std::function<void()> createCallback) {
+    _create_callback = createCallback;
+}
+
+void Marmalade::GUI::NativeUI::Window::Close() {
+    gtk_window_close(GTK_WINDOW(_handle));
 }
