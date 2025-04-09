@@ -130,7 +130,7 @@ void Application::Initialise() {
 
     audioDevice = alcOpenDevice(nullptr);
     if (audioDevice) {
-        LOG_INFO("Opening audio device: {}", alcGetString(audioDevice, ALC_DEFAULT_ALL_DEVICES_SPECIFIER));
+        std::cout << "Using audio device: " << alcGetString(audioDevice, ALC_DEFAULT_ALL_DEVICES_SPECIFIER) << std::endl;
     }
 
     audioContext = alcCreateContext(audioDevice, nullptr);
