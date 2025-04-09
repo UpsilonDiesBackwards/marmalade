@@ -5,6 +5,8 @@ list(APPEND ENGINE_SRC_NATIVE_UI
         msgbox.h
         window.h
         nativeobject.h
+        splashscreen.h
+        splashscreen.cpp
 )
 
 if (UNIX AND NOT APPLE)

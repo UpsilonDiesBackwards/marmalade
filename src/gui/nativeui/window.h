@@ -69,9 +69,21 @@ namespace Marmalade::GUI::NativeUI {
 
         static Window WrapGlfwWindow(GLFWwindow* window);
 
-        void SetCreateCallback(std::function<void()> createCallback);
+        void SetCreateCallback(std::function<void()> createCallback) {
+            _createCallback = std::move(createCallback);
+        }
 
-        std::function<void()> GetCreateCallback();
+        std::function<void()> GetCreateCallback() {
+            return _createCallback;
+        }
+
+        void SetPaintCallback(std::function<void()> paintCallback) {
+            _paintCallback = std::move(paintCallback);
+        }
+
+        std::function<void()> GetPaintCallback() {
+            return _paintCallback;
+        }
 
         const std::u16string GetTitle() const {
             return _title;
@@ -105,7 +117,7 @@ namespace Marmalade::GUI::NativeUI {
         void SetApp(GtkApplication* app);
 #endif
 
-        bool Create();
+        bool Create(bool borderless = false);
 
         bool Show(bool topmost = false);
 
@@ -118,7 +130,8 @@ namespace Marmalade::GUI::NativeUI {
 
         int _height;
 
-        std::function<void()> _create_callback = nullptr;
+        std::function<void()> _createCallback = nullptr;
+        std::function<void()> _paintCallback = nullptr;
 
 #if defined(WIN32)
         LPCWSTR _class_name = nullptr;

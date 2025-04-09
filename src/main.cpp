@@ -26,8 +26,8 @@
 
 #include "gui/nativeui/app.h"
 #include "gui/nativeui/window.h"
+#include "gui/nativeui/splashscreen.h"
 
-#include <iostream>
 #include <string>
 
 #ifdef _WIN32
@@ -49,11 +49,11 @@ std::mutex splashMutex;
 std::condition_variable splashCV;
 bool splashReady = false;
 
-void showSplashScreen(app_handle_type_t  app, Marmalade::GUI::NativeUI::Window &splashScreen) {
+void showSplashScreen(app_handle_type_t app, Marmalade::GUI::NativeUI::Window& splashScreen) {
 #if defined(__linux__)
     splashScreen.SetApp(app);
 #endif
-    splashScreen.Create();
+    splashScreen.Create(true);
     splashScreen.Show(true);
 
     // Allow main thread to continue
@@ -87,9 +87,16 @@ int main(int argc, char** argv) {
         }
     }
 
-    auto splashScreen = Marmalade::GUI::NativeUI::Window(Marmalade::GUI::NativeUI::Util::utf8ToUtf16Str("Marmalade Engine Startup"), 800, 600);
+    auto splashScreen = Marmalade::GUI::NativeUI::Window(Marmalade::GUI::NativeUI::Util::utf8ToUtf16Str("Marmalade Engine Startup"), 800, 500);
+    splashScreen.SetCreateCallback([&] {
+        Marmalade::GUI::NativeUI::SplashScreen::Create(splashScreen);
+    });
 
-#if defined(__linux__) // or APPLE
+    splashScreen.SetPaintCallback([&] {
+        Marmalade::GUI::NativeUI::SplashScreen::Paint(splashScreen);
+    });
+
+#if defined(__linux__)// or APPLE
     // Create a native app
     auto nativeApp = std::make_shared<Marmalade::GUI::NativeUI::App>();
 
@@ -101,7 +108,7 @@ int main(int argc, char** argv) {
     // This can be disregarded for other platforms
     std::thread gtkThread([&]() {
         // Don't pass any other args to GTK; GTK doesn't like them
-        char* gtkArgv[] = { const_cast<char*>(ARGV[0]), nullptr };
+        char* gtkArgv[] = {const_cast<char*>(ARGV[0]), nullptr};
         nativeApp->Create(1, gtkArgv);
     });
 #else
@@ -115,12 +122,7 @@ int main(int argc, char** argv) {
         splashCV.wait(lock, [] { return splashReady; });
     }
 
-    if (project != nullptr) {
-        std::cout << "Chosen project" << project << std::endl;
-    } else {
-        std::cout << "No chosen project" << std::endl;
-    }
-
+    Marmalade::GUI::NativeUI::SplashScreen::SetLoadingText(splashScreen, "Loading settings...");
     Marmalade::ConfigUtil::SetConfigDirectory(sameDirConfig);
     if (!Marmalade::EngineConfig::GetInstance().LoadConfig()) {
         return 1;
@@ -132,14 +134,17 @@ int main(int argc, char** argv) {
         Marmalade::Plugins::GetInstance().RecreateConfig();
     }
 
+    Marmalade::GUI::NativeUI::SplashScreen::SetLoadingText(splashScreen, "Initialising application...");
     Application& application = Application::GetInstance(1920, 1080, "Marmalade Engine");
     application.Initialise();
 
     // Load plugins
+    Marmalade::GUI::NativeUI::SplashScreen::SetLoadingText(splashScreen, "Loading plugins...");
     Marmalade::PluginLoader::GetInstance().LoadPlugins();
 
     if (project != nullptr) {
         // Open specified project
+        Marmalade::GUI::NativeUI::SplashScreen::SetLoadingText(splashScreen, "Opening project...");
         if (application.OpenProject(project)) {
             Marmalade::GUI::WindowManager::GetInstance().welcomeScreen.visible = false;
         }

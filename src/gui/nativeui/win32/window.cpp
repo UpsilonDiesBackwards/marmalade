@@ -19,22 +19,10 @@
 
 #include "../window.h"
 
-#include "../msgbox.h"
-
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 
 #include <CommCtrl.h>
-
-#include <utility>
-
-void Marmalade::GUI::NativeUI::Window::SetCreateCallback(std::function<void()> createCallback) {
-    _create_callback = std::move(createCallback);
-}
-
-std::function<void()> Marmalade::GUI::NativeUI::Window::GetCreateCallback() {
-    return _create_callback;
-}
 
 void Marmalade::GUI::NativeUI::Window::SetClassName(LPCWSTR className) {
     this->_class_name = className;
@@ -52,7 +40,7 @@ void Marmalade::GUI::NativeUI::Window::SetCmdShow(int cmdShow) {
     this->_cmd_show = cmdShow;
 }
 
-bool Marmalade::GUI::NativeUI::Window::Create() {
+bool Marmalade::GUI::NativeUI::Window::Create(bool borderless) {
     if (nullptr == this->_class_name) {
         return false;
     }
@@ -81,10 +69,17 @@ bool Marmalade::GUI::NativeUI::Window::Create() {
         return false;
     }
 
+    // Startup in center
+    int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+    int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+    int x = (screenWidth - _width) / 2;
+    int y = (screenHeight - _height) / 2;
+
     this->_handle = CreateWindowEx(
             0, this->_class_name, Marmalade::GUI::NativeUI::Util::utf16ToPlatformStr(this->_title),
-            WS_OVERLAPPEDWINDOW,
-            CW_USEDEFAULT, CW_USEDEFAULT, this->_width, this->_height,
+            borderless ? WS_POPUP : WS_OVERLAPPEDWINDOW,
+            x, y, this->_width, this->_height,
             nullptr, nullptr, this->_instance, this);
 
     return false;
@@ -92,6 +87,7 @@ bool Marmalade::GUI::NativeUI::Window::Create() {
 
 bool Marmalade::GUI::NativeUI::Window::Show(bool topmost) {
     ShowWindow(this->_handle, this->_cmd_show);
+    UpdateWindow(this->_handle);
     if (topmost) {
         SetWindowPos(_handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
     }
@@ -99,6 +95,8 @@ bool Marmalade::GUI::NativeUI::Window::Show(bool topmost) {
 }
 
 LRESULT CALLBACK Marmalade::GUI::NativeUI::Window::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    static Marmalade::GUI::NativeUI::Window *window = nullptr;
+
     switch (uMsg) {
         case WM_DESTROY:
             return 0;
@@ -108,9 +106,9 @@ LRESULT CALLBACK Marmalade::GUI::NativeUI::Window::WndProc(HWND hWnd, UINT uMsg,
             } else {
             }
             return 0;
-        case WM_CREATE:
+        case WM_CREATE: {
             auto create_struct = reinterpret_cast<CREATESTRUCT*>(lParam);
-            auto window = reinterpret_cast<Window*>(create_struct->lpCreateParams);
+            window = reinterpret_cast<Window*>(create_struct->lpCreateParams);
 
             if (nullptr != window) {
                 // Assign handle, since WM_CREATE is fired before CreateWindowEx returns
@@ -131,6 +129,11 @@ LRESULT CALLBACK Marmalade::GUI::NativeUI::Window::WndProc(HWND hWnd, UINT uMsg,
                     reinterpret_cast<LPARAM>(default_font));
 
             return 0;
+        }
+        case WM_PAINT: {
+            if (window->GetPaintCallback() != nullptr) window->GetPaintCallback()();
+            return 0;
+        }
     }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

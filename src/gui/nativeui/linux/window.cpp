@@ -20,10 +20,8 @@
 #include <gtk-3.0/gtk/gtk.h>
 
 #include "../window.h"
-#include "../msgbox.h"
-#include "../util.h"
 
-bool Marmalade::GUI::NativeUI::Window::Create() {
+bool Marmalade::GUI::NativeUI::Window::Create(bool borderless) {
     if (nullptr == this->_app) {
         return false;
     }
@@ -33,6 +31,15 @@ bool Marmalade::GUI::NativeUI::Window::Create() {
     gtk_window_set_title(GTK_WINDOW(_handle), title);
     gtk_window_set_default_size(GTK_WINDOW(_handle), this->_width, this->_height);
 
+    if (borderless) {
+        gtk_window_set_decorated(GTK_WINDOW(_handle), FALSE);
+    }
+
+    // Startup in center
+    gtk_window_set_position(GTK_WINDOW(_handle), GTK_WIN_POS_CENTER);
+
+    if (_createCallback != nullptr) _createCallback();
+
     g_free(title);
 
     return true;
@@ -40,6 +47,11 @@ bool Marmalade::GUI::NativeUI::Window::Create() {
 
 bool Marmalade::GUI::NativeUI::Window::Show(bool topmost) {
     gtk_widget_show_all(_handle);
+
+    if (topmost) {
+        gtk_window_set_keep_above(GTK_WINDOW(_handle), TRUE);
+    }
+
     return true;
 }
 
@@ -49,10 +61,6 @@ void Marmalade::GUI::NativeUI::Window::SetApp(GtkApplication* app) {
 
 Marmalade::GUI::NativeUI::Window Marmalade::GUI::NativeUI::Window::WrapGlfwWindow(GLFWwindow* window) {
     return {nullptr};
-}
-
-void Marmalade::GUI::NativeUI::Window::SetCreateCallback(std::function<void()> createCallback) {
-    _create_callback = createCallback;
 }
 
 void Marmalade::GUI::NativeUI::Window::Close() {
