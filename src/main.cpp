@@ -29,7 +29,6 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
 
 #ifdef _WIN32
 
@@ -44,6 +43,26 @@
 #define ARGV argv
 
 #endif
+
+// Mutex for ensuring splash screen is created
+std::mutex splashMutex;
+std::condition_variable splashCV;
+bool splashReady = false;
+
+void showSplashScreen(app_handle_type_t  app, Marmalade::GUI::NativeUI::Window &splashScreen) {
+#if defined(__linux__)
+    splashScreen.SetApp(app);
+#endif
+    splashScreen.Create();
+    splashScreen.Show(true);
+
+    // Allow main thread to continue
+    {
+        std::lock_guard<std::mutex> lock(splashMutex);
+        splashReady = true;
+    }
+    splashCV.notify_one();
+}
 
 #ifdef _WIN32
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
@@ -70,15 +89,31 @@ int main(int argc, char** argv) {
 
     auto splashScreen = Marmalade::GUI::NativeUI::Window(Marmalade::GUI::NativeUI::Util::utf8ToUtf16Str("Marmalade Engine Startup"), 800, 600);
 
-    auto nativeApp = Marmalade::GUI::NativeUI::App();
-    nativeApp.SetCreateCallback([&splashScreen](app_handle_type_t app) {
-#if defined(__linux__)
-        splashScreen.SetApp(app);
-#endif
-        splashScreen.Create();
-        splashScreen.Show(true);
+#if defined(__linux__) // or APPLE
+    // Create a native app
+    auto nativeApp = std::make_shared<Marmalade::GUI::NativeUI::App>();
+
+    nativeApp->SetCreateCallback([&](app_handle_type_t app) {
+        showSplashScreen(app, splashScreen);
     });
-    nativeApp.Create(1, new char*{ARGV[0]});
+
+    // GTK application needs to be in another thread
+    // This can be disregarded for other platforms
+    std::thread gtkThread([&]() {
+        // Don't pass any other args to GTK; GTK doesn't like them
+        char* gtkArgv[] = { const_cast<char*>(ARGV[0]), nullptr };
+        nativeApp->Create(1, gtkArgv);
+    });
+#else
+    // Call showSplashScreen directly
+    showSplashScreen(nullptr, splashScreen);
+#endif
+
+    // Wait for splash screen to be shown
+    {
+        std::unique_lock<std::mutex> lock(splashMutex);
+        splashCV.wait(lock, [] { return splashReady; });
+    }
 
     if (project != nullptr) {
         std::cout << "Chosen project" << project << std::endl;
@@ -119,5 +154,10 @@ int main(int argc, char** argv) {
 
     Marmalade::PluginLoader::GetInstance().UnloadPlugins();
     application.Terminate();
+
+#if defined(__linux__)
+    // Wait for GTK thread
+    gtkThread.join();
+#endif
     return 0;
 }
