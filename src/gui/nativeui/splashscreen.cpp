@@ -136,7 +136,7 @@ void updateLoadingTextInternal(NativeUI::Window& window) {
 
     NSDictionary* attributes = @{
         NSFontAttributeName: [NSFont systemFontOfSize:20],
-        NSForegroundColorAttributeName: [NSColor whiteColor]
+        NSForegroundColorAttributeName: [NSColor blackColor]
     };
 
     NSRect textRect = NSMakeRect(450, 390, self.bounds.size.width - 450, 30);

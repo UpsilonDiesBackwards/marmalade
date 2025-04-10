@@ -99,7 +99,7 @@ int main(int argc, char** argv) {
         NativeUI::SplashScreen::Paint(splashScreen);
     });
 
-#if defined(__linux__)// or APPLE
+#if defined(__linux__)
     // Create a native app
     auto nativeApp = std::make_shared<NativeUI::App>();
 
@@ -115,14 +115,9 @@ int main(int argc, char** argv) {
         nativeApp->Create(1, gtkArgv);
     });
 #elif defined(__APPLE__)
-    auto nativeApp = std::make_shared<NativeUI::App>();
-
-    nativeApp->SetCreateCallback([&](app_handle_type_t app) {
-        showSplashScreen(app, splashScreen);
-    });
-
-    char* appArgv[] = {const_cast<char*>(ARGV[0]), nullptr};
-    nativeApp->Create(1, appArgv);
+    // We should be creating a nativeApp object here
+    // But that leads to a lot of threading problems on macOS...
+    showSplashScreen(nullptr, splashScreen);
 #else
     // Call showSplashScreen directly
     showSplashScreen(nullptr, splashScreen);
@@ -149,7 +144,7 @@ int main(int argc, char** argv) {
 
     NativeUI::SplashScreen::SetLoadingText(splashScreen, "Initialising application...");
     Application& application = Application::GetInstance(1920, 1080, "Marmalade Engine");
-    application.Initialise();
+//    application.Initialise();
 
     bool safeMode = false;
     if (NativeUI::SplashScreen::AreSafeModeKeysHeld()) {
