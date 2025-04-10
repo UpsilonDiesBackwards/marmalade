@@ -42,7 +42,7 @@ using win_handle_type_t = HWND;
 
 #include "darwin/DarwinObjWrapper.h"
 
-using win_handle_type_t = Vineyard::UI::DarwinObjWrapper<NSWindow*>*;
+using win_handle_type_t = Marmalade::GUI::NativeUI::DarwinObjWrapper<NSWindow*>*;
 
 #else
 

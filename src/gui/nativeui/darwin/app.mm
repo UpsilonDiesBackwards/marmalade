@@ -1,0 +1,38 @@
+/*
+ Marmalade - Lightweight Game Engine
+ Copyright (C) 2025 Tayler Parsons
+ Copyright (C) 2025 Ryan Bester
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include "../app.h"
+
+#include "AppDelegate.h"
+
+#include <Cocoa/Cocoa.h>
+
+void Marmalade::GUI::NativeUI::App::Create(int argc, char** argv) {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    [NSApplication sharedApplication];
+
+    AppDelegate* appDelegate = [[AppDelegate alloc] init];
+    [appDelegate setLaunchCallback:[&]{
+        if (_createCallback != nullptr) _createCallback(nullptr);
+    }];
+    [NSApp setDelegate:appDelegate];
+    [NSApp run];
+
+    [pool release];
+}

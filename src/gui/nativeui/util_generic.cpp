@@ -23,6 +23,22 @@
 #include <stdexcept>
 
 std::u16string Marmalade::GUI::NativeUI::Util::utf8ToUtf16Str(const std::basic_string<char>& str) {
+#if __APPLE__
+    std::mbstate_t state = std::mbstate_t();
+    std::u16string utf16str;
+    wchar_t c16;
+    const char* src = str.c_str();
+    size_t len;
+
+    while ((len = mbrtowc(&c16, src, MB_CUR_MAX, &state)) > 0) {
+        if (len == -1 || len == -2) {
+            throw std::runtime_error("UTF-8 to UTF-16 conversion error");
+        }
+
+        utf16str += c16;
+        src += len;
+    }
+#else
     std::mbstate_t state = std::mbstate_t();
     std::u16string utf16str;
     char16_t c16;
@@ -37,6 +53,7 @@ std::u16string Marmalade::GUI::NativeUI::Util::utf8ToUtf16Str(const std::basic_s
         utf16str += c16;
         src += len;
     }
+#endif
 
     return utf16str;
 }

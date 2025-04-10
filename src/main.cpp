@@ -114,6 +114,15 @@ int main(int argc, char** argv) {
         char* gtkArgv[] = {const_cast<char*>(ARGV[0]), nullptr};
         nativeApp->Create(1, gtkArgv);
     });
+#elif defined(__APPLE__)
+    auto nativeApp = std::make_shared<NativeUI::App>();
+
+    nativeApp->SetCreateCallback([&](app_handle_type_t app) {
+        showSplashScreen(app, splashScreen);
+    });
+
+    char* appArgv[] = {const_cast<char*>(ARGV[0]), nullptr};
+    nativeApp->Create(1, appArgv);
 #else
     // Call showSplashScreen directly
     showSplashScreen(nullptr, splashScreen);

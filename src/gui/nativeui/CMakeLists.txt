@@ -25,7 +25,13 @@ elseif (WIN32)
     )
 elseif (APPLE)
     list(APPEND ENGINE_SRC_NATIVE_UI
-
+            darwin/util.mm
+            darwin/DarwinObjWrapper.h
+            darwin/AppDelegate.mm
+            darwin/AppDelegate.h
+            darwin/app.mm
+            darwin/msgbox.mm
+            darwin/window.mm
     )
 endif ()
 

@@ -183,10 +183,10 @@ if (APPLE)
     enable_language(OBJC)
     enable_language(OBJCXX)
 
-    file(GLOB_RECURSE SOURCES src/*.cpp src/*.mm src/*.m src/*.h src/*.hpp)
+    file(GLOB_RECURSE SOURCES src/gui/nativeui/*.cpp src/gui/nativeui/*.mm src/gui/nativeui/*.m src/gui/nativeui/*.h)
 
-    set_source_files_properties(${SOURCES} PROPERTIES COMPILE_FLAGS "-x objective-c++")
-    set_source_files_properties(${SOURCES} PROPERTIES LANGUAGE OBJCXX)
+    set_source_files_properties(${SOURCES} src/main.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
+    set_source_files_properties(${SOURCES} src/main.cpp PROPERTIES LANGUAGE OBJCXX)
 endif ()
 
 if (NOT WIN32)
@@ -195,6 +195,16 @@ endif ()
 
 # Copy static resources
 file(COPY res DESTINATION ${CMAKE_BINARY_DIR})
+
+if (APPLE)
+    set(RESOURCE_DEST "${CMAKE_BINARY_DIR}/marmalade.app/Contents/Resources/res")
+
+    add_custom_command(TARGET marmalade POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            res
+            ${RESOURCE_DEST}
+    )
+endif ()
 
 target_link_libraries(marmalade PRIVATE
         glfw

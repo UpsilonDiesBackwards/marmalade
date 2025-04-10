@@ -101,6 +101,80 @@ void updateLoadingTextInternal(NativeUI::Window& window) {
 
 #elif __APPLE__
 
+@interface SplashImageView : NSView
+
+@property(nonatomic, strong) NSString* loadingText;
+
+- (void)updateLoadingText:(NSString*)text;
+
+@end
+
+@implementation SplashImageView
+
+- (void)drawRect:(NSRect)dirtyRect {
+    [super drawRect:dirtyRect];
+
+    NSString* imagePath = [[NSBundle mainBundle] pathForResource:@TEXTURE_PATH ofType:@"png"];
+    NSImage* image = [[NSImage alloc] initWithContentsOfFile:imagePath];
+
+    if (!image) {
+        NSLog(@"Failed to load image at %@", imagePath);
+        return;
+    }
+
+    NSSize imageSize = [image size];
+    NSSize viewSize = [self bounds].size;
+
+    NSRect targetRect = NSMakeRect(0, 0, viewSize.width, viewSize.height);
+
+    [[NSGraphicsContext currentContext] saveGraphicsState];
+
+    [image drawInRect:targetRect
+             fromRect:NSZeroRect
+            operation:NSCompositingOperationSourceOver
+             fraction:1.0];
+
+    NSDictionary* attributes = @{
+        NSFontAttributeName: [NSFont systemFontOfSize:20],
+        NSForegroundColorAttributeName: [NSColor whiteColor]
+    };
+
+    NSRect textRect = NSMakeRect(450, 390, self.bounds.size.width - 450, 30);
+    [self.loadingText drawInRect:textRect withAttributes:attributes];
+
+    [[NSGraphicsContext currentContext] restoreGraphicsState];
+}
+
+- (void)updateLoadingText:(NSString*)text {
+    self.loadingText = text;
+    [self setNeedsDisplay:YES];
+}
+
+@end
+
+SplashImageView* imageView;
+
+void createInternal(NativeUI::Window& window) {
+    NSRect window_rect = NSMakeRect(0, 0, window.GetWidth(), window.GetHeight());
+
+    NSViewController* viewController = [[NSViewController alloc] init];
+    viewController.view = [[NSView alloc] initWithFrame:window_rect];
+    viewController.view.wantsLayer = YES;
+    viewController.view.layer.backgroundColor = [[NSColor grayColor] CGColor];
+
+    auto win = window.GetHandle()->GetObject();
+    win.contentViewController = viewController;
+
+    imageView = [[SplashImageView alloc] initWithFrame:win.contentView.bounds];
+    [win.contentView addSubview:imageView];
+}
+
+void paintInternal(NativeUI::Window& window) {}
+
+void updateLoadingTextInternal(NativeUI::Window& window) {
+    [imageView updateLoadingText:[NSString stringWithUTF8String:NativeUI::SplashScreen::GetLoadingText().c_str()]];
+}
+
 #else
 
 GtkWidget* label = nullptr;
@@ -171,9 +245,10 @@ bool NativeUI::SplashScreen::AreSafeModeKeysHeld() {
     bool isLeftCtrlDown = GetAsyncKeyState(VK_LCONTROL) & 0x8000;
     bool isLeftShiftDown = GetAsyncKeyState(VK_LSHIFT) & 0x8000;
 #elif __APPLE__
-
+    bool isLeftCtrlDown = (NSEvent.modifierFlags & NSEventModifierFlagControl) != 0;
+    bool isLeftShiftDown = (NSEvent.modifierFlags & NSEventModifierFlagShift) != 0;
 #else
-    GdkDisplay *display = gdk_display_get_default();
+    GdkDisplay* display = gdk_display_get_default();
     gboolean isLeftCtrlDown = gdk_keymap_get_modifier_state(gdk_keymap_get_for_display(display)) & GDK_CONTROL_MASK;
     gboolean isLeftShiftDown = gdk_keymap_get_modifier_state(gdk_keymap_get_for_display(display)) & GDK_SHIFT_MASK;
 #endif
