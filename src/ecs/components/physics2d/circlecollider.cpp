@@ -142,13 +142,18 @@ void Marmalade::ECS::CircleCollider::ShowBounds(const Marmalade::Mathematics::Ve
 
 bool Marmalade::ECS::CircleCollider::IntersectsAABB(const Marmalade::ECS::ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) {
     if (const auto* aabb = std::get_if<AABBDataBox>(&other.data)) {
+        // AABB's properties
         Marmalade::Mathematics::Vec2 halfExtents = aabb->size * 0.5f;
+        Marmalade::Mathematics::Vec2 aabbOffset = aabb->offset;
 
-        Marmalade::Mathematics::Vec2 closestPoint = (posA - posB - aabb->offset).Clamp(-halfExtents, halfExtents) + posB + aabb->offset;
+        // Calculate closest point of the AABB to the circle's position
+        Marmalade::Mathematics::Vec2 closestPoint = (posA - posB - aabbOffset).Clamp(-halfExtents, halfExtents) + posB + aabbOffset;
 
+        // Calculate distance from closest point to the circle's position
         float distSquared = (closestPoint - posA).Dot(closestPoint - posA);
         float radiusSquared = std::get<DataCircle>(data).radius * std::get<DataCircle>(data).radius;
 
+        // Check for intersection (circle-to-AABB or AABB-to-circle)
         return distSquared < radiusSquared;
     }
 

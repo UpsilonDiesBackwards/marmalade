@@ -84,10 +84,6 @@ void Marmalade::ECS::RigidBody::Deserialize(nlohmann::json json, Entity* entity)
 }
 
 void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float time) {
-    if (body.velocity.Magnitude() < 0.01f) { // If the velocity is less than 0.01...
-        body.velocity = Marmalade::Mathematics::Vec2(0.0f, 0.0f); //... set the velocity to zero
-    }
-
     body.velocity[1] += body.gravity * time; // Increase Y velocity via gravity over time
 
     // Collision queue
@@ -95,20 +91,23 @@ void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float time) {
         CollisionEvent event = collisionQueue.front();
         collisionQueue.pop();
 
-        Collide(event.self, event.other, event.normal, event.ptOnA_WorldSpace, event.ptOnB_WorldSpace); // Call 'Collide()' using the current collision event's data
+        Collide(event.self, event.other, event.normal, event.ptOnA_WorldSpace, event.ptOnB_WorldSpace);
 
-        if (event.normal[1] < 0 && event.other->componentManager.GetComponentOfType<RigidBody>()->isStatic) { // If the normal is 0 or the other is static...
-            body.velocity[1] = 0; //... set velocity to 0
+        if (event.normal[1] < 0 && event.other->componentManager.GetComponentOfType<RigidBody>()->isStatic) {
+            body.velocity[1] = 0;
         }
+
+    }
+
+    if (body.velocity.Magnitude() < FLT_EPSILON) {
+        return;
     }
 
     momentum = Marmalade::Mathematics::Vec2(body.velocity[0] * body.mass, body.velocity[1] * body.mass);
-
     Marmalade::Mathematics::Vec2 newPos = entity->getPosition() + momentum * time; // Calculate the new desired position of the entity
     entity->setPosition(newPos);
 
     float angularDisplacement = body.angularVelocity * time;
-
     entity->setRotation(entity->getRotation() + (angularDisplacement * 5));
 }
 
@@ -155,45 +154,39 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const Marma
                     (body.mass + otherRigidBody->body.mass + angularFactor);
     Marmalade::Mathematics::Vec2 vectorImpulse = normal * impulse; //... then use it, and the normal to calculate the vector impulse
 
-    Marmalade::Mathematics::Vec2 distance = self->getPosition() - other->getPosition();
+   Marmalade::Mathematics::Vec2 penetrationDepth = (selfSize / 2.0f + otherSize / 2.0f) - Marmalade::Mathematics::Abs(self->getPosition() - other->getPosition());
 
-    float overlapX = (selfSize[0] / 2.0f + otherSize[0] / 2.0f) - std::abs(distance[0]);
-    float overlapY = (selfSize[1] / 2.0f + otherSize[1] / 2.0f) - std::abs(distance[1]);
+   float restitutionFactor = 0.01f;
+   Marmalade::Mathematics::Vec2 restitution = normal * std::max(penetrationDepth.Magnitude(), 0.0f) * restitutionFactor;
 
-    overlapX = std::max(0.0f, overlapX);
-    overlapY = std::max(0.0f, overlapY);
+   restitution = restitution.Normalise() * std::min(restitution.Magnitude(), 2.0f);
 
-    float totalOverlap = overlapX * overlapY;
-    Marmalade::Mathematics::Vec2 penetrationDepth = totalOverlap > 0.0f ? distance.Normalise() * totalOverlap : Marmalade::Mathematics::Vec2(0.0f, 0.0f);
-
-    Marmalade::Mathematics::Vec2 correction = normal * penetrationDepth;
-
-    Marmalade::Mathematics::Vec2 perpendicular = Marmalade::Mathematics::Vec2(-normal[1], normal[0]).Normalise() * 0.1f;
-    Marmalade::Mathematics::Vec2 contactPoint = self->getPosition() + normal * (selfSize * 0.5f) + perpendicular;
+   Marmalade::Mathematics::Vec2 perpendicular = Marmalade::Mathematics::Vec2(-normal[1], normal[0]).Normalise() * 0.5f;
+   Marmalade::Mathematics::Vec2 contactPoint = self->getPosition() + normal * (selfSize / 2.0f) + perpendicular;
 
     ApplyImpulse(contactPoint, vectorImpulse, self); // Apply an impulse to self...
     if (!otherRigidBody->isStatic) { //... and if the other entity is NOT static, ...
         otherRigidBody->ApplyImpulse(contactPoint, -vectorImpulse, self); //... then apply the opposite vector impulse (we abide by the third law of motion here)
     }
 
-    const float velocityThreshold = FLT_EPSILON; // If the velocity is less than the threshold, then set the velocity to zero
-    if (body.velocity.Magnitude() < velocityThreshold) {
-        body.velocity = Marmalade::Mathematics::Vec2(0.0f, 0.0f);
-    }
-
     if (otherRigidBody->isStatic) { // If the other entity is static...
-        self->setPosition(self->getPosition() + correction); //... Only set the direction of the self
+        self->setPosition(self->getPosition() + restitution); //... Only set the direction of the self
     } else { //... or if not
         float totalMass = body.mass + otherRigidBody->body.mass; // Calculate the total mass of the two entity
         float selfMove = otherRigidBody->body.mass / totalMass;
         float otherMove = body.mass / totalMass;
 
         // And set the position of both entities
-        self->setPosition(self->getPosition() + correction * selfMove);
-        other->setPosition(other->getPosition() + correction * otherMove);
+        self->setPosition(self->getPosition() + restitution * selfMove);
+        other->setPosition(other->getPosition() + restitution * otherMove);
     }
 
-    // Set angular velocity to zero (TODO: Object should rest flush on the object. This just stops it.)
+    const float velocityThreshold = FLT_EPSILON; // If the velocity is less than the threshold, then set the velocity to zero
+    if (penetrationDepth.Magnitude() > velocityThreshold) {
+        body.velocity = Marmalade::Mathematics::Vec2(0.0f, 0.0f);
+    }
+
+    // Set angular velocity to zero
     if (Marmalade::Mathematics::Abs(normal[1]) > 0.99f && otherRigidBody->isStatic) {
         body.angularVelocity = 0.0f;
     }
