@@ -35,7 +35,7 @@ Marmalade::GUI::Preferences::Preferences() : Window() {
             {"appearance", PreferencesPane(drawGeneralAppearancePane)},
             {"projects", PreferencesPane(drawGeneralProjectsPane)},
             {"projectBrowser", PreferencesPane(drawGeneralProjectBrowserPane)},
-            {"input/output", PreferencesPane(drawGeneralInputOutputPane)}};
+            {"input/output", PreferencesPane(drawAudioInputOutputPane)}};
 }
 
 void Marmalade::GUI::Preferences::drawGeneralLoggingPane() {
@@ -93,11 +93,16 @@ void Marmalade::GUI::Preferences::selectableTreeNode(const char* title, const ch
 }
 
 void Marmalade::GUI::Preferences::drawLeftPane() {
-    if (ImGui::TreeNode("General")) {
+    if (ImGui::TreeNodeEx("General", ImGuiTreeNodeFlags_DefaultOpen)) {
         selectableTreeNode("Logging", "logging");
         selectableTreeNode("Appearance", "appearance");
         selectableTreeNode("Projects", "projects");
         selectableTreeNode("Project Browser", "projectBrowser");
+
+        ImGui::TreePop();
+    }
+
+    if (ImGui::TreeNodeEx("Audio", ImGuiTreeNodeFlags_DefaultOpen)) {
         selectableTreeNode("Input/Output", "input/output");
 
         ImGui::TreePop();
@@ -187,7 +192,7 @@ void Marmalade::GUI::Preferences::drawGeneralProjectBrowserPane() {
     }
 }
 
-void Marmalade::GUI::Preferences::drawGeneralInputOutputPane() {
+void Marmalade::GUI::Preferences::drawAudioInputOutputPane() {
     auto& engineConfig = EngineConfig::GetStoredConfig();
     auto& audioManager = Application::GetInstance().audioManager->GetInstance();
 
