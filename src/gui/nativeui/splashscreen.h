@@ -38,6 +38,8 @@ namespace Marmalade::GUI::NativeUI {
             return _loadingText;
         }
 
+        static bool AreSafeModeKeysHeld();
+
     private:
         static std::string _loadingText;
 

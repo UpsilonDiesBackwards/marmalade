@@ -165,3 +165,18 @@ void NativeUI::SplashScreen::Paint(NativeUI::Window& window) {
 void NativeUI::SplashScreen::updateLoadingText(NativeUI::Window& window) {
     updateLoadingTextInternal(window);
 }
+
+bool NativeUI::SplashScreen::AreSafeModeKeysHeld() {
+#ifdef _WIN32
+    bool isLeftCtrlDown = GetAsyncKeyState(VK_LCONTROL) & 0x8000;
+    bool isLeftShiftDown = GetAsyncKeyState(VK_LSHIFT) & 0x8000;
+#elif __APPLE__
+
+#else
+    GdkDisplay *display = gdk_display_get_default();
+    gboolean isLeftCtrlDown = gdk_keymap_get_modifier_state(gdk_keymap_get_for_display(display)) & GDK_CONTROL_MASK;
+    gboolean isLeftShiftDown = gdk_keymap_get_modifier_state(gdk_keymap_get_for_display(display)) & GDK_SHIFT_MASK;
+#endif
+
+    return isLeftCtrlDown && isLeftShiftDown;
+}

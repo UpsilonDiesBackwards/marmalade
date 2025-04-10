@@ -27,6 +27,7 @@
 #include "gui/nativeui/app.h"
 #include "gui/nativeui/window.h"
 #include "gui/nativeui/splashscreen.h"
+#include "gui/nativeui/msgbox.h"
 
 #include <string>
 
@@ -44,12 +45,14 @@
 
 #endif
 
+using namespace Marmalade::GUI;
+
 // Mutex for ensuring splash screen is created
 std::mutex splashMutex;
 std::condition_variable splashCV;
 bool splashReady = false;
 
-void showSplashScreen(app_handle_type_t app, Marmalade::GUI::NativeUI::Window& splashScreen) {
+void showSplashScreen(app_handle_type_t app, NativeUI::Window& splashScreen) {
 #if defined(__linux__)
     splashScreen.SetApp(app);
 #endif
@@ -87,18 +90,18 @@ int main(int argc, char** argv) {
         }
     }
 
-    auto splashScreen = Marmalade::GUI::NativeUI::Window(Marmalade::GUI::NativeUI::Util::utf8ToUtf16Str("Marmalade Engine Startup"), 800, 500);
+    auto splashScreen = NativeUI::Window(NativeUI::Util::utf8ToUtf16Str("Marmalade Engine Startup"), 800, 500);
     splashScreen.SetCreateCallback([&] {
-        Marmalade::GUI::NativeUI::SplashScreen::Create(splashScreen);
+        NativeUI::SplashScreen::Create(splashScreen);
     });
 
     splashScreen.SetPaintCallback([&] {
-        Marmalade::GUI::NativeUI::SplashScreen::Paint(splashScreen);
+        NativeUI::SplashScreen::Paint(splashScreen);
     });
 
 #if defined(__linux__)// or APPLE
     // Create a native app
-    auto nativeApp = std::make_shared<Marmalade::GUI::NativeUI::App>();
+    auto nativeApp = std::make_shared<NativeUI::App>();
 
     nativeApp->SetCreateCallback([&](app_handle_type_t app) {
         showSplashScreen(app, splashScreen);
@@ -122,9 +125,10 @@ int main(int argc, char** argv) {
         splashCV.wait(lock, [] { return splashReady; });
     }
 
-    Marmalade::GUI::NativeUI::SplashScreen::SetLoadingText(splashScreen, "Loading settings...");
+    NativeUI::SplashScreen::SetLoadingText(splashScreen, "Loading settings...");
     Marmalade::ConfigUtil::SetConfigDirectory(sameDirConfig);
     if (!Marmalade::EngineConfig::GetInstance().LoadConfig()) {
+        NativeUI::MsgBox::ShowMessage(splashScreen.GetHandle(), NativeUI::Util::utf8ToUtf16Str("Failed to load settings. See log for details."), NativeUI::Util::utf8ToUtf16Str("Marmalade Engine"), NativeUI::MsgBox::Style::Style_ERROR);
         return 1;
     }
     if (!Marmalade::Recents::GetInstance().LoadConfig()) {
@@ -134,17 +138,28 @@ int main(int argc, char** argv) {
         Marmalade::Plugins::GetInstance().RecreateConfig();
     }
 
-    Marmalade::GUI::NativeUI::SplashScreen::SetLoadingText(splashScreen, "Initialising application...");
+    NativeUI::SplashScreen::SetLoadingText(splashScreen, "Initialising application...");
     Application& application = Application::GetInstance(1920, 1080, "Marmalade Engine");
     application.Initialise();
 
-    // Load plugins
-    Marmalade::GUI::NativeUI::SplashScreen::SetLoadingText(splashScreen, "Loading plugins...");
-    Marmalade::PluginLoader::GetInstance().LoadPlugins();
+    bool safeMode = false;
+    if (NativeUI::SplashScreen::AreSafeModeKeysHeld()) {
+        std::cout << "Key down";
+        if (NativeUI::MsgBox::ShowMessage(splashScreen.GetHandle(), NativeUI::Util::utf8ToUtf16Str("Would you like to enable safe mode?"), NativeUI::Util::utf8ToUtf16Str("Marmalade Engine"),
+                                          NativeUI::MsgBox::Style::Style_INFO, NativeUI::MsgBox::Buttons::Buttons_YES_NO) == NativeUI::MsgBox::Result::Result_YES) {
+            safeMode = true;
+        }
+    }
+
+    if (!safeMode) {
+        // Load plugins
+        NativeUI::SplashScreen::SetLoadingText(splashScreen, "Loading plugins...");
+        Marmalade::PluginLoader::GetInstance().LoadPlugins();
+    }
 
     if (project != nullptr) {
         // Open specified project
-        Marmalade::GUI::NativeUI::SplashScreen::SetLoadingText(splashScreen, "Opening project...");
+        NativeUI::SplashScreen::SetLoadingText(splashScreen, "Opening project...");
         if (application.OpenProject(project)) {
             Marmalade::GUI::WindowManager::GetInstance().welcomeScreen.visible = false;
         }
