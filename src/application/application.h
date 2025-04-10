@@ -34,11 +34,9 @@
 
 #include <GLFW/glfw3.h>
 
-#include <AL/al.h>
-#include <AL/alc.h>
-
 #include <scene/entity.h>
 #include <graphics/multisampledframebuffer.h>
+#include "io/audiomanager.h"
 #include <io/inputmanager.h>
 #include <io/input.h>
 #include <graphics/viewport.h>
@@ -88,6 +86,7 @@ public:
     EditView* editView;
     GameView* gameView;
 
+    AudioManager* audioManager;
     InputManager& inputManager;
     Input input;
 
@@ -99,9 +98,6 @@ public:
     Profiler profiler;
 
     std::shared_ptr<GuiLogSink> guiSink;
-
-    ALCdevice* audioDevice;
-    ALCcontext* audioContext;
 
     bool OpenProject(const std::filesystem::path& path);
 

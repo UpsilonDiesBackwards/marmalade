@@ -73,6 +73,8 @@ namespace Marmalade {
         ProjectBrowserConfig projectBrowser{};
 
         std::vector<std::string> favouriteComponents{};
+
+        std::string audioOutputDevice{""};
     };
 
     class EngineConfig : public Config<EngineConfigStruct> {
@@ -101,7 +103,7 @@ namespace Marmalade {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::ProjectBrowserConfig, colorAssets, colorData, colorSrc);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfigStruct, version, appearance, windowPos, logLevel, defaultProjectPath, repos, projectBrowser, favouriteComponents);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfigStruct, version, appearance, windowPos, logLevel, defaultProjectPath, repos, projectBrowser, favouriteComponents, audioOutputDevice);
 }
 
 #endif

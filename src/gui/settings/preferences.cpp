@@ -20,6 +20,7 @@
 #include "preferences.h"
 
 #include "../../application/config/engineconfig.h"
+#include "../../application/application.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -33,7 +34,8 @@ Marmalade::GUI::Preferences::Preferences() : Window() {
             {"logging", PreferencesPane(drawGeneralLoggingPane)},
             {"appearance", PreferencesPane(drawGeneralAppearancePane)},
             {"projects", PreferencesPane(drawGeneralProjectsPane)},
-            {"projectBrowser", PreferencesPane(drawGeneralProjectBrowserPane)}};
+            {"projectBrowser", PreferencesPane(drawGeneralProjectBrowserPane)},
+            {"input/output", PreferencesPane(drawGeneralInputOutputPane)}};
 }
 
 void Marmalade::GUI::Preferences::drawGeneralLoggingPane() {
@@ -96,6 +98,7 @@ void Marmalade::GUI::Preferences::drawLeftPane() {
         selectableTreeNode("Appearance", "appearance");
         selectableTreeNode("Projects", "projects");
         selectableTreeNode("Project Browser", "projectBrowser");
+        selectableTreeNode("Input/Output", "input/output");
 
         ImGui::TreePop();
     }
@@ -183,6 +186,36 @@ void Marmalade::GUI::Preferences::drawGeneralProjectBrowserPane() {
         EngineConfig::GetStoredConfig().projectBrowser.colorSrc = ImGui::ColorConvertFloat4ToU32(srcCol);
     }
 }
+
+void Marmalade::GUI::Preferences::drawGeneralInputOutputPane() {
+    auto& engineConfig = EngineConfig::GetStoredConfig();
+    auto& audioManager = Application::GetInstance().audioManager->GetInstance();
+
+    std::vector<std::string> deviceList = audioManager.GetAvailableDevices();
+
+    std::vector<const char*> cstrings;
+    for (const auto& str : deviceList) {
+        cstrings.push_back(str.c_str());
+    }
+
+    static int selectedDeviceIndex = 0;
+    for (size_t i = 0; i < deviceList.size(); ++i) {
+        if (deviceList[i] == engineConfig.audioOutputDevice) {
+            selectedDeviceIndex = static_cast<int>(i);
+            break;
+        }
+    }
+
+    if (ImGui::Combo("Output device", &selectedDeviceIndex, cstrings.data(), cstrings.size())) {
+        const std::string& selectedDevice = deviceList[selectedDeviceIndex];
+
+        audioManager.SetCurrentDevice(selectedDevice.c_str());
+        engineConfig.audioOutputDevice = selectedDevice;
+
+        LOG_INFO("Selected device: {}", selectedDevice);
+    }
+}
+
 
 void Marmalade::GUI::Preferences::requiresRestartWarning() {
     ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), ICON_CI_WARNING " Requires restart");

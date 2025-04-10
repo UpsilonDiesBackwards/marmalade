@@ -49,7 +49,7 @@
 #include <fstream>
 
 Application::Application(int width, int height, const char* title) : window(nullptr), width(width), height(height), title(title), inputManager(InputManager::GetInstance()),
-                                                                     input(&inputManager), camera(new Camera(1920, 1080, 1.0f)) {
+                                                                     input(&inputManager), camera(new Camera(1920, 1080, 1.0f)), audioManager(&AudioManager::GetInstance()) {
 
     sceneManager = SceneManager();
     profiler = Profiler();
@@ -127,23 +127,6 @@ void Application::Initialise() {
 
     ImNodes::CreateContext();
     ImNodes::StyleColorsDark();
-
-    audioDevice = alcOpenDevice(nullptr);
-    if (audioDevice) {
-        LOG_INFO("Opening audio device: {}", alcGetString(audioDevice, ALC_DEFAULT_ALL_DEVICES_SPECIFIER));
-    }
-
-    audioContext = alcCreateContext(audioDevice, nullptr);
-    if (audioContext) {
-        std::cout << "Created OpenAL Context" << std::endl;
-    }
-
-    ALCenum alError = alcGetError(audioDevice);
-    if (alError != ALC_NO_ERROR) {
-        LOG_ERROR("OpenAL error: {}", alError);
-    }
-
-    alcMakeContextCurrent(audioContext);
 
     // Load ImGui custom style
     if (!std::filesystem::exists(Marmalade::ConfigUtil::GetConfigDirectory() / "editorstyle.txt")) {
@@ -260,10 +243,6 @@ void Application::Terminate() {
     ImGui::DestroyContext();
 
     ImNodes::DestroyContext();
-
-    alcMakeContextCurrent(nullptr);
-    alcDestroyContext(audioContext);
-    alcCloseDevice(audioDevice);
 
     glfwDestroyWindow(window);
     glfwTerminate();
