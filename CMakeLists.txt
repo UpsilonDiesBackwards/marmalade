@@ -159,11 +159,11 @@ file(GLOB IMGUIZMO_SRC "vendor/imguizmo/*.h" "vendor/imguizmo/*.cpp")
 list(APPEND IMNODES_SRC vendor/imnodes/imnodes.h vendor/imnodes/imnodes_internal.h vendor/imnodes/imnodes.cpp)
 
 set(EXECUTABLE_TYPE "")
-if(WIN32)
+if (WIN32)
     set(EXECUTABLE_TYPE WIN32)
-elseif(APPLE)
+elseif (APPLE)
     set(EXECUTABLE_TYPE MACOSX_BUNDLE)
-endif()
+endif ()
 
 add_executable(marmalade
         ${EXECUTABLE_TYPE}
@@ -177,6 +177,17 @@ add_executable(marmalade
 
 add_subdirectory(include)
 add_subdirectory(src)
+
+if (APPLE)
+    # Mark all files as objective-c++
+    enable_language(OBJC)
+    enable_language(OBJCXX)
+
+    file(GLOB_RECURSE SOURCES src/*.cpp src/*.mm src/*.m src/*.h src/*.hpp)
+
+    set_source_files_properties(${SOURCES} PROPERTIES COMPILE_FLAGS "-x objective-c++")
+    set_source_files_properties(${SOURCES} PROPERTIES LANGUAGE OBJCXX)
+endif ()
 
 if (NOT WIN32)
     add_dependencies(marmalade lua)
@@ -217,6 +228,10 @@ target_include_directories(marmalade PRIVATE
         vendor/imnodes
         vendor/openal-soft
 )
+
+if (APPLE)
+    target_include_directories(marmalade PRIVATE vendor/openal-soft/include)
+endif ()
 
 target_include_directories(marmalade PRIVATE include)
 
