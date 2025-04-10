@@ -113,11 +113,10 @@ std::vector<std::string> AudioManager::GetAvailableDevices() {
     const char* deviceList = alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER);
 
     if (deviceList != nullptr) {
-        std::istringstream ss(deviceList);
-        std::string device;
-
-        while (std::getline(ss, device, ',')) {
-            availableDevices.push_back(device);
+        const char* device = deviceList;
+        while (*device != '\0') {
+            availableDevices.emplace_back(device);
+            device += std::strlen(device) + 1;
         }
     } else {
         LOG_ERROR("No audio devices found on system");
