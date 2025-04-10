@@ -8,6 +8,7 @@ list(APPEND ENGINE_API
         graphics/multisampledframebuffer.h
         graphics/lighting/light.h
 
+        io/audiomanager.h
         io/input.h
         io/inputmanager.h
 

@@ -31,6 +31,7 @@ list(APPEND ENGINE_SRC
         graphics/lighting/light.cpp
         graphics/multisampledframebuffer.cpp
 
+        io/audiomanager.cpp
         io/input.cpp
         io/inputmanager.cpp
 
