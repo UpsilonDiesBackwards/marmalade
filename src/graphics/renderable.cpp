@@ -27,6 +27,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/type_ptr.hpp>
 
+#define OPENGL_VERSION "430"
+
 float vertices[] = {
         // Positions       // Texture Coords
         0.0f,  1.0f, 0.0f,  0.0f, 1.0f,  // Top-left
@@ -41,8 +43,8 @@ int indices[] = {
 };
 
 Renderable::Renderable(GLuint VAO, GLuint VBO, GLuint EBO, GLuint texture) : VAO(VAO), VBO(VBO), EBO(EBO),
-                        texture(texture),
-                        shaderProgram(Shader("res/shaders/shader.vert", "res/shaders/shader.frag")) {
+                                                                             texture(texture),
+                                                                             shaderProgram(Shader("res/shaders/opengl/" OPENGL_VERSION "/shader.vert", "res/shaders/opengl/" OPENGL_VERSION "/shader.frag")) {
 }
 
 void Renderable::Initialise() {

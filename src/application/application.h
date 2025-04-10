@@ -110,6 +110,9 @@ public:
 private:
     Application(int width, int height, const char* title);
 
+    int _graphicsVersionMajor;
+    int _graphicsVersionMinor;
+
     GLFWwindow* window;
     int width, height;
     const char* title;
@@ -123,6 +126,8 @@ private:
     std::shared_ptr<spdlog::logger> logger;
 
     std::unique_ptr<Marmalade::Project::Project> currentProject;
+
+    void getGraphicsVersion();
 };
 
 #endif

@@ -29,7 +29,12 @@
 AudioManager::AudioManager() {
     audioDevice = alcOpenDevice(Marmalade::EngineConfig::GetStoredConfig().audioOutputDevice.c_str());
     if (audioDevice) {
-        std::cout << "Using audio device: " << alcGetString(audioDevice, ALC_DEFAULT_ALL_DEVICES_SPECIFIER) << std::endl;
+        const char* deviceName = alcGetString(audioDevice, ALC_DEFAULT_ALL_DEVICES_SPECIFIER);
+        if (deviceName) {
+            std::cout << "Using audio device: " << deviceName << std::endl;
+        } else {
+            std::cerr << "Failed to get audio device name." << std::endl;
+        }
     } else {
         audioDevice = alcOpenDevice(nullptr);
     }

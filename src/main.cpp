@@ -144,7 +144,7 @@ int main(int argc, char** argv) {
 
     NativeUI::SplashScreen::SetLoadingText(splashScreen, "Initialising application...");
     Application& application = Application::GetInstance(1920, 1080, "Marmalade Engine");
-//    application.Initialise();
+    application.Initialise();
 
     bool safeMode = false;
     if (NativeUI::SplashScreen::AreSafeModeKeysHeld()) {

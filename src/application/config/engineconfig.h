@@ -35,6 +35,11 @@ namespace Marmalade {
         int depth{1};// Local repos do not work with shallow clone
     };
 
+    struct InterfaceConfig {
+        std::string graphicsSystem{"opengl"};
+        std::string graphicsVersion{"4.3"};
+    };
+
     struct AppearanceConfig {
         bool viewports{true};
         std::string themeFile{"editorstyle.txt"};
@@ -62,6 +67,7 @@ namespace Marmalade {
     struct EngineConfigStruct {
         int version{CONFIG_VERSION};
 
+        InterfaceConfig interface;
         AppearanceConfig appearance;
         WindowPosConfig windowPos;
 
@@ -97,13 +103,15 @@ namespace Marmalade {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::Repository, name, gitUrl, depth);
 
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::InterfaceConfig, graphicsSystem, graphicsVersion);
+
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::AppearanceConfig, viewports, themeFile, showWelcomeScreen, backgroundColor, scaleFactor, useSystemScaleFactor);
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::WindowPosConfig, monitor, x, y, width, height, maximised);
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::ProjectBrowserConfig, colorAssets, colorData, colorSrc);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfigStruct, version, appearance, windowPos, logLevel, defaultProjectPath, repos, projectBrowser, favouriteComponents, audioOutputDevice);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::EngineConfigStruct, version, interface, appearance, windowPos, logLevel, defaultProjectPath, repos, projectBrowser, favouriteComponents, audioOutputDevice);
 }
 
 #endif

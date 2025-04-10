@@ -76,6 +76,13 @@ void Application::Initialise() {
     } else
         std::cout << "GLFW Initialised" << std::endl;
 
+    getGraphicsVersion();
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, _graphicsVersionMajor);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, _graphicsVersionMinor);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);// macOS requires this
+
     window = glfwCreateWindow(width, height, title, NULL, NULL);// Create the main application window
     if (!window) {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -123,7 +130,11 @@ void Application::Initialise() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();// Create ImGui Context
     ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 430");
+
+    std::stringstream versionStream;
+    versionStream << "#version " << _graphicsVersionMajor << _graphicsVersionMinor << "0";
+    auto versionStr = versionStream.str();
+    ImGui_ImplOpenGL3_Init(versionStr.c_str());
 
     ImNodes::CreateContext();
     ImNodes::StyleColorsDark();
@@ -323,4 +334,15 @@ void Application::OnClose() {
     }
 
     Marmalade::EngineConfig::GetInstance().SaveConfig();
+}
+
+void Application::getGraphicsVersion() {
+    std::stringstream ss(Marmalade::EngineConfig::GetStoredConfig().interface.graphicsVersion);
+    int major, minor;
+
+    char dot;
+    ss >> major >> dot >> minor;
+
+    _graphicsVersionMajor = major;
+    _graphicsVersionMinor = minor;
 }
