@@ -29,6 +29,8 @@
 
 #include <queue>
 
+using namespace Marmalade::Mathematics;
+
 namespace Marmalade::ECS {
     /*
      * This handles rigid physics resolution of a colliding entity.
@@ -39,8 +41,8 @@ namespace Marmalade::ECS {
      * */
 
     struct Body {
-        Marmalade::Mathematics::Vec2 centreOfMass = {0.5f, 0.5f};
-        Marmalade::Mathematics::Vec2 velocity = {0.0f, 0.0f};
+        Vec2 centreOfMass = {0.5f, 0.5f};
+        Vec2 velocity = {0.0f, 0.0f};
         float angularVelocity = 0.0f;
         float mass = 1.0f;
         float gravity = -9.81f;
@@ -50,12 +52,12 @@ namespace Marmalade::ECS {
     struct CollisionEvent {
         Entity* self;
         Entity* other = nullptr;
-        Marmalade::Mathematics::Vec2 normal;
+        Vec2 normal;
 
-        Marmalade::Mathematics::Vec2 ptOnA_WorldSpace;
-        Marmalade::Mathematics::Vec2 ptOnB_WorldSpace;
-        Marmalade::Mathematics::Vec2 ptOnA_LocalSpace;
-        Marmalade::Mathematics::Vec2 ptOnB_LocalSpace;
+        Vec2 ptOnA_WorldSpace;
+        Vec2 ptOnB_WorldSpace;
+        Vec2 ptOnA_LocalSpace;
+        Vec2 ptOnB_LocalSpace;
     };
 
     class RigidBody : public Component {
@@ -75,13 +77,13 @@ namespace Marmalade::ECS {
 
         void UpdatePhysics(Entity* entity, float fixedDelta);
 
-        void Collide(Entity* self, Entity* other, const Marmalade::Mathematics::Vec2 normal, Marmalade::Mathematics::Vec2 ptOnA, Marmalade::Mathematics::Vec2 ptOnB);
+        void Collide(Entity* self, Entity* other, const Vec2 normal, Vec2 ptOnA, Vec2 ptOnB);
 
-        void ApplyImpulse(Marmalade::Mathematics::Vec2 point, Marmalade::Mathematics::Vec2 impulse, Entity* self);
-        void ApplyImpulseLinear(Marmalade::Mathematics::Vec2 impulse);
+        void ApplyImpulse(Vec2 point, Vec2 impulse, Entity* self);
+        void ApplyImpulseLinear(Vec2 impulse);
         void ApplyImpulseAngular(float dL, Entity* self);
 
-        Marmalade::Mathematics::Vec2 GetCentreOfMass() { return body.centreOfMass; }
+        Vec2 GetCentreOfMass() { return body.centreOfMass; }
         float GetInertiaTensor(Entity* self);
         float GetInverseInertiaTensor(Entity* self);
 
@@ -98,7 +100,9 @@ namespace Marmalade::ECS {
         float _accumulator = 0.0f;
         const float fixedTimeStep = 1.0f / 60.0f;// Target is 60 updates per second
 
-        Marmalade::Mathematics::Vec2 momentum;
+        const float _velocityThreshold = FLT_EPSILON;
+
+        Vec2 momentum;
     };
 
     REGISTER_COMPONENT(RigidBody);

@@ -85,8 +85,8 @@ void Marmalade::ECS::CircleCollider::Intersects(Entity* self, Entity* other) {
     auto* circleA = GetCollisionData<DataCircle>();
     auto* otherCollider = other->componentManager.GetComponentOfType<ColliderBase>();
 
-    Marmalade::Mathematics::Vec2 posA = self->getPosition() + circleA->offset;
-    Marmalade::Mathematics::Vec2 posB = other->getPosition();
+    Vec2 posA = self->getPosition() + circleA->offset;
+    Vec2 posB = other->getPosition();
 
     if (auto* circleCollider = other->componentManager.GetComponentOfType<CircleCollider>()) {
         if (auto* circleB = circleCollider->GetCollisionData<DataCircle>()) {
@@ -96,10 +96,10 @@ void Marmalade::ECS::CircleCollider::Intersects(Entity* self, Entity* other) {
 
             if (distSq <= radii * radii) {
                 if (auto* rb = self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
-                    Marmalade::Mathematics::Vec2 norm = posA - posB;
-                    Marmalade::Mathematics::Vec2 collisionNorm = norm.Normalise();
-                    Marmalade::Mathematics::Vec2 ptOnA_WorldSpace = posA + collisionNorm * circleA->radius;
-                    Marmalade::Mathematics::Vec2 ptOnB_WorldSpace = posB - collisionNorm * circleB->radius;
+                    Vec2 norm = posA - posB;
+                    Vec2 collisionNorm = norm.Normalise();
+                    Vec2 ptOnA_WorldSpace = posA + collisionNorm * circleA->radius;
+                    Vec2 ptOnB_WorldSpace = posB - collisionNorm * circleB->radius;
 
                     rb->collisionQueue.push({self, other, collisionNorm, ptOnA_WorldSpace, ptOnB_WorldSpace});
                 }
@@ -109,27 +109,27 @@ void Marmalade::ECS::CircleCollider::Intersects(Entity* self, Entity* other) {
 
     if (IntersectsAABB(*otherCollider, posA, posB)) {
         if (auto* rb = self->componentManager.GetComponentOfType<Marmalade::ECS::RigidBody>()) {
-            Marmalade::Mathematics::Vec2 offset = otherCollider->GetCollisionData<AABBDataBox>()->offset;
-            Marmalade::Mathematics::Vec2 size = otherCollider->GetCollisionData<AABBDataBox>()->size;
+            Vec2 offset = otherCollider->GetCollisionData<AABBDataBox>()->offset;
+            Vec2 size = otherCollider->GetCollisionData<AABBDataBox>()->size;
 
-            Marmalade::Mathematics::Vec2 closestPoint = (posA - posB - offset).Clamp(-size * 0.5f, size * 0.5f) + posB + offset;
+            Vec2 closestPoint = (posA - posB - offset).Clamp(-size * 0.5f, size * 0.5f) + posB + offset;
 
-            Marmalade::Mathematics::Vec2 norm = posA - closestPoint;
-            Marmalade::Mathematics::Vec2 collisionNorm = norm.Normalise();
-            Marmalade::Mathematics::Vec2 ptOnA_WorldSpace = posA - collisionNorm * circleA->radius;
-            Marmalade::Mathematics::Vec2 ptOnB_WorldSpace = closestPoint;
+            Vec2 norm = posA - closestPoint;
+            Vec2 collisionNorm = norm.Normalise();
+            Vec2 ptOnA_WorldSpace = posA - collisionNorm * circleA->radius;
+            Vec2 ptOnB_WorldSpace = closestPoint;
 
             rb->collisionQueue.push({self, other, collisionNorm, ptOnA_WorldSpace, ptOnB_WorldSpace});
         }
     }
 }
 
-void Marmalade::ECS::CircleCollider::ShowBounds(const Marmalade::Mathematics::Vec2& entityPosition, Transform transform) {
+void Marmalade::ECS::CircleCollider::ShowBounds(const Vec2& entityPosition, Transform transform) {
     if (auto* aabbData = std::get_if<DataCircle>(&data)) {
-        Marmalade::Mathematics::Vec2 centre = entityPosition + aabbData->offset + Marmalade::Mathematics::Vec2(aabbData->radius, aabbData->radius);
+        Vec2 centre = entityPosition + aabbData->offset + Vec2(aabbData->radius, aabbData->radius);
         float radius = aabbData->radius;
 
-        ImVec2 screenCentre = EditorViews::WorldToScreenSpace(Marmalade::Mathematics::Vec2(centre[0], centre[1]));
+        ImVec2 screenCentre = EditorViews::WorldToScreenSpace(Vec2(centre[0], centre[1]));
         float screenRadius = WorldRadiusToScreenScale(radius);
 
         ImGui::GetWindowDrawList()->AddCircle(
@@ -140,14 +140,14 @@ void Marmalade::ECS::CircleCollider::ShowBounds(const Marmalade::Mathematics::Ve
     }
 }
 
-bool Marmalade::ECS::CircleCollider::IntersectsAABB(const Marmalade::ECS::ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) {
+bool Marmalade::ECS::CircleCollider::IntersectsAABB(const Marmalade::ECS::ColliderBase& other, const Vec2& posA, const Vec2& posB) {
     if (const auto* aabb = std::get_if<AABBDataBox>(&other.data)) {
         // AABB's properties
-        Marmalade::Mathematics::Vec2 halfExtents = aabb->size * 0.5f;
-        Marmalade::Mathematics::Vec2 aabbOffset = aabb->offset;
+        Vec2 halfExtents = aabb->size * 0.5f;
+        Vec2 aabbOffset = aabb->offset;
 
         // Calculate closest point of the AABB to the circle's position
-        Marmalade::Mathematics::Vec2 closestPoint = (posA - posB - aabbOffset).Clamp(-halfExtents, halfExtents) + posB + aabbOffset;
+        Vec2 closestPoint = (posA - posB - aabbOffset).Clamp(-halfExtents, halfExtents) + posB + aabbOffset;
 
         // Calculate distance from closest point to the circle's position
         float distSquared = (closestPoint - posA).Dot(closestPoint - posA);
@@ -161,11 +161,11 @@ bool Marmalade::ECS::CircleCollider::IntersectsAABB(const Marmalade::ECS::Collid
 }
 
 float Marmalade::ECS::CircleCollider::WorldRadiusToScreenScale(float radius) {
-    ImVec2 screenStart = EditorViews::WorldToScreenSpace(Marmalade::Mathematics::Vec2(0.0f, 0.0f));
-    ImVec2 screenEnd = EditorViews::WorldToScreenSpace(Marmalade::Mathematics::Vec2(radius, 0.0f));
+    ImVec2 screenStart = EditorViews::WorldToScreenSpace(Vec2(0.0f, 0.0f));
+    ImVec2 screenEnd = EditorViews::WorldToScreenSpace(Vec2(radius, 0.0f));
 
-    Marmalade::Mathematics::Vec2 glmScreenStart(screenStart[0], screenStart[1]);
-    Marmalade::Mathematics::Vec2 glmScreenEnd(screenEnd[0], screenEnd[1]);
+    Vec2 glmScreenStart(screenStart[0], screenStart[1]);
+    Vec2 glmScreenEnd(screenEnd[0], screenEnd[1]);
 
     return glmScreenStart.Distance(glmScreenStart, glmScreenEnd);
 }

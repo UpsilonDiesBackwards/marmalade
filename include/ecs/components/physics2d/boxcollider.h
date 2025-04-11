@@ -29,6 +29,8 @@
 
 #include <nlohmann/json.hpp>
 
+using namespace Marmalade::Mathematics;
+
 namespace Marmalade::ECS {
     /*
      * This handles the collision detection of an entity.
@@ -50,7 +52,7 @@ namespace Marmalade::ECS {
                     "Supports both AABB and OBB collision detection based on entity orientation";
         }
 
-        Marmalade::Mathematics::Vec2 test;
+        Vec2 test;
 
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
@@ -61,14 +63,14 @@ namespace Marmalade::ECS {
 
         void Intersects(Entity* self, Entity* other) override;
 
-        bool IntersectsAABB(const ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) override;
-        bool IntersectsOBB(const ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) override;
-        bool AABBIntersectsOBB(const ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) override;
+        bool IntersectsAABB(const ColliderBase& other, const Vec2& posA, const Vec2& posB) override;
+        bool IntersectsOBB(const ColliderBase& other, const Vec2& posA, const Vec2& posB) override;
+        bool AABBIntersectsOBB(const ColliderBase& other, const Vec2& posA, const Vec2& posB) override;
 
-        void ShowBounds(const Marmalade::Mathematics::Vec2& entityPosition, Transform transform) override;
+        void ShowBounds(const Vec2& entityPosition, Transform transform) override;
 
-        bool TestAABBSeparation(const Marmalade::Mathematics::Vec2& axis, const Marmalade::Mathematics::Vec2& aabbCenter, const Marmalade::Mathematics::Vec2& aabbHalfSize, const Marmalade::Mathematics::Vec2& obbCenter, const Marmalade::Mathematics::Vec2* obbAxes, const Marmalade::Mathematics::Vec2& obbHalfSize, const Marmalade::Mathematics::Vec2& t) override;
-        Marmalade::Mathematics::Vec2 CalculateOBBCentrePoint(const Marmalade::Mathematics::Vec2& entityPosition, const Marmalade::Mathematics::Vec2& offset) override;
+        bool TestAABBSeparation(const Vec2& axis, const Vec2& aabbCenter, const Vec2& aabbHalfSize, const Vec2& obbCenter, const Vec2* obbAxes, const Vec2& obbHalfSize, const Vec2& t) override;
+        Vec2 CalculateOBBCentrePoint(const Vec2& entityPosition, const Vec2& offset) override;
     };
 
     REGISTER_COMPONENT(BoxCollider);

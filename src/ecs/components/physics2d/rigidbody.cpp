@@ -99,19 +99,19 @@ void Marmalade::ECS::RigidBody::UpdatePhysics(Entity* entity, float time) {
 
     }
 
-    if (body.velocity.Magnitude() < FLT_EPSILON) {
+    if (body.velocity.Magnitude() < _velocityThreshold) {
         return;
     }
 
-    momentum = Marmalade::Mathematics::Vec2(body.velocity[0] * body.mass, body.velocity[1] * body.mass);
-    Marmalade::Mathematics::Vec2 newPos = entity->getPosition() + momentum * time; // Calculate the new desired position of the entity
+    momentum = Vec2(body.velocity[0] * body.mass, body.velocity[1] * body.mass);
+    Vec2 newPos = entity->getPosition() + momentum * time; // Calculate the new desired position of the entity
     entity->setPosition(newPos);
 
     float angularDisplacement = body.angularVelocity * time;
     entity->setRotation(entity->getRotation() + (angularDisplacement * 5));
 }
 
-void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const Marmalade::Mathematics::Vec2 normal, Marmalade::Mathematics::Vec2 ptOnA, Marmalade::Mathematics::Vec2 ptOnB) {
+void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const Vec2 normal, Vec2 ptOnA, Vec2 ptOnB) {
     if (isStatic) return;
 
     auto* selfCollider = self->componentManager.GetComponentOfType<ColliderBase>();
@@ -121,21 +121,21 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const Marma
     ColliderInfo selfInfo = GetColliderInfo(selfCollider);
     ColliderInfo otherInfo = GetColliderInfo(otherCollider);
 
-    Marmalade::Mathematics::Vec2 selfSize = selfInfo.size.value_or(Marmalade::Mathematics::Vec2(0.0f, 0.0f));
-    Marmalade::Mathematics::Vec2 otherSize = otherInfo.size.value_or(Marmalade::Mathematics::Vec2(0.0f, 0.0f));
+    Vec2 selfSize = selfInfo.size.value_or(Vec2(0.0f, 0.0f));
+    Vec2 otherSize = otherInfo.size.value_or(Vec2(0.0f, 0.0f));
 
     // Calculate elasticity using the owning and other entities elasticity values
     float selfElasticity = body.elasticity;
     float otherElasticity = otherRigidBody->body.elasticity;
     float elasticity = selfElasticity * otherElasticity;
 
-    if (Marmalade::Mathematics::Abs(normal[1]) > 0.99f) { // Set ptOnA/B[0] as centre of mass[0]
+    if (Abs(normal[1]) > 0.99f) { // Set ptOnA/B[0] as centre of mass[0]
         ptOnA[0] = GetCentreOfMass()[0];
         ptOnB[0] = otherRigidBody->GetCentreOfMass()[0];
     }
 
-    Marmalade::Mathematics::Vec2 ra = ptOnA - GetCentreOfMass();
-    Marmalade::Mathematics::Vec2 rb = ptOnB - otherRigidBody->GetCentreOfMass();
+    Vec2 ra = ptOnA - GetCentreOfMass();
+    Vec2 rb = ptOnB - otherRigidBody->GetCentreOfMass();
 
     float crossRA_N = ra[0] * normal[1] - ra[1] * normal[0];
     float crossRB_N = rb[0] * normal[1] - rb[1] * normal[0];
@@ -144,25 +144,25 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const Marma
     float angularB = GetInverseInertiaTensor(other) * (crossRB_N * crossRB_N);
     float angularFactor = (angularA + angularB); // Calculate angular factor
 
-    Marmalade::Mathematics::Vec2 selfVelocity = Marmalade::Mathematics::Vec2(-ra[1], ra[0]) * body.velocity + body.angularVelocity;
-    Marmalade::Mathematics::Vec2 otherVelocity = Marmalade::Mathematics::Vec2(-ra[1], ra[0]) * otherRigidBody->body.velocity + otherRigidBody->body.angularVelocity;
+    Vec2 selfVelocity = Vec2(-ra[1], ra[0]) * body.velocity + body.angularVelocity;
+    Vec2 otherVelocity = Vec2(-ra[1], ra[0]) * otherRigidBody->body.velocity + otherRigidBody->body.angularVelocity;
 
-    Marmalade::Mathematics::Vec2 combinedVelocities = selfVelocity - otherVelocity; // Combine the velocities of the two objects
+    Vec2 combinedVelocities = selfVelocity - otherVelocity; // Combine the velocities of the two objects
 
     // Calculate the base impulse...
     float impulse = -(1.0f + elasticity) * combinedVelocities.Dot(normal) /
                     (body.mass + otherRigidBody->body.mass + angularFactor);
-    Marmalade::Mathematics::Vec2 vectorImpulse = normal * impulse; //... then use it, and the normal to calculate the vector impulse
+    Vec2 vectorImpulse = normal * impulse; //... then use it, and the normal to calculate the vector impulse
 
-   Marmalade::Mathematics::Vec2 penetrationDepth = (selfSize / 2.0f + otherSize / 2.0f) - Marmalade::Mathematics::Abs(self->getPosition() - other->getPosition());
+   Vec2 penetrationDepth = (selfSize / 2.0f + otherSize / 2.0f) - Abs(self->getPosition() - other->getPosition());
 
    float restitutionFactor = 0.01f;
-   Marmalade::Mathematics::Vec2 restitution = normal * std::max(penetrationDepth.Magnitude(), 0.0f) * restitutionFactor;
+   Vec2 restitution = normal * std::max(penetrationDepth.Magnitude(), 0.0f) * restitutionFactor;
 
    restitution = restitution.Normalise() * std::min(restitution.Magnitude(), 2.0f);
 
-   Marmalade::Mathematics::Vec2 perpendicular = Marmalade::Mathematics::Vec2(-normal[1], normal[0]).Normalise() * 0.5f;
-   Marmalade::Mathematics::Vec2 contactPoint = self->getPosition() + normal * (selfSize / 2.0f) + perpendicular;
+   Vec2 perpendicular = Vec2(-normal[1], normal[0]).Normalise() * 0.5f;
+   Vec2 contactPoint = self->getPosition() + normal * (selfSize / 2.0f) + perpendicular;
 
     ApplyImpulse(contactPoint, vectorImpulse, self); // Apply an impulse to self...
     if (!otherRigidBody->isStatic) { //... and if the other entity is NOT static, ...
@@ -181,32 +181,31 @@ void Marmalade::ECS::RigidBody::Collide(Entity* self, Entity* other, const Marma
         other->setPosition(other->getPosition() + restitution * otherMove);
     }
 
-    const float velocityThreshold = FLT_EPSILON; // If the velocity is less than the threshold, then set the velocity to zero
-    if (penetrationDepth.Magnitude() > velocityThreshold) {
-        body.velocity = Marmalade::Mathematics::Vec2(0.0f, 0.0f);
+    if (penetrationDepth.Magnitude() > _velocityThreshold) {
+        body.velocity = Vec2(0.0f, 0.0f);
     }
 
     // Set angular velocity to zero
-    if (Marmalade::Mathematics::Abs(normal[1]) > 0.99f && otherRigidBody->isStatic) {
+    if (Abs(normal[1]) > 0.99f && otherRigidBody->isStatic) {
         body.angularVelocity = 0.0f;
     }
 }
 
-void Marmalade::ECS::RigidBody::ApplyImpulse(Marmalade::Mathematics::Vec2 point, Marmalade::Mathematics::Vec2 impulse, Entity* self) {
+void Marmalade::ECS::RigidBody::ApplyImpulse(Vec2 point, Vec2 impulse, Entity* self) {
     if (body.mass == 0.0f) return;
 
     ApplyImpulseLinear(impulse);
 
     // Use Centre of Mass to determine the torque
-    Marmalade::Mathematics::Vec2 position = GetCentreOfMass();
-    Marmalade::Mathematics::Vec2 r = point - position;
+    Vec2 position = GetCentreOfMass();
+    Vec2 r = point - position;
 
     float torque = -r.Cross2D(r, impulse) * 0.2f;
 
     ApplyImpulseAngular(torque, self);
 }
 
-void Marmalade::ECS::RigidBody::ApplyImpulseLinear(Marmalade::Mathematics::Vec2 impulse) {
+void Marmalade::ECS::RigidBody::ApplyImpulseLinear(Vec2 impulse) {
     if (body.mass == 0 || isStatic) return;
 
     body.velocity += impulse / body.mass; // Apply impulse velocity
@@ -217,12 +216,12 @@ void Marmalade::ECS::RigidBody::ApplyImpulseAngular(float dL, Entity* self) {
 
     float invInertia = GetInverseInertiaTensor(self);
 
-    if (Marmalade::Mathematics::Abs(dL) > FLT_EPSILON) { body.angularVelocity += invInertia * dL; }
+    if (Abs(dL) > _velocityThreshold) { body.angularVelocity += invInertia * dL; }
 
 //    LOG_INFO("angular velocity: {}", body.angularVelocity);
 
     const float maxAngularSpeed = 15.0f; // Limit angular speed to prevent it going haywire
-    if (Marmalade::Mathematics::Abs(body.angularVelocity) > maxAngularSpeed) { // Set angular velocity
+    if (Abs(body.angularVelocity) > maxAngularSpeed) { // Set angular velocity
         body.angularVelocity = std::copysign(maxAngularSpeed, body.angularVelocity);
     }
 }

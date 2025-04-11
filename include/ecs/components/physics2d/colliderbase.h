@@ -30,6 +30,8 @@
 
 #include <variant>
 
+using namespace Marmalade::Mathematics;
+
 namespace Marmalade::ECS {
     class ColliderBase : public Component {
     public:
@@ -39,21 +41,21 @@ namespace Marmalade::ECS {
 
         virtual void Intersects(Entity* self, Entity* other) = 0;
 
-        virtual bool IntersectsAABB(const ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) = 0;
-        virtual bool IntersectsOBB(const ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) = 0;
-        virtual bool AABBIntersectsOBB(const ColliderBase& other, const Marmalade::Mathematics::Vec2& posA, const Marmalade::Mathematics::Vec2& posB) = 0;
+        virtual bool IntersectsAABB(const ColliderBase& other, const Vec2& posA, const Vec2& posB) = 0;
+        virtual bool IntersectsOBB(const ColliderBase& other, const Vec2& posA, const Vec2& posB) = 0;
+        virtual bool AABBIntersectsOBB(const ColliderBase& other, const Vec2& posA, const Vec2& posB) = 0;
 
-        virtual bool TestAABBSeparation(const Marmalade::Mathematics::Vec2& axis, const Marmalade::Mathematics::Vec2& aabbCenter, const Marmalade::Mathematics::Vec2& aabbHalfSize,
-                                           const Marmalade::Mathematics::Vec2& obbCenter, const Marmalade::Mathematics::Vec2 obbAxes[2], const Marmalade::Mathematics::Vec2& obbHalfSize,
-                                           const Marmalade::Mathematics::Vec2& t) = 0;
-        virtual Marmalade::Mathematics::Vec2 CalculateOBBCentrePoint(const Marmalade::Mathematics::Vec2& entityPosition, const Marmalade::Mathematics::Vec2& offset) = 0;
+        virtual bool TestAABBSeparation(const Vec2& axis, const Vec2& aabbCenter, const Vec2& aabbHalfSize,
+                                           const Vec2& obbCenter, const Vec2 obbAxes[2], const Vec2& obbHalfSize,
+                                           const Vec2& t) = 0;
+        virtual Vec2 CalculateOBBCentrePoint(const Vec2& entityPosition, const Vec2& offset) = 0;
 
         template<typename T>
         T* GetCollisionData() {
             return std::get_if<T>(&data);
         }
 
-        virtual void ShowBounds(const Marmalade::Mathematics::Vec2& entityPosition, Transform transform) = 0;
+        virtual void ShowBounds(const Vec2& entityPosition, Transform transform) = 0;
     };
 }
 

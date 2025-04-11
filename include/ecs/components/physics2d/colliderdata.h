@@ -27,38 +27,40 @@
 #include <optional>
 #include "mathematics/vector.h"
 
+using namespace Marmalade::Mathematics;
+
 namespace Marmalade::ECS {
 struct AABBDataBox {
-    Marmalade::Mathematics::Vec2 size;
-    Marmalade::Mathematics::Vec2 offset;
+    Vec2 size;
+    Vec2 offset;
 };
 
 struct OBBDataBox {
-    Marmalade::Mathematics::Vec2 size;
-    Marmalade::Mathematics::Vec2 offset;
+    Vec2 size;
+    Vec2 offset;
     float rotation;
-    Marmalade::Mathematics::Vec2 c;  // Center point
-    Marmalade::Mathematics::Vec2 u[2];  // Local x, y axes
-    Marmalade::Mathematics::Vec2 e;  // Half-width
+    Vec2 c;  // Center point
+    Vec2 u[2];  // Local x, y axes
+    Vec2 e;  // Half-width
 };
 
 struct DataCircle {
     float radius;
-    Marmalade::Mathematics::Vec2 offset;
+    Vec2 offset;
 };
 
 struct ColliderInfo {
-    std::optional<Marmalade::Mathematics::Vec2> offset;
+    std::optional<Vec2> offset;
 
     // Sizes
-    std::optional<Marmalade::Mathematics::Vec2> size;
+    std::optional<Vec2> size;
     std::optional<float> radius;
 
     // OBB Specific
     std::optional<float> rotation;
-    std::optional<Marmalade::Mathematics::Vec2> center;
-    std::optional<Marmalade::Mathematics::Vec2> axes[2];
-    std::optional<Marmalade::Mathematics::Vec2> halfWidth;
+    std::optional<Vec2> center;
+    std::optional<Vec2> axes[2];
+    std::optional<Vec2> halfWidth;
 };
 
     class ColliderBase;
