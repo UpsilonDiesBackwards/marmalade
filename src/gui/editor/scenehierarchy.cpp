@@ -30,7 +30,7 @@
 
 #include <iostream>
 
-static char newName[128] = ""; // New name to rename entity to
+static char newName[128] = "New Entity"; // New name to rename entity to
 
 void SceneHierarchy::Show() {
     Application& app = Application::GetInstance();
@@ -51,7 +51,9 @@ void SceneHierarchy::Show() {
     showContextMenu();
 
     if (_isCreatingEntityChild) {
-        _parent = _selected;
+        if (!_selectedEntities.empty()) {
+            _parent = _selectedEntities.front();
+        }
         ImGui::OpenPopup("Create Entity");
     }
 
@@ -67,18 +69,43 @@ void SceneHierarchy::Show() {
     showRenamePopup();
     showDeletePopup();
 
-    if (_selected.lock() && ImGui::IsKeyPressed(ImGuiKey_Escape)) { // If entity is selected AND escaped is pressed...
-        _selected.reset(); // ...then deselect the current entity
+    if (!_selectedEntities.empty() && ImGui::IsKeyPressed(ImGuiKey_Escape)) {
         DeselectEntity();
+    }
+
+    // Status Bar
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    ImVec2 windowPos = ImGui::GetWindowPos();
+    ImVec2 windowSize = ImGui::GetWindowSize();
+
+    float status_bar_height = 18.0f;
+
+    ImVec2 p1(windowPos.x, windowPos.y + windowSize.y - status_bar_height);
+    ImVec2 p2(windowPos.x + windowSize.x, windowPos.y + windowSize.y);
+
+    draw_list->AddRectFilled(p1, p2, IM_COL32(30, 35, 38, 170));
+
+    ImGui::SetCursorPos(ImVec2(4, ImGui::GetWindowHeight() - status_bar_height));
+
+    if (_selectedEntities.empty()) {
+        ImGui::Text("Entities: %zu", entities.size());
+    } else {
+        ImGui::Text("Selected Entities: %zu / %zu", _selectedEntities.size(), entities.size());
     }
 
     ImGui::End();
 }
 
 void SceneHierarchy::DeselectEntity() {
-    Application::GetInstance().editorGUI->details.inspectedEntity = nullptr;
-    Application::GetInstance().editView->selectedEntity = nullptr;
-    _selected.reset();
+    _selectedEntities.clear();
+
+    auto editorGui = Application::GetInstance().editorGUI;
+    auto editView = Application::GetInstance().editView;
+
+    editorGui->details.visible = false;
+    editorGui->details.inspectedEntity = nullptr;
+    editView->selectedEntity = nullptr;
 }
 
 void SceneHierarchy::createEntity(const std::string& name) {
@@ -99,36 +126,52 @@ void SceneHierarchy::createEntity(const std::string& name) {
 }
 
 void SceneHierarchy::displayEntity(std::shared_ptr<Entity> entity, int index) {
-    std::string nodeLabel = entity->name.empty() ? "Unnamed Entity" : entity->name;
+    std::string nodeLabel = entity->name.empty() ? "New Entity" : entity->name;
     nodeLabel += "##" + std::to_string(index);
 
     entity->id = index;
 
     ImGuiTreeNodeFlags nodeFlags = entity->children.empty() ? ImGuiTreeNodeFlags_Leaf : 0;
 
-    if (ImGui::TreeNodeEx(nodeLabel.c_str(), nodeFlags)) {
-        if (ImGui::IsItemHovered()) {
-            _selected = entity;
+    bool isSelected = false;
+    for (const auto& selected : _selectedEntities) {
+        if (auto locked = selected.lock()) {
+            if (locked.get() == entity.get()) {
+                isSelected = true;
+                break;
+            }
         }
+    }
 
+    if (isSelected) {
+        nodeFlags |= ImGuiTreeNodeFlags_Selected;
+    }
+
+    if (ImGui::TreeNodeEx(nodeLabel.c_str(), nodeFlags)) {
         if (ImGui::IsItemClicked()) {
-            if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl)) {
-                DeselectEntity();
+            bool ctrlHeld = ImGui::GetIO().KeyCtrl;
+            if (ctrlHeld) {
+                auto it = std::find_if(_selectedEntities.begin(), _selectedEntities.end(),
+                                       [&](const std::weak_ptr<Entity>& e) {
+                                           return !e.expired() && e.lock().get() == entity.get();
+                                       });
+
+                if (it != _selectedEntities.end()) {
+                    _selectedEntities.erase(it); // If already selected, then deselect
+                } else {
+                    _selectedEntities.push_back(entity); // Select entity
+                }
             } else {
-                _selected = entity;
+                _selectedEntities.clear();
+                _selectedEntities.push_back(entity);
+
                 Application::GetInstance().editorGUI->details.visible = true;
-                Application::GetInstance().editorGUI->details.inspectedEntity = _selected.lock().get();
-                Application::GetInstance().editView->selectedEntity = _selected.lock().get();
+                Application::GetInstance().editorGUI->details.inspectedEntity = entity.get();
+                Application::GetInstance().editView->selectedEntity = entity.get();
 
                 auto animationPlayer = entity->componentManager.GetComponentOfType<Marmalade::ECS::AnimationPlayer>();
-
-                if (animationPlayer) {
-                    if (animationPlayer->driver) {
+                if (animationPlayer && animationPlayer->driver) {
                         Marmalade::GUI::WindowManager::GetInstance().animationManager.driver = std::move(animationPlayer->driver);
-                        LOG_INFO("Animation Driver set successfully.");
-                    } else {
-                        LOG_WARN("Selected entity has no animation driver.");
-                    }
                 }
             }
         }
@@ -161,7 +204,6 @@ void SceneHierarchy::showCreatePopup() {
         ImGui::SameLine();
         if (ImGui::Button("Create")) {
             createEntity(newName);
-//            DeselectEntity();
 
             memset(newName, 0, sizeof(newName));
             _isCreatingEntityChild = false;
@@ -183,7 +225,7 @@ void SceneHierarchy::showContextMenu() {
             _isCreatingEntityChild = true;
         }
 
-        if (auto selectedPtr = _selected.lock()) {
+        if (!_selectedEntities.empty()) {
             if (ImGui::MenuItem("Rename")) {
                 _isRenaming = true;
             }
@@ -209,8 +251,10 @@ void SceneHierarchy::showRenamePopup() {
 
         ImGui::SameLine();
         if (ImGui::Button("Confirm")) {
-            if (strlen(newName) > 0) {
-                _selected.lock()->name = newName;
+            if (strlen(newName) > 0 && !_selectedEntities.empty()) {
+                if (auto entity = _selectedEntities.front().lock()) {
+                    entity->name = newName;
+                }
                 _isRenaming = false;
                 memset(newName, 0, sizeof(newName));
                 ImGui::CloseCurrentPopup();
@@ -226,8 +270,28 @@ void SceneHierarchy::showRenamePopup() {
 
 void SceneHierarchy::showDeletePopup() {
     if (ImGui::BeginPopupModal("Delete Entity", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-        ImGui::TextColored(ImVec4(0.90f, 0.49f, 0.50f, 1.0f),
-                           "Are you sure you want to delete %s ?", _selected.lock()->name.c_str());
+        if (_selectedEntities.empty()) {
+            _isDeleting = false;
+            ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+            return;
+        }
+
+        auto selected = _selectedEntities.front().lock();
+        if (!selected) {
+            _isDeleting = false;
+            ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+            return;
+        }
+
+        if (_selectedEntities.size() == 1 && selected) {
+            ImGui::TextColored(ImVec4(0.90f, 0.49f, 0.50f, 1.0f),
+                               "Are you sure you want to delete %s?", selected->name.c_str());
+        } else {
+            ImGui::TextColored(ImVec4(0.90f, 0.49f, 0.50f, 1.0f),
+                               "Are you sure you want to delete %zu entities?", _selectedEntities.size());
+        }
 
         if (ImGui::Button("Cancel")) {
             _isDeleting = false;
@@ -235,10 +299,14 @@ void SceneHierarchy::showDeletePopup() {
         }
         ImGui::SameLine();
         if (ImGui::Button("Confirm")) {
-            if (auto parentPtr = _selected.lock()->parent.lock()) {
-                parentPtr->RemoveChild(_selected.lock().get());
-            } else {
-                Application::GetInstance().sceneManager.GetCurrentScene()->RemoveEntity(_selected.lock().get());
+            for (auto& weakEntity : _selectedEntities) {
+                if (auto entity = weakEntity.lock()) {
+                    if (auto parentPtr = entity->parent.lock()) {
+                        parentPtr->RemoveChild(entity.get());
+                    } else {
+                        Application::GetInstance().sceneManager.GetCurrentScene()->RemoveEntity(entity.get());
+                    }
+                }
             }
 
             DeselectEntity();
@@ -253,14 +321,20 @@ void SceneHierarchy::showDeletePopup() {
 
 void SceneHierarchy::SelectEntityByUuid(const std::string& uuid) {
     auto currentScene = Application::GetInstance().sceneManager.GetCurrentScene();
-    std::vector<std::shared_ptr<Entity>>& entities = currentScene->GetEntities();
+    auto& entities = currentScene->GetEntities(); // Reference, nice.
 
     for (auto& entity : entities) {
         if (entity->uuid == uuid) {
-            _selected = entity;
-            Application::GetInstance().editorGUI->details.visible = true;
-            Application::GetInstance().editorGUI->details.inspectedEntity = _selected.lock().get();
-            Application::GetInstance().editView->selectedEntity = _selected.lock().get();
+            _selectedEntities.clear();
+            _selectedEntities.push_back(entity);
+
+            auto editorGui = Application::GetInstance().editorGUI;
+            auto editView = Application::GetInstance().editView;
+
+            editorGui->details.visible = true;
+            editorGui->details.inspectedEntity = entity.get();
+            editView->selectedEntity = entity.get();
+            return;
         }
     }
 }

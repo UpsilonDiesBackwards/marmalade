@@ -30,7 +30,8 @@ public:
 
 private:
     std::weak_ptr<Entity> _parent;
-    std::weak_ptr<Entity> _selected;
+    std::vector<std::weak_ptr<Entity>> _selectedEntities;
+
     bool _isCreatingEntityChild{false};
     bool _isDeleting{false};
     bool _isRenaming{false};
