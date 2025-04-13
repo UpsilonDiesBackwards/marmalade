@@ -36,6 +36,8 @@ namespace Marmalade::ECS {
 
         glm::mat4 modelMatrix = glm::mat4(1.0f);
 
+        bool isDirty = true;
+
         void Apply(Entity* entity) override;
         void Display(Entity* entity) override;
         void Setup(Entity* entity) override;

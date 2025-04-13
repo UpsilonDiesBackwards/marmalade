@@ -59,12 +59,11 @@ public:
     Entity(const std::string& name, EntityFlags flags, bool withDefaultComponents = true);
 
     glm::vec2 getPosition();
-    void setPosition(glm::vec2 newPos);
-
     float getRotation();
-    void setRotation(float newRot);
-
     glm::vec2 getScale();
+
+    void setPosition(glm::vec2 newPos);
+    void setRotation(float newRot);
     void setScale(glm::vec2 newScale);
 
     void UpdateModelMatrix();
@@ -72,7 +71,10 @@ public:
     void AddChild(std::shared_ptr<Entity> parent, std::shared_ptr<Entity> child);
     void RemoveChild(Entity* child);
 
-    bool HasParent() const;
+    bool HasParent();
+    bool HasChild();
+
+    std::weak_ptr<Entity> GetParent();
 
     void Render();
 };

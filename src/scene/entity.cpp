@@ -56,6 +56,10 @@ void Entity::Render() {
         component->Apply(this);
     }
 
+    if (transform->isDirty) {
+        UpdateModelMatrix();
+    }
+
     if (RENDERABLE) {
         bool hasTexture = componentManager.GetComponentOfType<Marmalade::ECS::TextureRenderer>();
 
@@ -74,8 +78,9 @@ glm::vec2 Entity::getPosition() {
 
 void Entity::setPosition(glm::vec2 newPos) {
     auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
+
     transform->pos = newPos;
-    UpdateModelMatrix();
+    transform->isDirty = true;
 }
 
 float Entity::getRotation() {
@@ -85,8 +90,9 @@ float Entity::getRotation() {
 
 void Entity::setRotation(float newRot) {
     auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
+
     transform->rotation = newRot;
-    UpdateModelMatrix();
+    transform->isDirty = true;
 }
 
 glm::vec2 Entity::getScale() {
@@ -96,8 +102,9 @@ glm::vec2 Entity::getScale() {
 
 void Entity::setScale(glm::vec2 newScale) {
     auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
+
     transform->scale = newScale;
-    UpdateModelMatrix();
+    transform->isDirty = true;
 }
 
 void Entity::UpdateModelMatrix() {
@@ -117,10 +124,14 @@ void Entity::UpdateModelMatrix() {
     for (auto& child: children) {
         child->UpdateModelMatrix();
     }
+
+    transform->isDirty = false;
 }
 
 void Entity::AddChild(std::shared_ptr<Entity> parent, std::shared_ptr<Entity> child) {
     child->parent = parent;
+    child->componentManager.GetComponentOfType<Marmalade::ECS::Transform>()->isDirty = true;
+
     children.push_back(std::move(child));
 
     LOG_INFO("child: {}", this->children[0]->name);
@@ -137,6 +148,14 @@ void Entity::RemoveChild(Entity* target) {
     }
 }
 
-bool Entity::HasParent() const {
+bool Entity::HasParent() {
     return !parent.expired();
+}
+
+bool Entity::HasChild() {
+    return !children.empty();
+}
+
+std::weak_ptr<Entity> Entity::GetParent() {
+    return parent;
 }

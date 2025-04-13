@@ -195,6 +195,8 @@ void EditView::ShowGizmo() {
         selectedEntity->setRotation(rotation.z);
         selectedEntity->setScale(glm::vec2(scale.x, scale.y));
 
+        selectedEntity->UpdateModelMatrix();
+
         ImGuizmo::RecomposeMatrixFromComponents(glm::value_ptr(translation),
                                                 glm::value_ptr(rotation),
                                                 glm::value_ptr(scale),
