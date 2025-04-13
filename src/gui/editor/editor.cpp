@@ -47,25 +47,30 @@ void EditorViews::Show() {
     }
 
     // Status Bar
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
-
     ImVec2 windowPos = ImGui::GetWindowPos();
     ImVec2 windowSize = ImGui::GetWindowSize();
 
-    float status_bar_height = 18.0f;
+    ImGui::SetCursorScreenPos(ImVec2(windowPos.x, windowPos.y + windowSize.y - 30.0f));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 4));
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(0, 0, 0, 100));
 
-    ImVec2 p1(windowPos.x, windowPos.y + windowSize.y - status_bar_height);
-    ImVec2 p2(windowPos.x + windowSize.x, windowPos.y + windowSize.y);
+    ImVec2 toolbarSize = ImVec2(windowSize.x, 30.0f);
 
-    draw_list->AddRectFilled(p1, p2, IM_COL32(39, 46, 51, 255));
+    if (ImGui::BeginChild("EditorBottomStatusBar", toolbarSize, true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+    {
+        ImGui::SetCursorPos(ImVec2(4, 4));
+        ImGui::Text("Cursor: (X: %.1f, Y: %.1f ) (%.1f) | Play State: %s | Editor Mode: %s | Scene: %s",
+                    (application.camera->GetPosition()[0]), application.camera->GetPosition()[1],
+                    application.camera->GetZoom(),
+                    (application.playState == PlayState::PlayState_PLAY ? "Playing" : "Stopped"),
+                    (application.editorMode == EditorMode::EditorMode_EDIT ? "Edit" : "Game"),
+                    (application.sceneManager.GetCurrentScene()->GetName().c_str()));
+    }
 
-    ImGui::SetCursorPos(ImVec2(4, ImGui::GetWindowHeight() - status_bar_height));
-    ImGui::Text("Cursor: (X: %.1f, Y: %.1f ) (%.1f) | Play State: %s | Editor Mode: %s | Scene: %s",
-                (application.camera->GetPosition()[0]), application.camera->GetPosition()[1],
-                application.camera->GetZoom(),
-                (application.playState == PlayState::PlayState_PLAY ? "Playing" : "Stopped"),
-                (application.editorMode == EditorMode::EditorMode_EDIT ? "Edit" : "Game"),
-                (application.sceneManager.GetCurrentScene()->GetName().c_str()));
+    ImGui::EndChild();
+
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
 
     ImGui::End();
 }

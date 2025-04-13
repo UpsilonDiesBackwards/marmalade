@@ -21,6 +21,7 @@
 #define ENGINE_EDITVIEW_H
 
 #include "graphics/multisampledframebuffer.h"
+#include "ImGuizmo.h"
 
 #include <scene/entity.h>
 
@@ -41,6 +42,9 @@ private:
     MultiSampledFramebuffer framebuffer;
     int width, height;
     ImVec2 imageMin, imageMax;
+
+    ImGuizmo::OPERATION _currentGuizmoOperation = ImGuizmo::TRANSLATE;
+    ImGuizmo::MODE _currentGuizmoMode = ImGuizmo::WORLD;
 
     void ShowGizmo();
     void ShowColliderBounds();

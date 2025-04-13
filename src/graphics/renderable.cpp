@@ -92,11 +92,29 @@ void Renderable::Draw(glm::mat4 modelMatrix, bool renderTexture) {
     shaderProgram.SetMat4("view", Application::GetInstance().camera->GetView());
     shaderProgram.SetMat4("model", modelMatrix);
 
+    ApplyRenderMode();
+
     glDrawElements(GL_TRIANGLES, sizeof(indices)/4, GL_UNSIGNED_INT, nullptr);
 
     glDepthMask(GL_TRUE);
 
     glBindVertexArray(0);
+}
+
+void Renderable::ApplyRenderMode() {
+    if (_previousRenderMode == renderMode) { return; }
+
+    switch (renderMode) {
+        case RenderMode::Lit:
+        case RenderMode::Unlit:
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            break;
+        case RenderMode::Wireframe:
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            break;
+    }
+
+    _previousRenderMode = renderMode;
 }
 
 void Renderable::UpdateTextureSettings() {

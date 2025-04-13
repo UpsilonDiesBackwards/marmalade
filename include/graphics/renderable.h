@@ -39,6 +39,13 @@ class Renderable {
     };
 
 public:
+    enum RenderMode {
+        Lit,
+        Unlit,
+        Wireframe,
+    };
+
+    RenderMode renderMode = RenderMode::Lit;
     TextureSettings texSettings;
 
     Renderable(unsigned int VAO, unsigned int VBO, unsigned int EBO, unsigned int texture);
@@ -46,11 +53,15 @@ public:
     void Initialise(); // Buffer Setup
     void Draw(glm::mat4 modelMatrix, bool renderTexture);
 
+    void ApplyRenderMode();
+
     void SetTexture(const std::string& filePath);
     unsigned int GetTexture();
     void UpdateTextureSettings();
 
 private:
+    RenderMode _previousRenderMode = RenderMode::Lit;
+
     unsigned int VAO, VBO, EBO;
     Shader shaderProgram;
     unsigned int texture;

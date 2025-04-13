@@ -77,6 +77,42 @@ void EditView::Render() {
                        ImVec2(windowPos.x + windowSize.x, windowPos.y + windowSize.y),
                        ImVec2(0, 1), ImVec2(1, 0));
 
+    ImGui::SetCursorScreenPos(windowPos);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 4));
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(0, 0, 0, 100));
+
+    ImVec2 toolbarSize = ImVec2(windowSize.x, 30.0f);
+
+    if (ImGui::BeginChild("EditViewTopBar", toolbarSize, true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+    {
+        if (_currentGuizmoOperation != ImGuizmo::SCALE) {
+            if (ImGui::RadioButton("World", _currentGuizmoMode == ImGuizmo::WORLD)) {
+                _currentGuizmoMode = ImGuizmo::WORLD;
+            }
+            ImGui::SameLine();
+            if (ImGui::RadioButton("Local", _currentGuizmoMode == ImGuizmo::LOCAL)) {
+                _currentGuizmoMode = ImGuizmo::LOCAL;
+            }
+        }
+
+        ImGui::SameLine();
+
+        static int currentRenderMode = 0;
+        const char* renderModes[] = { "Lit", "Unlit", "Wireframe" };
+
+        ImGui::SetNextItemWidth(95);
+        if (ImGui::Combo("Render Mode", &currentRenderMode, renderModes, IM_ARRAYSIZE(renderModes))) {
+            for (const auto& entity : Application::GetInstance().sceneManager.GetCurrentScene()->GetEntities()) {
+                entity->renderable.renderMode = static_cast<Renderable::RenderMode>(currentRenderMode);
+            }
+        }
+    }
+
+    ImGui::EndChild();
+
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
+
     // FIXME: Frame buffer image doesn't take into account tab bar, and bottom bar.
     // ...    Hence leaves a dead area in the bottom of the window when scrolling.
     imageMin = ImGui::GetWindowPos();
@@ -171,17 +207,14 @@ void EditView::ShowGizmo() {
     auto transform = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
     if (!transform) return;
 
-    static ImGuizmo::OPERATION currentGuizmoOperation(ImGuizmo::TRANSLATE);
-    static ImGuizmo::MODE currentGuizmoMode(ImGuizmo::WORLD);
-
     if (!(ImGuizmo::IsUsing() ||
           ImGui::IsAnyItemActive() ||
           ImGui::IsAnyItemFocused() ||
           ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopup))) {
 
-        if (ImGui::IsKeyPressed(ImGuiKey_Q)) { currentGuizmoOperation = ImGuizmo::TRANSLATE; }
-        if (ImGui::IsKeyPressed(ImGuiKey_W)) { currentGuizmoOperation = ImGuizmo::ROTATE; }
-        if (ImGui::IsKeyPressed(ImGuiKey_E)) { currentGuizmoOperation = ImGuizmo::SCALE; }
+        if (ImGui::IsKeyPressed(ImGuiKey_Q)) { _currentGuizmoOperation = ImGuizmo::TRANSLATE; }
+        if (ImGui::IsKeyPressed(ImGuiKey_W)) { _currentGuizmoOperation = ImGuizmo::ROTATE; }
+        if (ImGui::IsKeyPressed(ImGuiKey_E)) { _currentGuizmoOperation = ImGuizmo::SCALE; }
     }
 
     if (ImGuizmo::IsUsing()) {
@@ -203,16 +236,6 @@ void EditView::ShowGizmo() {
                                                 glm::value_ptr(transform->modelMatrix));
     }
 
-    if (currentGuizmoOperation != ImGuizmo::SCALE) {
-        if (ImGui::RadioButton("World", currentGuizmoMode == ImGuizmo::WORLD)) {
-            currentGuizmoMode = ImGuizmo::WORLD;
-        }
-        ImGui::SameLine();
-        if (ImGui::RadioButton("Local", currentGuizmoMode == ImGuizmo::LOCAL)) {
-            currentGuizmoMode = ImGuizmo::LOCAL;
-        }
-    }
-
     ImGuizmo::SetOrthographic(true);
     ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
     ImGuizmo::SetRect(app.framebuffer->position.x, app.framebuffer->position.y,
@@ -220,7 +243,7 @@ void EditView::ShowGizmo() {
 
     ImGuizmo::Manipulate(glm::value_ptr(app.camera->GetView()),
                          glm::value_ptr(app.camera->GetProjection()),
-                         currentGuizmoOperation, currentGuizmoMode,
+                         _currentGuizmoOperation, _currentGuizmoMode,
                          glm::value_ptr(transform->modelMatrix));
 }
 
