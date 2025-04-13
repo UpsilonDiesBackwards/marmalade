@@ -21,6 +21,9 @@
 
 #include "../application/util.h"
 
+#include <git2/global.h>
+#include <git2/repository.h>
+
 #include <fstream>
 #include <filesystem>
 #include <utility>
@@ -119,4 +122,23 @@ void Marmalade::Project::Project::SaveProjectPackages() {
     nlohmann::json new_packages = packages;
     o << new_packages.dump(2);
     o.close();
+}
+
+bool Marmalade::Project::Project::CheckIfGitRepository() {
+    static bool libGit2_init = false;
+    if (!libGit2_init) {
+        git_libgit2_init();
+        libGit2_init = true;
+    }
+
+    git_repository *repo = nullptr;
+
+    int err = git_repository_open(&repo, basePath.c_str()); // Attempt to open the git repository at the base path of the project...
+    if (err == 0) { //... if no error is returned then the repository exists, return true
+        git_repository_free(repo);
+        return true;
+    }
+
+    git_libgit2_shutdown();
+    return false; // No repository exists :'(
 }

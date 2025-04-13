@@ -34,8 +34,8 @@ namespace Marmalade::Project {
     class Project {
     public:
         std::string name;
-        std::filesystem::path basePath;// Project base directory
-        std::filesystem::path filePath;// Where the project is stored / project.marmalade file path
+        std::filesystem::path basePath; // Project base directory
+        std::filesystem::path filePath; // Where the project is stored / project.marmalade file path
 
         ProjectSettings settings;
         std::shared_ptr<ProjectFile> projectMarmalade;
@@ -53,6 +53,8 @@ namespace Marmalade::Project {
 
         void LoadProjectPackages();
         void SaveProjectPackages();
+
+        bool CheckIfGitRepository();
 
     private:
         std::vector<std::string> baseDirectories = { // Directories auto-created when the project is made

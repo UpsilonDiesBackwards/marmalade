@@ -45,6 +45,8 @@ list(APPEND ENGINE_SRC_GUI
         windows/packagemanager.h
         windows/stylemanager.cpp
         windows/stylemanager.h
+        windows/versioncontrol.cpp
+        windows/versioncontrol.h
         windows/welcomescreen.cpp
         windows/welcomescreen.h
 

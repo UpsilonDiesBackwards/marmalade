@@ -32,6 +32,7 @@
 #include "dialogs/about.h"
 #include "dialogs/configerror.h"
 #include "windows/animation.h"
+#include "windows/versioncontrol.h"
 
 #include <vector>
 
@@ -49,6 +50,7 @@ namespace Marmalade::GUI {
         Preferences preferences{};
         ProjectSettings settings{};
         ProjectBrowser projectBrowser{true};
+        VersionControl versionControl{};
         About about{};
         ConfigErrorDialog configErrorDlg{};
 

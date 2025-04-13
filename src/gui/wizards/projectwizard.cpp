@@ -175,7 +175,11 @@ void Marmalade::GUI::ProjectWizard::CreateProject() {
 }
 
 void Marmalade::GUI::ProjectWizard::InitialiseGitRepository(const char* repoPath) {
-    git_libgit2_init();
+    static bool libGit2_init = false;
+    if (!libGit2_init) {
+        git_libgit2_init();
+        libGit2_init = true;
+    }
 
     int error;
     git_repository_init_options options = GIT_REPOSITORY_INIT_OPTIONS_INIT;
@@ -230,7 +234,11 @@ void Marmalade::GUI::ProjectWizard::InitialiseGitRepository(const char* repoPath
 void Marmalade::GUI::ProjectWizard::SetGitRemoteURL(ProjectCreationOptions creationOptions) {
     std::filesystem::path repoFilePath = std::filesystem::path(projectFilePath) / projectName;
 
-    git_libgit2_init();
+    static bool libGit2_init = false;
+    if (!libGit2_init) {
+        git_libgit2_init();
+        libGit2_init = true;
+    }
 
     int error;
     error = git_repository_open(&creationOptions.repo, repoFilePath.string().c_str());// Open the creationOptions repository
