@@ -130,7 +130,7 @@ void Marmalade::GUI::TopBar::Show() {
 
             ImGui::MenuItem(ICON_CI_FILE_TEXT " Log", nullptr, &WindowManager::GetInstance().log.visible);
 
-            ImGui::MenuItem(ICON_CI_MARK_GITHUB " Version Control", nullptr, &WindowManager::GetInstance().versionControl.visible);
+            ImGui::MenuItem(ICON_CI_GIT_COMMIT " Version Control", nullptr, &WindowManager::GetInstance().versionControl.visible);
 
             if (ImGui::MenuItem(ICON_CI_SAVE " Save Layout")) {
                 Application::GetInstance().styleManager.SaveStyle((Marmalade::ConfigUtil::GetConfigDirectory() / Marmalade::EngineConfig::GetStoredConfig().appearance.themeFile).string());

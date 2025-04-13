@@ -37,7 +37,7 @@
 namespace fs = std::filesystem;
 
 void Marmalade::GUI::VersionControl::Draw() {
-    ImGui::Begin(ICON_CI_MARK_GITHUB " Version Control", &visible);
+    ImGui::Begin(ICON_CI_GIT_COMMIT " Version Control", &visible);
 
     if (Application::GetInstance().GetCurrentProject()->CheckIfGitRepository()) { // If the current project a valid git repo...
         CheckForModifiedItems(); //... then check for modified items...
@@ -64,7 +64,7 @@ void Marmalade::GUI::VersionControl::CheckForModifiedItems() {
 
     // Open the Git repository if it is not open already
     if (repo == nullptr) {
-        if (git_repository_open(&repo, Application::GetInstance().GetCurrentProject()->basePath.c_str()) != 0) {
+        if (git_repository_open(&repo, Application::GetInstance().GetCurrentProject()->basePath.string().c_str()) != 0) {
             LOG_ERROR("Failed to open Git repository: {}", git_error_last()->message);
             return;
         }
@@ -85,7 +85,7 @@ void Marmalade::GUI::VersionControl::CheckForModifiedItems() {
 
         if (entry->index_to_workdir != nullptr) { //... check if there are changes in between index and working versions
             const char *filename = entry->index_to_workdir->new_file.path;
-            std::string fullPath = Application::GetInstance().GetCurrentProject()->basePath / filename;
+            std::string fullPath = (Application::GetInstance().GetCurrentProject()->basePath / filename).string();
 
             if (entry->status & GIT_STATUS_WT_MODIFIED) { //... if there are changes, push its filepath to the _modifiedFiles vector
                 _modifiedFiles.push_back(fullPath);
@@ -93,7 +93,7 @@ void Marmalade::GUI::VersionControl::CheckForModifiedItems() {
         } else { // ... check if there are files between head and index (such as new or deleted files)...
             if (entry->head_to_index != nullptr) {
                 const char *filename = entry->head_to_index->old_file.path;
-                std::string fullPath = Application::GetInstance().GetCurrentProject()->basePath / filename;
+                std::string fullPath = (Application::GetInstance().GetCurrentProject()->basePath / filename).string();
 
                 if (entry->status & GIT_STATUS_INDEX_NEW) { //... if the file is new or deleted, push its filepath to the vector like before
                     _modifiedFiles.push_back(fullPath);
@@ -272,7 +272,7 @@ std::vector<std::string> Marmalade::GUI::VersionControl::GetOldVersionLines(cons
     std::filesystem::path relative_path = std::filesystem::relative(file_path, Application::GetInstance().GetCurrentProject()->basePath);
 
     git_tree_entry *entry = nullptr;
-    if (git_tree_entry_bypath(&entry, tree, relative_path.c_str()) != 0) { // Get file at that tree entry
+    if (git_tree_entry_bypath(&entry, tree, relative_path.string().c_str()) != 0) { // Get file at that tree entry
         LOG_ERROR("Failed to get file from tree: {}", git_error_last()->message);
         git_tree_free(tree);
         git_commit_free(headCommit);
@@ -314,7 +314,7 @@ std::vector<std::string> Marmalade::GUI::VersionControl::GetNewVersionLines(cons
 
     std::filesystem::path relative_path = std::filesystem::relative(file_path, Application::GetInstance().GetCurrentProject()->basePath);
 
-    git_index_entry *entry = const_cast<git_index_entry*>(git_index_get_bypath(index, relative_path.c_str(), 0)); // Get file from index...
+    git_index_entry *entry = const_cast<git_index_entry*>(git_index_get_bypath(index, relative_path.string().c_str(), 0)); // Get file from index...
     if (!entry) {
         LOG_ERROR("Failed to get file from index: {}", git_error_last()->message);
         git_index_free(index);
