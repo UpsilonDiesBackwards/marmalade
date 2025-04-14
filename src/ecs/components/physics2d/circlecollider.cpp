@@ -32,7 +32,7 @@ void Marmalade::ECS::CircleCollider::Display(Entity* entity) {
         using T = std::decay_t<decltype(colliderData)>;
 
         if constexpr (std::is_same_v<T, DataCircle>) {
-            ImGui::DragFloat("Radius",&colliderData.radius, 0.1f);
+            ImGui::DragFloat("Radius", &colliderData.radius, 0.1f);
             ImGui::DragFloat2("Offset", glm::value_ptr(colliderData.offset), 0.1f);
         }
     }, data);
@@ -122,6 +122,21 @@ void Marmalade::ECS::CircleCollider::Intersects(Entity* self, Entity* other) {
     }
 }
 
+bool Marmalade::ECS::CircleCollider::IntersectsAABB(const Marmalade::ECS::ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
+    if (const auto* aabb = std::get_if<AABBDataBox>(&other.data)) {
+        glm::vec2 halfExtents = aabb->size * 0.5f;
+
+        glm::vec2 closestPoint = glm::clamp(posA - posB - aabb->offset, -halfExtents, halfExtents) + posB  + aabb->offset;
+
+        float distSquared = glm::dot(closestPoint - posA, closestPoint - posA);
+        float radiusSquared = std::get<DataCircle>(data).radius * std::get<DataCircle>(data).radius;
+
+        return distSquared < radiusSquared;
+    }
+
+    return false;
+}
+
 void Marmalade::ECS::CircleCollider::ShowBounds(const glm::vec2& entityPosition, Transform transform) {
     if (auto* aabbData = std::get_if<DataCircle>(&data)) {
         glm::vec2 centre = entityPosition + aabbData->offset + glm::vec2(aabbData->radius, aabbData->radius);
@@ -136,21 +151,6 @@ void Marmalade::ECS::CircleCollider::ShowBounds(const glm::vec2& entityPosition,
                 32, 2.0f
                 );
     }
-}
-
-bool Marmalade::ECS::CircleCollider::IntersectsAABB(const Marmalade::ECS::ColliderBase& other, const glm::vec2& posA, const glm::vec2& posB) {
-    if (const auto* aabb = std::get_if<AABBDataBox>(&other.data)) {
-        glm::vec2 halfExtents = aabb->size * 0.5f;
-
-        glm::vec2 closestPoint = glm::clamp(posA - posB - aabb->offset, -halfExtents, halfExtents) + posB  + aabb->offset;
-
-        float distSquared = glm::dot(closestPoint - posA, closestPoint - posA);
-        float radiusSquared = std::get<DataCircle>(data).radius * std::get<DataCircle>(data).radius;
-
-        return distSquared < radiusSquared;
-    }
-
-    return false;
 }
 
 float Marmalade::ECS::CircleCollider::WorldRadiusToScreenScale(float radius) {
