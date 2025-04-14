@@ -63,7 +63,7 @@ void Entity::Render() {
     if (RENDERABLE) {
         bool hasTexture = componentManager.GetComponentOfType<Marmalade::ECS::TextureRenderer>();
 
-        renderable.Draw(transform->modelMatrix, hasTexture);
+        renderable.Draw(this, transform->modelMatrix, hasTexture);
     }
 
     for (auto& child: children) {

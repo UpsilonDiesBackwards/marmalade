@@ -21,6 +21,7 @@
 #define ENGINE_SCENE_H
 
 #include "entity.h"
+#include "ecs/components/lighting2d/light2d.h"
 
 #include <memory>
 
@@ -35,6 +36,10 @@ public:
 
     std::vector<std::shared_ptr<Entity>>& GetEntities();
 
+    void AddLight(Marmalade::ECS::Light2D* light);
+    void RemoveLight(Marmalade::ECS::Light2D* light);
+    std::vector<Marmalade::ECS::Light2D*> GetLights();
+
     void Render();
     void Update(float deltaTime);
 
@@ -45,6 +50,7 @@ private:
     std::string name;
     std::string uuid;
     std::vector<std::shared_ptr<Entity>> entities;
+    std::vector<Marmalade::ECS::Light2D*> lights;
 };
 
 #endif

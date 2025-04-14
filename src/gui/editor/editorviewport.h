@@ -46,8 +46,10 @@ private:
     ImGuizmo::OPERATION _currentGuizmoOperation = ImGuizmo::TRANSLATE;
     ImGuizmo::MODE _currentGuizmoMode = ImGuizmo::WORLD;
 
+    void ShowEditorUIGuizmos();
     void ShowGizmo();
     void ShowColliderBounds();
+    void ShowLightBounds();
 };
 
 

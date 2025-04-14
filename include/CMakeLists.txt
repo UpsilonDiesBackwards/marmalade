@@ -22,6 +22,8 @@ list(APPEND ENGINE_API
 
         ecs/components/audio/audioplayer.h
 
+        ecs/components/lighting2d/light2d.h
+
         ecs/components/physics2d/rigidbody.h
         ecs/components/physics2d/colliderbase.h
         ecs/components/physics2d/colliderdata.h

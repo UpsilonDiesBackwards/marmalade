@@ -63,6 +63,8 @@ list(APPEND ENGINE_SRC # ECS
 
         ecs/components/audio/audioplayer.cpp
 
+        ecs/components/lighting2d/light2d.cpp
+
         ecs/components/physics2d/rigidbody.cpp
         ecs/components/physics2d/colliderdata.cpp
         ecs/components/physics2d/boxcollider.cpp

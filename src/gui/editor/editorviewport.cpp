@@ -20,6 +20,7 @@
 #include "editorviewport.h"
 
 #include "../../application/application.h"
+#include "ecs/components/lighting2d/light2d.h"
 
 #include <ecs/components/physics2d/colliderbase.h>
 
@@ -77,6 +78,13 @@ void EditView::Render() {
                        ImVec2(windowPos.x + windowSize.x, windowPos.y + windowSize.y),
                        ImVec2(0, 1), ImVec2(1, 0));
 
+    for (const auto& entity : app.sceneManager.GetCurrentScene()->GetEntities()) {
+        auto lightComponent = entity->componentManager.GetComponentOfType<Marmalade::ECS::Light2D>();
+        if (lightComponent) {
+            lightComponent->ShowBounds(entity.get());
+        }
+    }
+
     ImGui::SetCursorScreenPos(windowPos);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 4));
     ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(0, 0, 0, 100));
@@ -97,15 +105,20 @@ void EditView::Render() {
 
         ImGui::SameLine();
 
-        static int currentRenderMode = 0;
+        static int currentRenderMode = 1;
         const char* renderModes[] = { "Lit", "Unlit", "Wireframe" };
 
         ImGui::SetNextItemWidth(95);
         if (ImGui::Combo("Render Mode", &currentRenderMode, renderModes, IM_ARRAYSIZE(renderModes))) {
             for (const auto& entity : Application::GetInstance().sceneManager.GetCurrentScene()->GetEntities()) {
                 entity->renderable.renderMode = static_cast<Renderable::RenderMode>(currentRenderMode);
+                entity->renderable.ApplyRenderMode();
             }
         }
+
+        ImGui::SameLine();
+
+        ImGui::Text("Light count: %zu", Application::GetInstance().sceneManager.GetCurrentScene()->GetLights().size());
     }
 
     ImGui::EndChild();
@@ -120,10 +133,7 @@ void EditView::Render() {
 
     framebuffer.position = windowPos;
 
-    if (selectedEntity) {
-        ShowGizmo();
-        ShowColliderBounds();
-    }
+    ShowEditorUIGuizmos();
 }
 
 void EditView::Resize(int width, int height) {
@@ -201,6 +211,13 @@ void EditView::RunInput() {
     });
 }
 
+void EditView::ShowEditorUIGuizmos() {
+    if (selectedEntity) {
+        ShowGizmo();
+        ShowColliderBounds();
+    }
+}
+
 void EditView::ShowGizmo() {
     Application& app = Application::GetInstance();
 
@@ -255,4 +272,14 @@ void EditView::ShowColliderBounds() {
     auto* transform = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
 
     comp->ShowBounds(selectedEntity->getPosition(), *transform);
+}
+
+void EditView::ShowLightBounds() {
+    auto lightComp = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::Light2D>();
+
+    if (!lightComp || !lightComp->showingBounds) {
+        return;
+    }
+
+    lightComp->ShowBounds(selectedEntity);
 }

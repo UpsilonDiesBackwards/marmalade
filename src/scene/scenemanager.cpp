@@ -20,6 +20,7 @@
 #include <scene/scenemanager.h>
 
 #include <iostream>
+#include "../application/logger.h"
 
 SceneManager::SceneManager() : currentScene(nullptr) {
 }
@@ -30,8 +31,16 @@ SceneManager::~SceneManager() {
 
 void SceneManager::AddScene(std::shared_ptr<Scene> scene) {
     const std::string& uuid = scene->GetUuid();
-    if (scenes.find(uuid) != scenes.end()) {
-        std::cout << "Scene already exists!" << std::endl;
+    const std::string& name = scene->GetName();
+
+    if (scenes.find(uuid) != scenes.end()) { // check if uuid already exists
+        return;
+    }
+
+    for (const auto& [existingUuid, existingScene] : scenes) { // check if name already exists
+        if (existingScene->GetName() == name) {
+            return;
+        }
     }
 
     scenes[uuid] = scene;

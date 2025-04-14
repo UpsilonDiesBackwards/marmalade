@@ -30,21 +30,24 @@
 #define OPENGL_VERSION "430"
 
 float vertices[] = {
-        // Positions       // Texture Coords
-        0.0f,  1.0f, 0.0f,  0.0f, 1.0f,  // Top-left
-        1.0f,  1.0f, 0.0f,  1.0f, 1.0f,  // Top-right
-        1.0f,  0.0f, 0.0f,  1.0f, 0.0f,  // Bottom-right
-        0.0f,  0.0f, 0.0f,  0.0f, 0.0f   // Bottom-left
+        // Position         // Normal          // UV
+        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, // Bottom Left
+        0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f, // Bottom Right
+        0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f, // Top Right
+        -0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f  // Top Left
 };
 
-int indices[] = {
-        0, 1, 3,
-        1, 2, 3
+
+unsigned int indices[] = {
+        0, 1, 2,
+        2, 3, 0
 };
 
-Renderable::Renderable(GLuint VAO, GLuint VBO, GLuint EBO, GLuint texture) : VAO(VAO), VBO(VBO), EBO(EBO),
+Renderable::Renderable(GLuint VAO, GLuint VBO, GLuint EBO, GLuint texture) : VAO(0), VBO(0), EBO(0),
                                                                              texture(texture),
                                                                              shaderProgram(Shader("res/shaders/opengl/" OPENGL_VERSION "/shader.vert", "res/shaders/opengl/" OPENGL_VERSION "/shader.frag")) {
+
+    ApplyRenderMode();
 }
 
 void Renderable::Initialise() {
@@ -59,18 +62,21 @@ void Renderable::Initialise() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0); // Position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1); // Normal
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+
+    glEnableVertexAttribArray(2); // Texture Coord
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Renderable::Draw(glm::mat4 modelMatrix, bool renderTexture) {
+void Renderable::Draw(Entity* entity, glm::mat4 modelMatrix, bool renderTexture) {
     if (!renderTexture || texture == 0) { return; }
 
     shaderProgram.Use();
@@ -92,9 +98,25 @@ void Renderable::Draw(glm::mat4 modelMatrix, bool renderTexture) {
     shaderProgram.SetMat4("view", Application::GetInstance().camera->GetView());
     shaderProgram.SetMat4("model", modelMatrix);
 
+    shaderProgram.SetVec3("viewPos", glm::vec3(Application::GetInstance().camera->GetPosition(), 1.0f));
+
     ApplyRenderMode();
 
-    glDrawElements(GL_TRIANGLES, sizeof(indices)/4, GL_UNSIGNED_INT, nullptr);
+    for (int i = 0; i < Application::GetInstance().sceneManager.GetCurrentScene()->GetLights().size(); ++i) {
+        auto light = Application::GetInstance().sceneManager.GetCurrentScene()->GetLights()[i];
+        std::string baseName = "lights[" + std::to_string(i) + "]";
+
+        shaderProgram.SetVec3(baseName + ".position", glm::vec3(light->GetPosition(), 1.0f));
+
+        shaderProgram.SetFloat(baseName + ".intensity", light->intensity);
+        shaderProgram.SetVec3(baseName + ".color", light->color);
+        shaderProgram.SetFloat(baseName + ".radius", light->radius);
+        shaderProgram.SetFloat(baseName + ".attenuation", light->attenuation);
+
+    }
+    shaderProgram.SetInt("numLights", Application::GetInstance().sceneManager.GetCurrentScene()->GetLights().size());
+
+    glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]), GL_UNSIGNED_INT, nullptr);
 
     glDepthMask(GL_TRUE);
 
@@ -106,7 +128,11 @@ void Renderable::ApplyRenderMode() {
 
     switch (renderMode) {
         case RenderMode::Lit:
+            shaderProgram.SetBool("useLighting", true);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            break;
         case RenderMode::Unlit:
+            shaderProgram.SetBool("useLighting", false);
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             break;
         case RenderMode::Wireframe:

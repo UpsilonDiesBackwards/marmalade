@@ -29,6 +29,8 @@
 
 #include <cstdlib>
 
+class Entity;
+
 class Renderable {
     struct TextureSettings {
         std::string filePath;
@@ -45,13 +47,13 @@ public:
         Wireframe,
     };
 
-    RenderMode renderMode = RenderMode::Lit;
+    RenderMode renderMode = RenderMode::Unlit;
     TextureSettings texSettings;
 
     Renderable(unsigned int VAO, unsigned int VBO, unsigned int EBO, unsigned int texture);
 
     void Initialise(); // Buffer Setup
-    void Draw(glm::mat4 modelMatrix, bool renderTexture);
+    void Draw(Entity* entity, glm::mat4 modelMatrix, bool renderTexture);
 
     void ApplyRenderMode();
 
@@ -60,7 +62,7 @@ public:
     void UpdateTextureSettings();
 
 private:
-    RenderMode _previousRenderMode = RenderMode::Lit;
+    RenderMode _previousRenderMode;
 
     unsigned int VAO, VBO, EBO;
     Shader shaderProgram;

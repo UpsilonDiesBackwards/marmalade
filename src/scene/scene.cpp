@@ -50,6 +50,22 @@ std::vector<std::shared_ptr<Entity>>& Scene::GetEntities() {
     return entities;
 }
 
+void Scene::AddLight(Marmalade::ECS::Light2D* light) {
+    lights.push_back(light);
+}
+
+void Scene::RemoveLight(Marmalade::ECS::Light2D* light) {
+    auto it = std::find(lights.begin(), lights.end(), light);
+
+    if (it != lights.end()) {
+        lights.erase(it);
+    }
+}
+
+std::vector<Marmalade::ECS::Light2D*> Scene::GetLights() {
+    return lights;
+}
+
 void Scene::Render() {
     for (const auto& entity: entities) {
         entity->Render();
