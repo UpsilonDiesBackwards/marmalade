@@ -32,12 +32,12 @@ using namespace Marmalade::Mathematics;
 namespace Marmalade::ECS {
 struct AABBDataBox {
     Vec2 size;
-    Vec2 offset;
+    Vec2 offset = {0.5, 0.5};
 };
 
 struct OBBDataBox {
     Vec2 size;
-    Vec2 offset;
+    Vec2 offset = {0.5, 0.5};
     float rotation;
     Vec2 c;  // Center point
     Vec2 u[2];  // Local x, y axes
@@ -46,7 +46,7 @@ struct OBBDataBox {
 
 struct DataCircle {
     float radius;
-    Vec2 offset;
+    Vec2 offset = {0.5, 0.5};
 };
 
 struct ColliderInfo {

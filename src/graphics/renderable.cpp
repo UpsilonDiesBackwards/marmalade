@@ -28,16 +28,17 @@
 #include <glm/gtc/type_ptr.hpp>
 
 float vertices[] = {
-        // Positions       // Texture Coords
-        0.0f,  1.0f, 0.0f,  0.0f, 1.0f,  // Top-left
-        1.0f,  1.0f, 0.0f,  1.0f, 1.0f,  // Top-right
-        1.0f,  0.0f, 0.0f,  1.0f, 0.0f,  // Bottom-right
-        0.0f,  0.0f, 0.0f,  0.0f, 0.0f   // Bottom-left
+        // Position         // UV
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // Bottom L
+         0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // Bottom R
+         0.5f,  0.5f, 0.0f, 1.0f, 1.0f, // Top R
+        -0.5f,  0.5f, 0.0f, 0.0f, 1.0f  // Top L
 };
 
-int indices[] = {
-        0, 1, 3,
-        1, 2, 3
+
+unsigned int indices[] = {
+        0, 1, 2,
+        2, 3, 0
 };
 
 Renderable::Renderable(GLuint VAO, GLuint VBO, GLuint EBO, GLuint texture) : VAO(VAO), VBO(VBO), EBO(EBO),
