@@ -28,6 +28,23 @@
 namespace Marmalade::ECS {
     class Light2D : public Component {
     public:
+#define LIGHT2D_CTOR_BODY                     \
+    name = "Light2D";                         \
+    isMutable = true;                         \
+    allowMultiple = false;                    \
+    categories = {"Lighting"};                \
+    description =                             \
+            "Adds a 2D light to the entity\n" \
+            "Uses the Transform's position and scale, and will affect the appearance of nearby entities. CURRENTLY ONLY A POINT LIGHT";
+
+        // Same pattern as animationplayer
+#ifdef _MSC_VER
+        Light2D();
+#else
+        Light2D(){
+                LIGHT2D_CTOR_BODY}
+#endif
+
         glm::vec2 position = glm::vec3(0.0f);
 
         glm::vec3 color = glm::vec3(1.0f);
@@ -48,16 +65,6 @@ namespace Marmalade::ECS {
 
         void ShowBounds(Entity* entity);
         float WorldRadiusToScreenScale(float radius);
-
-        Light2D() {
-            name = "Light2D";
-            isMutable = true;
-            allowMultiple = false;
-            categories = {"Lighting"};
-            description =
-                    "Adds a 2D light to the entity\n"
-                    "Uses the Transform's position and scale, and will affect the appearance of nearby entities. CURRENTLY ONLY A POINT LIGHT";
-        }
     };
 
     REGISTER_COMPONENT(Light2D);

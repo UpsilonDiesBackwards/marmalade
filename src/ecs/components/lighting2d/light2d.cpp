@@ -26,6 +26,12 @@
 
 #include <imgui.h>
 
+#ifdef _MSC_VER
+Marmalade::ECS::Light2D::Light2D() {
+    LIGHT2D_CTOR_BODY
+}
+#endif
+
 void Marmalade::ECS::Light2D::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
 
