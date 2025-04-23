@@ -16,8 +16,6 @@ Marmalade is a modular 2D game engine.
 - Animation
 - Version Control
 
-- High qwuality wcee pwus pwus cwode uwu
-
 ## Building
 
 This repository in itself, without building any packages, is essentially just an engine UI and API.
