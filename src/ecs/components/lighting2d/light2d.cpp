@@ -46,14 +46,6 @@ void Marmalade::ECS::Light2D::Apply(Entity* entity) {
 }
 
 void Marmalade::ECS::Light2D::Setup(Entity* entity) {
-    Application::GetInstance().sceneManager.GetCurrentScene()->AddLight(this);
-
-    std::shared_ptr<Scene> scene = Application::GetInstance().sceneManager.GetCurrentScene();
-//    LOG_INFO("Adding light to scene: {}", scene->GetName());
-
-    for (int i = 0; i < Application::GetInstance().sceneManager.GetCurrentScene()->GetLights().size(); ++i) {
-//        LOG_INFO("Light [{}] in Scene", i);
-    }
 }
 
 nlohmann::json Marmalade::ECS::Light2D::Serialize(const Entity* entity) {
@@ -113,9 +105,5 @@ float Marmalade::ECS::Light2D::WorldRadiusToScreenScale(float radius) {
     glm::vec2 glmScreenEnd(screenEnd.x, screenEnd.y);
 
     return glm::distance(glmScreenStart, glmScreenEnd);
-}
-
-Marmalade::ECS::Light2D::~Light2D() {
-//    Application::GetInstance().sceneManager.GetCurrentScene()->RemoveLight(this);
 }
 

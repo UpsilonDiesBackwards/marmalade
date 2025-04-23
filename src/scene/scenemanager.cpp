@@ -64,6 +64,22 @@ std::shared_ptr<Scene> SceneManager::GetCurrentScene() const {
 void SceneManager::SetCurrentScene(const std::string &uuid) {
     auto scene = scenes.find(uuid);
     if (scene != scenes.end()) {
+        if (currentScene) {
+            for (auto entity : currentScene->GetEntities()) {
+                auto* light = entity->componentManager.GetComponentOfType<Marmalade::ECS::Light2D>();
+                if (light) {
+                    currentScene->RemoveLight(light);
+                }
+            }
+        }
+
         currentScene = scene->second;
+
+        for (auto entity : currentScene->GetEntities()) { // Add lights from the new scene
+            auto* light = entity->componentManager.GetComponentOfType<Marmalade::ECS::Light2D>();
+            if (light) {
+                currentScene->AddLight(light);
+            }
+        }
     }
 }

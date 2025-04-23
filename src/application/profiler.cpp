@@ -18,6 +18,7 @@
  */
 
 #include "profiler.h"
+#include "application.h"
 
 #include <GLFW/glfw3.h>
 
@@ -34,6 +35,21 @@ void Profiler::Update() {
     frameTime = deltaTime * 1000.0f; // Convert to milliseconds
 }
 
+void Profiler::FixedUpdate() {
+    if (Application::GetInstance().playState != PlayState::PlayState_STEP &&
+        Application::GetInstance().playState != PlayState::PlayState_PAUSE) {
+
+        _accumulator = fixedTimeStep;
+    } else {
+        _accumulator += fixedTimeStep;
+    }
+
+
+    while (_accumulator >= fixedTimeStep) { // We use an accumulator to prevent physic jitteriness
+        _accumulator -= fixedTimeStep;
+    }
+}
+
 int Profiler::GetCurrentFPS() const {
     return fps;
 }
@@ -44,4 +60,8 @@ float Profiler::GetCurrentFrameTime() const {
 
 double Profiler::GetDeltaTime() const {
     return deltaTime;
+}
+
+float Profiler::GetFixedDeltaTime() {
+    return fixedTimeStep;
 }

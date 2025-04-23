@@ -41,21 +41,9 @@ void Marmalade::ECS::RigidBody::Apply(Entity* entity) {
         return;
     }
 
-    if (Application::GetInstance().playState != PlayState::PlayState_STEP &&
-        Application::GetInstance().playState != PlayState::PlayState_PAUSE) {
-
-        _accumulator = fixedTimeStep;
-    } else {
-        _accumulator += fixedTimeStep;
-    }
-
-
-    while (_accumulator >= fixedTimeStep) { // We use an accumulator to prevent jitteriness
-        if ((Application::GetInstance().playState == PlayState::PlayState_PLAY || // If the object is NOT static, and the application is in play or stepped...
-             Application::GetInstance().playState == PlayState::PlayState_STEP) && !isStatic) {
-            UpdatePhysics(entity, fixedTimeStep); //... activate the physics
-        }
-        _accumulator -= fixedTimeStep;
+    if ((Application::GetInstance().playState == PlayState::PlayState_PLAY || // If the object is NOT static, and the application is in play or stepped...
+         Application::GetInstance().playState == PlayState::PlayState_STEP) && !isStatic) {
+        UpdatePhysics(entity, Application::GetInstance().profiler.GetFixedDeltaTime()); //... activate the physics
     }
 }
 

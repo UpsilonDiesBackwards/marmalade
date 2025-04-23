@@ -21,6 +21,7 @@
 
 #include "../application/util.h"
 #include "../application/logger.h"
+#include "../application/application.h"
 
 #include <graphics/texture.h>
 
@@ -64,6 +65,9 @@ void Entity::Render() {
         bool hasTexture = componentManager.GetComponentOfType<Marmalade::ECS::TextureRenderer>();
 
         renderable.Draw(this, transform->modelMatrix, hasTexture);
+
+        renderable.ApplyLighting(Application::GetInstance().sceneManager.GetCurrentScene()->GetLights(),
+                                 glm::vec3(Application::GetInstance().camera->GetPosition(), 1.0f));
     }
 
     for (auto& child: children) {

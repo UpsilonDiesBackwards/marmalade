@@ -21,6 +21,7 @@
 #define ENGINE_RENDERABLE_H
 
 #include "shader.h"
+#include "ecs/components/lighting2d/light2d.h"
 
 #include <glad/glad.h>
 
@@ -28,6 +29,7 @@
 #include <glm/mat4x4.hpp>
 
 #include <cstdlib>
+#include <vector>
 
 class Entity;
 
@@ -55,6 +57,8 @@ public:
     void Initialise(); // Buffer Setup
     void Draw(Entity* entity, glm::mat4 modelMatrix, bool renderTexture);
 
+    void ApplyLighting(const std::vector<Marmalade::ECS::Light2D*>& lights, const glm::vec3& viewPos);
+
     void ApplyRenderMode();
 
     void SetTexture(const std::string& filePath);
@@ -62,7 +66,7 @@ public:
     void UpdateTextureSettings();
 
 private:
-    RenderMode _previousRenderMode;
+    RenderMode _previousRenderMode = RenderMode::Wireframe;
 
     unsigned int VAO, VBO, EBO;
     Shader shaderProgram;

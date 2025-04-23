@@ -28,7 +28,7 @@ void main() {
     vec3 texColor = texture(texture0, texCoord).rgb;
 
     if (useLighting) {
-        vec3 result = vec3(0.0);
+        vec3 result = vec3(1.0f);
 
         vec3 norm = normalize(Normal);
         vec3 viewDir = normalize(viewPos - FragPos);
@@ -39,29 +39,29 @@ void main() {
             vec3 lightVec = light.position - FragPos;
             float distance = length(lightVec);
 
-            if (distance < light.radius)
-            continue;
+            if (distance > light.radius) { continue; }
 
             vec3 lightDir = normalize(lightVec);
 
-            float ambientStrength = 0.1;
+            float ambientStrength = 0.1f;
             vec3 ambient = ambientStrength * light.color;
 
-            float diff = max(dot(norm, lightDir), 0.0);
+            float diff = max(dot(norm, lightDir), 0.1f);
             vec3 diffuse = diff * (light.color * light.intensity);
 
-            float specularStrength = 0.5;
+            float specularStrength = 0.1f;
             vec3 reflectDir = reflect(-lightDir, norm);
-            float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+            float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 32.0f);
             vec3 specular = specularStrength * spec * light.color;
 
-            float distanceFactor = 1.0 - (distance / light.radius);
-            distanceFactor = clamp(distanceFactor, 0.0, 1.0);
-            float attenuation = 1.0 / (1.0 + light.attenuation * distance * distance);
+            float dist = 1.0f - (distance / light.radius);
+            dist = clamp(dist, 0.0f, 1.0f);
 
-            vec3 lightContribution = (ambient + diffuse + specular) * attenuation * distanceFactor;
+            float attenuation = 1.0f / (1.0f + light.attenuation * distance * distance);
 
-            result += lightContribution;
+            vec3 lighting = (ambient + diffuse + spec) * attenuation * dist;
+
+            result += lighting;
         }
 
         FragColor = vec4(result * texColor, texture(texture0, texCoord).a);

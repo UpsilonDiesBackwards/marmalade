@@ -28,6 +28,9 @@
 #include <imgui.h>
 
 class EditView {
+    static int currentRenderMode;
+    const char* renderModes[3] = { "Lit", "Unlit", "Wireframe" };
+
 public:
     Entity* selectedEntity{};
 
@@ -51,6 +54,5 @@ private:
     void ShowColliderBounds();
     void ShowLightBounds();
 };
-
 
 #endif

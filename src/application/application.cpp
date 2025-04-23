@@ -180,6 +180,7 @@ void Application::Initialise() {
 
 void Application::Run() {
     profiler.Update();
+    profiler.FixedUpdate();
 
     ImVec4 backgroundCol = ImGui::ColorConvertU32ToFloat4(Marmalade::EngineConfig::GetStoredConfig().appearance.backgroundColor);
     glClearColor(backgroundCol.x, backgroundCol.y, backgroundCol.z, backgroundCol.w);

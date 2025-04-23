@@ -32,6 +32,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+int EditView::currentRenderMode = 1;
+
 EditView::EditView(int width, int height) : width(width), height(height) {
     Application::GetInstance().framebuffer = &framebuffer;
 }
@@ -104,9 +106,6 @@ void EditView::Render() {
         }
 
         ImGui::SameLine();
-
-        static int currentRenderMode = 1;
-        const char* renderModes[] = { "Lit", "Unlit", "Wireframe" };
 
         ImGui::SetNextItemWidth(95);
         if (ImGui::Combo("Render Mode", &currentRenderMode, renderModes, IM_ARRAYSIZE(renderModes))) {
