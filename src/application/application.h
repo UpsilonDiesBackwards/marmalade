@@ -30,7 +30,7 @@
 #include "../gui/editor.h"
 #include "guilogsink.h"
 
-#include "profiler.h"
+#include "time.h"
 
 #include <GLFW/glfw3.h>
 

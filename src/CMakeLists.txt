@@ -5,8 +5,8 @@ list(APPEND ENGINE_SRC
         application/application.cpp
         application/application.h
         application/logger.h
-        application/profiler.cpp
-        application/profiler.h
+        application/time.cpp
+        application/time.h
         application/guilogsink.cpp
         application/guilogsink.h
         application/config/recents.cpp
@@ -28,7 +28,6 @@ list(APPEND ENGINE_SRC
         graphics/shader.cpp
         graphics/texture.cpp
         graphics/framebuffer.cpp
-        graphics/lighting/light.cpp
         graphics/multisampledframebuffer.cpp
 
         io/audiomanager.cpp

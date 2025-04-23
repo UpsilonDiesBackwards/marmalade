@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "profiler.h"
+#include "time.h"
 #include "application.h"
 
 #include <GLFW/glfw3.h>

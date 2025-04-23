@@ -59,7 +59,6 @@ namespace Marmalade::ECS {
         void Setup(Entity* entity) override;
         nlohmann::json Serialize(const Entity* entity) override;
         void Deserialize(nlohmann::json json, Entity* entity) override;
-        ~Light2D() override;
 
         glm::vec2 GetPosition();
 
