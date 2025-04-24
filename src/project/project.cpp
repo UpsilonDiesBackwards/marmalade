@@ -133,7 +133,7 @@ bool Marmalade::Project::Project::CheckIfGitRepository() {
 
     git_repository *repo = nullptr;
 
-    int err = git_repository_open(&repo, basePath.c_str()); // Attempt to open the git repository at the base path of the project...
+    int err = git_repository_open(&repo, basePath.string().c_str()); // Attempt to open the git repository at the base path of the project...
     if (err == 0) { //... if no error is returned then the repository exists, return true
         git_repository_free(repo);
         return true;

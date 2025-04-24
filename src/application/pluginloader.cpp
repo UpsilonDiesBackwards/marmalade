@@ -88,7 +88,7 @@ void Marmalade::PluginLoader::UnloadPlugins() {
 
 LIBRARY_TYPE Marmalade::PluginLoader::loadPluginLibrary(const std::filesystem::path& path) {
 #ifdef _WIN32
-    HMODULE pluginLib = LoadLibrary(path.string().c_str());
+    HMODULE pluginLib = LoadLibraryA(path.string().c_str());
     if (!pluginLib) {
         LOG_ERROR("Failed to load plugin: {}", path.filename().string());
         return nullptr;

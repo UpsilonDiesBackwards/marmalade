@@ -34,10 +34,9 @@
 
 #include <spdlog/logger.h>
 
+#include <stdarg.h>
 #include <vector>
 #include <filesystem>
-
-#include <stdarg.h>
 
 #define PLUGIN_LOG_FUNC(level)                                                        \
     auto* spdlog_logger = reinterpret_cast<std::shared_ptr<spdlog::logger>*>(logger); \

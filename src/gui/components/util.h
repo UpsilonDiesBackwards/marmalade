@@ -21,6 +21,7 @@
 #define MARMALADE_GUI_COMPONENTS_UTIL
 
 #include <type_traits>
+#include <memory>
 
 namespace Marmalade::GUI::Components {
     /**
