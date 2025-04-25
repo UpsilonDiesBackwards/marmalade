@@ -20,7 +20,7 @@
 #ifndef MARMALADE_PLUGINLOADER_H
 #define MARMALADE_PLUGINLOADER_H
 
-#include "plugin.h"
+#include <plugin.h>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -53,15 +53,15 @@ namespace Marmalade {
     public:
         LIBRARY_TYPE library;
         std::shared_ptr<spdlog::logger> logger;
+        EngineAPI Api;
     };
 
     class PluginLoader {
     public:
-        static PluginLoader GetInstance();
+        static PluginLoader& GetInstance();
 
         void LoadPlugins();
         void UnloadPlugins();
-
     private:
         std::vector<Plugin> _loadedPlugins{};
 
@@ -86,6 +86,5 @@ namespace Marmalade {
         static void LogCritical(void* logger, const char* fmt, ...) { PLUGIN_LOG_FUNC(critical); }
     };
 }
-
 
 #endif

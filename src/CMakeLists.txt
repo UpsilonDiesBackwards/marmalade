@@ -15,14 +15,15 @@ list(APPEND ENGINE_SRC
         application/config/plugins.h
         application/util.cpp
         application/util.h
-        application/pluginloader.cpp
-        application/pluginloader.h
         application/config/config.h
         application/config/configutil.h
         application/config/configutil.cpp
         application/config/engineconfig.cpp
         application/config/engineconfig.h
 
+        application/plugins/pluginloader.cpp
+        application/plugins/pluginloader.h
+        application/plugins/guiimpl.h
         graphics/viewport.cpp
         graphics/renderable.cpp
         graphics/shader.cpp

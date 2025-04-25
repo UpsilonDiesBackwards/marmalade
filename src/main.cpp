@@ -21,7 +21,7 @@
 #include "application/config/configutil.h"
 #include "application/config/recents.h"
 #include "application/config/plugins.h"
-#include "application/pluginloader.h"
+#include "application/plugins/pluginloader.h"
 #include "gui/windowmanager.h"
 
 #include "gui/nativeui/app.h"

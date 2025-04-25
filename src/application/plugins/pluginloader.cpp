@@ -21,13 +21,17 @@
 
 #include "config/configutil.h"
 #include "logger.h"
+#include "guiimpl.h"
+
+#include "../config/configutil.h"
+#include "../logger.h"
 
 int Marmalade::EngineApiImpl::GetVersion() {
     return 1;
 }
 
-Marmalade::PluginLoader Marmalade::PluginLoader::GetInstance() {
-    static PluginLoader instance = PluginLoader();
+Marmalade::PluginLoader& Marmalade::PluginLoader::GetInstance() {
+    static PluginLoader instance{};
     return instance;
 }
 
@@ -45,8 +49,12 @@ void Marmalade::PluginLoader::LoadPlugins() {
 
     _loadedPlugins.clear();
 
+    // Static methods, function pointers set by plugins might persist across plugins?
+    static auto guiApi = GuiApiImpl::Create();
+
     EngineAPI api{};
     api.GetVersion = &EngineApiImpl::GetVersion;
+    api.GuiApi = &guiApi;
 
     for (const auto& pluginFile: std::filesystem::directory_iterator(pluginsDir)) {
         LOG_INFO("Loading plugin: {}", pluginFile.path().filename().string());
@@ -70,6 +78,7 @@ void Marmalade::PluginLoader::LoadPlugins() {
 
         api.Logger = &pluginLogger;
         callPluginMain(plugin, api);
+        plugin.Api = api;
 
         _loadedPlugins.push_back(plugin);
     }

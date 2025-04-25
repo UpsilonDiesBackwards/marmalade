@@ -33,7 +33,7 @@ typedef enum {
     MARM_RESULT_FAILURE = 1,
 } MarmResult;
 
-ENGINE_PROVIDED struct PluginLogger {
+struct ENGINE_PROVIDED PluginLogger {
     void (*LogTrace)(void* logger, const char* fmt, ...);
     void (*LogDebug)(void* logger, const char* fmt, ...);
     void (*LogInfo)(void* logger, const char* fmt, ...);
@@ -52,10 +52,14 @@ ENGINE_PROVIDED struct PluginLogger {
 #define LOG_CRITICAL(fmt, ...) engineApi.Logger->LogCritical(engineApi.Logger->_logger, fmt, __VA_ARGS__)
 #endif
 
+struct GuiAPI;
 
-ENGINE_PROVIDED struct EngineAPI {
+struct ENGINE_PROVIDED EngineAPI {
     int (*GetVersion)();
     struct PluginLogger* Logger;
+
+    // Structures for each API, in alphabetical order
+    struct GuiAPI* GuiApi;
 };
 
 
