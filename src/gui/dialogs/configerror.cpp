@@ -20,6 +20,7 @@
 #include "configerror.h"
 
 #include "../../application/application.h"
+#include "../../application/plugins/interfaceimpl.h"
 
 #include <imgui.h>
 

@@ -19,14 +19,14 @@
 
 #include "details.h"
 
-#include "../../application/util.h"
+#include "../../application/plugins/interfaceimpl.h"
 
 #include <imgui.h>
 
 #include <IconsCodicons.h>
 
 void Marmalade::GUI::Details::Draw() {
-    ImGui::Begin(ICON_CI_SEARCH " Details", &visible);
+    WINDOW_BEGIN(ICON_CI_SEARCH " Details", ImGuiWindowFlags_None)
 
     if (!inspectedEntity) {// Do not draw if there is no entity selected
         visible = false;
@@ -65,7 +65,7 @@ void Marmalade::GUI::Details::Draw() {
     ShowRemovePopup();
     _addComponentDialog.Draw();
 
-    ImGui::End();
+    WINDOW_END()
 }
 
 void Marmalade::GUI::Details::ShowRemovePopup() {

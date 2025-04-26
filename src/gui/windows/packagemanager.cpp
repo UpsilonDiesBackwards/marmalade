@@ -23,6 +23,7 @@
 #include "../components/markdownparser.h"
 #include "../fontmanager.h"
 #include "../../application/config/configutil.h"
+#include "../../application/plugins/interfaceimpl.h"
 
 #include <sstream>
 #include <thread>
@@ -135,18 +136,18 @@ Components::TableView<Marmalade::Repository, std::vector<Marmalade::Repository>,
 #pragma endregion
 
 void PackageManagerOptions::Draw() {
-    ImGui::Begin(ICON_CI_SETTINGS_GEAR " Package Manager Settings", &visible);
+    WINDOW_BEGIN(ICON_CI_SETTINGS_GEAR " Package Manager Settings", ImGuiWindowFlags_None)
 
     _tableView.Draw();
 
-    ImGui::End();
+    WINDOW_END()
 }
 
 void PackageManager::Draw() {
     const float BOTTOM_BAR_HEIGHT = 22.0f;
 
     ImGui::SetNextWindowSize(ImVec2(1080, 720), ImGuiCond_FirstUseEver);
-    ImGui::Begin(ICON_CI_PACKAGE " Package Manager", &visible, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
+    WINDOW_BEGIN(ICON_CI_PACKAGE " Package Manager", ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse)
     if (ImGui::BeginTabBar("PackageManagerTabs")) {
         if (ImGui::BeginTabItem("All")) {
             drawSplit(PackageManagerTab_ALL, BOTTOM_BAR_HEIGHT);
@@ -165,7 +166,7 @@ void PackageManager::Draw() {
 
     drawBottomBar(BOTTOM_BAR_HEIGHT);
 
-    ImGui::End();
+    WINDOW_END()
 }
 
 void PackageManager::drawLeftPane(PackageManagerTab tab) {

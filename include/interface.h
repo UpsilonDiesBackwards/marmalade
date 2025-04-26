@@ -17,19 +17,22 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_GUI_API_H
-#define MARMALADE_GUI_API_H
+#ifndef MARMALADE_INTERFACE_API_H
+#define MARMALADE_INTERFACE_API_H
 
-struct ENGINE_PROVIDED GuiAPI {
+struct ENGINE_PROVIDED InterfaceAPI {
     void (*Init)();
+
+    void (*AddBeginHook)(const char* nameRegex, void (*BeginHook)());
+    void (*AddEndHook)(const char* nameRegex, void (*EndHook)());
 
     // TODO: Hooks for each window
     // Maybe way to listen for Draw function with specific window title string
     // Or each window provides a structure with callbacks for specific events
 
-#define GUI_API_SIGNATURE
+#define INTERFACE_API_SIGNATURE
 #include "imgui.inc"
-#undef GUI_API_SIGNATURE
+#undef INTERFACE_API_SIGNATURE
 };
 
 #endif

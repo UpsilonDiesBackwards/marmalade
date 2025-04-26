@@ -21,6 +21,7 @@
 
 #include "../../application/util.h"
 #include "../fontmanager.h"
+#include "../../application/plugins/interfaceimpl.h"
 
 #include <imgui.h>
 
@@ -48,7 +49,7 @@ std::vector<Marmalade::GUI::About::Package> Marmalade::GUI::About::loadPackages(
 }
 
 void Marmalade::GUI::About::Draw() {
-    ImGui::Begin(ICON_CI_INFO " About", &visible);
+    WINDOW_BEGIN(ICON_CI_INFO " About", ImGuiWindowFlags_None)
 
     static int aboutTexId = Util::LoadGuiTexture("res/icons/logo/logo1920.png");
 
@@ -99,5 +100,5 @@ void Marmalade::GUI::About::Draw() {
         ImGui::EndTabBar();
     }
 
-    ImGui::End();
+    WINDOW_END()
 }

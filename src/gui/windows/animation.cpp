@@ -1,4 +1,3 @@
-
 /*
  Marmalade - Lightweight Game Engine
  Copyright (C) 2025 Tayler Parsons
@@ -21,20 +20,19 @@
 #include "animation.h"
 
 #include "../../application/util.h"
-
+#include "../../application/application.h"
+#include "../../application/plugins/interfaceimpl.h"
 
 #include <glm/common.hpp>
 
 #include <imgui.h>
 #include <imnodes.h>
 
-#include "IconsCodicons.h"
-#include "../../application/application.h"
-#include "ImGuiFileDialog.h"
-#include "../windowmanager.h"
+#include <IconsCodicons.h>
+#include <ImGuiFileDialog.h>
 
 void Marmalade::GUI::Animation::Draw() {
-    ImGui::Begin(ICON_CI_DEVICE_CAMERA_VIDEO " Animation", &visible, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
+    WINDOW_BEGIN(ICON_CI_DEVICE_CAMERA_VIDEO " Animation", ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse)
 
     static float topSectionHeight = 300.0f;
     float minHeight = 100.0f;
@@ -50,7 +48,7 @@ void Marmalade::GUI::Animation::Draw() {
     // Animation timeline
     DrawTimeline();
 
-    ImGui::End();
+    WINDOW_END()
 }
 
 void Marmalade::GUI::Animation::DrawNodeArea() {

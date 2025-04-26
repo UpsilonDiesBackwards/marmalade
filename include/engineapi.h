@@ -44,15 +44,16 @@ struct ENGINE_PROVIDED PluginLogger {
 };
 
 #ifndef ENGINE_BUILD
-#define LOG_TRACE(fmt, ...) engineApi.Logger->LogTrace(engineApi.Logger->_logger, fmt, __VA_ARGS__)
-#define LOG_DEBUG(fmt, ...) engineApi.Logger->LogDebug(engineApi.Logger->_logger, fmt, __VA_ARGS__)
-#define LOG_INFO(fmt, ...) engineApi.Logger->LogInfo(engineApi.Logger->_logger, fmt, __VA_ARGS__)
-#define LOG_WARN(fmt, ...) engineApi.Logger->LogWarn(engineApi.Logger->_logger, fmt, __VA_ARGS__)
-#define LOG_ERROR(fmt, ...) engineApi.Logger->LogError(engineApi.Logger->_logger, fmt, __VA_ARGS__)
-#define LOG_CRITICAL(fmt, ...) engineApi.Logger->LogCritical(engineApi.Logger->_logger, fmt, __VA_ARGS__)
+#define LOG_TRACE(engineApi, fmt, ...) (engineApi)->Logger->LogTrace((engineApi)->Logger->_logger, fmt, __VA_ARGS__)
+#define LOG_DEBUG(engineApi, fmt, ...) (engineApi)->Logger->LogDebug((engineApi)->Logger->_logger, fmt, __VA_ARGS__)
+#define LOG_INFO(engineApi, fmt, ...) (engineApi)->Logger->LogInfo((engineApi)->Logger->_logger, fmt, __VA_ARGS__)
+#define LOG_WARN(engineApi, fmt, ...) (engineApi)->Logger->LogWarn((engineApi)->Logger->_logger, fmt, __VA_ARGS__)
+#define LOG_ERROR(engineApi, fmt, ...) (engineApi)->Logger->LogError((engineApi)->Logger->_logger, fmt, __VA_ARGS__)
+#define LOG_CRITICAL(engineApi, fmt, ...) (engineApi)->Logger->LogCritical((engineApi)->Logger->_logger, fmt, __VA_ARGS__)
 #endif
 
 struct GuiAPI;
+struct InterfaceAPI;
 
 struct ENGINE_PROVIDED EngineAPI {
     int (*GetVersion)();
@@ -60,6 +61,7 @@ struct ENGINE_PROVIDED EngineAPI {
 
     // Structures for each API, in alphabetical order
     struct GuiAPI* GuiApi;
+    struct InterfaceAPI* InterfaceApi;
 };
 
 

@@ -21,6 +21,7 @@
 
 #include "../../application/application.h"
 #include "../../application/config/recents.h"
+#include "../../application/plugins/interfaceimpl.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>

@@ -17,8 +17,8 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_PLUGINLOADER_H
-#define MARMALADE_PLUGINLOADER_H
+#ifndef MARMALADE_PLUGINS_PLUGINLOADER_H
+#define MARMALADE_PLUGINS_PLUGINLOADER_H
 
 #include <plugin.h>
 

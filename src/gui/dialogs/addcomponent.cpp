@@ -21,6 +21,7 @@
 
 #include "../../application/application.h"
 #include "../../application/util.h"
+#include "../../application/plugins/interfaceimpl.h"
 
 #include <ecs/component.h>
 

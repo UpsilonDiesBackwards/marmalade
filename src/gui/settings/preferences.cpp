@@ -21,6 +21,7 @@
 
 #include "../../application/config/engineconfig.h"
 #include "../../application/application.h"
+#include "../../application/plugins/interfaceimpl.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -167,11 +168,11 @@ void Marmalade::GUI::Preferences::drawSplit() {
 void Marmalade::GUI::Preferences::Draw() {
     ImGui::SetNextWindowSize(ImVec2(800, 500));
 
-    ImGui::Begin(ICON_CI_SETTINGS_GEAR " Preferences", &visible);
+    WINDOW_BEGIN(ICON_CI_SETTINGS_GEAR " Preferences", ImGuiWindowFlags_None)
 
     drawSplit();
 
-    ImGui::End();
+    WINDOW_END()
 }
 
 void Marmalade::GUI::Preferences::drawGeneralProjectBrowserPane() {
