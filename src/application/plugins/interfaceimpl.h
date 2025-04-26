@@ -37,6 +37,7 @@ namespace Marmalade {
                     .Init = &Init,
                     .AddBeginHook = &AddBeginHook,
                     .AddEndHook = &AddEndHook,
+                    .GetFocusedWindow = &GetFocusedWindow,
 #define INTERFACE_API_INITIALISER
 #include <imgui.inc>
 #undef INTERFACE_API_INITIALISER
@@ -49,6 +50,8 @@ namespace Marmalade {
 
         static void AddEndHook(const char* nameRegex, void (*EndHook)());
 
+        static const char* GetFocusedWindow();
+
 #define INTERFACE_API_IMPL
 #include <imgui.inc>
 #undef INTERFACE_API_IMPL
@@ -56,7 +59,12 @@ namespace Marmalade {
         static void CallBeginHooks(std::string windowName);
 
         static void CallEndHooks(std::string windowName);
+
+        static void SetFocusedWindow(std::string windowName);
+
     private:
+        static std::string _focusedWindowName;
+
         static std::unordered_map<std::string, bool> _hookCacheStatus;
 
         static std::unordered_map<std::string, std::vector<std::function<void()>>> _beginHooksCached;

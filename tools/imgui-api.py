@@ -48,12 +48,13 @@ HEADER = '''/*
  */
 '''
 
-# Functions listed here in format, (ImGui name, return type, signature, call args)
+# Functions listed here in format, (function name, return type, signature, call args, [ImGui name])
 # Types will need to be translated to C
-FUNCTIONS = {
+FUNCTIONS = [
+    ('SameLine', 'void' ,'', ''),
+    ('SameLineWithOffset', 'void' ,'float offset, float spacing', 'offset, spacing', 'SameLine'),
     ('Button', 'int', 'const char *label', 'label')
-}
-
+]
 
 def main():
     with open(IMGUI_INC_PATH, "w") as f:
@@ -61,18 +62,19 @@ def main():
         f.write('\n')
 
         f.write(f"#ifdef INTERFACE_API_SIGNATURE\n")
-        for name, ret_type, args, call_args in FUNCTIONS:
+        for name, ret_type, args, call_args, *other in FUNCTIONS:
             f.write(f"{ret_type} (*{name})({args});\n")
         f.write(f"#endif // INTERFACE_API_SIGNATURE\n\n")
 
         f.write(f"#ifdef INTERFACE_API_INITIALISER\n")
-        for name, ret_type, args, call_args in FUNCTIONS:
+        for name, ret_type, args, call_args, *other in FUNCTIONS:
             f.write(f".{name} = &{name}Impl,\n")
         f.write(f"#endif // INTERFACE_API_INITIALISER\n\n")
 
         f.write(f"#ifdef INTERFACE_API_IMPL\n")
-        for name, ret_type, args, call_args in FUNCTIONS:
-            f.write(f"static {ret_type} {name}Impl({args}) {{ return ImGui::{name}({call_args}); }}\n")
+        for name, ret_type, args, call_args, *other in FUNCTIONS:
+            imgui_func = other[0] if other else name
+            f.write(f"static {ret_type} {name}Impl({args}) {{ return ImGui::{imgui_func}({call_args}); }}\n")
         f.write(f"#endif // INTERFACE_API_IMPL\n")
 
 

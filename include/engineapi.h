@@ -52,6 +52,9 @@ struct ENGINE_PROVIDED PluginLogger {
 #define LOG_CRITICAL(engineApi, fmt, ...) (engineApi)->Logger->LogCritical((engineApi)->Logger->_logger, fmt, __VA_ARGS__)
 #endif
 
+// Each structure contains a Size field to allow for ABI safety
+#define SAFE_TO_CALL(type, api, func) (sizeof(*(api)) >= (offsetof(type, func) + sizeof((api)->func)))
+
 struct InterfaceAPI;
 
 struct ENGINE_PROVIDED EngineAPI {

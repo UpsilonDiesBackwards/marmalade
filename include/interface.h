@@ -21,10 +21,14 @@
 #define MARMALADE_INTERFACE_API_H
 
 struct ENGINE_PROVIDED InterfaceAPI {
+    unsigned int Size; // Set to sizeof(InterfaceAPI)
+
     void (*Init)();
 
     void (*AddBeginHook)(const char* nameRegex, void (*BeginHook)());
     void (*AddEndHook)(const char* nameRegex, void (*EndHook)());
+
+    const char* (*GetFocusedWindow)();
 
     // TODO: Hooks for each window
     // Maybe way to listen for Draw function with specific window title string

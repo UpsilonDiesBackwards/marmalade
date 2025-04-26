@@ -20,11 +20,12 @@
 #ifndef MARMALADE_GUI_WINDOW_H
 #define MARMALADE_GUI_WINDOW_H
 
-#define WINDOW_BEGIN(name, flags)        \
-    ImGui::Begin(name, &visible, flags); \
-    {                                    \
-        const char* _window_name = name; \
-        Marmalade::InterfaceApiImpl::CallBeginHooks(name);
+#define WINDOW_BEGIN(name, flags)                          \
+    ImGui::Begin(name, &visible, flags);                   \
+    {                                                      \
+        const char* _window_name = name;                   \
+        Marmalade::InterfaceApiImpl::CallBeginHooks(name); \
+        if (ImGui::IsWindowFocused()) Marmalade::InterfaceApiImpl::SetFocusedWindow(name);
 
 #define WINDOW_END()                                         \
     Marmalade::InterfaceApiImpl::CallEndHooks(_window_name); \

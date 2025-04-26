@@ -25,6 +25,7 @@
 
 using namespace Marmalade;
 
+std::string InterfaceApiImpl::_focusedWindowName = "";
 std::unordered_map<std::string, bool> InterfaceApiImpl::_hookCacheStatus{};
 std::unordered_map<std::string, std::vector<std::function<void()>>> InterfaceApiImpl::_beginHooksCached{};
 std::unordered_map<std::string, std::vector<std::function<void()>>> InterfaceApiImpl::_endHooksCached{};
@@ -37,6 +38,11 @@ void InterfaceApiImpl::AddBeginHook(const char* nameRegex, void (*BeginHook)()) 
 
 void InterfaceApiImpl::AddEndHook(const char* nameRegex, void (*EndHook)()) {
     _endHooks[nameRegex].emplace_back(EndHook);
+}
+
+const char* InterfaceApiImpl::GetFocusedWindow() {
+    auto str= _focusedWindowName.c_str();
+    return str;
 }
 
 void InterfaceApiImpl::CallBeginHooks(std::string windowName) {
@@ -57,6 +63,14 @@ void InterfaceApiImpl::CallEndHooks(std::string windowName) {
     for (auto& hook: _endHooksCached[windowName]) {
         hook();
     }
+}
+
+void InterfaceApiImpl::SetFocusedWindow(std::string windowName) {
+    // Remove unicode stuff
+    std::string result;
+    std::copy_if(windowName.begin(), windowName.end(), std::back_inserter(result),
+                 [](unsigned char c) { return c <= 0x7F && c != 0x00; });
+    _focusedWindowName = result;
 }
 
 void InterfaceApiImpl::cacheHooks(std::string windowName) {

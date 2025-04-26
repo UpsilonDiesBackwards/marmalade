@@ -22,13 +22,19 @@
  */
 
 #ifdef INTERFACE_API_SIGNATURE
+void (*SameLine)();
+void (*SameLineWithOffset)(float offset, float spacing);
 int (*Button)(const char *label);
 #endif // INTERFACE_API_SIGNATURE
 
 #ifdef INTERFACE_API_INITIALISER
+.SameLine = &SameLineImpl,
+.SameLineWithOffset = &SameLineWithOffsetImpl,
 .Button = &ButtonImpl,
 #endif // INTERFACE_API_INITIALISER
 
 #ifdef INTERFACE_API_IMPL
+static void SameLineImpl() { return ImGui::SameLine(); }
+static void SameLineWithOffsetImpl(float offset, float spacing) { return ImGui::SameLine(offset, spacing); }
 static int ButtonImpl(const char *label) { return ImGui::Button(label); }
 #endif // INTERFACE_API_IMPL

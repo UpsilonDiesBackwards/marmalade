@@ -19,8 +19,6 @@
 
 #include "pluginloader.h"
 
-#include "config/configutil.h"
-#include "logger.h"
 #include "interfaceimpl.h"
 
 #include "../config/configutil.h"
