@@ -23,7 +23,8 @@ list(APPEND ENGINE_SRC
 
         application/plugins/pluginloader.cpp
         application/plugins/pluginloader.h
-        application/plugins/guiimpl.h
+        application/plugins/interfaceimpl.cpp
+        application/plugins/interfaceimpl.h
         graphics/viewport.cpp
         graphics/renderable.cpp
         graphics/shader.cpp

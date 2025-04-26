@@ -40,7 +40,7 @@ list(APPEND ENGINE_API
         plugin.h
 
         imgui.inc
-        gui.h
+        interface.h
 )
 
 target_sources(marmalade PRIVATE ${ENGINE_API})

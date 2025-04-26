@@ -60,20 +60,20 @@ def main():
         f.write(HEADER)
         f.write('\n')
 
-        f.write(f"#ifdef GUI_API_SIGNATURE\n")
+        f.write(f"#ifdef INTERFACE_API_SIGNATURE\n")
         for name, ret_type, args, call_args in FUNCTIONS:
             f.write(f"{ret_type} (*{name})({args});\n")
-        f.write(f"#endif\n")
+        f.write(f"#endif // INTERFACE_API_SIGNATURE\n\n")
 
-        f.write(f"#ifdef GUI_API_INITIALISER\n")
+        f.write(f"#ifdef INTERFACE_API_INITIALISER\n")
         for name, ret_type, args, call_args in FUNCTIONS:
             f.write(f".{name} = &{name}Impl,\n")
-        f.write(f"#endif\n")
+        f.write(f"#endif // INTERFACE_API_INITIALISER\n\n")
 
-        f.write(f"#ifdef GUI_API_IMPL\n")
+        f.write(f"#ifdef INTERFACE_API_IMPL\n")
         for name, ret_type, args, call_args in FUNCTIONS:
             f.write(f"static {ret_type} {name}Impl({args}) {{ return ImGui::{name}({call_args}); }}\n")
-        f.write(f"#endif\n")
+        f.write(f"#endif // INTERFACE_API_IMPL\n")
 
 
 if __name__ == '__main__':

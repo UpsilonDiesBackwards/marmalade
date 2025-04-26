@@ -23,6 +23,7 @@
 #include "../../project/projectmanager.h"
 #include "../../application/application.h"
 #include "../../application/config/recents.h"
+#include "../../application/plugins/interfaceimpl.h"
 
 #include <imgui.h>
 

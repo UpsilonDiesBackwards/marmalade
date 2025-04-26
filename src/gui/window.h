@@ -20,14 +20,28 @@
 #ifndef MARMALADE_GUI_WINDOW_H
 #define MARMALADE_GUI_WINDOW_H
 
-#define WINDOW_BEGIN_MODAL(name, flags) \
-    if (visible) {               \
-        ImGui::OpenPopup(name);  \
-    }                            \
-    if (ImGui::BeginPopupModal(name, &visible, flags)) {
+#define WINDOW_BEGIN(name, flags)        \
+    ImGui::Begin(name, &visible, flags); \
+    {                                    \
+        const char* _window_name = name; \
+        Marmalade::InterfaceApiImpl::CallBeginHooks(name);
 
-#define WINDOW_END_MODAL() \
-    ImGui::EndPopup();     \
+#define WINDOW_END()                                         \
+    Marmalade::InterfaceApiImpl::CallEndHooks(_window_name); \
+    ImGui::End();                                            \
+    }
+
+#define WINDOW_BEGIN_MODAL(name, flags)                  \
+    if (visible) {                                       \
+        ImGui::OpenPopup(name);                          \
+    }                                                    \
+    if (ImGui::BeginPopupModal(name, &visible, flags)) { \
+        const char* _window_name = name;                 \
+        Marmalade::InterfaceApiImpl::CallBeginHooks(name);
+
+#define WINDOW_END_MODAL()                                   \
+    Marmalade::InterfaceApiImpl::CallEndHooks(_window_name); \
+    ImGui::EndPopup();                                       \
     }
 
 namespace Marmalade::GUI {

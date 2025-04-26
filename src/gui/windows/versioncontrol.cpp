@@ -21,6 +21,7 @@
 #include "versioncontrol.h"
 
 #include "../../application/application.h"
+#include "../../application/plugins/interfaceimpl.h"
 
 #include <git2/global.h>
 #include <git2/repository.h>
@@ -37,7 +38,7 @@
 namespace fs = std::filesystem;
 
 void Marmalade::GUI::VersionControl::Draw() {
-    ImGui::Begin(ICON_CI_GIT_COMMIT " Version Control", &visible);
+    WINDOW_BEGIN(ICON_CI_GIT_COMMIT " Version Control", ImGuiWindowFlags_None)
 
     if (Application::GetInstance().GetCurrentProject()->CheckIfGitRepository()) { // If the current project a valid git repo...
         CheckForModifiedItems(); //... then check for modified items...
@@ -52,7 +53,7 @@ void Marmalade::GUI::VersionControl::Draw() {
         ShowItemDiff(oldContent, newContent);
     }
 
-    ImGui::End();
+    WINDOW_END()
 }
 
 void Marmalade::GUI::VersionControl::CheckForModifiedItems() {

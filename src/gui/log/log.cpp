@@ -20,18 +20,18 @@
 #include "log.h"
 
 #include "../../application/application.h"
+#include "../../application/plugins/interfaceimpl.h"
 
-#include "imgui.h"
+#include <imgui.h>
 
-#include "IconsCodicons.h"
+#include <IconsCodicons.h>
 
 void Marmalade::GUI::Log::Draw() {
     static const ImVec4 COLOR_YELLOW(1.0f, 1.0f, 0.0f, 1.0f);
     static const ImVec4 COLOR_RED(1.0f, 0.0f, 0.0f, 1.0f);
     static const ImVec4 COLOR_GRAY(0.6f, 0.6f, 0.6f, 1.0f);
 
-    ImGui::Begin(ICON_CI_FILE_TEXT " Engine Log", &visible);
-    {
+    WINDOW_BEGIN(ICON_CI_FILE_TEXT " Engine Log", ImGuiWindowFlags_None) {
         if (ImGui::BeginChild("CommandLineScrollingRegion", ImVec2(ImGui::GetWindowWidth(),
                                                                    ImGui::GetWindowHeight() - 60))) {
             for (const auto& line: Application::GetInstance().guiSink->get_items()) {
@@ -66,11 +66,10 @@ void Marmalade::GUI::Log::Draw() {
             ImGui::OpenPopup("Options");
         }
 
-        ImGui::End();
+        WINDOW_END()
     }
 
-    ImGui::Begin(ICON_CI_FILE_TEXT " Game Log", &visible);
-    {
-        ImGui::End();
+    WINDOW_BEGIN(ICON_CI_FILE_TEXT " Game Log", ImGuiWindowFlags_None) {
+        WINDOW_END()
     }
 }

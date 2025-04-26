@@ -20,8 +20,8 @@
 #include "settings.h"
 
 #include "../../application/application.h"
-#include "../../application/logger.h"
 #include "../../project/projectmanager.h"
+#include "../../application/plugins/interfaceimpl.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -32,7 +32,7 @@ void Marmalade::GUI::ProjectSettings::Draw() {
     Application& app = Application::GetInstance();
 
     ImGui::SetNextWindowSize(ImVec2(1080, 720), ImGuiCond_FirstUseEver);
-    ImGui::Begin(ICON_CI_SETTINGS " Project Settings", &visible, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
+    WINDOW_BEGIN(ICON_CI_SETTINGS " Project Settings", ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse)
 
     if (app.GetCurrentProject() == nullptr) {
         LOG_ERROR("Can not open project settings! A project is not currently opened.");
@@ -66,7 +66,7 @@ void Marmalade::GUI::ProjectSettings::Draw() {
         Marmalade::Project::ProjectManager<>::SaveProject(app.GetCurrentProject());
     }
 
-    ImGui::End();
+    WINDOW_END()
 }
 
 void Marmalade::GUI::ProjectSettings::drawProjectSettings() {
