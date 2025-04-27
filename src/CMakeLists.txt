@@ -25,12 +25,14 @@ list(APPEND ENGINE_SRC
         application/plugins/pluginloader.h
         application/plugins/interfaceimpl.cpp
         application/plugins/interfaceimpl.h
-        graphics/viewport.cpp
+
+        graphics/framebuffer.cpp
+        graphics/material.cpp
+        graphics/multisampledframebuffer.cpp
         graphics/renderable.cpp
         graphics/shader.cpp
         graphics/texture.cpp
-        graphics/framebuffer.cpp
-        graphics/multisampledframebuffer.cpp
+        graphics/viewport.cpp
 
         io/audiomanager.cpp
         io/input.cpp
@@ -60,7 +62,7 @@ list(APPEND ENGINE_SRC
 list(APPEND ENGINE_SRC # ECS
         ecs/componentmanager.cpp
         ecs/components/transform.cpp
-        ecs/components/texturerenderer.cpp
+        ecs/components/materialrenderer.cpp
 
         ecs/components/audio/audioplayer.cpp
 
