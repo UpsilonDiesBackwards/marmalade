@@ -23,7 +23,7 @@
 #include "../graphics/renderable.h"
 #include "../ecs/componentmanager.h"
 #include "../ecs/components/transform.h"
-#include "../ecs/components/texturerenderer.h"
+#include "../ecs/components/materialrenderer.h"
 
 #include <glm/mat4x4.hpp>
 

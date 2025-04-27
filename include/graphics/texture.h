@@ -22,11 +22,18 @@
 
 #include <glad/glad.h>
 
+#include "material.h"
+
 #include <string>
+
+namespace Marmalade::Material {
+    struct TextureSettings;
+}
 
 class Texture {
 public:
-    static GLuint LoadTexture(const std::string &filePath);
+
+    static GLuint LoadTexture(const std::string& filePath, const Marmalade::Material::TextureSettings& settings);
 };
 
 #endif

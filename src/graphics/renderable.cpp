@@ -81,9 +81,26 @@ void Renderable::Draw(Entity* entity, glm::mat4 modelMatrix, bool renderTexture)
     shaderProgram.Use();
     glBindVertexArray(VAO);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    shaderProgram.SetInt("texture0", 0);
+    if (material && !material->albedo.filePath.empty()) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, material->albedo.id);
+        shaderProgram.SetInt("albedoMap", 0);
+    } else {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        shaderProgram.SetInt("albedoMap", 0);
+    }
+
+    if (material && !material->normal.filePath.empty()) {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, material->normal.id);
+        shaderProgram.SetInt("normalMap", 1);
+    } else {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        shaderProgram.SetInt("normalMap", 1);
+    }
+
 
     glEnable(GL_BLEND);
     glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
@@ -152,29 +169,4 @@ void Renderable::ApplyRenderMode() {
     }
 
     _previousRenderMode = renderMode;
-}
-
-void Renderable::UpdateTextureSettings() {
-    if (texture == 0) return;
-
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texSettings.wrapS);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texSettings.wrapT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texSettings.minFilter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texSettings.magFilter);
-}
-
-void Renderable::SetTexture(const std::string& filePath) {
-    texSettings.filePath = filePath;
-
-    glDeleteTextures(1, &texture);
-
-    texture = Texture::LoadTexture(filePath);
-
-    UpdateTextureSettings();
-}
-
-unsigned int Renderable::GetTexture() {
-    return texture;
 }

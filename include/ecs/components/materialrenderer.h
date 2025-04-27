@@ -17,8 +17,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_ECS_SPRITERENDER_H
-#define MARMALADE_ECS_SPRITERENDER_H
+#ifndef MARMALADE_ECS_MATERIALRENDER_H
+#define MARMALADE_ECS_MATERIALRENDER_H
 
 #include "../component.h"
 
@@ -27,8 +27,10 @@
 #include <nlohmann/json.hpp>
 
 namespace Marmalade::ECS {
-    class TextureRenderer : public Component {
+    class MaterialRenderer : public Component {
     public:
+        std::filesystem::path materialPath;
+
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
         void Setup(Entity* entity) override;
@@ -36,17 +38,20 @@ namespace Marmalade::ECS {
         nlohmann::json Serialize(const Entity* entity) override;
         void Deserialize(nlohmann::json json, Entity* entity) override;
 
-        TextureRenderer() {
-            name = "Texture Renderer";
+        nlohmann::json SerializeTexture(const Marmalade::Material::Texture& texture);
+        void DeserializeTexture(const nlohmann::json& textureJson, Marmalade::Material::Texture& texture);
+
+        MaterialRenderer() {
+            name = "Material Renderer";
             allowMultiple = false;
             categories = {"General"};
             description =
-                    "Adds a texture renderer component\n"
-                    "Renders a texture to the screen";
+                    "Adds a material renderer component\n"
+                    "Allows the assignment of albedo, normal, and other types of texture maps to an entity.";
         }
     };
 
-    REGISTER_COMPONENT(TextureRenderer);
+    REGISTER_COMPONENT(MaterialRenderer);
 }
 
 #endif

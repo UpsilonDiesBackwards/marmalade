@@ -22,6 +22,7 @@
 
 #include "shader.h"
 #include "ecs/components/lighting2d/light2d.h"
+#include "material.h"
 
 #include <glad/glad.h>
 
@@ -34,14 +35,6 @@
 class Entity;
 
 class Renderable {
-    struct TextureSettings {
-        std::string filePath;
-        int wrapS = GL_REPEAT;
-        int wrapT = GL_REPEAT;
-        int minFilter = GL_LINEAR_MIPMAP_LINEAR;
-        int magFilter = GL_LINEAR;
-    };
-
 public:
     enum RenderMode {
         Lit,
@@ -50,7 +43,8 @@ public:
     };
 
     RenderMode renderMode = RenderMode::Unlit;
-    TextureSettings texSettings;
+
+    std::shared_ptr<Marmalade::Material::Material> material;
 
     Renderable(unsigned int VAO, unsigned int VBO, unsigned int EBO, unsigned int texture);
 
@@ -60,10 +54,6 @@ public:
     void ApplyLighting(const std::vector<Marmalade::ECS::Light2D*>& lights, const glm::vec3& viewPos);
 
     void ApplyRenderMode();
-
-    void SetTexture(const std::string& filePath);
-    unsigned int GetTexture();
-    void UpdateTextureSettings();
 
 private:
     RenderMode _previousRenderMode = RenderMode::Wireframe;

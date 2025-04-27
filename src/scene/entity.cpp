@@ -29,7 +29,7 @@
 #include <glm/ext/matrix_transform.hpp>
 
 Entity::Entity(const std::string& name, const std::string& uuid, EntityFlags flags, bool withDefaultComponents)
-    : name(name), uuid(uuid), flags(flags), renderable(0, 0, 0, Texture::LoadTexture("")) {
+    : name(name), uuid(uuid), flags(flags), renderable(0, 0, 0, Texture::LoadTexture("", Marmalade::Material::TextureSettings{})) {
 
     renderable.Initialise();
 
@@ -38,7 +38,7 @@ Entity::Entity(const std::string& name, const std::string& uuid, EntityFlags fla
         componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Transform", Marmalade::Util::GenerateUUIDv4()));
 
         // Temporary
-        componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Texture Renderer", Marmalade::Util::GenerateUUIDv4()));
+        componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Material Renderer", Marmalade::Util::GenerateUUIDv4()));
         componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Box Collider", Marmalade::Util::GenerateUUIDv4()));
         componentManager.AddComponent(Marmalade::ECS::ComponentRegistry::Instance().CreateComponent("Rigid Body", Marmalade::Util::GenerateUUIDv4()));
     }
@@ -62,7 +62,7 @@ void Entity::Render() {
     }
 
     if (RENDERABLE) {
-        bool hasTexture = componentManager.GetComponentOfType<Marmalade::ECS::TextureRenderer>();
+        bool hasTexture = componentManager.GetComponentOfType<Marmalade::ECS::MaterialRenderer>();
 
         renderable.Draw(this, transform->modelMatrix, hasTexture);
 

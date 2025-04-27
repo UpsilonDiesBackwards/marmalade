@@ -1,12 +1,12 @@
 # Engine API
 list(APPEND ENGINE_API
-        graphics/viewport.h
+        graphics/framebuffer.h
+        graphics/material.h
+        graphics/multisampledframebuffer.h
         graphics/renderable.h
         graphics/shader.h
         graphics/texture.h
-        graphics/framebuffer.h
-        graphics/multisampledframebuffer.h
-        graphics/lighting/light.h
+        graphics/viewport.h
 
         io/audiomanager.h
         io/input.h
@@ -18,7 +18,7 @@ list(APPEND ENGINE_API
 
         ecs/componentmanager.h
         ecs/components/transform.h
-        ecs/components/texturerenderer.h
+        ecs/components/materialrenderer.h
 
         ecs/components/audio/audioplayer.h
 

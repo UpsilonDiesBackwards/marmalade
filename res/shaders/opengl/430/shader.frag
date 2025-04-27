@@ -5,11 +5,13 @@ layout (location = 0) out vec4 FragColor;
 layout (location = 0) in vec2 texCoord;
 layout (location = 1) in vec3 Normal;
 layout (location = 2) in vec3 FragPos;
+layout (location = 3) in mat3 TBN;
 
 layout (location = 0) uniform bool useLighting;
 layout (location = 6) uniform vec3 viewPos;
 
-uniform sampler2D texture0;
+uniform sampler2D albedoMap;
+uniform sampler2D normalMap;
 
 // Lighting
 struct Light {
@@ -25,12 +27,14 @@ layout (location = 7) uniform int numLights;
 layout (location = 8) uniform Light lights[MAX_LIGHTS];
 
 void main() {
-    vec3 texColor = texture(texture0, texCoord).rgb;
+    vec3 texColor = texture(albedoMap, texCoord).rgb;
+
+    vec3 normalMapSample = texture(normalMap, texCoord).rgb;
+    vec3 normal = normalize(TBN * (normalMapSample * 2.0 - 1.0));
 
     if (useLighting) {
         vec3 result = vec3(1.0f);
 
-        vec3 norm = normalize(Normal);
         vec3 viewDir = normalize(viewPos - FragPos);
 
         for (int i = 0; i < numLights; ++i) {
@@ -46,11 +50,11 @@ void main() {
             float ambientStrength = 0.1f;
             vec3 ambient = ambientStrength * light.color;
 
-            float diff = max(dot(norm, lightDir), 0.1f);
+            float diff = max(dot(normal, lightDir), 0.1f);
             vec3 diffuse = diff * (light.color * light.intensity);
 
             float specularStrength = 0.1f;
-            vec3 reflectDir = reflect(-lightDir, norm);
+            vec3 reflectDir = reflect(-lightDir, normal);
             float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 32.0f);
             vec3 specular = specularStrength * spec * light.color;
 
@@ -64,8 +68,8 @@ void main() {
             result += lighting;
         }
 
-        FragColor = vec4(result * texColor, texture(texture0, texCoord).a);
+        FragColor = vec4(result * texColor, texture(albedoMap, texCoord).a);
     } else {
-        FragColor = texture(texture0, texCoord);
+        FragColor = texture(albedoMap, texCoord);
     }
 }

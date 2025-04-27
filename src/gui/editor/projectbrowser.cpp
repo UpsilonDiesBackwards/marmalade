@@ -22,12 +22,13 @@
 #include "../../application/application.h"
 #include "../../application/util.h"
 #include "../windowmanager.h"
+
 #include "../../application/plugins/interfaceimpl.h"
+#include "ImGuiFileDialog.h"
 
 #include <imgui.h>
 
 #include <IconsCodicons.h>
-
 #include <thread>
 #include <fstream>
 
@@ -348,7 +349,7 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
     ImGui::SetNextWindowPos(ImVec2(256, 128), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(720, 380), ImGuiCond_FirstUseEver);
 
-    WINDOW_BEGIN(ICON_CI_ZOOM_IN " Project Browser", ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)
+    ImGui::Begin(ICON_CI_ZOOM_IN " Project Browser", &visible, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
     // Top bar
     drawTopBar();
@@ -451,5 +452,5 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
     // Bottom bar
     drawBottomBar();
 
-    WINDOW_END()
+    ImGui::End();
 }
