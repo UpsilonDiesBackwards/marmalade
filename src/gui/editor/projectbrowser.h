@@ -133,6 +133,7 @@ namespace Marmalade::GUI {
         void processItem(DirectoryEntry& item);
 
         unsigned int getTextureId(const DirectoryEntry& item);
+        void displayContextMenu(const DirectoryEntry& item);
         void handleItemDoubleClick(const DirectoryEntry& item);
         void handleDrag(const DirectoryEntry& item, const unsigned int textureId);
         void displayTooltip(const DirectoryEntry& item);

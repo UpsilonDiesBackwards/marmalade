@@ -22,13 +22,14 @@
 #include "../../application/application.h"
 #include "../../application/util.h"
 #include "../windowmanager.h"
-
 #include "../../application/plugins/interfaceimpl.h"
-#include "ImGuiFileDialog.h"
+
+#include <ImGuiFileDialog.h>
 
 #include <imgui.h>
 
 #include <IconsCodicons.h>
+
 #include <thread>
 #include <fstream>
 
@@ -90,9 +91,11 @@ void Marmalade::GUI::ProjectBrowser::drawBottomBar() {
     // View buttons
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
     if (ImGui::Button(ICON_CI_LAYOUT)) _displayMode = DisplayMode_TILES;
+    ImGui::SetItemTooltip("Show as Tiles");
     ImGui::SameLine();
     ImGui::PopStyleVar();
     if (ImGui::Button(ICON_CI_LIST_FLAT)) _displayMode = DisplayMode_LIST;
+    ImGui::SetItemTooltip("Show as List");
     ImGui::SameLine();
 
     ImGui::PushItemWidth(sliderWidth);
@@ -116,6 +119,7 @@ void Marmalade::GUI::ProjectBrowser::drawItemTile(Marmalade::GUI::DirectoryEntry
     ImGui::ImageButton(path.string().c_str(), textureId, ImVec2(_thumbnailSize, _thumbnailSize),
                        ImVec2(0, 1), ImVec2(1, 0));
 
+    displayContextMenu(item);
     handleDrag(item, textureId);
     handleItemDoubleClick(item);
     displayTooltip(item);
@@ -133,6 +137,8 @@ void Marmalade::GUI::ProjectBrowser::drawItemTile(Marmalade::GUI::DirectoryEntry
 }
 
 void Marmalade::GUI::ProjectBrowser::drawItemList(Marmalade::GUI::DirectoryEntry item, int i) {
+    ImGui::PushID(item.Entry.path().string().c_str());
+
     std::string label = item.Entry.path().filename().string();
     if (!item.DisplayName.empty()) {
         label = item.DisplayName;
@@ -146,12 +152,15 @@ void Marmalade::GUI::ProjectBrowser::drawItemList(Marmalade::GUI::DirectoryEntry
         _selectedRow = (isSelected ? -1 : i);
     }
 
+    displayContextMenu(item);
     handleDrag(item, textureId);
     handleItemDoubleClick(item);
     displayTooltip(item);
 
     ImGui::TableNextColumn();
     ImGui::Text("%s", FileTypes[item.FileCategory]);
+
+    ImGui::PopID();
 }
 
 void Marmalade::GUI::ProjectBrowser::iterateFiles(std::function<void(DirectoryEntry)> item_callback) {
@@ -260,6 +269,16 @@ unsigned int Marmalade::GUI::ProjectBrowser::getTextureId(const Marmalade::GUI::
     return textureId;
 }
 
+void Marmalade::GUI::ProjectBrowser::displayContextMenu(const Marmalade::GUI::DirectoryEntry& item) {
+    std::string contextMenuId = "ProjectBrowserItemContextMenu:";
+    contextMenuId += item.Entry.path().string();
+    if (ImGui::BeginPopupContextWindow(contextMenuId.c_str(), ImGuiPopupFlags_MouseButtonRight)) {
+        ImGui::MenuItem("Delete");
+
+        ImGui::EndPopup();
+    }
+}
+
 void Marmalade::GUI::ProjectBrowser::handleItemDoubleClick(const Marmalade::GUI::DirectoryEntry& item) {
     if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
         if (item.Entry.is_directory()) {
@@ -349,7 +368,7 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
     ImGui::SetNextWindowPos(ImVec2(256, 128), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(720, 380), ImGuiCond_FirstUseEver);
 
-    ImGui::Begin(ICON_CI_ZOOM_IN " Project Browser", &visible, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    WINDOW_BEGIN(ICON_CI_ZOOM_IN " Project Browser", ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)
 
     // Top bar
     drawTopBar();
@@ -452,5 +471,5 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
     // Bottom bar
     drawBottomBar();
 
-    ImGui::End();
+    WINDOW_END()
 }

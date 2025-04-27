@@ -26,13 +26,13 @@ list(APPEND ENGINE_SRC
         application/plugins/interfaceimpl.cpp
         application/plugins/interfaceimpl.h
 
-        graphics/framebuffer.cpp
-        graphics/material.cpp
-        graphics/multisampledframebuffer.cpp
+        graphics/viewport.cpp
         graphics/renderable.cpp
         graphics/shader.cpp
         graphics/texture.cpp
-        graphics/viewport.cpp
+        graphics/framebuffer.cpp
+        graphics/multisampledframebuffer.cpp
+        graphics/material.cpp
 
         io/audiomanager.cpp
         io/input.cpp

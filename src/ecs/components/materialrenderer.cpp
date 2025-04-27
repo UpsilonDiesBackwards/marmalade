@@ -22,7 +22,8 @@
 #include "../../application/config/config.h"
 #include "../../application/application.h"
 #include "../../application/logger.h"
-#include "IconsCodicons.h"
+
+#include <IconsCodicons.h>
 
 #include <scene/entity.h>
 
