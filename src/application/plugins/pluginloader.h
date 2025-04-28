@@ -49,11 +49,18 @@
 
 
 namespace Marmalade {
+    enum PluginType {
+        PluginType_NATIVE,
+        PluginType_WASM
+    };
+
     class Plugin {
     public:
         LIBRARY_TYPE library;
         std::shared_ptr<spdlog::logger> logger;
         EngineAPI Api;
+        std::filesystem::path Path;
+        PluginType Type;
     };
 
     class PluginLoader {
@@ -62,6 +69,7 @@ namespace Marmalade {
 
         void LoadPlugins();
         void UnloadPlugins();
+        std::vector<Plugin> &GetLoadedPlugins();
     private:
         std::vector<Plugin> _loadedPlugins{};
 

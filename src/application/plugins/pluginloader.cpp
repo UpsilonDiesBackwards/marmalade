@@ -77,6 +77,8 @@ void Marmalade::PluginLoader::LoadPlugins() {
         api.Logger = &pluginLogger;
         callPluginMain(plugin, api);
         plugin.Api = api;
+        plugin.Path = pluginFile.path();
+        plugin.Type = PluginType_NATIVE;
 
         _loadedPlugins.push_back(plugin);
     }
@@ -91,6 +93,10 @@ void Marmalade::PluginLoader::UnloadPlugins() {
         dlclose(plugin.library);
 #endif
     }
+}
+
+std::vector<Marmalade::Plugin>& Marmalade::PluginLoader::GetLoadedPlugins() {
+    return _loadedPlugins;
 }
 
 LIBRARY_TYPE Marmalade::PluginLoader::loadPluginLibrary(const std::filesystem::path& path) {

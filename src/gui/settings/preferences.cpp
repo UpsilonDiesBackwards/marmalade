@@ -20,7 +20,9 @@
 #include "preferences.h"
 
 #include "../../application/config/engineconfig.h"
+#include "../../application/config/configutil.h"
 #include "../../application/application.h"
+#include "../../application/plugins/pluginloader.h"
 #include "../../application/plugins/interfaceimpl.h"
 
 #include <imgui.h>
@@ -36,6 +38,7 @@ Marmalade::GUI::Preferences::Preferences() : Window() {
             {"appearance", PreferencesPane(drawGeneralAppearancePane)},
             {"projects", PreferencesPane(drawGeneralProjectsPane)},
             {"projectBrowser", PreferencesPane(drawGeneralProjectBrowserPane)},
+            {"plugins", PreferencesPane(drawGeneralPluginsPane)},
             {"input/output", PreferencesPane(drawAudioInputOutputPane)}};
 }
 
@@ -87,6 +90,32 @@ void Marmalade::GUI::Preferences::drawGeneralProjectsPane() {
     ImGui::Checkbox("Show Welcome Screen on Startup", &Marmalade::EngineConfig::GetStoredConfig().appearance.showWelcomeScreen);
 }
 
+void Marmalade::GUI::Preferences::drawGeneralPluginsPane() {
+    auto loadedPlugins = PluginLoader::GetInstance().GetLoadedPlugins();
+
+    ImGui::Text("%zu plugins loaded", loadedPlugins.size());
+
+    static int selected = -1;
+    auto pluginsDir = ConfigUtil::GetConfigDirectory() / "plugins";
+    if (ImGui::BeginTable("##Plugins", 2, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
+        ImGui::TableSetupColumn("File Name");
+        ImGui::TableSetupColumn("Type");
+        ImGui::TableHeadersRow();
+
+        for (size_t i = 0; i < loadedPlugins.size(); ++i) {
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            auto relativePath = std::filesystem::relative(loadedPlugins[i].Path, pluginsDir).string();
+            const bool isSelected = (selected == (int)i);
+            if (ImGui::Selectable(relativePath.c_str(), isSelected)) selected = (int)i;
+
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text(loadedPlugins[i].Type == PluginType_WASM ? "WASM" : "Native");
+        }
+        ImGui::EndTable();
+    }
+}
+
 void Marmalade::GUI::Preferences::selectableTreeNode(const char* title, const char* id) {
     if (ImGui::Selectable(title, _selectedItem == id)) {
         _selectedItem = id;
@@ -99,6 +128,7 @@ void Marmalade::GUI::Preferences::drawLeftPane() {
         selectableTreeNode("Appearance", "appearance");
         selectableTreeNode("Projects", "projects");
         selectableTreeNode("Project Browser", "projectBrowser");
+        selectableTreeNode("Loaded Plugins", "plugins");
 
         ImGui::TreePop();
     }

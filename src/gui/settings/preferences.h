@@ -56,6 +56,7 @@ namespace Marmalade::GUI {
         static void drawGeneralAppearancePane();
         static void drawGeneralProjectsPane();
         static void drawGeneralProjectBrowserPane();
+        static void drawGeneralPluginsPane();
         static void drawAudioInputOutputPane();
 
         static void requiresRestartWarning();
