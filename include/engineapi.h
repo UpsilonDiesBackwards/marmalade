@@ -65,5 +65,12 @@ struct ENGINE_PROVIDED EngineAPI {
     struct InterfaceAPI* InterfaceApi;
 };
 
+#ifdef WASM_IMPORT
+
+WASM_IMPORT(engine, Log) extern void engine_Log(const char* text);
+WASM_IMPORT(engine, GetVersion) extern int engine_GetVersion();
+
+#endif
+
 
 #endif

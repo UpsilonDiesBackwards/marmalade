@@ -41,6 +41,7 @@ list(APPEND ENGINE_API
 
         imgui.inc
         interface.h
+        wasm.h
 )
 
 target_sources(marmalade PRIVATE ${ENGINE_API})

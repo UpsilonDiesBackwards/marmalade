@@ -24,6 +24,12 @@
 #include "../config/configutil.h"
 #include "../logger.h"
 
+#include <m3_api_libc.h>
+#include <wasm3.h>
+#include <m3_env.h>
+
+EngineAPI *gapi = nullptr;
+
 int Marmalade::EngineApiImpl::GetVersion() {
     return 1;
 }
@@ -31,6 +37,21 @@ int Marmalade::EngineApiImpl::GetVersion() {
 Marmalade::PluginLoader& Marmalade::PluginLoader::GetInstance() {
     static PluginLoader instance{};
     return instance;
+}
+
+m3ApiRawFunction(wasm_engine_Log)
+{
+    m3ApiGetArgMem(const char*, text);
+    LOG_INFO("[PLUGIN] {}\n", text);
+    m3ApiSuccess();
+}
+
+m3ApiRawFunction(wasm_engine_GetVersion)
+{
+    m3ApiReturnType (int32_t);
+
+    int version = gapi->GetVersion();
+    m3ApiReturn(version);
 }
 
 void Marmalade::PluginLoader::LoadPlugins() {
@@ -50,22 +71,98 @@ void Marmalade::PluginLoader::LoadPlugins() {
     // Static methods, function pointers set by plugins might persist across plugins?
     static auto interfaceApi = InterfaceApiImpl::Create();
 
-    EngineAPI api{};
+    static EngineAPI api{};
+    gapi = &api;
     api.GetVersion = &EngineApiImpl::GetVersion;
     api.InterfaceApi = &interfaceApi;
 
     for (const auto& pluginFile: std::filesystem::directory_iterator(pluginsDir)) {
         LOG_INFO("Loading plugin: {}", pluginFile.path().filename().string());
 
-        auto pluginLib = loadPluginLibrary(pluginFile.path());
-        if (pluginLib == nullptr) continue;
+        if (pluginFile.path().extension() == ".wasm") {
+            // Wasm loader
+            M3Result result = nullptr;
 
-        Plugin plugin{pluginLib};
+            // FIXME: Environment should be global
+            IM3Environment env = m3_NewEnvironment();
+            if (!env) {
+                LOG_ERROR("m3_NewEnvironment failed");
+                continue;
+            }
 
-        // TODO: Use plugin name from manifest
-        auto pluginName = pluginFile.path().filename().string();
-        plugin.logger = createPluginLogger(pluginName);
-         static auto pluginLogger = PluginLogger{
+#define WASM_STACK_SIZE 64 * 1024
+            IM3Runtime runtime = m3_NewRuntime(env, WASM_STACK_SIZE, nullptr);
+            if (!runtime) {
+                LOG_ERROR("m3_NewRuntime failed");
+                continue;
+            }
+
+            FILE* file = fopen(pluginFile.path().string().c_str(), "rb");
+            if (!file) {
+                LOG_ERROR("Failed to open WASM file");
+                continue;
+            }
+            fseek(file, 0, SEEK_END);
+            size_t size = ftell(file);
+            rewind(file);
+
+            std::vector<uint8_t> buffer(size);
+            fread(buffer.data(), 1, size, file);
+            fclose(file);
+
+            IM3Module module;
+            result = m3_ParseModule(env, &module, buffer.data(), size);
+            if (result) {
+                LOG_ERROR("m3_ParseModule failed: {}", result);
+                continue;
+            }
+
+            result = m3_LoadModule(runtime, module);
+            if (result) {
+                LOG_ERROR("m3_LoadModule failed: {}", result);
+                continue;
+            }
+
+            m3_LinkLibC(module);
+
+            result = m3_LinkRawFunction(module, "engine", "Log", "v(*)", wasm_engine_Log);
+            if (result != m3Err_none) {
+                LOG_ERROR("Failed to link engine_Log: {}", result);
+            }
+
+            result = m3_LinkRawFunction(module, "engine", "GetVersion", "i()", wasm_engine_GetVersion);
+            if (result != m3Err_none) {
+                LOG_ERROR("Failed to link engine_GetVersion: {}", result);
+            }
+
+            IM3Function function;
+            result = m3_FindFunction(&function, runtime, "PluginMain");
+            if (result) {
+                LOG_ERROR("m3_FindFunction failed: {}", result);
+                continue;
+            }
+
+            result = m3_CallV(function);
+            if (result) {
+                LOG_ERROR("m3_CallV failed: {}", result);
+                continue;
+            }
+
+            Plugin plugin{};
+            plugin.Path = pluginFile.path();
+            plugin.Type = PluginType_WASM;
+            _loadedPlugins.push_back(plugin);
+        } else {
+            // Native (.so, .dll, .dylib)
+            auto pluginLib = loadPluginLibrary(pluginFile.path());
+            if (pluginLib == nullptr) continue;
+
+            Plugin plugin{pluginLib};
+
+            // TODO: Use plugin name from manifest
+            auto pluginName = pluginFile.path().filename().string();
+            plugin.logger = createPluginLogger(pluginName);
+            static auto pluginLogger = PluginLogger{
                 .LogTrace = &PluginLoggerImpl::LogTrace,
                 .LogDebug = &PluginLoggerImpl::LogDebug,
                 .LogInfo = &PluginLoggerImpl::LogInfo,
@@ -74,24 +171,26 @@ void Marmalade::PluginLoader::LoadPlugins() {
                 .LogCritical = &PluginLoggerImpl::LogCritical,
                 ._logger = &plugin.logger};
 
-        api.Logger = &pluginLogger;
-        callPluginMain(plugin, api);
-        plugin.Api = api;
-        plugin.Path = pluginFile.path();
-        plugin.Type = PluginType_NATIVE;
-
-        _loadedPlugins.push_back(plugin);
+            api.Logger = &pluginLogger;
+            callPluginMain(plugin, api);
+            plugin.Api = api;
+            plugin.Path = pluginFile.path();
+            plugin.Type = PluginType_NATIVE;
+            _loadedPlugins.push_back(plugin);
+        }
     }
 }
 
 void Marmalade::PluginLoader::UnloadPlugins() {
     LOG_INFO("Unloading plugins");
     for (auto& plugin: _loadedPlugins) {
+        if (plugin.Type == PluginType_NATIVE) {
 #ifdef _WIN32
-        FreeLibrary(plugin.library);
+            FreeLibrary(plugin.library);
 #else
-        dlclose(plugin.library);
+            dlclose(plugin.library);
 #endif
+        }
     }
 }
 

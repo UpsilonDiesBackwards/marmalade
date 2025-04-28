@@ -44,3 +44,6 @@
 [submodule "misc/doxygen-awesome-css"]
 	path = misc/doxygen-awesome-css
 	url = https://github.com/jothepro/doxygen-awesome-css.git
+[submodule "vendor/wasm3"]
+	path = vendor/wasm3
+	url = https://github.com/wasm3/wasm3.git
