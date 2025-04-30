@@ -43,14 +43,30 @@ struct ENGINE_PROVIDED PluginLogger {
     void* const _logger;
 };
 
+#define THIRD_ARG(a, b, c, ...) c
+#define VA_OPT_SUPPORTED_I(...) THIRD_ARG(__VA_OPT__(, ), true, false, )
+#define VA_OPT_SUPPORTED VA_OPT_SUPPORTED_I(?)
+
 #ifndef ENGINE_BUILD
-#define LOG_TRACE(engineApi, fmt, ...) (engineApi)->Logger->LogTrace((engineApi)->Logger->_logger, fmt, __VA_ARGS__)
-#define LOG_DEBUG(engineApi, fmt, ...) (engineApi)->Logger->LogDebug((engineApi)->Logger->_logger, fmt, __VA_ARGS__)
-#define LOG_INFO(engineApi, fmt, ...) (engineApi)->Logger->LogInfo((engineApi)->Logger->_logger, fmt, __VA_ARGS__)
-#define LOG_WARN(engineApi, fmt, ...) (engineApi)->Logger->LogWarn((engineApi)->Logger->_logger, fmt, __VA_ARGS__)
-#define LOG_ERROR(engineApi, fmt, ...) (engineApi)->Logger->LogError((engineApi)->Logger->_logger, fmt, __VA_ARGS__)
-#define LOG_CRITICAL(engineApi, fmt, ...) (engineApi)->Logger->LogCritical((engineApi)->Logger->_logger, fmt, __VA_ARGS__)
-#endif
+
+#if VA_OPT_SUPPORTED
+
+#define LOG_IMPL(level, engineApi, fmt, ...) (engineApi)->Logger->Log##level((engineApi)->Logger->_logger, fmt __VA_OPT__(, __VA_ARGS__))
+
+#else
+
+#define LOG_IMPL(level, engineApi, fmt, ...) (engineApi)->Logger->Log##level((engineApi)->Logger->_logger, fmt, __VA_ARGS__)
+
+#endif// VA_OPT_SUPPORTED
+
+#define LOG_TRACE(engineApi, fmt, ...) LOG_IMPL(Trace, engineApi, fmt, __VA_ARGS__)
+#define LOG_DEBUG(engineApi, fmt, ...) LOG_IMPL(Debug, engineApi, fmt, __VA_ARGS__)
+#define LOG_INFO(engineApi, fmt, ...) LOG_IMPL(Info, engineApi, fmt, __VA_ARGS__)
+#define LOG_WARN(engineApi, fmt, ...) LOG_IMPL(Warn, engineApi, fmt, __VA_ARGS__)
+#define LOG_ERROR(engineApi, fmt, ...) LOG_IMPL(Error, engineApi, fmt, __VA_ARGS__)
+#define LOG_CRITICAL(engineApi, fmt, ...) LOG_IMPL(Critical, engineApi, fmt, __VA_ARGS__)
+
+#endif// ENGINE_BUILD
 
 // Each structure contains a Size field to allow for ABI safety
 #define SAFE_TO_CALL(type, api, func) (sizeof(*(api)) >= (offsetof(type, func) + sizeof((api)->func)))
