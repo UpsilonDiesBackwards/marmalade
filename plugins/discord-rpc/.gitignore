@@ -1,0 +1,4 @@
+cmake-build**/
+.idea/
+vendor/discord_game_sdk/c/
+vendor/discord_game_sdk/lib/

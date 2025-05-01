@@ -21,6 +21,7 @@
 
 #include "interfaceimpl.h"
 
+#include "../util.h"
 #include "../config/configutil.h"
 #include "../logger.h"
 
@@ -32,6 +33,18 @@ EngineAPI *gapi = nullptr;
 
 int Marmalade::EngineApiImpl::GetVersion() {
     return 1;
+}
+
+int Marmalade::EngineApiImpl::IsDebugMode() {
+#ifdef DEBUG
+    return true;
+#else
+    return false;
+#endif
+}
+
+int Marmalade::EngineApiImpl::IsDebuggerAttached() {
+    return Util::IsDebuggerAttached();
 }
 
 Marmalade::PluginLoader& Marmalade::PluginLoader::GetInstance() {
@@ -74,6 +87,8 @@ void Marmalade::PluginLoader::LoadPlugins() {
     static EngineAPI api{};
     gapi = &api;
     api.GetVersion = &EngineApiImpl::GetVersion;
+    api.IsDebugMode = &EngineApiImpl::IsDebugMode;
+    api.IsDebuggerAttached = &EngineApiImpl::IsDebuggerAttached;
     api.InterfaceApi = &interfaceApi;
 
     for (const auto& pluginFile: std::filesystem::directory_iterator(pluginsDir)) {

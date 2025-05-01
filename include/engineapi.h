@@ -75,6 +75,8 @@ struct InterfaceAPI;
 
 struct ENGINE_PROVIDED EngineAPI {
     int (*GetVersion)();
+    int (*IsDebugMode)();
+    int (*IsDebuggerAttached)();
     struct PluginLogger* Logger;
 
     // Structures for each API, in alphabetical order

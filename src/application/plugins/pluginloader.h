@@ -82,6 +82,8 @@ namespace Marmalade {
     class EngineApiImpl {
     public:
         static int GetVersion();
+        static int IsDebugMode();
+        static int IsDebuggerAttached();
     };
 
     class PluginLoggerImpl {
