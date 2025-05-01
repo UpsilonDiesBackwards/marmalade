@@ -1,0 +1,18 @@
+{
+  "name": "Discord RPC",
+  "description": "Displays current Marmalade activity in Discord.",
+  "authors": [
+    "Marmalade"
+  ],
+  "license": "COPYING",
+  "images": {
+    "featured": [
+      "assets/discordrpc.png"
+    ]
+  },
+  "keywords": [
+    "discord",
+    "rich-presence",
+    "rpc"
+  ]
+}
