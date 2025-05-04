@@ -60,12 +60,12 @@ void Marmalade::Project::Project::CreateEmptyProject(ProjectCreationOptions crea
 
         if (path == basePath / ".gitignore" && !creationOptions.initGitRepository) {// Create / Skip .gitignore
             LOG_WARN("Project created with Git disabled, skipping '.gitignore' creation");
-            continue;// Git has not been enabled, skipping .gitignore
+            continue; // Git has not been enabled, skipping .gitignore
         }
 
         if (path == basePath / "README.md" && !creationOptions.createREADME) {// Create / Skip README.md
             LOG_WARN("Project created without README.md");
-            continue;// README.md creation has not been enabled, skipping README.md
+            continue; // README.md creation has not been enabled, skipping README.md
         }
 
         try {

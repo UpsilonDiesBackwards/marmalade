@@ -31,7 +31,7 @@
 #define ANIMATION_VERSION 1
 
 namespace Marmalade::Animation {
-    class AnimationSequence : public Config<Marmalade::Animation::Frame> {
+    class AnimationSequence : Marmalade::Project::Assets::Asset, public Config<Marmalade::Animation::Frame> {
     public:
         std::string type{"Marmalade::Animation::Sequence"};
         int version{ ANIMATION_VERSION };

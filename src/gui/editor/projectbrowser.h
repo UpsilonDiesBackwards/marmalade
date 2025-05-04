@@ -101,6 +101,8 @@ namespace Marmalade::GUI {
 
         char _filterText[512] = "";
 
+        bool _rebuildAssetRegistry = false;
+
         // Asset creation requests
         bool _createMaterial = false;
 

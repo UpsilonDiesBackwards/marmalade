@@ -48,6 +48,8 @@ void Marmalade::GUI::ProjectBrowser::drawTopBar() {
     ImGui::SameLine();
     if (ImGui::Button(ICON_CI_REFRESH)) {
         _texturesLoaded = "";
+
+        _rebuildAssetRegistry = true;
     }
 
     auto* project = Application::GetInstance().GetCurrentProject();
@@ -470,6 +472,13 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
 
     // Bottom bar
     drawBottomBar();
+
+    if (_rebuildAssetRegistry) {
+        Marmalade::Project::Assets::Registry::GetInstance().RebuildRegistry();
+        _rebuildAssetRegistry = false;
+    }
+
+    CreateMaterial();
 
     WINDOW_END()
 }

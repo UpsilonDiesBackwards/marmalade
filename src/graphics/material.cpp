@@ -19,9 +19,14 @@
  */
 
 #include "graphics/material.h"
+#include "../application/util.h"
 
-Marmalade::Material::Material::Material(std::filesystem::path filePath, const std::string& name) :
-    Config(filePath), name(name) {
+Marmalade::Material::Material::Material(std::filesystem::path filePath, const std::string& name, const std::string& uuid)
+    : Config(filePath), name(name) {
+
+    storedConfig.uuid = uuid;
+    storedConfig.name = name;
+    storedConfig.version = version;
 
     useGui = true;
 }
@@ -74,9 +79,6 @@ void Marmalade::Material::Material::Deserialise(const nlohmann::json& json) {
 }
 
 void Marmalade::Material::Material::PrepareNewConfig() {
-    storedConfig.uuid = uuid;
-    storedConfig.name = name;
-
     storedConfig.albedo = albedo;
     storedConfig.normal = normal;
     storedConfig.specular = specular;

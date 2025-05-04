@@ -20,8 +20,12 @@
 
 #include "animation/animationdriver.h"
 
-Marmalade::Animation::AnimationDriver::AnimationDriver(std::filesystem::path filePath, const std::string& name) :
-    Config(filePath), name(name) {
+Marmalade::Animation::AnimationDriver::AnimationDriver(std::filesystem::path filePath, const std::string& name)
+    : Config(filePath), name(name) {
+
+    storedConfig.uuid = uuid;
+    storedConfig.name = name;
+    storedConfig.version = version;
 
     useGui = true;
 }

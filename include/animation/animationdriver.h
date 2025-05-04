@@ -40,7 +40,7 @@ namespace Marmalade::Animation {
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AnimationDriverData,
-                                       version, uuid, name,
+                                       type, version, uuid, name,
                                        sequences, currentSequence)
 
     class AnimationDriver : public Config<AnimationDriverData> {

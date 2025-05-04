@@ -68,6 +68,7 @@ namespace Marmalade::Project {
                 "settings.marm",
                 "package-settings.marm",
                 "user.marm",
+                ".assetreg",
                 ".gitignore",
                 "README.md",
         };

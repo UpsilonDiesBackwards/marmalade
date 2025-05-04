@@ -27,6 +27,7 @@
 #include "config/recents.h"
 #include "util.h"
 #include "../project/projectmanager.h"
+#include "../project/assetregistry.h"
 #include "../gui/fontmanager.h"
 
 #include <imgui.h>
@@ -293,6 +294,29 @@ bool Application::OpenProject(const std::filesystem::path& path) {
         Marmalade::Recents::GetInstance().SaveConfig();
 
         SetCurrentProject(project);
+
+        std::filesystem::path assetRegistry = currentProject->basePath / ".assetreg";
+
+        if (!std::filesystem::exists(assetRegistry)) {
+            LOG_WARN("Asset Registry missing, creating new one");
+
+            try {
+                std::ofstream createdFile(assetRegistry);
+                if (!createdFile) {
+                    LOG_ERROR("Error creating new asset registry: '{}'", assetRegistry.string());
+                    return false;
+                }
+
+                Marmalade::Project::Assets::Registry::GetInstance().RebuildRegistry();
+                Marmalade::Project::Assets::Registry::GetInstance().Save(assetRegistry);
+                createdFile.close();
+            } catch (const std::exception& e) {
+                LOG_ERROR("Error creating file '{}': {}", assetRegistry.string(), e.what());
+                return false;
+            }
+        } else {
+            Marmalade::Project::Assets::Registry::GetInstance().Load(assetRegistry);
+        }
     } catch (const std::exception& ex) {
         LOG_ERROR("Failed to open project: {}", ex.what());
         return false;

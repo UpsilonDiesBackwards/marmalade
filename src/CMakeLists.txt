@@ -48,6 +48,8 @@ list(APPEND ENGINE_SRC
         packages/package.cpp
         packages/package.h
 
+        project/assetregistry.cpp
+        project/assetregistry.h
         project/project.cpp
         project/project.h
         project/projectfile.cpp
