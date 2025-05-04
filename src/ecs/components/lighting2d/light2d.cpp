@@ -39,16 +39,6 @@ void Marmalade::ECS::Light2D::Display(Entity* entity) {
     ImGui::DragFloat("Intensity", &intensity, 0.1f, 0.0f, 512.0f);
     ImGui::DragFloat("Radius", &radius, 0.1f, 0.0f, 1024.0f);
     ImGui::DragFloat("Attenuation", &attenuation, 0.1f, 0.0f, 256.0f);
-
-        ImDrawList* drawList = ImGui::GetWindowDrawList();
-        ImVec2 screenPos = ImGui::GetCursorScreenPos();
-
-        ImVec2 texturePos(position.x, position.y);
-        ImVec2 size((float)texWidth, (float)texHeight);
-
-        drawList->AddImage((ImTextureID)(intptr_t)_lightTex,
-                           texturePos,
-                           ImVec2(texturePos.x + size.x, texturePos.y + size.y));
 }
 
 void Marmalade::ECS::Light2D::Apply(Entity* entity) {
