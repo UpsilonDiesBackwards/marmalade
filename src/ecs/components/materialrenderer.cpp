@@ -55,7 +55,7 @@ void Marmalade::ECS::MaterialRenderer::Display(Entity* entity) {
                     file >> jsonData;
                     file.close();
 
-                    m = new Marmalade::Material::Material(materialPath, "");
+                    m = new Marmalade::Material::Material(materialPath, "", "");
                     m->Deserialise(jsonData);
 
                     entity->renderable.material = static_cast<const std::shared_ptr<Material::Material>>(m);
@@ -180,7 +180,7 @@ void Marmalade::ECS::MaterialRenderer::Deserialize(nlohmann::json json, Entity* 
     if (json.contains("materialPath")) {
         std::string materialPath = json["materialPath"].get<std::string>();
 
-        auto material = std::make_shared<Marmalade::Material::Material>(materialPath, "");
+        auto material = std::make_shared<Marmalade::Material::Material>(materialPath, "", "");
         material->filePath = std::filesystem::path(materialPath);
 
         if (json.contains("textures")) {

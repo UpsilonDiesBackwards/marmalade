@@ -22,6 +22,8 @@
 #define MARMALADE_MATERIAL_H
 
 #include "../../src/application/config/config.h"
+#include "../../src/project/assetregistry.h"
+
 #include "texture.h"
 
 #include <vector>
@@ -92,7 +94,7 @@ namespace Marmalade::Material {
         GLuint GetTexture(TextureMode mode) const;
 
         Material() = default;
-        explicit Material(std::filesystem::path filePath, const std::string& name);
+        explicit Material(std::filesystem::path filePath, const std::string& name, const std::string& uuid);
 
         void Deserialise(const nlohmann::json& json);
 

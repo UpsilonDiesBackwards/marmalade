@@ -275,7 +275,23 @@ void Marmalade::GUI::ProjectBrowser::displayContextMenu(const Marmalade::GUI::Di
     std::string contextMenuId = "ProjectBrowserItemContextMenu:";
     contextMenuId += item.Entry.path().string();
     if (ImGui::BeginPopupContextWindow(contextMenuId.c_str(), ImGuiPopupFlags_MouseButtonRight)) {
-        ImGui::MenuItem("Delete");
+        if (ImGui::MenuItem("New Material")) {
+            _createMaterial = true;
+        }
+
+        if (ImGui::MenuItem("Delete")) {
+            std::filesystem::remove(item.Entry.path());
+            _texturesLoaded = "";
+
+            for (const auto& [uuid, meta] : Marmalade::Project::Assets::Registry::assets) {
+                if (meta.filePath == item.Entry.path()) {
+                    Marmalade::Project::Assets::Registry::UnregisterAsset(uuid);
+                    break;
+                }
+            }
+
+            _rebuildAssetRegistry = true;
+        }
 
         ImGui::EndPopup();
     }
@@ -481,4 +497,27 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
     CreateMaterial();
 
     WINDOW_END()
+}
+
+void Marmalade::GUI::ProjectBrowser::CreateMaterial() {
+    if (_createMaterial) {
+        IGFD::FileDialogConfig config;
+        config.path = EngineConfig::GetStoredConfig().defaultProjectPath;
+        config.flags = ImGuiFileDialogFlags_Modal;
+        ImGuiFileDialog::Instance()->OpenDialog("CreateMaterial", "New Material", ".mmlmat", config);
+        _createMaterial = false;
+    }
+
+    if (ImGuiFileDialog::Instance()->Display("CreateMaterial")) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
+            _newMaterialPath = ImGuiFileDialog::Instance()->GetFilePathName();
+            std::string selectedFileName = ImGuiFileDialog::Instance()->GetCurrentFileName();
+
+            std::string uuid = Util::GenerateUUIDv4();
+            Marmalade::Material::Material newMaterial(_newMaterialPath, selectedFileName, uuid);
+
+            newMaterial.SaveConfig();
+        }
+        ImGuiFileDialog::Instance()->Close();
+    }
 }
