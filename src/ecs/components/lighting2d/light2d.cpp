@@ -36,9 +36,19 @@ void Marmalade::ECS::Light2D::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
 
     ImGui::ColorPicker3("Color", reinterpret_cast<float*>(&color));
-    ImGui::DragFloat("Intensity", &intensity, 0.1f);
-    ImGui::DragFloat("Radius", &radius, 0.1f);
-    ImGui::DragFloat("Attenuation", &attenuation, 0.1f);
+    ImGui::DragFloat("Intensity", &intensity, 0.1f, 0.0f, 512.0f);
+    ImGui::DragFloat("Radius", &radius, 0.1f, 0.0f, 1024.0f);
+    ImGui::DragFloat("Attenuation", &attenuation, 0.1f, 0.0f, 256.0f);
+
+        ImDrawList* drawList = ImGui::GetWindowDrawList();
+        ImVec2 screenPos = ImGui::GetCursorScreenPos();
+
+        ImVec2 texturePos(position.x, position.y);
+        ImVec2 size((float)texWidth, (float)texHeight);
+
+        drawList->AddImage((ImTextureID)(intptr_t)_lightTex,
+                           texturePos,
+                           ImVec2(texturePos.x + size.x, texturePos.y + size.y));
 }
 
 void Marmalade::ECS::Light2D::Apply(Entity* entity) {
@@ -85,17 +95,24 @@ glm::vec2 Marmalade::ECS::Light2D::GetPosition() {
 
 void Marmalade::ECS::Light2D::ShowBounds(Entity* entity) {
     glm::vec2 centre = entity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>()->pos;
-    float worldRadius = radius;
-
     ImVec2 screenCentre = EditorViews::WorldToScreenSpace(centre);
-    float screenRadius = WorldRadiusToScreenScale(worldRadius);
 
+    float screenRadius = WorldRadiusToScreenScale(radius);
     ImGui::GetWindowDrawList()->AddCircle(
-            screenCentre,screenRadius,
+            screenCentre, screenRadius,
             ImGui::GetColorU32(IM_COL32(255, 255, 0, 255)),
-            32,2.0f
+            32, 2.0f
+    );
+
+    float attenuationRadius = radius + attenuation;
+    float screenAttenuation = WorldRadiusToScreenScale(attenuationRadius);
+    ImGui::GetWindowDrawList()->AddCircle(
+            screenCentre, screenAttenuation,
+            ImGui::GetColorU32(IM_COL32(255, 0, 255, 128)),
+            32, 1.0f
     );
 }
+
 
 float Marmalade::ECS::Light2D::WorldRadiusToScreenScale(float radius) {
     ImVec2 screenStart = EditorViews::WorldToScreenSpace(glm::vec2(0.0f, 0.0f));
@@ -106,4 +123,3 @@ float Marmalade::ECS::Light2D::WorldRadiusToScreenScale(float radius) {
 
     return glm::distance(glmScreenStart, glmScreenEnd);
 }
-

@@ -22,6 +22,8 @@
 #define MARMALADE_LIGHT2D_H
 
 #include "ecs/component.h"
+#include "glad/glad.h"
+#include "graphics/material.h"
 #include <glm/vec3.hpp>
 #include <glm/glm.hpp>
 
