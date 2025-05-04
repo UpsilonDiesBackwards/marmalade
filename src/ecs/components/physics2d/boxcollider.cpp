@@ -21,6 +21,7 @@
 #include "ecs/components/physics2d/boxcollider.h"
 
 #include "ecs/components/physics2d/rigidbody.h"
+#include "../../../gui/components/backgroundlabel.h"
 
 #include <imgui.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -41,17 +42,39 @@ void Marmalade::ECS::BoxCollider::Display(Entity* entity) {
         glm::vec2 uX = glm::vec2(cos(rotation), sin(rotation));
         glm::vec2 uY = glm::vec2(-uX.y, uX.x);
 
-
         data = OBBDataBox{prevData.size, prevData.offset, rotation,
-                       prevData.offset, {uX, uY}, prevData.size * 0.5f};
+                          prevData.offset, {uX, uY}, prevData.size * 0.5f};
     }
 
     std::visit([&](auto &colliderData) {
         using T = std::decay_t<decltype(colliderData)>;
 
         if constexpr (std::is_same_v<T, AABBDataBox> || std::is_same_v<T, OBBDataBox>) {
-            ImGui::DragFloat2("Size", glm::value_ptr(colliderData.size), 0.1f);
-            ImGui::DragFloat2("Offset", glm::value_ptr(colliderData.offset), 0.1f);
+            // Size
+
+            ImGui::Text("Size    ");
+            ImGui::SameLine();
+            Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+            ImGui::SameLine();
+            ImGui::DragFloat(("##SizeX" + std::to_string(entity->id)).c_str(), &colliderData.size.x, 0.1f);
+
+            ImGui::SameLine();
+            Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+            ImGui::SameLine();
+            ImGui::DragFloat(("##SizeY" + std::to_string(entity->id)).c_str(), &colliderData.size.y, 0.1f);
+
+            // Offset
+
+            ImGui::Text("Offset");
+            ImGui::SameLine();
+            Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+            ImGui::SameLine();
+            ImGui::DragFloat(("##OffsetX" + std::to_string(entity->id)).c_str(), &colliderData.offset.x, 0.1f);
+
+            ImGui::SameLine();
+            Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+            ImGui::SameLine();
+            ImGui::DragFloat(("##OffsetY" + std::to_string(entity->id)).c_str(), &colliderData.offset.y, 0.1f);
         }
     }, data);
 

@@ -3,6 +3,7 @@ add_subdirectory(nativeui)
 
 # ImGui GUI
 list(APPEND ENGINE_SRC_GUI
+        components/backgroundlabel.h
         components/util.h
         components/tableview.h
         components/selectablelistview.h
