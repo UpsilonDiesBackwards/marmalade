@@ -275,8 +275,30 @@ void Marmalade::GUI::ProjectBrowser::displayContextMenu(const Marmalade::GUI::Di
     std::string contextMenuId = "ProjectBrowserItemContextMenu:";
     contextMenuId += item.Entry.path().string();
     if (ImGui::BeginPopupContextWindow(contextMenuId.c_str(), ImGuiPopupFlags_MouseButtonRight)) {
-        if (ImGui::MenuItem("New Material")) {
-            _createMaterial = true;
+        if (ImGui::BeginMenu("Create New")) {
+            if (ImGui::MenuItem("Directory")) {
+                _createDirectory = true;
+                _newMaterialPath = item.Entry.path();
+                std::memset(_newDirectoryName, 0, sizeof(_newDirectoryName));
+            }
+
+            if (ImGui::MenuItem("Material")) {
+                _createMaterial = true;
+            }
+
+            if (ImGui::MenuItem("Lua Script")) {
+            }
+
+            if (ImGui::MenuItem("Text Document")) {
+            }
+
+            if (ImGui::MenuItem("Animation Driver")) {
+            }
+
+            if (ImGui::MenuItem("Animation")) {
+            }
+
+            ImGui::EndMenu();
         }
 
         if (ImGui::MenuItem("Delete")) {
@@ -494,9 +516,37 @@ void Marmalade::GUI::ProjectBrowser::Draw() {
         _rebuildAssetRegistry = false;
     }
 
+    CreateDirectory();
     CreateMaterial();
 
     WINDOW_END()
+}
+
+void Marmalade::GUI::ProjectBrowser::CreateDirectory() {
+    if (_createDirectory) {
+        ImGui::OpenPopup("Create New Directory");
+        _createDirectory = false;
+    }
+
+    if (ImGui::BeginPopupModal("Create New Directory", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::InputText("Directory Name", _newDirectoryName, IM_ARRAYSIZE(_newDirectoryName));
+
+        if (ImGui::Button("Create") && std::strlen(_newDirectoryName) > 0) {
+            std::filesystem::path newDirPath = _rootAssetDir / _newDirectoryName; // TODO: Make this the currently open directory
+            if (!std::filesystem::exists(newDirPath)) {
+                std::filesystem::create_directory(newDirPath);
+            }
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Cancel")) {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
 }
 
 void Marmalade::GUI::ProjectBrowser::CreateMaterial() {

@@ -104,9 +104,14 @@ namespace Marmalade::GUI {
         bool _rebuildAssetRegistry = false;
 
         // Asset creation requests
+        bool _createDirectory = false;
         bool _createMaterial = false;
 
+        // Asset default names
+        char _newDirectoryName[64] = {};
+
         // Asset creation paths
+        std::string _newDirectoryPath;
         std::string _newMaterialPath;
 
         std::filesystem::path _rootAssetDir;
@@ -128,8 +133,6 @@ namespace Marmalade::GUI {
         void drawItemTile(Marmalade::GUI::DirectoryEntry item);
         void drawItemList(Marmalade::GUI::DirectoryEntry item, int i);
 
-        void showRMBContextMenu();
-
         void iterateFiles(std::function<void(DirectoryEntry)> item_callback);
         FileType determineFileType(const std::filesystem::path& extension);
         void processItem(DirectoryEntry& item);
@@ -144,6 +147,7 @@ namespace Marmalade::GUI {
         void loadTextures();
 
         // Asset creation functions
+        void CreateDirectory();
         void CreateMaterial();
     };
 }
