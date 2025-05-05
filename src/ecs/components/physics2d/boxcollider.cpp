@@ -50,31 +50,60 @@ void Marmalade::ECS::BoxCollider::Display(Entity* entity) {
         using T = std::decay_t<decltype(colliderData)>;
 
         if constexpr (std::is_same_v<T, AABBDataBox> || std::is_same_v<T, OBBDataBox>) {
-            // Size
+            if (ImGui::BeginTable("TransformTable", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersInnerV)) {
+                ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 65.0f);
+                ImGui::TableSetupColumn("Control", ImGuiTableFlags_None);
 
-            ImGui::Text("Size    ");
-            ImGui::SameLine();
-            Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
-            ImGui::SameLine();
-            ImGui::DragFloat(("##SizeX" + std::to_string(entity->id)).c_str(), &colliderData.size.x, 0.1f);
+                // Size
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("Size");
+                ImGui::TableSetColumnIndex(1);
+                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
+                Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+                ImGui::SameLine();
+                ImGui::PushItemWidth(100);
+                bool sizeChanged = false;
+                sizeChanged |= ImGui::DragFloat(("##SizeX" + std::to_string(entity->id)).c_str(), &colliderData.size.x, 0.1f);
+                ImGui::PopItemWidth();
 
-            ImGui::SameLine();
-            Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
-            ImGui::SameLine();
-            ImGui::DragFloat(("##SizeY" + std::to_string(entity->id)).c_str(), &colliderData.size.y, 0.1f);
+                ImGui::SameLine();
+                Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+                ImGui::SameLine();
+                ImGui::PushItemWidth(100);
+                sizeChanged |= ImGui::DragFloat(("##SizeY" + std::to_string(entity->id)).c_str(), &colliderData.size.y, 0.1f);
+                ImGui::PopItemWidth();
 
-            // Offset
+                if (sizeChanged) {
+                    colliderData.size = (glm::vec2(colliderData.size.x, colliderData.size.y));
+                }
 
-            ImGui::Text("Offset");
-            ImGui::SameLine();
-            Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
-            ImGui::SameLine();
-            ImGui::DragFloat(("##OffsetX" + std::to_string(entity->id)).c_str(), &colliderData.offset.x, 0.1f);
+                // Offset
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("Offset");
+                ImGui::TableSetColumnIndex(1);
+                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
+                Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+                ImGui::SameLine();
+                ImGui::PushItemWidth(100);
+                bool offsetChanged = false;
+                offsetChanged |= ImGui::DragFloat(("##OffsetX" + std::to_string(entity->id)).c_str(), &colliderData.offset.x, 0.1f);
+                ImGui::PopItemWidth();
 
-            ImGui::SameLine();
-            Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
-            ImGui::SameLine();
-            ImGui::DragFloat(("##OffsetY" + std::to_string(entity->id)).c_str(), &colliderData.offset.y, 0.1f);
+                ImGui::SameLine();
+                Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+                ImGui::SameLine();
+                ImGui::PushItemWidth(100);
+                offsetChanged |= ImGui::DragFloat(("##OffsetY" + std::to_string(entity->id)).c_str(), &colliderData.offset.y, 0.1f);
+                ImGui::PopItemWidth();
+
+                if (offsetChanged) {
+                    colliderData.offset = (glm::vec2(colliderData.offset.x, colliderData.offset.y));
+                }
+
+                ImGui::EndTable();
+            }
         }
     }, data);
 

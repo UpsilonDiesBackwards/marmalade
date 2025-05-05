@@ -85,6 +85,8 @@ void Renderable::Draw(Entity* entity, glm::mat4 modelMatrix, bool renderTexture)
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, material->albedo.id);
         shaderProgram.SetInt("albedoMap", 0);
+        shaderProgram.SetVec2("uvScale", glm::vec2(material->albedo.settings.uvScaleX,
+                                                   material->albedo.settings.uvScaleY));
     } else {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -95,6 +97,8 @@ void Renderable::Draw(Entity* entity, glm::mat4 modelMatrix, bool renderTexture)
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, material->normal.id);
         shaderProgram.SetInt("normalMap", 1);
+        shaderProgram.SetVec2("uvScale", glm::vec2(material->normal.settings.uvScaleX,
+                                                   material->normal.settings.uvScaleY));
     } else {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture);

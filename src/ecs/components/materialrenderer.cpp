@@ -22,6 +22,7 @@
 #include "../../application/config/config.h"
 #include "../../application/application.h"
 #include "../../application/logger.h"
+#include "../../gui/components/backgroundlabel.h"
 
 #include <IconsCodicons.h>
 
@@ -110,45 +111,90 @@ void Marmalade::ECS::MaterialRenderer::Display(Entity* entity) {
             ImGuiFileDialog::Instance()->Close();
         }
 
-        // Filter Settings
-        const char* filterModes[] = { "Nearest", "Linear", "Mipmap Nearest", "Mipmap Linear" };
-        int minFilterIdx = (texture.settings.minFilter == GL_NEAREST) ? 0 :
-                           (texture.settings.minFilter == GL_LINEAR) ? 1 :
-                           (texture.settings.minFilter == GL_NEAREST_MIPMAP_NEAREST) ? 2 : 3;
+        ImGui::Indent();
 
-        if (ImGui::Combo((std::string("Min Filter##") + label).c_str(), &minFilterIdx, filterModes, IM_ARRAYSIZE(filterModes))) {
-            texture.settings.minFilter =
-                    (minFilterIdx == 0) ? GL_NEAREST :
-                    (minFilterIdx == 1) ? GL_LINEAR :
-                    (minFilterIdx == 2) ? GL_NEAREST_MIPMAP_NEAREST :
-                                        GL_LINEAR_MIPMAP_LINEAR;
+        if (ImGui::CollapsingHeader((std::string("Settings##") + label).c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
 
-            glBindTexture(GL_TEXTURE_2D, texture.id);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texture.settings.minFilter);
+            // Filter Settings
+            const char* filterModes[] = {"Nearest", "Linear", "Mipmap Nearest", "Mipmap Linear"};
+            int minFilterIdx = (texture.settings.minFilter == GL_NEAREST) ? 0 : (texture.settings.minFilter == GL_LINEAR)           ? 1
+                                                                        : (texture.settings.minFilter == GL_NEAREST_MIPMAP_NEAREST) ? 2
+                                                                                                                                    : 3;
+
+            if (ImGui::Combo((std::string("Min Filter##") + label).c_str(), &minFilterIdx, filterModes, IM_ARRAYSIZE(filterModes))) {
+                texture.settings.minFilter =
+                        (minFilterIdx == 0) ? GL_NEAREST : (minFilterIdx == 1) ? GL_LINEAR
+                                                   : (minFilterIdx == 2)       ? GL_NEAREST_MIPMAP_NEAREST
+                                                                               : GL_LINEAR_MIPMAP_LINEAR;
+
+                glBindTexture(GL_TEXTURE_2D, texture.id);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texture.settings.minFilter);
+            }
+
+            int magFilterIdx = (texture.settings.magFilter == GL_NEAREST) ? 0 : (texture.settings.magFilter == GL_LINEAR) ? 1
+                                                                                                                          : 2;
+
+            if (ImGui::Combo((std::string("Mag Filter##") + label).c_str(), &magFilterIdx, filterModes, IM_ARRAYSIZE(filterModes))) {
+                texture.settings.magFilter =
+                        (magFilterIdx == 0) ? GL_NEAREST : (magFilterIdx == 1) ? GL_LINEAR
+                                                                               : GL_LINEAR;
+
+                glBindTexture(GL_TEXTURE_2D, texture.id);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texture.settings.magFilter);
+            }
+
+            if (ImGui::BeginTable("TransformTable", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersInnerV)) {
+                ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 65.0f);
+                ImGui::TableSetupColumn("Control", ImGuiTableFlags_None);
+
+                // UV Scale
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("UV Scale");
+                ImGui::TableSetColumnIndex(1);
+                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
+                Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+                ImGui::SameLine();
+                ImGui::PushItemWidth(100);
+                bool uvScaleChanged = false;
+                uvScaleChanged |= ImGui::DragFloat(("##UVScaleX" + std::to_string(texture.id)).c_str(), &texture.settings.uvScaleX, 0.1f);
+                ImGui::PopItemWidth();
+
+                ImGui::SameLine();
+                Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+                ImGui::SameLine();
+                ImGui::PushItemWidth(100);
+                uvScaleChanged |= ImGui::DragFloat(("##UVScaleY" + std::to_string(texture.id)).c_str(), &texture.settings.uvScaleY, 0.1f);
+                ImGui::PopItemWidth();
+
+                if (uvScaleChanged) {
+                    texture.settings.uvScaleX = texture.settings.uvScaleX;
+                    texture.settings.uvScaleY = texture.settings.uvScaleY;
+                }
+
+                ImGui::EndTable();
+            }
         }
 
-        int magFilterIdx = (texture.settings.magFilter == GL_NEAREST) ? 0 :
-                           (texture.settings.magFilter == GL_LINEAR) ? 1 : 2;
-
-        if (ImGui::Combo((std::string("Mag Filter##") + label).c_str(), &magFilterIdx, filterModes, IM_ARRAYSIZE(filterModes))) {
-            texture.settings.magFilter =
-                    (magFilterIdx == 0) ? GL_NEAREST :
-                    (magFilterIdx == 1) ? GL_LINEAR :
-                                        GL_LINEAR;
-
-            glBindTexture(GL_TEXTURE_2D, texture.id);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texture.settings.magFilter);
-        }
+        ImGui::Unindent();
     };
 
     m = entity->renderable.material.get();
 
     if (!m) return;
 
-    displaySlot("Albedo", m->albedo);
-    displaySlot("Normal", m->normal);
-    displaySlot("Specular", m->specular);
-    displaySlot("Roughness", m->roughness);
+    if (ImGui::CollapsingHeader("Albedo", ImGuiTreeNodeFlags_DefaultOpen)) {
+        displaySlot("Albedo", m->albedo);
+    }
+    if (ImGui::CollapsingHeader("Normal", ImGuiTreeNodeFlags_DefaultOpen)) {
+        displaySlot("Normal", m->normal);
+    }
+    if (ImGui::CollapsingHeader("Specular", ImGuiTreeNodeFlags_DefaultOpen)) {
+        displaySlot("Specular", m->specular);
+    }
+    if (ImGui::CollapsingHeader("Roughness", ImGuiTreeNodeFlags_DefaultOpen)) {
+        displaySlot("Roughness", m->roughness);
+    }
 
     m->SaveConfig();
 }
@@ -219,6 +265,9 @@ nlohmann::json Marmalade::ECS::MaterialRenderer::SerializeTexture(const Marmalad
     tex["settings"]["magFilter"] = texture.settings.magFilter;
     tex["settings"]["wrapS"] = texture.settings.wrapS;
     tex["settings"]["wrapT"] = texture.settings.wrapT;
+    tex["settings"]["uvScale"]["x"] = texture.settings.uvScaleX;
+    tex["settings"]["uvScale"]["y"] = texture.settings.uvScaleY;
+
     return tex;
 }
 
@@ -228,4 +277,6 @@ void Marmalade::ECS::MaterialRenderer::DeserializeTexture(const nlohmann::json& 
     texture.settings.magFilter = textureJson["settings"]["magFilter"].get<GLuint>();
     texture.settings.wrapS = textureJson["settings"]["wrapS"].get<GLuint>();
     texture.settings.wrapT = textureJson["settings"]["wrapT"].get<GLuint>();
+    texture.settings.uvScaleX = textureJson["settings"]["uvScale"]["x"].get<float>();
+    texture.settings.uvScaleY = textureJson["settings"]["uvScale"]["y"].get<float>();
 }

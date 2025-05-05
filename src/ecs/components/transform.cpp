@@ -28,64 +28,74 @@
 
 void Marmalade::ECS::Transform::Display(Entity* entity) {
     auto transform = entity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
-    if (!transform) return;
 
-    ImGui::Text("%s", name.c_str());
+    if (ImGui::BeginTable("TransformTable", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersInnerV)) {
+        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 65.0f);
+        ImGui::TableSetupColumn("Control", ImGuiTableFlags_None);
 
-    // Translation
-    ImGui::Text("Translation ");
-    ImGui::SameLine();
+        // Translation
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Translation");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
+        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+        ImGui::SameLine();
+        ImGui::PushItemWidth(100);
+        bool posChanged = false;
+        posChanged |= ImGui::DragFloat(("##PosX" + std::to_string(entity->id)).c_str(), &transform->pos.x, 0.1f);
+        ImGui::PopItemWidth();
 
-    float totalWidth = ImGui::GetContentRegionAvail().x;
-    float spacing = ImGui::GetStyle().ItemSpacing.x;
-    float labelWidth = ImGui::CalcTextSize(" X ").x + ImGui::GetStyle().FramePadding.x * 2;
-    int itemsPerRow = 2;
-    float sliderWidth = (totalWidth - (labelWidth + spacing) * itemsPerRow) / itemsPerRow;
+        ImGui::SameLine();
+        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+        ImGui::SameLine();
+        ImGui::PushItemWidth(100);
+        posChanged |= ImGui::DragFloat(("##PosY" + std::to_string(entity->id)).c_str(), &transform->pos.y, 0.1f);
+        ImGui::PopItemWidth();
 
-    Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
-    ImGui::SameLine();
-    ImGui::PushItemWidth(sliderWidth);
-    if (ImGui::DragFloat(("##PosX" + std::to_string(entity->id)).c_str(), &transform->pos.x, 0.1f)) {
-        entity->setPosition(glm::vec2(transform->pos.x, transform->pos.y));
-    }
-    ImGui::PopItemWidth();
+        if (posChanged) {
+            entity->setPosition(glm::vec2(transform->pos.x, transform->pos.y));
+        }
 
-    ImGui::SameLine();
-    Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
-    ImGui::SameLine();
-    ImGui::PushItemWidth(sliderWidth);
-    if (ImGui::DragFloat(("##PosY" + std::to_string(entity->id)).c_str(), &transform->pos.y, 0.1f)) {
-        entity->setPosition(glm::vec2(transform->pos.x, transform->pos.y));
-    }
-    ImGui::PopItemWidth();
+        // Rotation
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Rotation");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
+        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+        ImGui::SameLine();
+        ImGui::PushItemWidth(-1);
+        if (ImGui::SliderFloat(("##Rot" + std::to_string(entity->id)).c_str(), &transform->rotation, 0, 360)) {
+            entity->setRotation(transform->rotation);
+        }
+        ImGui::PopItemWidth();
 
-    // Rotation
-    ImGui::Text("Rotation    ");
-    ImGui::SameLine();
+        // Scale
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Scale");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
+        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+        ImGui::SameLine();
+        ImGui::PushItemWidth(100);
+        bool scaleChanged = false;
+        scaleChanged |= ImGui::DragFloat(("##ScaX" + std::to_string(entity->id)).c_str(), &transform->scale.x, 0.1f);
+        ImGui::PopItemWidth();
 
-    Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
-    ImGui::SameLine();
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
-    if (ImGui::SliderFloat(("##Rot" + std::to_string(entity->id)).c_str(), &transform->rotation, 0, 360)) {
-        entity->setRotation(transform->rotation);
-    }
+        ImGui::SameLine();
+        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+        ImGui::SameLine();
+        ImGui::PushItemWidth(100);
+        scaleChanged |= ImGui::DragFloat(("##ScaY" + std::to_string(entity->id)).c_str(), &transform->scale.y, 0.1f);
+        ImGui::PopItemWidth();
 
-    // Scale
-    ImGui::Text("Scale          ");
-    ImGui::SameLine();
+        if (scaleChanged) {
+            entity->setScale(glm::vec2(transform->scale.x, transform->scale.y));
+        }
 
-    Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
-    ImGui::SameLine();
-    ImGui::PushItemWidth(sliderWidth);
-    if (ImGui::DragFloat(("##ScaX" + std::to_string(entity->id)).c_str(), &transform->scale.x, 0.1f)) {
-        entity->setScale(glm::vec2(transform->scale.x, transform->scale.y));
-    }
-
-    ImGui::SameLine();
-    Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
-    ImGui::SameLine();
-    if (ImGui::DragFloat(("##ScaY" + std::to_string(entity->id)).c_str(), &transform->scale.y, 0.1f)) {
-        entity->setScale(glm::vec2(transform->scale.x, transform->scale.y));
+        ImGui::EndTable();
     }
 }
 

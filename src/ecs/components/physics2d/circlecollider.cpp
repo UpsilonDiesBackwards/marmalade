@@ -20,6 +20,7 @@
 
 #include "ecs/components/physics2d/circlecollider.h"
 #include "ecs/components/physics2d/rigidbody.h"
+#include "../../../gui/components/backgroundlabel.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -32,8 +33,50 @@ void Marmalade::ECS::CircleCollider::Display(Entity* entity) {
         using T = std::decay_t<decltype(colliderData)>;
 
         if constexpr (std::is_same_v<T, DataCircle>) {
-            ImGui::DragFloat("Radius", &colliderData.radius, 0.1f);
-            ImGui::DragFloat2("Offset", glm::value_ptr(colliderData.offset), 0.1f);
+            if (ImGui::BeginTable("TransformTable", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersInnerV)) {
+                ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 65.0f);
+                ImGui::TableSetupColumn("Control", ImGuiTableFlags_None);
+
+                // Radius
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("Radius");
+                ImGui::TableSetColumnIndex(1);
+                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
+                Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+                ImGui::SameLine();
+                ImGui::PushItemWidth(-1);
+                if (ImGui::SliderFloat(("##Radius" + std::to_string(entity->id)).c_str(), &colliderData.radius, 0, 360)) {
+                    colliderData.radius = colliderData.radius;
+                }
+                ImGui::PopItemWidth();
+
+                // Offset
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("Offset");
+                ImGui::TableSetColumnIndex(1);
+                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
+                Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+                ImGui::SameLine();
+                ImGui::PushItemWidth(100);
+                bool offsetChanged = false;
+                offsetChanged |= ImGui::DragFloat(("##OffsetX" + std::to_string(entity->id)).c_str(), &colliderData.offset.x, 0.1f);
+                ImGui::PopItemWidth();
+
+                ImGui::SameLine();
+                Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+                ImGui::SameLine();
+                ImGui::PushItemWidth(100);
+                offsetChanged |= ImGui::DragFloat(("##OffsetY" + std::to_string(entity->id)).c_str(), &colliderData.offset.y, 0.1f);
+                ImGui::PopItemWidth();
+
+                if (offsetChanged) {
+                    colliderData.offset = (glm::vec2(colliderData.offset.x, colliderData.offset.y));
+                }
+
+                ImGui::EndTable();
+            }
         }
     }, data);
 

@@ -24,7 +24,11 @@
 #include "../../src/application/config/config.h"
 #include "../../src/project/assetregistry.h"
 
+#include <glm/glm.hpp>
+
 #include "texture.h"
+
+#include "imgui.h"
 
 #include <vector>
 
@@ -36,10 +40,13 @@ namespace Marmalade::Material {
         int wrapT = GL_REPEAT;
         int minFilter = GL_LINEAR_MIPMAP_LINEAR;
         int magFilter = GL_LINEAR;
+
+        float uvScaleX = 1.0f;
+        float uvScaleY = 1.0f;
     };
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TextureSettings,
-                                       wrapS, wrapT, minFilter, magFilter);
+                                       wrapS, wrapT, minFilter, magFilter, uvScaleX, uvScaleY);
 
     enum TextureMode {
         Albedo,

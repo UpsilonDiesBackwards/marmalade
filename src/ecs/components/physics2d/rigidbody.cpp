@@ -18,6 +18,7 @@
  */
 
 #include "ecs/components/physics2d/rigidbody.h"
+#include "../../../gui/components/backgroundlabel.h"
 
 #include <imgui.h>
 
@@ -28,11 +29,104 @@ void Marmalade::ECS::RigidBody::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
 
     ImGui::Checkbox("Static", &isStatic);
-    ImGui::DragFloat2("Centre of Mass", &body.centreOfMass.x, 0.1f);
-    ImGui::DragFloat2("Velocity", &body.velocity.x, 0.1f);
-    ImGui::DragFloat("Gravity", &body.gravity, 0.1f);
-    ImGui::DragFloat("Mass", &body.mass, 0.1f, 0.1f);
-    ImGui::DragFloat("Elasticity", &body.elasticity, 0.0f);
+
+    if (ImGui::BeginTable("TransformTable", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersInnerV)) {
+        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 65.0f);
+        ImGui::TableSetupColumn("Control", ImGuiTableFlags_None);
+
+        // Centre of Mass
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Offset");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
+        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+        ImGui::SameLine();
+        ImGui::PushItemWidth(100);
+        bool comChanged = false;
+        comChanged |= ImGui::DragFloat(("##COMX" + std::to_string(entity->id)).c_str(), &body.centreOfMass.x, 0.1f);
+        ImGui::PopItemWidth();
+
+        ImGui::SameLine();
+        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+        ImGui::SameLine();
+        ImGui::PushItemWidth(100);
+        comChanged |= ImGui::DragFloat(("##COMY" + std::to_string(entity->id)).c_str(), &body.centreOfMass.y, 0.1f);
+        ImGui::PopItemWidth();
+
+        if (comChanged) {
+            body.centreOfMass = (glm::vec2(body.centreOfMass.x, body.centreOfMass.y));
+        }
+
+        // Velocity
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Velocity");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
+        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+        ImGui::SameLine();
+        ImGui::PushItemWidth(100);
+        bool velChanged = false;
+        velChanged |= ImGui::DragFloat(("##VelX" + std::to_string(entity->id)).c_str(), &body.velocity.x, 0.1f);
+        ImGui::PopItemWidth();
+
+        ImGui::SameLine();
+        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+        ImGui::SameLine();
+        ImGui::PushItemWidth(100);
+        velChanged |= ImGui::DragFloat(("##VelY" + std::to_string(entity->id)).c_str(), &body.velocity.y, 0.1f);
+        ImGui::PopItemWidth();
+
+        if (velChanged) {
+            body.velocity = (glm::vec2(body.velocity.x, body.velocity.y));
+        }
+
+        // Gravity
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Gravity");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
+        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+        ImGui::SameLine();
+        ImGui::PushItemWidth(-1);
+        if (ImGui::SliderFloat(("##Grav" + std::to_string(entity->id)).c_str(), &body.gravity, 0, 360)) {
+            body.gravity = body.gravity;
+        }
+        ImGui::PopItemWidth();
+
+        // Mass
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Mass");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
+        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+        ImGui::SameLine();
+        ImGui::PushItemWidth(-1);
+        if (ImGui::SliderFloat(("##Mass" + std::to_string(entity->id)).c_str(), &body.mass, 0, 360)) {
+            body.mass = body.mass;
+        }
+        ImGui::PopItemWidth();
+
+        // TODO: Implement physics materials
+        // Elasticity
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Elasticity");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
+        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+        ImGui::SameLine();
+        ImGui::PushItemWidth(-1);
+        if (ImGui::SliderFloat(("##Elast" + std::to_string(entity->id)).c_str(), &body.elasticity, 0, 360)) {
+            body.elasticity = body.elasticity;
+        }
+        ImGui::PopItemWidth();
+
+        ImGui::EndTable();
+    }
 }
 
 void Marmalade::ECS::RigidBody::Apply(Entity* entity) {
