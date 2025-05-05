@@ -40,12 +40,17 @@ void Marmalade::GUI::Details::Draw() {
     for (auto& comp: inspectedEntity->componentManager.components) {
         ImGui::PushID(comp.get());
 
-        comp->Display(inspectedEntity);
+        if (ImGui::CollapsingHeader(comp->name.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
+            comp->Display(inspectedEntity);
 
-        if (comp->isMutable) {// If entity is mutable then allow it to be removed
-            if (ImGui::Button(ICON_CI_TRASHCAN " Remove")) {
-                _isRemovingComponent = true;
-                _selectedComponent = comp.get();
+            if (comp->isMutable) {
+                float buttonWidth = ImGui::CalcTextSize(ICON_CI_TRASHCAN " Remove").x + ImGui::GetStyle().FramePadding.x * 2;
+                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - buttonWidth);
+
+                if (ImGui::Button(ICON_CI_TRASHCAN " Remove")) {
+                    _isRemovingComponent = true;
+                    _selectedComponent = comp.get();
+                }
             }
         }
 

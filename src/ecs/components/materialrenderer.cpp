@@ -90,6 +90,9 @@ void Marmalade::ECS::MaterialRenderer::Display(Entity* entity) {
             ImGui::EndDragDropTarget();
         }
 
+        float buttonWidth = ImGui::CalcTextSize("Choose Texture##").x + ImGui::GetStyle().FramePadding.x * 2;
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - buttonWidth);
+
         if (ImGui::Button(std::string("Choose Texture##" + std::string(label)).c_str())) {
             auto* project = Application::GetInstance().GetCurrentProject();
             if (project) {
