@@ -79,7 +79,7 @@ void Marmalade::Project::Assets::Registry::Save(std::filesystem::path filePath) 
 
 void Marmalade::Project::Assets::Registry::Load(std::filesystem::path filePath) {
     if (!std::filesystem::exists(filePath)) {
-        LOG_ERROR("Asset file does not exist: {}", filePath.c_str());
+        LOG_ERROR("Asset file does not exist: {}", filePath.string().c_str());
         return;
     }
 

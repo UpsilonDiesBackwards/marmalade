@@ -33,6 +33,13 @@
 #include <thread>
 #include <fstream>
 
+#ifdef _WIN32
+
+// Causes conflict with CreateDirectory function
+#undef CreateDirectory
+
+#endif
+
 // Needed for drag and drop
 static Marmalade::GUI::ProjectItem projectItem;
 
@@ -278,7 +285,7 @@ void Marmalade::GUI::ProjectBrowser::displayContextMenu(const Marmalade::GUI::Di
         if (ImGui::BeginMenu("Create New")) {
             if (ImGui::MenuItem("Directory")) {
                 _createDirectory = true;
-                _newMaterialPath = item.Entry.path();
+                _newMaterialPath = item.Entry.path().string();
                 std::memset(_newDirectoryName, 0, sizeof(_newDirectoryName));
             }
 
