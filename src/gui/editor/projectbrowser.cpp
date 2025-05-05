@@ -138,11 +138,29 @@ void Marmalade::GUI::ProjectBrowser::drawItemTile(Marmalade::GUI::DirectoryEntry
         label = item.DisplayName;
     }
 
-    ImVec2 curPos = ImGui::GetCursorScreenPos();
-    ImVec2 textSize = ImGui::CalcTextSize(label.c_str(), nullptr, true);
+    ImVec2 textSize = ImGui::CalcTextSize(label.c_str());
 
-    ImGui::GetWindowDrawList()->AddRectFilled(curPos, ImVec2(curPos.x + textSize.x, curPos.y + textSize.y), getBackgroundColor(item.Type));
+    const float labelBoxBkgWidth = _thumbnailSize + 10.0f;
+    const float labelBoxBkgHeight = textSize.y + 8.0f;
+    const float labelBoxBkgRounding = 6.0f;
+
+    ImVec2 cur = ImGui::GetCursorScreenPos();
+    ImVec2 rectMin = cur;
+    ImVec2 rectMax = ImVec2(cur.x + labelBoxBkgWidth, cur.y + labelBoxBkgHeight);
+
+    ImU32 bgCol = IM_COL32(49, 50, 68, 170);
+    ImU32 borderCol = getBackgroundColor(item.Type);
+
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    drawList->AddRectFilled(rectMin, rectMax, bgCol, labelBoxBkgRounding);
+    drawList->AddRect(rectMin, rectMax, borderCol, labelBoxBkgRounding, 0, 1.8f);
+
+    float textY = rectMin.y + (labelBoxBkgHeight - textSize.y) * 0.5f;
+
+    ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x + 4.0f, textY));
     ImGui::TextWrapped("%s", label.c_str());
+
+    ImGui::SetCursorScreenPos(ImVec2(rectMin.x, rectMax.y + 4.0f));
 }
 
 void Marmalade::GUI::ProjectBrowser::drawItemList(Marmalade::GUI::DirectoryEntry item, int i) {
