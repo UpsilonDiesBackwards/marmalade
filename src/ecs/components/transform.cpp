@@ -39,7 +39,7 @@ void Marmalade::ECS::Transform::Display(Entity* entity) {
         ImGui::Text("Translation");
         ImGui::TableSetColumnIndex(1);
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
-        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+        Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(100);
         bool posChanged = false;
@@ -47,7 +47,7 @@ void Marmalade::ECS::Transform::Display(Entity* entity) {
         ImGui::PopItemWidth();
 
         ImGui::SameLine();
-        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+        Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(100);
         posChanged |= ImGui::DragFloat(("##PosY" + std::to_string(entity->id)).c_str(), &transform->pos.y, 0.1f);
@@ -63,7 +63,7 @@ void Marmalade::ECS::Transform::Display(Entity* entity) {
         ImGui::Text("Rotation");
         ImGui::TableSetColumnIndex(1);
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
-        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+        Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(-1);
         if (ImGui::SliderFloat(("##Rot" + std::to_string(entity->id)).c_str(), &transform->rotation, 0, 360)) {
@@ -77,7 +77,7 @@ void Marmalade::ECS::Transform::Display(Entity* entity) {
         ImGui::Text("Scale");
         ImGui::TableSetColumnIndex(1);
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
-        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+        Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(100);
         bool scaleChanged = false;
@@ -85,7 +85,7 @@ void Marmalade::ECS::Transform::Display(Entity* entity) {
         ImGui::PopItemWidth();
 
         ImGui::SameLine();
-        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+        Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(100);
         scaleChanged |= ImGui::DragFloat(("##ScaY" + std::to_string(entity->id)).c_str(), &transform->scale.y, 0.1f);

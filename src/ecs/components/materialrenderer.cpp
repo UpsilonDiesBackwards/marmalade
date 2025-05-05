@@ -153,7 +153,7 @@ void Marmalade::ECS::MaterialRenderer::Display(Entity* entity) {
                 ImGui::Text("UV Scale");
                 ImGui::TableSetColumnIndex(1);
                 ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
-                Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+                Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
                 ImGui::SameLine();
                 ImGui::PushItemWidth(100);
                 bool uvScaleChanged = false;
@@ -161,7 +161,7 @@ void Marmalade::ECS::MaterialRenderer::Display(Entity* entity) {
                 ImGui::PopItemWidth();
 
                 ImGui::SameLine();
-                Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+                Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
                 ImGui::SameLine();
                 ImGui::PushItemWidth(100);
                 uvScaleChanged |= ImGui::DragFloat(("##UVScaleY" + std::to_string(texture.id)).c_str(), &texture.settings.uvScaleY, 0.1f);

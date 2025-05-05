@@ -25,36 +25,38 @@
 #include <string>
 
 namespace Marmalade::GUI::Components {
+     class BackgroundLabel {
+     public:
+         static void DrawInlineLabelWithBackground(const char* text, const ImVec4& bgColor, const ImVec4& textColor = ImVec4(1, 1, 1, 1), float rounding = 3.0f, float padding = 3.0f) {
+             Draw(text, bgColor, textColor, rounding, padding);
+             ImGui::SameLine();
+         }
+     private:
+         static void Draw(const char* text, const ImVec4& bgColor, const ImVec4& textColor = ImVec4(1, 1, 1, 1), float rounding = 3.0f, float padding = 3.0f) {
+             ImVec2 textSize = ImGui::CalcTextSize(text);
+             ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+             ImVec2 paddingVec = ImVec2(padding, padding * 0.5f);
 
-    inline void Draw(const char* text, const ImVec4& bgColor, const ImVec4& textColor = ImVec4(1, 1, 1, 1), float rounding = 3.0f, float padding = 3.0f) {
-        ImVec2 textSize = ImGui::CalcTextSize(text);
-        ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-        ImVec2 paddingVec = ImVec2(padding, padding * 0.5f);
+             ImGui::GetWindowDrawList()->AddRectFilled(
+                     cursorPos,
+                     ImVec2(cursorPos.x + textSize.x + paddingVec.x * 2, cursorPos.y + textSize.y + paddingVec.y * 2),
+                     ImGui::ColorConvertFloat4ToU32(bgColor),
+                     rounding
+             );
 
-        ImGui::GetWindowDrawList()->AddRectFilled(
-                cursorPos,
-                ImVec2(cursorPos.x + textSize.x + paddingVec.x * 2, cursorPos.y + textSize.y + paddingVec.y * 2),
-                ImGui::ColorConvertFloat4ToU32(bgColor),
-                rounding
-        );
+             ImGui::SetCursorScreenPos(ImVec2(
+                     cursorPos.x + paddingVec.x,
+                     cursorPos.y + paddingVec.y
+                     ));
 
-        ImGui::SetCursorScreenPos(ImVec2(
-                cursorPos.x + paddingVec.x,
-                cursorPos.y + paddingVec.y
-                ));
+             ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorConvertFloat4ToU32(textColor));
+             ImGui::TextUnformatted(text);
+             ImGui::PopStyleColor();
 
-        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorConvertFloat4ToU32(textColor));
-        ImGui::TextUnformatted(text);
-        ImGui::PopStyleColor();
-
-        ImGui::SetCursorScreenPos(cursorPos);
-        ImGui::Dummy(ImVec2(textSize.x + paddingVec.x * 2, textSize.y + paddingVec.y * 2));
-    }
-
-    inline void DrawInlineLabelWithBackground(const char* text, const ImVec4& bgColor, const ImVec4& textColor = ImVec4(1, 1, 1, 1), float rounding = 3.0f, float padding = 3.0f) {
-        Draw(text, bgColor, textColor, rounding, padding);
-        ImGui::SameLine();
-    }
+             ImGui::SetCursorScreenPos(cursorPos);
+             ImGui::Dummy(ImVec2(textSize.x + paddingVec.x * 2, textSize.y + paddingVec.y * 2));
+         }
+     };
 }
 
 #endif // MARMALADE_BACKGROUNDLABEL_H

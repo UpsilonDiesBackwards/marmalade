@@ -60,7 +60,7 @@ void Marmalade::ECS::BoxCollider::Display(Entity* entity) {
                 ImGui::Text("Size");
                 ImGui::TableSetColumnIndex(1);
                 ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
-                Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+                Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
                 ImGui::SameLine();
                 ImGui::PushItemWidth(100);
                 bool sizeChanged = false;
@@ -68,7 +68,7 @@ void Marmalade::ECS::BoxCollider::Display(Entity* entity) {
                 ImGui::PopItemWidth();
 
                 ImGui::SameLine();
-                Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+                Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
                 ImGui::SameLine();
                 ImGui::PushItemWidth(100);
                 sizeChanged |= ImGui::DragFloat(("##SizeY" + std::to_string(entity->id)).c_str(), &colliderData.size.y, 0.1f);
@@ -84,7 +84,7 @@ void Marmalade::ECS::BoxCollider::Display(Entity* entity) {
                 ImGui::Text("Offset");
                 ImGui::TableSetColumnIndex(1);
                 ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
-                Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+                Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
                 ImGui::SameLine();
                 ImGui::PushItemWidth(100);
                 bool offsetChanged = false;
@@ -92,7 +92,7 @@ void Marmalade::ECS::BoxCollider::Display(Entity* entity) {
                 ImGui::PopItemWidth();
 
                 ImGui::SameLine();
-                Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+                Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
                 ImGui::SameLine();
                 ImGui::PushItemWidth(100);
                 offsetChanged |= ImGui::DragFloat(("##OffsetY" + std::to_string(entity->id)).c_str(), &colliderData.offset.y, 0.1f);

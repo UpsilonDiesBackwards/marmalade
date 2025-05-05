@@ -40,7 +40,7 @@ void Marmalade::ECS::RigidBody::Display(Entity* entity) {
         ImGui::Text("Offset");
         ImGui::TableSetColumnIndex(1);
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
-        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+        Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(100);
         bool comChanged = false;
@@ -48,7 +48,7 @@ void Marmalade::ECS::RigidBody::Display(Entity* entity) {
         ImGui::PopItemWidth();
 
         ImGui::SameLine();
-        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+        Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(100);
         comChanged |= ImGui::DragFloat(("##COMY" + std::to_string(entity->id)).c_str(), &body.centreOfMass.y, 0.1f);
@@ -64,7 +64,7 @@ void Marmalade::ECS::RigidBody::Display(Entity* entity) {
         ImGui::Text("Velocity");
         ImGui::TableSetColumnIndex(1);
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
-        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+        Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(100);
         bool velChanged = false;
@@ -72,7 +72,7 @@ void Marmalade::ECS::RigidBody::Display(Entity* entity) {
         ImGui::PopItemWidth();
 
         ImGui::SameLine();
-        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
+        Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" Y ", ImVec4(0.65f, 0.75f, 0.50f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(100);
         velChanged |= ImGui::DragFloat(("##VelY" + std::to_string(entity->id)).c_str(), &body.velocity.y, 0.1f);
@@ -88,7 +88,7 @@ void Marmalade::ECS::RigidBody::Display(Entity* entity) {
         ImGui::Text("Gravity");
         ImGui::TableSetColumnIndex(1);
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
-        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+        Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(-1);
         if (ImGui::SliderFloat(("##Grav" + std::to_string(entity->id)).c_str(), &body.gravity, 0, 360)) {
@@ -102,7 +102,7 @@ void Marmalade::ECS::RigidBody::Display(Entity* entity) {
         ImGui::Text("Mass");
         ImGui::TableSetColumnIndex(1);
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
-        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+        Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(-1);
         if (ImGui::SliderFloat(("##Mass" + std::to_string(entity->id)).c_str(), &body.mass, 0, 360)) {
@@ -117,7 +117,7 @@ void Marmalade::ECS::RigidBody::Display(Entity* entity) {
         ImGui::Text("Elasticity");
         ImGui::TableSetColumnIndex(1);
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.0f);
-        Marmalade::GUI::Components::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
+        Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(-1);
         if (ImGui::SliderFloat(("##Elast" + std::to_string(entity->id)).c_str(), &body.elasticity, 0, 360)) {
