@@ -48,20 +48,12 @@ namespace Marmalade::GUI::Components {
         ImGui::PopStyleColor();
 
         ImGui::SetCursorScreenPos(cursorPos);
-        ImGui::Dummy(ImVec2(textSize.x + paddingVec.x * 2, textSize.y + paddingVec.y * 2)); // Reserve space
+        ImGui::Dummy(ImVec2(textSize.x + paddingVec.x * 2, textSize.y + paddingVec.y * 2));
     }
 
     inline void DrawInlineLabelWithBackground(const char* text, const ImVec4& bgColor, const ImVec4& textColor = ImVec4(1, 1, 1, 1), float rounding = 3.0f, float padding = 3.0f) {
         Draw(text, bgColor, textColor, rounding, padding);
         ImGui::SameLine();
-    }
-
-    inline void Draw(const std::string& text, const ImVec4& bgColor, const ImVec4& textColor = ImVec4(1, 1, 1, 1), float rounding = 3.0f, float padding = 3.0f) {
-        Draw(text.c_str(), bgColor, textColor, rounding, padding);
-    }
-
-    inline void DrawInlineLabelWithBackground(const std::string& text, const ImVec4& bgColor, const ImVec4& textColor = ImVec4(1, 1, 1, 1), float rounding = 3.0f, float padding = 3.0f) {
-        DrawInlineLabelWithBackground(text.c_str(), bgColor, textColor, rounding, padding);
     }
 }
 
