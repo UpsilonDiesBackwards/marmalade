@@ -53,7 +53,7 @@ Application::Application(int width, int height, const char* title) : window(null
                                                                      input(&inputManager), camera(new Camera(1920, 1080, 1.0f)), audioManager(&AudioManager::GetInstance()) {
 
     sceneManager = SceneManager();
-    profiler = Profiler();
+    profiler = Time();
     editorGUI = new Editor;
 }
 

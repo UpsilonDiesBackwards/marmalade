@@ -22,10 +22,10 @@
 
 #include <GLFW/glfw3.h>
 
-Profiler::Profiler() : lastTime(0.0), deltaTime(0.0), fps(0), frameTime(0.0) {
+Time::Time() : lastTime(0.0), deltaTime(0.0), fps(0), frameTime(0.0) {
 }
 
-void Profiler::Update() {
+void Time::Update() {
     double currentTime = glfwGetTime();
     deltaTime = currentTime - lastTime;
     lastTime = currentTime;
@@ -35,7 +35,7 @@ void Profiler::Update() {
     frameTime = deltaTime * 1000.0f; // Convert to milliseconds
 }
 
-void Profiler::FixedUpdate() {
+void Time::FixedUpdate() {
     if (Application::GetInstance().playState != PlayState::PlayState_STEP &&
         Application::GetInstance().playState != PlayState::PlayState_PAUSE) {
 
@@ -50,18 +50,18 @@ void Profiler::FixedUpdate() {
     }
 }
 
-int Profiler::GetCurrentFPS() const {
+int Time::GetCurrentFPS() const {
     return fps;
 }
 
-float Profiler::GetCurrentFrameTime() const {
+float Time::GetCurrentFrameTime() const {
     return frameTime;
 }
 
-double Profiler::GetDeltaTime() const {
+double Time::GetDeltaTime() const {
     return deltaTime;
 }
 
-float Profiler::GetFixedDeltaTime() {
+float Time::GetFixedDeltaTime() {
     return fixedTimeStep;
 }

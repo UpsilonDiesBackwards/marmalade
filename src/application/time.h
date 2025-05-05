@@ -22,9 +22,9 @@
 
 #include "scene/entity.h"
 
-class Profiler {
+class Time {
 public:
-    Profiler();
+    Time();
 
     void Update();
     void FixedUpdate();

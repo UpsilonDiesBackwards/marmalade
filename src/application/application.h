@@ -95,7 +95,7 @@ public:
 
     StyleManager styleManager;
 
-    Profiler profiler;
+    Time profiler;
 
     std::shared_ptr<GuiLogSink> guiSink;
 
