@@ -118,7 +118,41 @@ find_package(OpenAL REQUIRED)
 
 add_subdirectory(vendor/wasm3)
 
+# ----- LOCALISATION -----
 add_subdirectory(vendor/libintl-lite)
+
+if (WIN32)
+    set(GETTEXT_MSGMERGE_EXECUTABLE "msgmerge.exe" CACHE FILEPATH "gettext msgmerge executable")
+    set(GETTEXT_MSGFMT_EXECUTABLE "msgfmt.exe" CACHE FILEPATH "gettext msgfmt executable")
+else ()
+    find_package(Gettext REQUIRED)
+endif ()
+
+if (GETTEXT_MSGFMT_EXECUTABLE)
+    file(GLOB PO_LANGS LIST_DIRECTORIES true ${CMAKE_SOURCE_DIR}/po/*.po)
+
+    add_custom_target(po-compile)
+
+    foreach (PO_LANG IN ITEMS ${PO_LANGS})
+        get_filename_component(PO_FILENAME ${PO_LANG} NAME)
+        string(REPLACE ".po" "" PO_LANG_STRIPPED ${PO_FILENAME})
+
+        set(OUTPUT_DIR ${CMAKE_BINARY_DIR}/locale/${PO_LANG_STRIPPED}/LC_MESSAGES)
+        set(OUTPUT_FILE ${OUTPUT_DIR}/marmalade.mo)
+
+        message(STATUS "Adding msgfmt for: ${PO_LANG}")
+        add_custom_command(
+                TARGET po-compile
+                PRE_BUILD
+                COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_DIR}
+                COMMAND ${GETTEXT_MSGFMT_EXECUTABLE}
+                --output-file=${OUTPUT_FILE}
+                ${PO_FILENAME}
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/po
+                COMMENT "Compiling ${PO_FILENAME} to ${OUTPUT_FILE}"
+        )
+    endforeach ()
+endif ()
 
 if (UNIX AND NOT APPLE)
     find_package(PkgConfig REQUIRED)
@@ -192,6 +226,8 @@ if (APPLE)
     set_source_files_properties(${SOURCES} src/main.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
     set_source_files_properties(${SOURCES} src/main.cpp PROPERTIES LANGUAGE OBJCXX)
 endif ()
+
+add_dependencies(marmalade po-compile)
 
 if (NOT WIN32)
     add_dependencies(marmalade lua)
