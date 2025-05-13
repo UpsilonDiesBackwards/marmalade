@@ -39,11 +39,14 @@
 	path = vendor/imnodes
 	url = https://github.com/Nelarius/imnodes.git
 [submodule "vendor/openal-soft"]
-	path = vendor/openal-soft
-	url = https://github.com/kcat/openal-soft.git
+    path = vendor/openal-soft
+    url = https://github.com/kcat/openal-soft.git
 [submodule "misc/doxygen-awesome-css"]
 	path = misc/doxygen-awesome-css
 	url = https://github.com/jothepro/doxygen-awesome-css.git
 [submodule "vendor/wasm3"]
 	path = vendor/wasm3
 	url = https://github.com/wasm3/wasm3.git
+[submodule "vendor/libintl-lite"]
+	path = vendor/libintl-lite
+	url = https://github.com/j-jorge/libintl-lite.git

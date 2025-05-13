@@ -118,6 +118,8 @@ find_package(OpenAL REQUIRED)
 
 add_subdirectory(vendor/wasm3)
 
+add_subdirectory(vendor/libintl-lite)
+
 if (UNIX AND NOT APPLE)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(GTK3 gtk+-3.0)
@@ -218,6 +220,7 @@ target_link_libraries(marmalade PRIVATE
         libgit2package
         OpenAL::OpenAL
         m3
+        intl
 )
 
 if (WIN32)
@@ -241,6 +244,7 @@ target_include_directories(marmalade PRIVATE
         vendor/imnodes
         vendor/openal-soft
         vendor/wasm3/source
+        ${LibIntl_SOURCE_DIR}
 )
 
 if (APPLE)
