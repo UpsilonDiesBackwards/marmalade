@@ -25,7 +25,7 @@ DATE=$(date "+%Y-%m-%d %H:%M%z")
 TMPFILE="$(mktemp)"
 
 find ../src \( -name "*.cpp" -o -name "*.h" \) > POTFILES
-xgettext --keyword=_ -o $POT_FILE --files-from=POTFILES
+xgettext --add-comments=Translators --keyword=_ -o $POT_FILE --files-from=POTFILES
 
 
 read -r -d '' HEADER << EOM

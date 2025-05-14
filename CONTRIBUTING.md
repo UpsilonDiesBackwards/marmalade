@@ -39,3 +39,35 @@ class SomeClass {
         void privateMethod();
 };
 ```
+
+# Localisation
+
+Any string displayed in the UI must be translatable. Make sure to include the `application/i18n.h` header.
+
+Simply remember to use wrap the string in `_( )`, e.g. `_("My string")`.
+
+Plurals should use the `ngettext` function. For example:
+
+```c++
+/* xgettext: range: 1..6 */
+ngettext("An item", "%d items", n); // n is the number of items
+```
+
+xgettext comments can be useful to display information to translators.
+
+If a translation has multiple contents, like in menu bars, use the `pgettext` function, for example:
+
+```c++
+pgettext("File|", "Print")
+```
+
+Include the trailing `|` if the context is a menu.
+
+Finally, you can include messages for translators at any time, by appending `Translators: ` to be the beginning of your comment:
+
+```c++
+/* Translators: This is the verb, not the noun */
+_("Shop")
+```
+
+POT files can be generated with the `generate-pot.sh` script.
