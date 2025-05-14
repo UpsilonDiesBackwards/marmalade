@@ -25,10 +25,10 @@ index 5f99f87..b7b9545 100644
  	std::string slash = "/";
  	const size_t length = languages.size();
 diff --git a/internal/libintl.cpp b/internal/libintl.cpp
-index 186c16a..ba612f0 100644
+index 186c16a..4ed855e 100644
 --- a/internal/libintl.cpp
 +++ b/internal/libintl.cpp
-@@ -48,249 +48,212 @@ using namespace libintllite::internal;
+@@ -48,249 +48,217 @@ using namespace libintllite::internal;
  
  static char* currentDefaultDomain = NULL;
  static map<char*, MessageCatalog*> loadedMessageCatalogPtrsByDomain;
@@ -148,10 +148,6 @@ index 186c16a..ba612f0 100644
 +    } catch (...) {
 +        return LIBINTL_LITE_BOOL_FALSE;
 +    }
-+}
-+
-+libintl_lite_bool_t bindtextdomain(const char* domain, const char* moFilePath) {
-+    return loadMessageCatalog(domain, moFilePath, g_language);
  }
  
 -libintl_lite_bool_t loadMessageCatalogFile(const char* domain, FILE* moFile)
@@ -237,14 +233,22 @@ index 186c16a..ba612f0 100644
 -	{
 -		return LIBINTL_LITE_BOOL_FALSE;
 -	}
-+libintl_lite_bool_t bind_textdomain_codeset(const char* domain, const char* moFilePath) {
-+    // not implemented yet
-+    return LIBINTL_LITE_BOOL_FALSE;
++libintl_lite_bool_t bindtextdomain(const char* domain, const char* moFilePath) {
++    return loadMessageCatalog(domain, moFilePath, g_language);
  }
  
 -libintl_lite_bool_t bindtextdomain(const char* domain, const char* moFilePath)
 -{
 -	return loadMessageCatalog( domain, moFilePath );
++libintl_lite_bool_t bind_textdomain_codeset(const char* domain, const char* moFilePath) {
++    // not implemented yet
++    return LIBINTL_LITE_BOOL_FALSE;
+ }
+ 
+-libintl_lite_bool_t bind_textdomain_codeset(const char* domain, const char* moFilePath)
+-{
+-	// not implemented yet
+-	return LIBINTL_LITE_BOOL_FALSE;
 +void closeLoadedMessageCatalog(const char* domain) {
 +    if (domain) {
 +        for (map<char*, MessageCatalog*>::iterator i = loadedMessageCatalogPtrsByDomain.begin();
@@ -258,22 +262,6 @@ index 186c16a..ba612f0 100644
 +            }
 +        }
 +    }
- }
- 
--libintl_lite_bool_t bind_textdomain_codeset(const char* domain, const char* moFilePath)
--{
--	// not implemented yet
--	return LIBINTL_LITE_BOOL_FALSE;
-+void closeAllLoadedMessageCatalogs() {
-+    for (map<char*, MessageCatalog*>::iterator i = loadedMessageCatalogPtrsByDomain.begin();
-+         i != loadedMessageCatalogPtrsByDomain.end();
-+         i++) {
-+        free(i->first);
-+        delete i->second;
-+    }
-+    loadedMessageCatalogPtrsByDomain.clear();
-+    free(currentDefaultDomain);
-+    currentDefaultDomain = NULL;
  }
  
 -void closeLoadedMessageCatalog(const char* domain)
@@ -293,18 +281,16 @@ index 186c16a..ba612f0 100644
 -			}
 -		}
 -	}
-+const char* textdomain(const char* domain) {
-+    if (domain) {
-+        char* newDefaultDomain = strdup(domain);
-+        if (!newDefaultDomain) {
-+            return NULL;
-+        }
-+        free(currentDefaultDomain);
-+        currentDefaultDomain = newDefaultDomain;
-+        return newDefaultDomain;
-+    } else {
-+        return NULL;
++void closeAllLoadedMessageCatalogs() {
++    for (map<char*, MessageCatalog*>::iterator i = loadedMessageCatalogPtrsByDomain.begin();
++         i != loadedMessageCatalogPtrsByDomain.end();
++         i++) {
++        free(i->first);
++        delete i->second;
 +    }
++    loadedMessageCatalogPtrsByDomain.clear();
++    free(currentDefaultDomain);
++    currentDefaultDomain = NULL;
  }
  
 -void closeAllLoadedMessageCatalogs()
@@ -319,8 +305,18 @@ index 186c16a..ba612f0 100644
 -	loadedMessageCatalogPtrsByDomain.clear();
 -	free(currentDefaultDomain);
 -	currentDefaultDomain = NULL;
-+const char* gettext(const char* origStr) {
-+    return dgettext(NULL, origStr);
++const char* textdomain(const char* domain) {
++    if (domain) {
++        char* newDefaultDomain = strdup(domain);
++        if (!newDefaultDomain) {
++            return NULL;
++        }
++        free(currentDefaultDomain);
++        currentDefaultDomain = newDefaultDomain;
++        return newDefaultDomain;
++    } else {
++        return NULL;
++    }
  }
  
 -const char* textdomain(const char* domain)
@@ -340,6 +336,13 @@ index 186c16a..ba612f0 100644
 -	{
 -		return NULL;
 -	}
++const char* gettext(const char* origStr) {
++    return dgettext(NULL, origStr);
+ }
+ 
+-const char* gettext(const char* origStr)
+-{
+-	return dgettext(NULL, origStr);
 +const char* dgettext(const char* domain, const char* origStr) {
 +    if (!origStr) {
 +        return NULL;
@@ -371,17 +374,6 @@ index 186c16a..ba612f0 100644
 +        return translatedStrPtr->c_str();
 +    } else {
 +        return origStr;
-+    }
- }
- 
--const char* gettext(const char* origStr)
--{
--	return dgettext(NULL, origStr);
-+const char* ngettext(const char* origStr, const char* origStrPlural, unsigned long n) {
-+    if (n == 1) {
-+        return gettext(origStr);
-+    } else {
-+        return gettext(origStrPlural);
 +    }
  }
  
@@ -429,11 +421,11 @@ index 186c16a..ba612f0 100644
 -	{
 -		return origStr;
 -	}
-+const char* dngettext(const char* domain, const char* origStr, const char* origStrPlural, unsigned long n) {
++const char* ngettext(const char* origStr, const char* origStrPlural, unsigned long n) {
 +    if (n == 1) {
-+        return dgettext(domain, origStr);
++        return gettext(origStr);
 +    } else {
-+        return dgettext(domain, origStrPlural);
++        return gettext(origStrPlural);
 +    }
  }
  
@@ -447,8 +439,9 @@ index 186c16a..ba612f0 100644
 -	{
 -		return gettext(origStrPlural);
 -	}
-+void setlanguage(const char* language) {
-+    g_language = language;
++LIBINTL_LITE_API const char* pgettext(const char *context, const char *origStr) {
++    std::string combined = std::string(context) + '\x04' + std::string(origStr);
++    return gettext(combined.c_str());
  }
  
 -const char* dngettext(const char* domain, const char* origStr, const char* origStrPlural, unsigned long n)
@@ -461,15 +454,34 @@ index 186c16a..ba612f0 100644
 -	{
 -		return dgettext(domain, origStrPlural);
 -	}
++const char* dngettext(const char* domain, const char* origStr, const char* origStrPlural, unsigned long n) {
++    if (n == 1) {
++        return dgettext(domain, origStr);
++    } else {
++        return dgettext(domain, origStrPlural);
++    }
++}
++
++void setlanguage(const char* language) {
++    g_language = language;
++}
++
 +
 +std::string getlanguage() {
 +    return g_language;
  }
 diff --git a/libintl.h b/libintl.h
-index f022415..c7e08ea 100644
+index f022415..a391175 100644
 --- a/libintl.h
 +++ b/libintl.h
-@@ -117,6 +117,8 @@ LIBINTL_LITE_API const char* ngettext(const char* origStr, const char* origStrPl
+@@ -112,11 +112,15 @@ LIBINTL_LITE_API const char* dgettext(const char* domain, const char* origStr);
+  */
+ LIBINTL_LITE_API const char* ngettext(const char* origStr, const char* origStrPlural, unsigned long n);
+ 
++LIBINTL_LITE_API const char* pgettext(const char *context, const char *origStr);
++
+ /**
+  * Works like the ngettext() function, but uses the message catalog for a specified domain.
   */
  LIBINTL_LITE_API const char* dngettext(const char* domain, const char* origStr, const char* origStrPlural, unsigned long n);
  
