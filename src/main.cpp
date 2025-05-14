@@ -18,6 +18,7 @@
  */
 
 #include "application/application.h"
+#include "application/i18n.h"
 #include "application/config/configutil.h"
 #include "application/config/recents.h"
 #include "application/config/plugins.h"
@@ -44,6 +45,7 @@
 #define ARGV argv
 
 #endif
+
 
 using namespace Marmalade::GUI;
 
@@ -135,6 +137,9 @@ int main(int argc, char** argv) {
         NativeUI::MsgBox::ShowMessage(splashScreen.GetHandle(), NativeUI::Util::utf8ToUtf16Str("Failed to load settings. See log for details."), NativeUI::Util::utf8ToUtf16Str("Marmalade Engine"), NativeUI::MsgBox::Style::Style_ERROR);
         return 1;
     }
+
+    Marmalade::I18n::SetupI18n(Marmalade::EngineConfig::GetStoredConfig().appearance.language.c_str());
+
     if (!Marmalade::Recents::GetInstance().LoadConfig()) {
         Marmalade::Recents::GetInstance().RecreateConfig();
     }

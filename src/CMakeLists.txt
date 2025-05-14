@@ -20,6 +20,7 @@ list(APPEND ENGINE_SRC
         application/config/configutil.cpp
         application/config/engineconfig.cpp
         application/config/engineconfig.h
+        application/i18n.h
 
         application/plugins/pluginloader.cpp
         application/plugins/pluginloader.h

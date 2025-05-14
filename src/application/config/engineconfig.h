@@ -47,6 +47,7 @@ namespace Marmalade {
         long long backgroundColor = 8589934591;
         float scaleFactor{1.0f};
         bool useSystemScaleFactor{true};
+        std::string language{"en"};
     };
 
     struct WindowPosConfig {
@@ -105,7 +106,7 @@ namespace Marmalade {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::InterfaceConfig, graphicsSystem, graphicsVersion);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::AppearanceConfig, viewports, themeFile, showWelcomeScreen, backgroundColor, scaleFactor, useSystemScaleFactor);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::AppearanceConfig, viewports, themeFile, showWelcomeScreen, backgroundColor, scaleFactor, useSystemScaleFactor, language);
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::WindowPosConfig, monitor, x, y, width, height, maximised);
 

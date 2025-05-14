@@ -67,7 +67,10 @@
     },
     {
       "path": "vendor/libintl-lite",
-      "url": "https://github.com/j-jorge/libintl-lite.git"
+      "url": "https://github.com/j-jorge/libintl-lite.git",
+      "patches": [
+        "patches/libintl-lite/setmessage-func.patch"
+      ]
     }
   ]
 }
