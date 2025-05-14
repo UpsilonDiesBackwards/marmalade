@@ -23,5 +23,5 @@ This repository in itself, without building any packages, is essentially just an
 Multiple built-in packages and plugins are contained in `packages` and `plugins` directories respectively.
 
 1. Clone the repository
-2. Run `git submodule update --init`
+2. Run `python submodules.py restore`
 3. Build with CMake

@@ -1,0 +1,73 @@
+{
+  "submodules": [
+    {
+      "path": "vendor/imgui",
+      "url": "https://github.com/ocornut/imgui.git",
+      "branch": "docking"
+    },
+    {
+      "path": "vendor/glfw",
+      "url": "https://github.com/glfw/glfw.git"
+    },
+    {
+      "path": "vendor/imguifiledialog",
+      "url": "https://github.com/aiekick/ImGuiFileDialog.git"
+    },
+    {
+      "path": "vendor/json",
+      "url": "https://github.com/nlohmann/json.git"
+    },
+    {
+      "path": "vendor/glm",
+      "url": "https://github.com/g-truc/glm.git"
+    },
+    {
+      "path": "vendor/luaaa",
+      "url": "https://github.com/gengyong/luaaa.git"
+    },
+    {
+      "path": "vendor/stb",
+      "url": "https://github.com/nothings/stb.git"
+    },
+    {
+      "path": "vendor/libgit2",
+      "url": "https://github.com/libgit2/libgit2.git"
+    },
+    {
+      "path": "vendor/iconfontcppheaders",
+      "url": "https://github.com/juliettef/IconFontCppHeaders.git"
+    },
+    {
+      "path": "vendor/spdlog",
+      "url": "https://github.com/gabime/spdlog.git"
+    },
+    {
+      "path": "vendor/imguizmo",
+      "url": "https://github.com/CedricGuillemet/ImGuizmo.git"
+    },
+    {
+      "path": "vendor/imgui_markdown",
+      "url": "https://github.com/enkisoftware/imgui_markdown.git"
+    },
+    {
+      "path": "vendor/imnodes",
+      "url": "https://github.com/Nelarius/imnodes.git"
+    },
+    {
+      "path": "vendor/openal-soft",
+      "url": "https://github.com/kcat/openal-soft.git"
+    },
+    {
+      "path": "misc/doxygen-awesome-css",
+      "url": "https://github.com/jothepro/doxygen-awesome-css.git"
+    },
+    {
+      "path": "vendor/wasm3",
+      "url": "https://github.com/wasm3/wasm3.git"
+    },
+    {
+      "path": "vendor/libintl-lite",
+      "url": "https://github.com/j-jorge/libintl-lite.git"
+    }
+  ]
+}

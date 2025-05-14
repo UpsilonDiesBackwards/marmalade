@@ -1,2 +1,21 @@
 cmake-build**/
 doxydocs/
+
+# submodules
+vendor/imgui
+vendor/glfw
+vendor/imguifiledialog
+vendor/json
+vendor/glm
+vendor/luaaa
+vendor/stb
+vendor/libgit2
+vendor/iconfontcppheaders
+vendor/spdlog
+vendor/imguizmo
+vendor/imgui_markdown
+vendor/imnodes
+vendor/openal-soft
+misc/doxygen-awesome-css
+vendor/wasm3
+vendor/libintl-lite
