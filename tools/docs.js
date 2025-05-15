@@ -18,53 +18,37 @@
  */
 
 const fs = require("fs");
-const { exec } = require("child_process");
+const {exec} = require("child_process");
 const http = require("http");
 const path = require("path");
 
-const WATCH_DIR = path.resolve(__dirname, "../src");
+const WATCH_DIRS = [path.resolve(__dirname, "../src"), path.resolve(__dirname, "../include"), path.resolve(__dirname, "../misc/docs")];
 const DOCS_DIR = path.resolve(__dirname, "../doxydocs/html");
 const PORT = 8000;
 const DELAY = 5000;
 
 let timeout;
 
+let clients = new Set();
+
 function runDoxygen() {
     console.log("Regenerating documentation...");
-    exec("doxygen Doxyfile", (error, stdout, stderr) => {
+    exec("doxygen Doxyfile", {
+        'cwd': '../'
+    }, (error, stdout, stderr) => {
         if (error) console.error(`Error: ${error.message}`);
         if (stderr) console.error(`stderr: ${stderr}`);
         console.log(stdout || "Documentation updated!");
+        notifyClients();
     });
 }
 
-fs.watch(WATCH_DIR, { recursive: true }, (eventType, filename) => {
-    if (filename && (filename.endsWith(".cpp") || filename.endsWith(".h"))) {
-        console.log(`File changed: ${filename}`);
-        clearTimeout(timeout);
-        timeout = setTimeout(runDoxygen, DELAY);
+function notifyClients() {
+    console.log("reloading clients");
+    for (const res of clients) {
+        res.write("data: reload\n\n");
     }
-});
-
-console.log(`Watching for changes in: ${WATCH_DIR}`);
-
-const server = http.createServer((req, res) => {
-    let filePath = path.join(DOCS_DIR, req.url === "/" ? "index.html" : req.url);
-
-    fs.readFile(filePath, (err, data) => {
-        if (err) {
-            res.writeHead(404, { "Content-Type": "text/plain" });
-            res.end("404 Not Found");
-        } else {
-            res.writeHead(200, { "Content-Type": getContentType(filePath) });
-            res.end(data);
-        }
-    });
-});
-
-server.listen(PORT, () => {
-    console.log(`Serving documentation at http://localhost:${PORT}/`);
-});
+}
 
 function getContentType(filePath) {
     const ext = path.extname(filePath).toLowerCase();
@@ -80,3 +64,71 @@ function getContentType(filePath) {
     };
     return mimeTypes[ext] || "application/octet-stream";
 }
+
+// ----- MAIN
+
+runDoxygen();
+
+WATCH_DIRS.forEach(watch_dir => {
+    fs.watch(watch_dir, {recursive: true}, (eventType, filename) => {
+        if (filename && (filename.endsWith(".cpp") || filename.endsWith(".h") || filename.endsWith(".dox"))) {
+            console.log(`File changed: ${filename}`);
+            clearTimeout(timeout);
+            timeout = setTimeout(runDoxygen, DELAY);
+        }
+    });
+});
+
+console.log(`Watching for changes in: ${WATCH_DIRS}`);
+
+const server = http.createServer((req, res) => {
+    let filePath = path.join(DOCS_DIR, req.url === "/" ? "index.html" : req.url);
+
+
+    if (req.url === "/subscribe") {
+        res.writeHead(200, {
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "Access-Control-Allow-Origin": "*",
+        });
+
+        res.write(": connected\n\n");
+        console.log("client subscribed");
+        clients.add(res);
+
+        req.on("close", () => {
+            clients.delete(res);
+        });
+
+        return;
+    }
+
+    fs.readFile(filePath, "utf8", (err, data) => {
+        if (err) {
+            res.writeHead(404, {"Content-Type": "text/plain"});
+            res.end("404 Not Found");
+        } else {
+            let contentType = getContentType(filePath);
+            res.writeHead(200, {"Content-Type": contentType});
+
+            // Inject auto-reload script
+            if (contentType === "text/html") {
+                const injectedScript = `
+<script>
+  let evtSource = new EventSource("/subscribe");
+  evtSource.onmessage = function () { location.reload(); };
+</script>
+</body>`;
+                const modified = data.replace("</body>", injectedScript);
+                res.end(modified);
+            } else {
+                res.end(data);
+            }
+        }
+    });
+});
+
+server.listen(PORT, () => {
+    console.log(`Serving documentation at http://localhost:${PORT}/`);
+});
