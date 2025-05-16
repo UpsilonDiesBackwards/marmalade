@@ -72,6 +72,8 @@ struct ENGINE_PROVIDED PluginLogger {
 #define SAFE_TO_CALL(type, api, func) (sizeof(*(api)) >= (offsetof(type, func) + sizeof((api)->func)))
 
 struct InterfaceAPI;
+struct ProjectBrowserAPI;
+struct VersionControlAPI;
 
 struct ENGINE_PROVIDED EngineAPI {
     int (*GetVersion)();
@@ -81,6 +83,8 @@ struct ENGINE_PROVIDED EngineAPI {
 
     // Structures for each API, in alphabetical order
     struct InterfaceAPI* InterfaceApi;
+    struct ProjectBrowserAPI* ProjectBrowserApi;
+    struct VersionControlAPI* VersionControlApi;
 };
 
 #ifdef WASM_IMPORT

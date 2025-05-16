@@ -26,6 +26,10 @@ list(APPEND ENGINE_SRC
         application/plugins/pluginloader.h
         application/plugins/interfaceimpl.cpp
         application/plugins/interfaceimpl.h
+        application/plugins/projectbrowserimpl.cpp
+        application/plugins/projectbrowserimpl.h
+        application/plugins/versioncontrolimpl.cpp
+        application/plugins/versioncontrolimpl.h
 
         graphics/viewport.cpp
         graphics/renderable.cpp

@@ -17,32 +17,12 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_PLUGINS_GUI_H
-#define MARMALADE_PLUGINS_GUI_H
+#ifndef MARMALADE_VERSIONCONTROL_API_H
+#define MARMALADE_VERSIONCONTROL_API_H
 
-#include <engineapi.h>
-#include <gui.h>
+struct ENGINE_PROVIDED VersionControlAPI {
+    void (*Init)();
+};
 
-#include <imgui.h>
-
-namespace Marmalade {
-    class GuiApiImpl {
-    public:
-        static inline GuiAPI Create() {
-            return GuiAPI{
-                    .Init = &Init,
-#define GUI_API_INITIALISER
-#include <imgui.inc>
-#undef GUI_API_INITIALISER
-            };
-        }
-
-        static void Init() {}
-
-#define GUI_API_IMPL
-#include <imgui.inc>
-#undef GUI_API_IMPL
-    };
-}
 
 #endif

@@ -38,6 +38,8 @@ list(APPEND ENGINE_API
 
         engineapi.h
         plugin.h
+        projectbrowser.h
+        versioncontrol.h
 
         imgui.inc
         interface.h
