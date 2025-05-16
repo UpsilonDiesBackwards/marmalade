@@ -147,14 +147,14 @@ int main(int argc, char** argv) {
         Marmalade::Plugins::GetInstance().RecreateConfig();
     }
 
-    NativeUI::SplashScreen::SetLoadingText(splashScreen, "Initialising application...");
-    Application& application = Application::GetInstance(1920, 1080, "Marmalade Engine");
+    NativeUI::SplashScreen::SetLoadingText(splashScreen, _("Initialising application..."));
+    Application& application = Application::GetInstance(1920, 1080, _("Marmalade Engine"));
     application.Initialise();
 
     bool safeMode = false;
     if (NativeUI::SplashScreen::AreSafeModeKeysHeld()) {
         std::cout << "Key down";
-        if (NativeUI::MsgBox::ShowMessage(splashScreen.GetHandle(), NativeUI::Util::utf8ToUtf16Str("Would you like to enable safe mode?"), NativeUI::Util::utf8ToUtf16Str("Marmalade Engine"),
+        if (NativeUI::MsgBox::ShowMessage(splashScreen.GetHandle(), NativeUI::Util::utf8ToUtf16Str(_("Would you like to enable safe mode?")), NativeUI::Util::utf8ToUtf16Str(_("Marmalade Engine")),
                                           NativeUI::MsgBox::Style::Style_INFO, NativeUI::MsgBox::Buttons::Buttons_YES_NO) == NativeUI::MsgBox::Result::Result_YES) {
             safeMode = true;
         }
@@ -162,13 +162,13 @@ int main(int argc, char** argv) {
 
     if (!safeMode) {
         // Load plugins
-        NativeUI::SplashScreen::SetLoadingText(splashScreen, "Loading plugins...");
+        NativeUI::SplashScreen::SetLoadingText(splashScreen, _("Loading plugins..."));
         Marmalade::PluginLoader::GetInstance().LoadPlugins();
     }
 
     if (project != nullptr) {
         // Open specified project
-        NativeUI::SplashScreen::SetLoadingText(splashScreen, "Opening project...");
+        NativeUI::SplashScreen::SetLoadingText(splashScreen, _("Opening project..."));
         if (application.OpenProject(project)) {
             Marmalade::GUI::WindowManager::GetInstance().welcomeScreen.visible = false;
         }

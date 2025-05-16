@@ -1,18 +1,54 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Marmalade - Lightweight Game Engine
+# Copyright (C) 2025 Tayler Parsons
+# Copyright (C) 2025 Ryan Bester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: Marmalade 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-13 22:00+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2025-05-16 15:28+0100\n"
+"PO-Revision-Date: 2025-05-16 15:28+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: ../src/gui/dialogs/about.cpp:63
+msgid "A lightweight 2D game engine"
+msgstr ""
+
+#: ../src/main.cpp:150
+msgid "Initialising application..."
+msgstr ""
+
+#: ../src/main.cpp:151 ../src/main.cpp:157
+msgid "Marmalade Engine"
+msgstr ""
+
+#: ../src/main.cpp:157
+msgid "Would you like to enable safe mode?"
+msgstr ""
+
+#: ../src/main.cpp:165
+msgid "Loading plugins..."
+msgstr ""
+
+#: ../src/main.cpp:171
+msgid "Opening project..."
+msgstr ""
