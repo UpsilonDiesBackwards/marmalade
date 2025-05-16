@@ -1,0 +1,78 @@
+/** \page cp-submodules Submodules
+
+Due to Marmalade being a C++ project, some libraries are required to be compiled alongside the engine.
+
+These are managed by the submodules system.
+
+Submodules are effectively git repositories cloned to a local directory, typically`vendor/`.
+
+<b>TL;DR: `python submodules.py restore` to download all submodules</b>
+
+\section submodules-script Submodules Script
+
+The `submodules.py` Python script in the project root is the main method of managing submodules.
+
+Submodules can be added with the `add` command:
+
+```bash
+python submodules.py add https://github.com/path/to/repo vendor/library
+```
+
+Note, when adding a submodule, the directory should also be added to .gitignore.
+
+Similarly, submodules can be deleted with the `delete` command:
+
+```bash
+python submodules.py delete vendor/library
+```
+
+When cloning the Marmalade repo, the `restore` command can be used to download and patch all submodules:
+
+```bash
+python submodules.py restore
+```
+
+\section submodules-json submodules.json
+
+The submodules.json file is the source of truth for all submodules. It contains a single `submodules` array.
+
+Each submodule contains the following properties:
+
+<table>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>`path`</td>
+<td>The local path of the submodule</td>
+</tr>
+<tr>
+<td>`url`</td>
+<td>The remote Git URL of the submodule. Recommend to use HTTPS as opposed to SSH</td>
+</tr>
+<tr>
+<td>`branch`</td>
+<td>The branch to fetch from the remote repository</td>
+</tr>
+<tr>
+<td>`commit`</td>
+<td>The SHA1 hash of the specific commit to fetch from the remote repository</td>
+</tr>
+<tr>
+<td>`patches`</td>
+<td>An array of patches to apply. See \ref patching section below.</td>
+</tr>
+</table>
+
+\section patching Patching
+
+The submodules system allows patches to be applied to submodules. Patch files can be specified by adding them to the `patches` array in the `submodules.json` file.
+
+Patches can be created by modifying the submodules code, then executing the `git diff > mypatch.patch` command. This automatically generates a patch file from the uncommitted changes.
+
+\section submodules-lock submodules.lock
+
+The `submodules.lock` file is generated automatically on restore, and contains the commit hashes and branches of each submodule.
+
+*/

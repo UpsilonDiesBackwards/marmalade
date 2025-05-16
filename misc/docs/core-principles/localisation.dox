@@ -1,0 +1,103 @@
+/** \page cp-localisation Localisation
+
+Localisation is an important concept in Marmalade. It allows users from different cultures to use Marmalade Engine.
+
+Any string which is displayed in the user interface must be localised.
+
+Marmalade uses the <a href="https://github.com/j-jorge/libintl-lite">libintl-lite</a> library for localisation.
+
+<b>If you are a translator, skip to the \ref building-translations section.</b>
+
+\section localising-strings Localising Strings
+
+In the simplest manner, strings can be localised by wrapping the string in the `_( )` macro, defined in `application/i18n.h`:
+
+```cpp
+_("My string to be localised");
+```
+
+\subsection plural-forms Plural Forms
+
+If a string is used a singular and plural forms, the `ngettext()` function should be used:
+
+```cpp
+ngettext("1 item added", "%d items added", n); // n is the number of items
+```
+
+The function takes three arguments: the singular string, the plural string (typically as a C-format string), and the
+number. For more information, see the <a href="https://www.gnu.org/software/gettext/manual/html_node/Plural-forms.html">gettext guide on plural forms</a>.
+
+\subsection contexts Contexts
+
+Sometimes a string on its own might not be enough to provide a suitable translation. This is where contexts should be used.
+
+A \ref translator-comments "Translator Comment" might be enough here, but if a string is used multiple times in different contexts, the `pgettext()`
+function should be used:
+
+```cpp
+pgettext("File|", "Open");
+pgettext("Printer|", "Open");
+```
+
+Here, the "Open" string could appear in the "File" menu or the "Printer menu". When using a menu as a context, make sure to include the trailing `|`.
+
+For more information, see the <a href="https://www.gnu.org/software/gettext/manual/html_node/Contexts.html">gettext guide on contexts</a>.
+
+\section translator-comments Translator Comments
+
+Never hesitate to add additional comments for translators if a string could be unclear or ambiguous.
+
+Comments for translators begin with "Translators: ":
+
+```cpp
+/* Translators: This is the verb, not the noun */
+_("Shop")
+```
+
+Special comments, such as above `ngettext()` can also be used:
+
+```cpp
+/* xgettext: range: 1..6 */
+ngettext("An item", "%d items", n);
+```
+
+\section pot-files POT Files
+
+After adding a localisable string, run the `po/generate-pot.sh` script. This will scan the source files and create a POT
+file.
+
+A POT file is essentially a template file containing all the strings requiring translation. It is the starting point for
+building translations.
+
+\section testing-translations Testing Translations
+
+It is important to ensure all strings displayed in the UI are localisable. This can be performed by providing a
+pseudo-localisation.
+
+First of all, make sure the POT file is up to date, see \ref pot-files. Then run the `tools/pseudo-localise.py` script.
+
+Set the language inside Marmalade to `po@pseudo` and after a restart, any localisable string should render with accents
+and additional characters.
+
+\section building-translations Building Translations
+
+First of all, make sure <a href="https://poedit.net/">Poedit</a> is installed.
+
+Turn off "Automatically compile MO file when saving" in Poedit's Settings, since these are compiled by CMake during build.
+
+\subsection new-language For a New Language
+
+1. Open Poedit
+2. Select "Create new" and select the `po/marmalade.pot` file.
+3. Choose the language you want to add a translation for and click "OK".
+4. Add translations for the strings.
+5. Save the .po file to the `po` directory and reload CMake.
+
+\subsection existing-language For an Existing Language
+
+1. Open Poedit
+2. Select "Browse files" and choose the relevant .po file in the `po` directory.
+3. Choose Translation -> Update from POT file, and select the `po/marmalade.pot` file.
+4. Any new strings will be displayed in Poedit.
+
+*/
