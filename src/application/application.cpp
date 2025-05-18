@@ -197,6 +197,10 @@ void Application::Run() {
 
     input.Update();
 
+    // Turn empty background into a dock space
+    ImGuiID dockspaceId = ImGui::GetID("MainDockSpace");
+    ImGui::DockSpaceOverViewport(dockspaceId, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+
     editorGUI->Render();
 
     if (playState == PlayState::PlayState_STEP) {
