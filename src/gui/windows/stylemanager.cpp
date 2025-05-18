@@ -104,8 +104,8 @@ void StyleManager::LoadStyle(const std::string& stylePath) {
             file >> style.TabRounding;
         else if (token == "TabBorderSize")
             file >> style.TabBorderSize;
-        else if (token == "TabMinWidthForCloseButton")
-            file >> style.TabMinWidthForCloseButton;
+        else if (token == "TabCloseButtonMinWidthUnselected")
+            file >> style.TabCloseButtonMinWidthUnselected;
         else if (token == "DisplayWindowPadding")
             file >> style.DisplayWindowPadding.x >> style.DisplayWindowPadding.y;
         else if (token == "DisplaySafeAreaPadding")
@@ -171,7 +171,7 @@ void StyleManager::SaveStyle(const std::string& stylePath) {
     file << "LogSliderDeadzone " << style.LogSliderDeadzone << "\n";
     file << "TabRounding " << style.TabRounding << "\n";
     file << "TabBorderSize " << style.TabBorderSize << "\n";
-    file << "TabMinWidthForCloseButton " << style.TabMinWidthForCloseButton << "\n";
+    file << "TabCloseButtonMinWidthUnselected " << style.TabCloseButtonMinWidthUnselected << "\n";
     file << "DisplayWindowPadding " << style.DisplayWindowPadding.x << " " << style.DisplayWindowPadding.y << "\n";
     file << "DisplaySafeAreaPadding " << style.DisplaySafeAreaPadding.x << " " << style.DisplaySafeAreaPadding.y << "\n";
     file << "MouseCursorScale " << style.MouseCursorScale << "\n";
