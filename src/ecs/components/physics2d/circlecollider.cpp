@@ -182,7 +182,7 @@ bool Marmalade::ECS::CircleCollider::IntersectsAABB(const Marmalade::ECS::Collid
 
 void Marmalade::ECS::CircleCollider::ShowBounds(const glm::vec2& entityPosition, Transform transform) {
     if (auto* aabbData = std::get_if<DataCircle>(&data)) {
-        glm::vec2 centre = entityPosition + aabbData->offset + glm::vec2(aabbData->radius, aabbData->radius);
+        glm::vec2 centre = entityPosition + aabbData->offset;
         float radius = aabbData->radius;
 
         ImVec2 screenCentre = EditorViews::WorldToScreenSpace(centre);

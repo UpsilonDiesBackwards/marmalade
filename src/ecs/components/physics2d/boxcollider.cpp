@@ -312,7 +312,7 @@ bool Marmalade::ECS::BoxCollider::AABBIntersectsOBB(const ColliderBase& other, c
 
 void Marmalade::ECS::BoxCollider::ShowBounds(const glm::vec2& entityPosition, Transform transform) {
     if (auto* aabbData = std::get_if<AABBDataBox>(&data)) {
-        glm::vec2 min = entityPosition + aabbData->offset;
+        glm::vec2 min = entityPosition + aabbData->offset - aabbData->size * 0.5f;
         glm::vec2 max = min + aabbData->size;
 
         ImVec2 screenMin = EditorViews::WorldToScreenSpace(min);
@@ -323,7 +323,8 @@ void Marmalade::ECS::BoxCollider::ShowBounds(const glm::vec2& entityPosition, Tr
                 ImGui::GetColorU32(IM_COL32(255, 255, 255, 255)), 0.0f, 0.0f, 2.0f
         );
     } else if (auto* obbData = std::get_if<OBBDataBox>(&data)) {
-        obbData->c = entityPosition + obbData->offset;
+        glm::vec2 center = entityPosition + obbData->offset - obbData->size * 0.5f;
+        obbData->c = center;
 
         float theta = glm::radians(transform.rotation);
 

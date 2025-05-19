@@ -29,7 +29,7 @@ Marmalade::ECS::ColliderInfo Marmalade::ECS::GetColliderInfo(const ColliderBase*
 
         if constexpr (std::is_same_v<T, AABBDataBox> || std::is_same_v<T, OBBDataBox>) {
             info.size = colliderData.size;
-            info.offset = colliderData.offset;
+            info.offset = colliderData.offset - colliderData.size * 0.5f;
         }
         if constexpr (std::is_same_v<T, OBBDataBox>) {
             info.rotation = colliderData.rotation;
@@ -40,7 +40,7 @@ Marmalade::ECS::ColliderInfo Marmalade::ECS::GetColliderInfo(const ColliderBase*
         }
         if constexpr (std::is_same_v<T, DataCircle>) {
             info.radius = colliderData.radius;
-            info.offset = colliderData.offset;
+            info.offset = colliderData.offset - colliderData.radius * 0.5f;
         }
     }, collider->data);
 

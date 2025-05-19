@@ -189,15 +189,18 @@ void EditView::RunInput() {
             auto entityPos = entity->getPosition();
             auto entityScale = entity->getScale();
 
-            glm::vec2 maxBounds = entityPos + entityScale;
+            glm::vec2 minBounds = entityPos - entityScale * 0.5f;
+            glm::vec2 maxBounds = entityPos + entityScale * 0.5f;
 
-            bool withinBounds(worldCoords.x >= entityPos.x && worldCoords.x <= maxBounds.x &&
-                              worldCoords.y >= entityPos.y && worldCoords.y <= maxBounds.y);
+            bool withinBounds = (worldCoords.x >= minBounds.x && worldCoords.x <= maxBounds.x &&
+                                 worldCoords.y >= minBounds.y && worldCoords.y <= maxBounds.y);
             if (withinBounds) {
-                auto screenMin = EditorViews::WorldToScreenSpace(entity->getPosition());
-                auto screenMax = EditorViews::WorldToScreenSpace(entity->getPosition() + entity->getScale());
+                auto screenMin = EditorViews::WorldToScreenSpace(minBounds);
+                auto screenMax = EditorViews::WorldToScreenSpace(maxBounds);
 
-                ImGui::GetForegroundDrawList(ImGui::GetMainViewport())->AddRect(screenMin, screenMax, ImGui::GetColorU32(IM_COL32(255, 255, 255, 255)), 0.0f, ImDrawFlags_None, 1.0f);
+                ImGui::GetForegroundDrawList(ImGui::GetMainViewport())->AddRect(screenMin, screenMax,
+                                                                                ImGui::GetColorU32(IM_COL32(255, 255, 255, 255)),
+                                                                                0.0f, ImDrawFlags_None, 1.0f);
 
                 if (app.inputManager.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
                     app.editorGUI->sceneHierarchy.SelectEntityByUuid(entity->uuid);
@@ -277,7 +280,7 @@ void EditView::ShowColliderBounds() {
 
     auto* transform = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
 
-    comp->ShowBounds(selectedEntity->getPosition(), *transform);
+    comp->ShowBounds(selectedEntity->getPosition() , *transform);
 }
 
 void EditView::ShowLightBounds() {
