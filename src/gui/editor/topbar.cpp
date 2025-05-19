@@ -179,7 +179,7 @@ void Marmalade::GUI::TopBar::Show() {
         );
 
         float fpsRegionWidth = 5.0f;
-        float rightMargin = -115.0f;
+        float rightMargin = 100.0f;
 
         float totalButtonWidth = (editorButtonSize.x + editorButtonSize.x) * 3;
         float totalWidth = (totalButtonWidth + fpsRegionWidth + rightMargin);
