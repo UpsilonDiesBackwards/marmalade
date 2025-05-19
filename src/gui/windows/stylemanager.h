@@ -21,7 +21,9 @@
 #define ENGINE_STYLEMANAGER_H
 
 #include <string>
-
+/*
+* \brief Marmalade style manager. Sets and loads the interface style
+*/
 class StyleManager {
 public:
     StyleManager();

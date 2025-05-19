@@ -34,29 +34,56 @@
 
 class Entity;
 
+/**
+ * \brief A renderable is an object that can be rendered onto the screen
+ */
+
 class Renderable {
 public:
     enum RenderMode {
-        Lit,
-        Unlit,
-        Wireframe,
+        RenderMode_LIT,
+        RenderMode_UNLIT,
+        RenderMode_WIREFRAME,
     };
 
-    RenderMode renderMode = RenderMode::Unlit;
+    /**
+     * \brief The current RenderMode of the renderable, determines how it should be rendered
+     * \brief Possible states: RenderMode_LIT, RenderMode_UNLIT, RenderMode_WIREFRAME
+     */
+    RenderMode renderMode = RenderMode::RenderMode_UNLIT;
 
     std::shared_ptr<Marmalade::Material::Material> material;
 
     Renderable(unsigned int VAO, unsigned int VBO, unsigned int EBO, unsigned int texture);
 
-    void Initialise(); // Buffer Setup
+    /**
+     * \brief Initialises the renderable
+     * \brief Generates and binds buffer objects
+     */
+    void Initialise();
+
+    /**
+     * \brief Draws the renderable object to the screen
+     * \param entity Owning entity
+     * \param modelMatrix The modelmatrix of the renderable
+     * \param renderTexture Render the renderable with a material texture
+     */
     void Draw(Entity* entity, glm::mat4 modelMatrix, bool renderTexture);
 
+    /**
+     * \brief Applies lighting to the renderable
+     * \param lights Vector of lights within the current scene
+     * \param viewPos The current View Position of the Camera
+     */
     void ApplyLighting(const std::vector<Marmalade::ECS::Light2D*>& lights, const glm::vec3& viewPos);
 
+    /**
+     * \brief Update and apply a new render mode for the renderable
+     */
     void ApplyRenderMode();
 
 private:
-    RenderMode _previousRenderMode = RenderMode::Wireframe;
+    RenderMode _previousRenderMode = RenderMode::RenderMode_WIREFRAME;
 
     unsigned int VAO, VBO, EBO;
     Shader shaderProgram;

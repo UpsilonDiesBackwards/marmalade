@@ -28,12 +28,12 @@ Camera::Camera(float width, float height, float zoom) : position(0.0f, 0.0f), zo
 }
 
 void Camera::Move(float xOffset, float yOffset) {
-    position.x += xOffset * panSpeed * Application::GetInstance().profiler.GetDeltaTime();
-    position.y += yOffset * panSpeed * Application::GetInstance().profiler.GetDeltaTime();
+    position.x += xOffset * panSpeed * Application::GetInstance().time.GetDeltaTime();
+    position.y += yOffset * panSpeed * Application::GetInstance().time.GetDeltaTime();
 }
 
 void Camera::Zoom(float amount) {
-    zoom += amount * Application::GetInstance().profiler.GetDeltaTime();
+    zoom += amount * Application::GetInstance().time.GetDeltaTime();
     if (zoom <= 0.02f) zoom = 0.02f;
     if (zoom > 200.0f) zoom = 200.0f;
 }

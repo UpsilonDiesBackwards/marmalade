@@ -26,6 +26,9 @@
 
 #include <IconsCodicons.h>
 
+/**
+ * \brief Draws the Config Error dialog
+ */
 void Marmalade::GUI::ConfigErrorDialog::Draw() {
     WINDOW_BEGIN_MODAL(ICON_CI_ERROR " Config Error", ImGuiWindowFlags_AlwaysAutoResize)
 

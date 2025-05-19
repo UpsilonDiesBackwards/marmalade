@@ -26,13 +26,30 @@
 #include "imgui.h"
 
 class GameView {
+/**
+ * \brief Game view of the application
+ * \brief This is the main game view that shows the state of the game as-is
+ */
 public:
     GameView(int width, int height);
     ~GameView();
 
+    /**
+     * \brief Render the game view.
+     */
     void Render();
+
+    /**
+     * \brief Resize the game viewport to a specified dimension
+     * \param width Desired width of the viewport
+     * \param height Desired height of the viewport
+     */
     void Resize(int width, int height);
 
+    /**
+     * \brief Execute any game viewport-specific input
+     * \todo This eventually ought to be developer-specified controls that are created via the API
+     */
     void RunInput();
 private:
     MultiSampledFramebuffer framebuffer;

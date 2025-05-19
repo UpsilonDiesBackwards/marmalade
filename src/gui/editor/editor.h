@@ -24,11 +24,25 @@
 
 #include <glm/glm.hpp>
 
+/**
+ * \brief Creates the window that displays the two editor view subwindows.
+ */
 class EditorViews {
 public:
     void Show();
 
+    /**
+     * \brief Converts a position from world-space into screen-space coordinates
+     * \param world World position
+     * \return ImVec2 Screen-space position
+     */
     static ImVec2 WorldToScreenSpace(const glm::vec2& world);
+
+    /**
+     * \brief Converts a position from screen-space into world-space coordinates
+     * \param screen Screen position
+     * \return glm::vec2 World-space position
+     */
     static glm::vec2 ScreenToWorldSpace(const ImVec2& screen);
 };
 

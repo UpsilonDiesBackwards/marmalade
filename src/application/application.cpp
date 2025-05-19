@@ -49,11 +49,18 @@
 #include <iostream>
 #include <fstream>
 
+/**
+ * \param width Width of the application window
+ * \param height Height of the application window
+ * \param title Title of the application window - Most often times set the the name of the current project
+ *
+ * \brief Application constructor, sets necessary variables
+ */
 Application::Application(int width, int height, const char* title) : window(nullptr), width(width), height(height), title(title), inputManager(InputManager::GetInstance()),
                                                                      input(&inputManager), camera(new Camera(1920, 1080, 1.0f)), audioManager(&AudioManager::GetInstance()) {
 
     sceneManager = SceneManager();
-    profiler = Time();
+    time = Time();
     editorGUI = new Editor;
 }
 
@@ -180,8 +187,8 @@ void Application::Initialise() {
 }
 
 void Application::Run() {
-    profiler.Update();
-    profiler.FixedUpdate();
+    time.Update();
+    time.FixedUpdate();
 
     ImVec4 backgroundCol = ImGui::ColorConvertU32ToFloat4(Marmalade::EngineConfig::GetStoredConfig().appearance.backgroundColor);
     glClearColor(backgroundCol.x, backgroundCol.y, backgroundCol.z, backgroundCol.w);
@@ -291,6 +298,12 @@ void Application::SetupLogger() {
     spdlog::set_level(Marmalade::EngineConfig::GetStoredConfig().logLevel);
 }
 
+/**
+ * \brief
+ * \param path Path of the target project to open
+ * \return Boolean
+ */
+
 bool Application::OpenProject(const std::filesystem::path& path) {
     try {
         auto project = std::make_unique<Marmalade::Project::Project>(Marmalade::Project::ProjectManager<>::OpenProject(path));
@@ -329,6 +342,11 @@ bool Application::OpenProject(const std::filesystem::path& path) {
     return true;
 }
 
+/**
+ * \brief Change from the current project to a new project
+ * \param project Target project
+ */
+
 void Application::SetCurrentProject(std::unique_ptr<Marmalade::Project::Project>& project) {// Change the current projects and update the window title to inc project name
     currentProject = std::move(project);
 
@@ -337,6 +355,11 @@ void Application::SetCurrentProject(std::unique_ptr<Marmalade::Project::Project>
     glfwSetWindowTitle(window, windowTitle.c_str());
 }
 
+
+/**
+ * \brief Returns the currently opened project
+ * \return Marmalade::Project::Project* current application
+ */
 Marmalade::Project::Project* Application::GetCurrentProject() {
     return currentProject.get();
 }
@@ -364,6 +387,10 @@ void Application::OnClose() {
 
     Marmalade::EngineConfig::GetInstance().SaveConfig();
 }
+
+/**
+ * \brief Get the Graphics version from the engine config
+ */
 
 void Application::getGraphicsVersion() {
     std::stringstream ss(Marmalade::EngineConfig::GetStoredConfig().interface.graphicsVersion);

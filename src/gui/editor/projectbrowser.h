@@ -36,16 +36,29 @@
 #include <functional>
 
 namespace Marmalade::GUI {
+    /**
+     * \brief The current Browser mode
+     * \brief BrowserMode_PROJECT shows project files
+     * \brief BrowserMode_FILES shows project data files
+     */
     enum BrowserMode {
         BrowserMode_PROJECT,
         BrowserMode_FILES
     };
 
+    /**
+     * \brief The display mode of items within the project browser
+     * \brief DisplayMode_TILES shows items as tiles with thumbnails
+     * \brief DisplayMode_LIST shows items as entries in a list
+     */
     enum DisplayMode {
         DisplayMode_TILES,
         DisplayMode_LIST
     };
 
+    /**
+     * \brief File type categories
+     */
     enum FileType {
         FileType_IMAGE,
         FileType_VIDEO,
@@ -57,6 +70,9 @@ namespace Marmalade::GUI {
 
     static const char* FileTypes[] = {"Image", "Video", "Script", "Code", "Text", "Unknown"};
 
+    /**
+     * \brief Common directories of the project structure
+     */
     enum CommonDirectory {
         CommonDirectory_ASSETS,
         CommonDirectory_DATA,
@@ -69,6 +85,9 @@ namespace Marmalade::GUI {
         std::string Path;
     };
 
+    /**
+     * \brief Directory entry of the project browser
+     */
     struct DirectoryEntry {
         std::filesystem::directory_entry Entry;
         CommonDirectory Type;
@@ -79,6 +98,9 @@ namespace Marmalade::GUI {
         DirectoryEntry(std::filesystem::directory_entry entry, CommonDirectory type) : Entry(std::move(entry)), Type(type) {}
     };
 
+    /**
+     * \brief The project browser GUI. Will show all the directories and asset items within the currently open project
+     */
     class ProjectBrowser : public Window {
     public:
         explicit ProjectBrowser(bool visible) : Window(visible) {};
@@ -130,17 +152,65 @@ namespace Marmalade::GUI {
 
         void drawTopBar();
         void drawBottomBar();
+
+        /**
+         * \brief Draw directory entries as tiles
+         * \param item Browser item entry
+         */
         void drawItemTile(Marmalade::GUI::DirectoryEntry item);
+
+        /**
+         * \brief Draw directory entries as list items
+         * \param item Browser item entry
+         * \param i Browser item index
+         */
         void drawItemList(Marmalade::GUI::DirectoryEntry item, int i);
 
+        /**
+         * \brief Iterate all items in the common directories of the project
+         * \param item_callback Item
+         */
         void iterateFiles(std::function<void(DirectoryEntry)> item_callback);
+
+        /**
+         * \brief Determine the file type of an item depending on its extension
+         * \param extension Extension of the item
+         * \return FileType File type of the item
+         */
         FileType determineFileType(const std::filesystem::path& extension);
+
+        /**
+         * \brief Process directory items, handles rendering and events for clicking on the item
+         * \param item Directory item to process
+         */
         void processItem(DirectoryEntry& item);
 
+        /**
+         * \brief If item is an image file, get its texture ID
+         * \param item Target directory item
+         * \return uint Texture ID
+         */
         unsigned int getTextureId(const DirectoryEntry& item);
+
+        /**
+         * \brief Display context menu for the an item
+         * \param item Target directory item
+         */
         void displayContextMenu(const DirectoryEntry& item);
+
         void handleItemDoubleClick(const DirectoryEntry& item);
+
+        /**
+         * \brief Creates the ImGui DragDrop Source for the target directory item
+         * \param item Target directory item
+         * \param textureId TextureID of item to display when dragging
+         */
         void handleDrag(const DirectoryEntry& item, const unsigned int textureId);
+
+        /**
+         * \brief Display the tooltip for a directory item,
+         * \param item Target diretory item
+         */
         void displayTooltip(const DirectoryEntry& item);
         ImU32 getBackgroundColor(CommonDirectory type);
 

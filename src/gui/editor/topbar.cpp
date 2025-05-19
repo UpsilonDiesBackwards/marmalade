@@ -173,8 +173,8 @@ void Marmalade::GUI::TopBar::Show() {
 
         std::string fpsText = std::format(
                 "FPS: {} | ({:.2f} ms)",
-                Application::GetInstance().profiler.GetCurrentFPS(),
-                Application::GetInstance().profiler.GetCurrentFrameTime()
+                Application::GetInstance().time.GetCurrentFPS(),
+                Application::GetInstance().time.GetCurrentFrameTime()
         );
 
         float fpsRegionWidth = 5.0f;

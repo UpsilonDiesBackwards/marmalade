@@ -29,6 +29,10 @@
 
 #define OPENGL_VERSION "430"
 
+/**
+ * \brief The vertex information for the base renderable square
+ * \todo Add support for non-square renderable shapes, such as circular, triangular etc
+ */
 float vertices[] = {
         // Position                       // Normal                      // UV
         -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, // Bottom Left
@@ -37,11 +41,22 @@ float vertices[] = {
         -0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f  // Top Left
 };
 
+/**
+ * \brief The index information for the base renderable square
+ * \todo When support for non-square renderable shapes are implemented, automatically generate the indices, or automatically update them depending on shape
+ */
 unsigned int indices[] = {
         0, 1, 2,
         2, 3, 0
 };
 
+/**
+ * \brief Renderable constructor, assign base variables
+ * \param VAO Vertex array object
+ * \param VBO Vertex buffer object
+ * \param EBO Element buffer object
+ * \param texture The material texture of the renderable
+ */
 Renderable::Renderable(GLuint VAO, GLuint VBO, GLuint EBO, GLuint texture) : VAO(0), VBO(0), EBO(0),
                                                                              texture(texture),
                                                                              shaderProgram(Shader("res/shaders/opengl/" OPENGL_VERSION "/shader.vert", "res/shaders/opengl/" OPENGL_VERSION "/shader.frag")) {
@@ -118,7 +133,7 @@ void Renderable::Draw(Entity* entity, glm::mat4 modelMatrix, bool renderTexture)
 
     ApplyRenderMode();
 
-    if (renderMode == RenderMode::Lit) {
+    if (renderMode == RenderMode::RenderMode_LIT) {
         shaderProgram.SetBool("useLighting", true);
     } else {
         shaderProgram.SetBool("useLighting", false);
@@ -158,15 +173,15 @@ void Renderable::ApplyRenderMode() {
     glGetUniformiv(shaderProgram.ID, location, &value);
 
     switch (renderMode) {
-        case RenderMode::Lit:
+        case RenderMode::RenderMode_LIT:
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             shaderProgram.SetBool("useLighting", true);
             break;
-        case RenderMode::Unlit:
+        case RenderMode::RenderMode_UNLIT:
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             shaderProgram.SetBool("useLighting", false);
             break;
-        case RenderMode::Wireframe:
+        case RenderMode::RenderMode_WIREFRAME:
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             shaderProgram.SetBool("useLighting", false);
             break;

@@ -27,12 +27,22 @@
 #include "scene/entity.h"
 
 namespace Marmalade::GUI {
+    /**
+     * \brief Draws the 'Details' window, this shows the components attached to the selected entity and their values
+     */
     class Details : public Window {
     public:
+        /**
+         * \brief Entity currently selected within scene hierarchy
+         */
         Entity* inspectedEntity{nullptr};
 
         void Draw() override;
 
+        /**
+         * \brief If the user is adding a new component to the selected entity, show the 'Add Component' modal dialog window
+         * \param adding
+         */
         void SetAddingComponent(bool adding) { _addComponentDialog.visible = adding; }
 
     private:

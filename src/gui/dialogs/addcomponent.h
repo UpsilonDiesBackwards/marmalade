@@ -25,11 +25,17 @@
 #include <string>
 
 namespace Marmalade::GUI {
+    /**
+     * \brief Draws the 'Add Component' dialog window
+     */
     class AddComponentDialog : public Window {
     public:
         void Draw() override;
 
     private:
+        /**
+         * \brief Tab selected by default
+         */
         std::string _selectedTab = "Favourites";
 
         void drawLeftPane();

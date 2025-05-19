@@ -26,6 +26,10 @@
 #include <vector>
 
 namespace Marmalade::GUI {
+    /**
+     * \brief Code for the 'About' GUI window
+     * \brief Shows the engine information, license information for packages and contributor names 
+     */
     class About : public Window {
     public:
         struct Package {

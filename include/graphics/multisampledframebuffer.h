@@ -22,6 +22,10 @@
 
 #include <imgui.h>
 
+/**
+ * \brief Creates a multi-sampled (MS) OpenGL framebuffer
+ */
+
 class MultiSampledFramebuffer {
 public:
     int width = 1920;
@@ -34,14 +38,44 @@ public:
     MultiSampledFramebuffer();
     ~MultiSampledFramebuffer();
 
+    /**
+     * \brief Bind the MS framebuffer to the current OpenGL context
+     */
     void Bind();
+
+    /**
+     * \brief Unbind the MS framebuffer from the current OpenGL context
+     */
     void Unbind();
+
+    /**
+     * \brief Resolve the MS framebuffer
+     * \brief Resolving is the act of taking each pixel (which has multiple samples) and converting it into a singular image with 1 sample per pixel
+     */
     void Resolve();
 
+    /**
+     * \brief Resize the MS framebuffer
+     * \param width Desired width of the MS framebuffer
+     * \param height Desired height of the MS framebuffer
+     */
     void Resize(int width, int height);
+
+    /**
+     * \brief Refresh by deleting then re-initialising it as a new MS framebuffer
+     */
     void Refresh();
 
+    /**
+     * \brief Returns the framebuffer texture ID
+     * \return uint
+     */
     unsigned int GetTexture() const;
+
+    /**
+     * \brief Returns the framebuffer object ID
+     * \return uint
+     */
     unsigned int GetFBO() const;
 private:
     unsigned int fbo, resolvedFBO;

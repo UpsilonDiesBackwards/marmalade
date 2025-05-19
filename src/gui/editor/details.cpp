@@ -72,7 +72,9 @@ void Marmalade::GUI::Details::Draw() {
 
     WINDOW_END()
 }
-
+/**
+ * \brief Shows the modal dialog for removing a component from an entity
+ */
 void Marmalade::GUI::Details::ShowRemovePopup() {
     if (ImGui::BeginPopupModal("Remove Component", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::Text("Are you sure you want to remove: %s?", _selectedComponent->name.c_str());

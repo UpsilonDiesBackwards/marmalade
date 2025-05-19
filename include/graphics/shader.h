@@ -23,6 +23,9 @@
 #include <glm/glm.hpp>
 
 #include <string>
+/**
+ * \brief Creates and manages an OpenGL shader program
+ */
 
 class Shader {
 public:
@@ -32,14 +35,54 @@ public:
 
     void Use();
 
+    /**
+     * \brief Sets a boolean parameter within a shader program
+     * \param name Name of the parameter to update
+     * \param value Value to change the parameter to
+     */
     void SetBool(const std::string &name, bool value) const;
+
+    /**
+     * \brief Set an integer parameter within a shader program
+     * \param name Name of the parameter to update
+     * \param value Value to change the parameter to
+     */
     void SetInt(const std::string &name, int value) const;
+
+    /**
+     * \brief Set an float parameter within a shader program
+     * \param name Name of the parameter to update
+     * \param value Value to change the parameter to
+     */
     void SetFloat(const std::string &name, float value) const;
+
+    /**
+     * \brief Set an Vector2 parameter within a shader program
+     * \param name Name of the parameter to update
+     * \param value Value to change the parameter to
+     */
     void SetVec2(const std::string& name, const glm::vec2& value) const;
+
+    /**
+     * \brief Set an Vector3 parameter within a shader program
+     * \param name Name of the parameter to update
+     * \param value Value to change the parameter to
+     */
     void SetVec3(const std::string& name, glm::vec3 value) const;
+
+    /**
+     * \brief Set an Matrix4 parameter within a shader program
+     * \param name Name of the parameter to update
+     * \param value Value to change the parameter to
+     */
     void SetMat4(const std::string &name, const glm::mat4 &mat) const;
 
 private:
+    /**
+     * \brief Check for any OpenGL errors and return any
+     * \param shader Shader program ID
+     * \param type Type of shader object to check errors for
+     */
     void GetError(unsigned int shader, std::string type);
 };
 

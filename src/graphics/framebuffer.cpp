@@ -33,6 +33,10 @@ Framebuffer::~Framebuffer() {
     glDeleteRenderbuffers(1, &rbo);
 }
 
+/**
+ * \brief Initialises the frame buffer object
+ * \brief Handles the generation and binding processes
+ */
 void Framebuffer::Initialise() {
     glGenFramebuffers(1, &fbo); // Create frame buffer
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -65,7 +69,6 @@ void Framebuffer::Initialise() {
 void Framebuffer::Bind() {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 }
-
 
 void Framebuffer::Resize(int newW, int newH) {
     width = newW;

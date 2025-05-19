@@ -25,14 +25,17 @@
 
 #include "imgui.h"
 
-/*
- * We will use a frame buffer to display a texture in an imgui window. this will allow us to have a detachable
- * view of our game.
+/**
+ * \brief Constructor of the game viewport
+ * \param width Starting width of the viewport
+ * \param height Starting height of the viewport
  */
-
 GameView::GameView(int width, int height) {
 }
 
+/**
+ * \brief Sets the framebuffer, and renders any entities within the scene
+ */
 void GameView::Render() {
     Application& app = Application::GetInstance();
 

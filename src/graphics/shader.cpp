@@ -28,6 +28,11 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 
+/**
+ * \brief Opens and reads vertex and fragment shader files, then generate the shaders and the shader program
+ * \param vPath Path to vertex shader file
+ * \param fPath Path to fragment shader file
+ */
 Shader::Shader(const char *vPath, const char *fPath) {
     std::string vCode;
     std::string fCode;
@@ -78,6 +83,10 @@ Shader::Shader(const char *vPath, const char *fPath) {
     glDeleteShader(fragment);
 }
 
+
+/**
+ * \brief Instruct OpenGL to use this shader program
+ */
 void Shader::Use() {
     glUseProgram(ID);
 }

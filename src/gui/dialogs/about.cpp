@@ -31,6 +31,11 @@
 
 #include <fstream>
 
+/**
+ * \brief Loads the information about packages included in the current project
+ * \param filename File path of the packages.json file
+ * \return std::vector<Marmalade::GUI::About::Package> Vector of packages included in the current project
+ */
 std::vector<Marmalade::GUI::About::Package> Marmalade::GUI::About::loadPackages(const std::string& filename) {
     std::ifstream file(filename);
     if (!file) {
@@ -48,6 +53,9 @@ std::vector<Marmalade::GUI::About::Package> Marmalade::GUI::About::loadPackages(
     return packages;
 }
 
+/**
+ * \brief Draws the 'About' GUI window. Shows the (temp) Marmalade logo and creates a list of tabs for each package and 3rd Party license
+ */
 void Marmalade::GUI::About::Draw() {
     WINDOW_BEGIN(ICON_CI_INFO " About", ImGuiWindowFlags_None)
 

@@ -21,6 +21,10 @@
 
 #include "../../application/application.h"
 
+/**
+ * \brief Handles the switching from the Edit and Game editor views
+ * \brief Also renders a status bar at the bottom of the window
+ */
 void EditorViews::Show() {
     Application& application = Application::GetInstance();
 
@@ -90,7 +94,7 @@ ImVec2 EditorViews::WorldToScreenSpace(const glm::vec2& world) {
     }
 
     float screenX = (clipSpace.x * 0.5f + 0.5f) * framebufferSize.x;
-    float screenY = (1.0f - (clipSpace.y * 0.5f + 0.5f)) * framebufferSize.y;// Flip Y
+    float screenY = (1.0f - (clipSpace.y * 0.5f + 0.5f)) * framebufferSize.y; // Flip Y
 
     return {screenX + framebufferPos.x, screenY + framebufferPos.y};
 }

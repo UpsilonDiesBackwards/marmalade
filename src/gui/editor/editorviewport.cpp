@@ -34,13 +34,20 @@
 
 int EditView::currentRenderMode = 1;
 
+/**
+ * \brief Constructor of the editor viewport. Assigns the initial framebuffer
+ * \param width Starting width of the viewport
+ * \param height Starting height of the viewport
+ */
 EditView::EditView(int width, int height) : width(width), height(height) {
     Application::GetInstance().framebuffer = &framebuffer;
 }
 
-EditView::~EditView() {
-}
+EditView::~EditView() { }
 
+/**
+ * \brief Sets the framebuffer and shows editor viewport toolbar which includes drop down for render mode and guizmo mode toggles
+ */
 void EditView::Render() {
     Application& app = Application::GetInstance();
 

@@ -36,6 +36,10 @@ MultiSampledFramebuffer::MultiSampledFramebuffer() {
     Initialize();
 }
 
+/**
+ * \brief Deconstructs the MS framebuffer by deleting the objects and texture
+ */
+
 MultiSampledFramebuffer::~MultiSampledFramebuffer() {
     glDeleteFramebuffers(1, &fbo);
     if (sampleCount > 0) glDeleteFramebuffers(1, &resolvedFBO);
@@ -43,6 +47,12 @@ MultiSampledFramebuffer::~MultiSampledFramebuffer() {
     if (sampleCount > 0) glDeleteTextures(1, &resolvedTexture);
     glDeleteRenderbuffers(1, &rbo);
 }
+
+/**
+ * \brief Initialises the MS frame buffer object
+ * \brief Handles the generation and binding processes
+ * \brief Additionally determines which type of framebuffer to use (Sampled or non-sampled) based on the sampleCount param
+ */
 
 void MultiSampledFramebuffer::Initialize() {
     glGenFramebuffers(1, &fbo);

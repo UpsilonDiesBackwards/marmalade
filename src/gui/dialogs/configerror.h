@@ -26,10 +26,17 @@
 #include <functional>
 
 namespace Marmalade::GUI {
+    /**
+     * \brief Shows a dialog if a config error has occurred
+     */
     class ConfigErrorDialog : public Window {
     public:
         std::string fileName{};
         std::string errorMsg{};
+
+        /**
+         * \brief Callback for config recreation
+         */
         std::function<void()> recreateConfigCallback{nullptr};
 
         void Draw() override;

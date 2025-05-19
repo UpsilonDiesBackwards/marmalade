@@ -59,53 +59,122 @@ enum EditorMode {
 
 class Editor;
 
+/**
+ * \brief Main marmalade application class
+ */
 class Application {
 public:
+    /**
+     * \brief Returns the application singleton instance
+     */
     static Application& GetInstance(int width = 1920, int height = 1080, const char* title = "Engine") {
         static Application instance(width, height, title);
         return instance;
     }
     ~Application();
 
+    /**
+     * \brief Initialises the project on startup. Performs tasks such as initialising GLFW and loading engine config
+     */
     void Initialise();
+
+    /**
+     * \brief Executes functions that need to be called per-frame, such as the input and render loop
+     */
     void Run();
+
+    /**
+     * \brief Setup ImGui Docking
+     */
     void SetupDocking() const;
+
+    /**
+     * \brief Setup marmalade engine logger
+     */
     void SetupLogger();
+
+    /**
+     * \brief Terminate and cleanup application process
+     */
     void Terminate();
 
+    /**
+     * \brief Returns the glfw application window
+     */
     GLFWwindow* getWindow();
+    /**
+     * \brief Returns the application camera
+     */
     Camera* getCamera();
 
+    /**
+     * \brief The PlayState of the engine
+     * Possible states: PlayState_PLAY, PlayState_STOP, PlayState_PAUSE, PlayState_STEP
+     */
     PlayState playState = PlayState::PlayState_STOP;
+
+    /**
+     * \brief The mode of the editor, determines user behaviour such as the ability to edit scene entities
+     * Possible states: EditorMode_EDIT, EditorMode_GAME
+     */
     EditorMode editorMode = EditorMode::EditorMode_EDIT;
 
+    /**
+     * \brief The framebuffer of the application. It is used to render the OpenGL context into an ImGui interface
+     */
     MultiSampledFramebuffer* framebuffer;
 
+    /**
+     * \brief Main editor UI
+     */
     Editor* editorGUI;
 
+    /**
+     * \brief Edit view of the engine
+     */
     EditView* editView;
+
+    /**
+     * \brief Game view of the engine
+     */
     GameView* gameView;
 
     AudioManager* audioManager;
+
+    /**
+     * \brief The Marmalade input manager. This is used to perform input checks (ie. isKeyDown(), getMouseX())
+     */
     InputManager& inputManager;
     Input input;
 
+    /**
+     * \brief Marmalade Scene manager
+     */
     SceneManager sceneManager;
     Camera* camera;
 
     StyleManager styleManager;
 
-    Time profiler;
+    Time time;
 
     std::shared_ptr<GuiLogSink> guiSink;
 
+    /**
+     * \brief Opens a marmalade project and sets it as the current application project
+     */
     bool OpenProject(const std::filesystem::path& path);
 
     void SetCurrentProject(std::unique_ptr<Marmalade::Project::Project>& project);
     Marmalade::Project::Project* GetCurrentProject();
 
+    /**
+     * \brief Performs non-cleanup code such as saving the engine config
+     */
     void OnClose();
 
+    /**
+     * \brief Used to determine whether the application should advance a single frame during Game mode
+     */
     bool stepFrame = false;
 private:
     Application(int width, int height, const char* title);

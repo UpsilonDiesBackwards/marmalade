@@ -20,16 +20,42 @@
 #ifndef MARMALADE_FRAMEBUFFER_H
 #define MARMALADE_FRAMEBUFFER_H
 
+/**
+ * \brief Creates an OpenGL framebuffer
+ */
+
 class Framebuffer {
 public:
     Framebuffer();
     ~Framebuffer();
 
+    /**
+     * \brief Bind the framebuffer to the current OpenGL context
+     */
     void Bind();
+
+    /**
+     * \brief Unbind the framebuffer from the current OpenGL context
+     */
     void Unbind();
+
+    /**
+     * \brief Resize the framebuffer
+     * \param width Desired width of the framebuffer
+     * \param height Desired height of the framebuffer
+     */
     void Resize(int width, int height);
 
+    /**
+     * \brief Returns the framebuffer texture ID
+     * \return uint
+     */
     unsigned int GetTexture() const;
+
+    /**
+     * \brief Returns the framebuffer object ID
+     * \return uint
+     */
     unsigned int GetFBO() const;
 
     int width = 1920;

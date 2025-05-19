@@ -27,19 +27,41 @@
 
 #include <imgui.h>
 
+/**
+ * \brief Edit view of the application
+ * \brief This is the main editor view that allows the user to manipulate entities, display guizmos and other development-specific information
+ */
 class EditView {
+    /**
+     * \brief Current Render Mode of the application as an integer
+     */
     static int currentRenderMode;
-    const char* renderModes[3] = { "Lit", "Unlit", "Wireframe" };
+    const char* renderModes[3] = { "RenderMode_LIT", "RenderMode_UNLIT", "RenderMode_WIREFRAME" };
 
 public:
+    /**
+     * \brief The entity that has been selected in the scene hierarchy
+     */
     Entity* selectedEntity{};
 
     EditView(int width, int height);
     ~EditView();
 
+    /**
+     * \brief Render the edit view.
+     */
     void Render();
+
+    /**
+     * \brief Resize the editor viewport to a specified dimension
+     * \param width Desired width of the viewport
+     * \param height Desired height of the viewport
+     */
     void Resize(int width, int height);
 
+    /**
+     * \brief Execute any editor viewport-specific input such as guizmo-control hotkeys
+     */
     void RunInput();
 private:
     MultiSampledFramebuffer framebuffer;
@@ -49,9 +71,24 @@ private:
     ImGuizmo::OPERATION _currentGuizmoOperation = ImGuizmo::TRANSLATE;
     ImGuizmo::MODE _currentGuizmoMode = ImGuizmo::WORLD;
 
+    /**
+     * \brief Toggles the display of all UI guizmos
+     */
     void ShowEditorUIGuizmos();
+
+    /**
+     * \brief Toggles display of the entity transform guizmo
+     */
     void ShowGizmo();
+
+    /**
+     * \brief Toggles display of entity collider bounds
+     */
     void ShowColliderBounds();
+
+    /**
+     * \brief Toggle display of bounds of the size and attenuation bounds of any Lights in the scene
+     */
     void ShowLightBounds();
 };
 

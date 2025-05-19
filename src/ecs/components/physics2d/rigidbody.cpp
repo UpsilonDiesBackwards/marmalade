@@ -137,7 +137,7 @@ void Marmalade::ECS::RigidBody::Apply(Entity* entity) {
 
     if ((Application::GetInstance().playState == PlayState::PlayState_PLAY || // If the object is NOT static, and the application is in play or stepped...
          Application::GetInstance().playState == PlayState::PlayState_STEP) && !isStatic) {
-        UpdatePhysics(entity, Application::GetInstance().profiler.GetFixedDeltaTime()); //... activate the physics
+        UpdatePhysics(entity, Application::GetInstance().time.GetFixedDeltaTime()); //... activate the physics
     }
 }
 

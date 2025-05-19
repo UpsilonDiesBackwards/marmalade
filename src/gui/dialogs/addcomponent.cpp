@@ -30,6 +30,9 @@
 
 #include <IconsCodicons.h>
 
+/**
+ * \brief Draws the 'Add Component' Modal Dialog window
+ */
 void Marmalade::GUI::AddComponentDialog::Draw() {
     ImGui::SetNextWindowSize(ImVec2(700.0f, 400.0f), ImGuiCond_FirstUseEver);
 
@@ -40,6 +43,11 @@ void Marmalade::GUI::AddComponentDialog::Draw() {
     WINDOW_END_MODAL()
 }
 
+/**
+ * \brief Draws the right pane of the dialog window
+ * \brief Gets a list of every component registered by the ECS and the category tree
+ * \brief Renders entities in the selected tab. Shows their name, description; any dependencies, and if they are favourited
+ */
 void Marmalade::GUI::AddComponentDialog::drawRightPane() {
     std::vector<ECS::RegisteredComponent*> components{};
     auto& categoryTree = ECS::ComponentRegistry::Instance().GetCategoryTree();
@@ -105,6 +113,10 @@ void Marmalade::GUI::AddComponentDialog::drawRightPane() {
     }
 }
 
+/**
+ * \brief Draws the left pane of the dialog window
+ * \brief Creates the row of categories
+ */
 void Marmalade::GUI::AddComponentDialog::drawLeftPane() {
     if (ImGui::BeginListBox("AddComponentLeftList", ImGui::GetContentRegionAvail())) {
         addRow("Favourites");
@@ -118,6 +130,9 @@ void Marmalade::GUI::AddComponentDialog::drawLeftPane() {
     }
 }
 
+/**
+ * \brief Draws each of the two frames split side-by-side
+ */
 void Marmalade::GUI::AddComponentDialog::drawSplit() {
     ImVec2 area = ImGui::GetContentRegionAvail();
 
@@ -153,6 +168,10 @@ void Marmalade::GUI::AddComponentDialog::drawSplit() {
     ImGui::EndChild();
 }
 
+/**
+ * \brief Adds a row to the category list
+ * \param category Name of category
+ */
 void Marmalade::GUI::AddComponentDialog::addRow(const std::string& category) {
     ImGui::PushID(("AddComponentLeftList" + category).c_str());
 

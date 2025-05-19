@@ -155,7 +155,7 @@ void Marmalade::GUI::Animation::DrawTimeline() {
 
     if (!animation) { ImGui::EndChild(); return; }
 
-    auto deltaTime = static_cast<float>(Application::GetInstance().profiler.GetDeltaTime());
+    auto deltaTime = static_cast<float>(Application::GetInstance().time.GetDeltaTime());
 
     CreatePlaybackControls(*animation, deltaTime);
 
