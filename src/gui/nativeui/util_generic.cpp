@@ -19,6 +19,7 @@
 
 #include "util.h"
 
+#include <cstring>
 #include <cuchar>
 #include <stdexcept>
 
