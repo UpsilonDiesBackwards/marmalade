@@ -24,6 +24,8 @@
 
 #define _(STRING) gettext(STRING)
 
+#define ICON_WITH_TEXT(icon, text) (std::string(icon) +  " " + text).c_str()
+
 namespace Marmalade::I18n {
     inline void SetupI18n(const char* lang) {
         setlanguage(lang);

@@ -20,12 +20,10 @@
 #include "topbar.h"
 
 #include "../../application/application.h"
-#include "../../application/config/recents.h"
 #include "../../application/util.h"
 #include "../../project/projectmanager.h"
 #include "../../application/config/configutil.h"
-#include "../windowmanager.h"
-#include "../../application/logger.h"
+#include "../../application/i18n.h"
 
 #include <ecs/component.h>
 
@@ -35,6 +33,8 @@
 
 #include <IconsCodicons.h>
 
+#include <libintl.h>
+
 void Marmalade::GUI::TopBar::Show() {
     static bool showStyleEditor = false;
     static bool showSceneCreationPopUp = false;
@@ -42,39 +42,40 @@ void Marmalade::GUI::TopBar::Show() {
     static bool showSceneOpenPopUp = false;
 
     if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem(ICON_CI_ADD " New Project")) {
+        if (ImGui::BeginMenu(pgettext("Menu|", "File"))) {
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_ADD, pgettext("Menu|File|", "New Project")))) {
                 WindowManager::GetInstance().projectWizard.ToggleWindow();
             }
-            if (ImGui::MenuItem(ICON_CI_FOLDER_OPENED " Open Project")) {
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_FOLDER_OPENED, pgettext("Menu|File|", "Open Project")))) {
                 IGFD::FileDialogConfig config;
                 config.path = EngineConfig::GetStoredConfig().defaultProjectPath;
                 config.fileName = "project.marmalade";
                 config.flags = ImGuiFileDialogFlags_Modal;
                 ImGuiFileDialog::Instance()->OpenDialog("ChooseProject", "Choose Project File", ".marmalade", config);
             }
-            if (ImGui::MenuItem(ICON_CI_SCREEN_FULL " New Scene")) {
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_SCREEN_FULL, pgettext("Menu|File|", "New Scene")))) {
                 showSceneCreationPopUp = true;
             }
-            if (ImGui::MenuItem(ICON_CI_OPEN_PREVIEW " Open Scene")) {
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_OPEN_PREVIEW, pgettext("Menu|File|","Open Scene")))) {
                 showSceneOpenPopUp = true;
             }
-            if (ImGui::MenuItem(ICON_CI_STAR " Welcome Screen")) {
+            // TODO: Package Builder menu item, to open existing package builder window
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_STAR, pgettext("Menu|File|", "Welcome Screen")))) {
                 WindowManager::GetInstance().welcomeScreen.ToggleWindow();
             }
-            if (ImGui::MenuItem(ICON_CI_CLOSE_ALL " Quit")) {
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_CLOSE_ALL, pgettext("Menu|File|",  "Quit")))) {
                 glfwSetWindowShouldClose(Application::GetInstance().getWindow(), true);
             }
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Entity")) {
+        if (ImGui::BeginMenu(pgettext("Menu|", "Entity"))) {
             auto* inspectedEntity = Application::GetInstance().editorGUI->details.inspectedEntity;
             if (inspectedEntity == nullptr) {
-                ImGui::MenuItem("No entity selected", nullptr, nullptr, false);
+                ImGui::MenuItem(_("No entity selected"), nullptr, nullptr, false);
             } else {
-                if (ImGui::BeginMenu("Add Component")) {
-                    if (ImGui::BeginMenu("Favourites")) {
+                if (ImGui::BeginMenu(pgettext("Menu|Entity|AddComponent|","Add Component"))) {
+                    if (ImGui::BeginMenu(pgettext("Menu|Entity|AddComponent|", "Favourites"))) {
                         for (const auto& component: Marmalade::ECS::ComponentRegistry::Instance().GetFavorites()) {
                             if (ImGui::MenuItem(component->Name.c_str())) {
                                 inspectedEntity->componentManager.AddComponent(component->Factory->Create(Util::GenerateUUIDv4()));
@@ -82,7 +83,7 @@ void Marmalade::GUI::TopBar::Show() {
                         }
                         ImGui::EndMenu();
                     }
-                    if (ImGui::BeginMenu("All")) {
+                    if (ImGui::BeginMenu(pgettext("Menu|Entity|AddComponent|", "All"))) {
                         for (const auto& [_, component]: Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()) {
                             if (ImGui::MenuItem(component.Name.c_str())) {
                                 inspectedEntity->componentManager.AddComponent(component.Factory->Create(Util::GenerateUUIDv4()));
@@ -104,7 +105,7 @@ void Marmalade::GUI::TopBar::Show() {
 
                     ImGui::Separator();
 
-                    if (ImGui::MenuItem("Add Component...")) {
+                    if (ImGui::MenuItem(pgettext("Menu|Entity|AddComponent|", "Add Component..."))) {
                         Application::GetInstance().editorGUI->details.SetAddingComponent(true);
                     }
 
@@ -115,24 +116,24 @@ void Marmalade::GUI::TopBar::Show() {
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Settings")) {
-            ImGui::MenuItem(ICON_CI_SETTINGS " Project Settings", nullptr, &WindowManager::GetInstance().settings.visible);
-            ImGui::MenuItem(ICON_CI_EDIT " Style Editor", nullptr, &showStyleEditor);
-            ImGui::MenuItem(ICON_CI_SETTINGS_GEAR " Preferences", nullptr, &WindowManager::GetInstance().preferences.visible);
+        if (ImGui::BeginMenu(pgettext("Menu|", "Settings"))) {
+            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_SETTINGS,  pgettext("Menu|Settings|", "Project Settings")), nullptr, &WindowManager::GetInstance().settings.visible);
+            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_EDIT, pgettext("Menu|Settings|", "Style Editor")), nullptr, &showStyleEditor);
+            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_SETTINGS_GEAR, pgettext("Menu|Settings|", "Preferences")), nullptr, &WindowManager::GetInstance().preferences.visible);
 
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Window")) {
-            ImGui::MenuItem(ICON_CI_DEVICE_CAMERA_VIDEO " Animation", nullptr, &WindowManager::GetInstance().animationManager.visible);
+        if (ImGui::BeginMenu(pgettext("Menu|", "Window"))) {
+            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_DEVICE_CAMERA_VIDEO, pgettext("Menu|Window|", "Animation")), nullptr, &WindowManager::GetInstance().animationManager.visible);
 
-            ImGui::MenuItem(ICON_CI_PACKAGE " Package Manager", nullptr, &WindowManager::GetInstance().packageManager.visible);
+            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_PACKAGE, pgettext("Menu|Window|", "Package Manager")), nullptr, &WindowManager::GetInstance().packageManager.visible);
 
-            ImGui::MenuItem(ICON_CI_FILE_TEXT " Log", nullptr, &WindowManager::GetInstance().log.visible);
+            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_FILE_TEXT, pgettext("Menu|Window|", "Log")), nullptr, &WindowManager::GetInstance().log.visible);
 
-            ImGui::MenuItem(ICON_CI_GIT_COMMIT " Version Control", nullptr, &WindowManager::GetInstance().versionControl.visible);
+            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_GIT_COMMIT, pgettext("Menu|Window|", "Version Control")), nullptr, &WindowManager::GetInstance().versionControl.visible);
 
-            if (ImGui::MenuItem(ICON_CI_SAVE " Save Layout")) {
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_SAVE, pgettext("Menu|Window|", "Save Layout")))) {
                 Application::GetInstance().styleManager.SaveStyle((Marmalade::ConfigUtil::GetConfigDirectory() / Marmalade::EngineConfig::GetStoredConfig().appearance.themeFile).string());
 
                 ImGui::OpenPopup("LayoutSavePopup");
@@ -143,15 +144,15 @@ void Marmalade::GUI::TopBar::Show() {
                 ImGui::EndPopup();
             }
 
-            if (ImGui::MenuItem(ICON_CI_DEBUG " ImGui Demo")) {
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_DEBUG, pgettext("Menu|Window|", "ImGui Demo")))) {
                 WindowManager::GetInstance().ToggleDebugWindow();
             }
 
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Help")) {
-            ImGui::MenuItem(ICON_CI_INFO " About", nullptr, &WindowManager::GetInstance().about.visible);
+        if (ImGui::BeginMenu(pgettext("Menu|", "Help"))) {
+            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_INFO, pgettext("Menu|Help|", "About")), nullptr, &WindowManager::GetInstance().about.visible);
 
             ImGui::EndMenu();
         }

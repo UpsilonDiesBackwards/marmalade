@@ -44,14 +44,22 @@ std::u16string Marmalade::GUI::NativeUI::Util::utf8ToUtf16Str(const std::basic_s
     char16_t c16;
     const char* src = str.c_str();
     size_t len;
+    size_t remaining = std::strlen(src);
 
-    while ((len = mbrtoc16(&c16, src, MB_CUR_MAX, &state)) > 0) {
-        if (len == -1 || len == -2) {
+    while (remaining > 0) {
+        len = mbrtoc16(&c16, src, remaining, &state);
+        if (len == (size_t) -1) {
             throw std::runtime_error("UTF-8 to UTF-16 conversion error");
+        } else if (len == (size_t) -2) {
+            throw std::runtime_error("Incomplete UTf-8 character at end of input");
+        } else if (len == 0) {
+            // NULL terminator reached
+            break;
         }
 
         utf16str += c16;
         src += len;
+        remaining -= len;
     }
 #endif
 

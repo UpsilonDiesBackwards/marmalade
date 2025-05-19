@@ -20,8 +20,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Marmalade 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-16 15:28+0100\n"
-"PO-Revision-Date: 2025-05-16 15:28+0100\n"
+"POT-Creation-Date: 2025-05-19 19:26+0100\n"
+"PO-Revision-Date: 2025-05-19 19:26+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: \n"
@@ -31,6 +31,135 @@ msgstr ""
 
 #: ../src/gui/dialogs/about.cpp:63
 msgid "A lightweight 2D game engine"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:47
+msgctxt "Menu|"
+msgid "File"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:48
+msgctxt "Menu|File|"
+msgid "New Project"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:51
+msgctxt "Menu|File|"
+msgid "Open Project"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:58
+msgctxt "Menu|File|"
+msgid "New Scene"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:61
+msgctxt "Menu|File|"
+msgid "Open Scene"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:65
+msgctxt "Menu|File|"
+msgid "Welcome Screen"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:68
+msgctxt "Menu|File|"
+msgid "Quit"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:74
+msgctxt "Menu|"
+msgid "Entity"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:77
+msgid "No entity selected"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:79
+msgctxt "Menu|Entity|AddComponent|"
+msgid "Add Component"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:80
+msgctxt "Menu|Entity|AddComponent|"
+msgid "Favourites"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:88
+msgctxt "Menu|Entity|AddComponent|"
+msgid "All"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:110
+msgctxt "Menu|Entity|AddComponent|"
+msgid "Add Component..."
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:121
+msgctxt "Menu|"
+msgid "Settings"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:122
+msgctxt "Menu|Settings|"
+msgid "Project Settings"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:123
+msgctxt "Menu|Settings|"
+msgid "Style Editor"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:124
+msgctxt "Menu|Settings|"
+msgid "Preferences"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:129
+msgctxt "Menu|"
+msgid "Window"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:130
+msgctxt "Menu|Window|"
+msgid "Animation"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:132
+msgctxt "Menu|Window|"
+msgid "Package Manager"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:134
+msgctxt "Menu|Window|"
+msgid "Log"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:136
+msgctxt "Menu|Window|"
+msgid "Version Control"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:138
+msgctxt "Menu|Window|"
+msgid "Save Layout"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:149
+msgctxt "Menu|Window|"
+msgid "ImGui Demo"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:156
+msgctxt "Menu|"
+msgid "Help"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:157
+msgctxt "Menu|Help|"
+msgid "About"
 msgstr ""
 
 #: ../src/main.cpp:150

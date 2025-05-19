@@ -22,6 +22,7 @@
 #include "../../application/util.h"
 #include "../fontmanager.h"
 #include "../../application/plugins/interfaceimpl.h"
+#include "../../application/i18n.h"
 
 #include <imgui.h>
 
@@ -67,7 +68,7 @@ void Marmalade::GUI::About::Draw() {
             ImGui::Text("Marmalade Engine");
             ImGui::PopFont();
 
-            ImGui::Text("A lightweight 2D game engine");
+            ImGui::Text(_("A lightweight 2D game engine"));
 
             ImGui::Image(aboutTexId, ImVec2(200, 200), ImVec2(0, 1), ImVec2(1, 0));
 
