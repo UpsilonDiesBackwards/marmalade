@@ -29,7 +29,7 @@ class Camera {
 public:
     Camera(float width, float height, float zoom = 0.0f);
 
-    void Move(float xOffset, float yOffset);
+    void Move(float xOffset, float yOffset, bool rawWorldUnits = false);
     void Zoom(float amount);
 
     void UpdateViewport(float width, float height);

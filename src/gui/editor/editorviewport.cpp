@@ -199,8 +199,8 @@ void EditView::RunInput() {
                 auto screenMax = EditorViews::WorldToScreenSpace(maxBounds);
 
                 ImGui::GetForegroundDrawList(ImGui::GetMainViewport())->AddRect(screenMin, screenMax,
-                                                                                ImGui::GetColorU32(IM_COL32(255, 255, 255, 255)),
-                                                                                0.0f, ImDrawFlags_None, 1.0f);
+                                                                                ImGui::GetColorU32(IM_COL32(249, 226, 175, 255)),
+                                                                                0.0f, ImDrawFlags_None, 2.0f);
 
                 if (app.inputManager.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
                     app.editorGUI->sceneHierarchy.SelectEntityByUuid(entity->uuid);
@@ -216,7 +216,16 @@ void EditView::RunInput() {
         bool withinBounds = (mousePos.x >= imageMin.x && mousePos.x <= imageMax.x) &&
                             (mousePos.y >= imageMin.y && mousePos.y <= imageMax.y);
 
-        if (withinBounds) app.camera->Zoom(yOffset);
+        if (!withinBounds) return;
+
+        glm::vec2 worldBefore = EditorViews::ScreenToWorldSpace(mousePos);
+
+        app.camera->Zoom(yOffset);
+
+        glm::vec2 worldAfter = EditorViews::ScreenToWorldSpace(mousePos);
+
+        glm::vec2 delta = worldBefore - worldAfter;
+        app.camera->Move(delta.x, delta.y, true);
     });
 }
 

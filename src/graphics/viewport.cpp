@@ -27,15 +27,25 @@
 Camera::Camera(float width, float height, float zoom) : position(0.0f, 0.0f), zoom(zoom), width(width), height(height) {
 }
 
-void Camera::Move(float xOffset, float yOffset) {
-    position.x += xOffset * panSpeed * Application::GetInstance().time.GetDeltaTime();
-    position.y += yOffset * panSpeed * Application::GetInstance().time.GetDeltaTime();
+void Camera::Move(float xOffset, float yOffset, bool rawWorldUnits) {
+    if (rawWorldUnits) {
+        position.x += xOffset;
+        position.y += yOffset;
+    } else {
+        position.x += xOffset * panSpeed * Application::GetInstance().time.GetDeltaTime();
+        position.y += yOffset * panSpeed * Application::GetInstance().time.GetDeltaTime();
+    }
 }
 
 void Camera::Zoom(float amount) {
-    zoom += amount * Application::GetInstance().time.GetDeltaTime();
-    if (zoom <= 0.02f) zoom = 0.02f;
-    if (zoom > 200.0f) zoom = 200.0f;
+    float zoomFactor = 1.025f; // Set to <1.0 for natural scrolling
+    if (amount > 0) {
+        zoom *= zoomFactor;
+    } else if (amount < 0) {
+        zoom /= zoomFactor;
+    }
+
+    zoom = glm::clamp(zoom, 0.02f, 200.0f);
 }
 
 void Camera::UpdateViewport(float newWidth, float newHeight) {
@@ -60,7 +70,7 @@ glm::mat4 Camera::GetView() {
     glm::mat4 view_mat = glm::mat4(1.0f);
 
     view_mat = glm::translate(view_mat, glm::vec3(-Application::GetInstance().camera->GetPosition(), 0.0f));
-    view_mat = glm::scale(view_mat, glm::vec3(Application::GetInstance().camera->GetZoom(), Application::GetInstance().camera->GetZoom(), 1.0f));
+//    view_mat = glm::scale(view_mat, glm::vec3(Application::GetInstance().camera->GetZoom(), Application::GetInstance().camera->GetZoom(), 1.0f));
 
     return view_mat;
 }
