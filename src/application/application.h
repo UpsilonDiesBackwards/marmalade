@@ -199,4 +199,7 @@ private:
     void getGraphicsVersion();
 };
 
+#define DELTA_TIME Application::GetInstance().time.GetDeltaTime()
+#define FIXED_DELTA_TIME Application::GetInstance().time.GetFixedDeltaTime()
+
 #endif
