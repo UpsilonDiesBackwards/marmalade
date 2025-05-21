@@ -38,8 +38,10 @@ void Time::Update() {
     fps = static_cast<int>(1.0 / deltaTime);
 
     frameTime = deltaTime * 1000.0f; // Convert to milliseconds
-}
 
+    // If enabled, save the project the game is NOT in play
+    if (enableAutoSave && (!GET_APP.playState) != PlayState_STOP) { PollAutoSave(); }
+}
 
 /**
  * \brief If the engine play state is set to anything other than PlayState_STEP reset the accumulator
@@ -53,7 +55,6 @@ void Time::FixedUpdate() {
     } else {
         _accumulator += fixedTimeStep;
     }
-
 
     while (_accumulator >= fixedTimeStep) { // We use an accumulator to prevent physic jitteriness
         _accumulator -= fixedTimeStep;
@@ -94,4 +95,16 @@ double Time::GetDeltaTime() const {
 
 float Time::GetFixedDeltaTime() {
     return fixedTimeStep;
+}
+
+void Time::PollAutoSave() {
+    timeUntilNextAutosave -= deltaTime;
+    timeSinceLastAutoSave += deltaTime;
+
+    if (timeSinceLastAutoSave >= autoSaveInterval) {
+        GET_APP.autoSave.SaveEngine();
+
+        timeUntilNextAutosave = autoSaveInterval;
+        timeSinceLastAutoSave = 0.0f;
+    }
 }

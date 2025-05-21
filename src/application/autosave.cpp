@@ -1,3 +1,4 @@
+
 /*
  Marmalade - Lightweight Game Engine
  Copyright (C) 2025 Tayler Parsons
@@ -17,25 +18,26 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "editor.h"
+#include "autosave.h"
 
-#include "editor/editor.h"
+#include "application.h"
 
-void Editor::Render() {
+#include <chrono>
 
-    if (showEditorViews) {
-        editorViews.Show();
-    }
+void AutoSave::SaveEngine() {
+    lastSaveTimeStamp = GetCurrentTimeStamp();
 
-    if (showSceneHeirarchy) {
-        sceneHierarchy.Show();
-    }
+    ShowToast();
+}
 
-    if (showDetails) {
-        details.Show();
-    }
+void AutoSave::ShowToast() {
+    GET_APP.editorGUI->autoSaveUI.visible = true;
+    toastStartTime = std::chrono::steady_clock::now();
+}
 
-    // Persistent UI
-    topBar.Show();
-    autoSaveUI.Draw();
+std::string AutoSave::GetCurrentTimeStamp() {
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+
+    return std::ctime(&now_c);
 }

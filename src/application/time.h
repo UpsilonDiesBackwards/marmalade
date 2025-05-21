@@ -27,6 +27,11 @@
  */
 class Time {
 public:
+    bool enableAutoSave = true; // TODO Add this to engine config
+    float autoSaveInterval = 900.0f; // In seconds. 15 Minutes TODO Add this to engine config
+    float timeUntilNextAutosave = autoSaveInterval; // For Countdown
+    float timeSinceLastAutoSave = 0.0f;
+
     Time();
 
     /**
@@ -54,6 +59,11 @@ private:
     // Accumulator for phys updates
     float _accumulator = 0.0f;
     float fixedTimeStep = 1.0f / 60.0f; // Target is 60 updates per second
+
+    void PollAutoSave();
 };
+
+#define GET_DELTA_TIME GetDeltaTime()
+#define GET_FIXED_DELTA_TIME GetFixedDeltaTime()
 
 #endif

@@ -184,7 +184,18 @@ void Marmalade::GUI::TopBar::Show() {
         float totalButtonWidth = (editorButtonSize.x + editorButtonSize.x) * 3;
         float totalWidth = (totalButtonWidth + fpsRegionWidth + rightMargin);
 
-        ImGui::SetCursorPosX(windowWidth - totalWidth + 550.0f);
+        ImGui::SetCursorPosX(windowWidth - totalWidth + 525.0f);
+
+        ImGui::TextColored(ImVec4(0.7f, 0.9f, 1.0f, 1.0f), ICON_CI_SAVE "");
+
+        if(ImGui::IsItemHovered()) {
+            ImGui::BeginTooltip();
+
+            ImGui::Text("Autosaved: %s", GET_APP.autoSave.lastSaveTimeStamp.c_str());
+            ImGui::Text("Autosaving in: %.0f", GET_APP.time.timeUntilNextAutosave);
+
+            ImGui::EndTooltip();
+        }
 
         if (Application::GetInstance().playState == PlayState::PlayState_PLAY || Application::GetInstance().playState == PlayState::PlayState_PAUSE) {
             if (ImGui::Button("Stop", editorButtonSize)) {

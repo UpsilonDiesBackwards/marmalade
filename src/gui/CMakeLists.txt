@@ -14,6 +14,8 @@ list(APPEND ENGINE_SRC_GUI
         dialogs/about.h
         dialogs/addcomponent.cpp
         dialogs/addcomponent.h
+        dialogs/autosave.cpp
+        dialogs/autosave.h
         dialogs/configerror.cpp
         dialogs/configerror.h
 

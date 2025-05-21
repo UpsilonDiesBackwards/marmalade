@@ -37,6 +37,7 @@
 #include <scene/entity.h>
 #include <graphics/multisampledframebuffer.h>
 #include "io/audiomanager.h"
+#include "autosave.h"
 #include <io/inputmanager.h>
 #include <io/input.h>
 #include <graphics/viewport.h>
@@ -157,6 +158,8 @@ public:
 
     Time time;
 
+    AutoSave autoSave;
+
     std::shared_ptr<GuiLogSink> guiSink;
 
     /**
@@ -199,7 +202,6 @@ private:
     void getGraphicsVersion();
 };
 
-#define DELTA_TIME Application::GetInstance().time.GetDeltaTime()
-#define FIXED_DELTA_TIME Application::GetInstance().time.GetFixedDeltaTime()
+#define GET_APP Application::GetInstance()
 
 #endif

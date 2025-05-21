@@ -1,3 +1,4 @@
+
 /*
  Marmalade - Lightweight Game Engine
  Copyright (C) 2025 Tayler Parsons
@@ -17,25 +18,16 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "editor.h"
+#ifndef MARMALADE_AUTOSAVE_GUI_H
+#define MARMALADE_AUTOSAVE_GUI_H
 
-#include "editor/editor.h"
+#include "../window.h"
 
-void Editor::Render() {
-
-    if (showEditorViews) {
-        editorViews.Show();
-    }
-
-    if (showSceneHeirarchy) {
-        sceneHierarchy.Show();
-    }
-
-    if (showDetails) {
-        details.Show();
-    }
-
-    // Persistent UI
-    topBar.Show();
-    autoSaveUI.Draw();
+namespace Marmalade::GUI {
+    class AutoSave : public Window {
+    public:
+        void Draw() override;
+    };
 }
+
+#endif

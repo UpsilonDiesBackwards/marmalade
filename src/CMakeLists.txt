@@ -4,6 +4,8 @@ add_subdirectory(gui)
 list(APPEND ENGINE_SRC
         application/application.cpp
         application/application.h
+        application/autosave.cpp
+        application/autosave.h
         application/logger.h
         application/time.cpp
         application/time.h

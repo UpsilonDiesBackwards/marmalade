@@ -25,6 +25,7 @@
 #include "editor/topbar.h"
 #include "editor/scenehierarchy.h"
 #include "editor/details.h"
+#include "dialogs/autosave.h"
 
 class Editor {
 public:
@@ -33,6 +34,8 @@ public:
 
     Marmalade::GUI::TopBar topBar;
     Marmalade::GUI::Details details;
+
+    Marmalade::GUI::AutoSave autoSaveUI;
 
     // If `true` then ui element will be opened on startup
     bool showEditorViews = true;
