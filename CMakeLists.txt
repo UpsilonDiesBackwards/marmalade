@@ -294,3 +294,16 @@ endif ()
 target_include_directories(marmalade PRIVATE include)
 
 target_link_directories(marmalade PRIVATE vendor/nativefiledialog/lib vendor/luaaa ${GTK3_LIBRARIES})
+
+# Publish target
+set(PUBLISH_DIR "${CMAKE_BINARY_DIR}/publish")
+
+add_custom_target(marmalade_publish ALL
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${PUBLISH_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:marmalade>" "${PUBLISH_DIR}/"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/res" "${PUBLISH_DIR}/res"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/locale" "${PUBLISH_DIR}/locale"
+        BYPRODUCTS "${PUBLISH_DIR}/marmalade.exe"
+        COMMENT "Publishing build to ${PUBLISH_DIR}"
+        DEPENDS marmalade
+)

@@ -4,4 +4,5 @@ This section contains information about developing Marmalade.
 
 - \subpage cp-submodules
 - \subpage cp-localisation
+- \subpage imgui-hooks
  */

@@ -1,0 +1,49 @@
+/** \page imgui-hooks ImGui Hooks
+
+Sometimes features need to be added into the ImGui source code. This can be performed with the ImGui hooks system; a
+CMake module to dynamically add function hooks at configure-time.
+
+All files to do with the module are in the `cmake/ImGuiHooks` directory.
+
+Due to the module being run at configure-time, changes will only take place on a CMake reload.
+
+\section callbacks Callbacks
+
+The callback is the function call added by the hook. It contains all parameters of the hooked function, with the first
+being the class instance if the `add_this` property is true, and the function is a member function.
+
+The callback function returns a boolean; true indicating the original function should return there, or false to resume
+execution of the original function.
+
+\section imgui-hooks-json imgui_hooks.json
+
+The `imgui_hooks.json` file lists the function hooks that need to be installed, and their related callback functions.
+
+<table>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>`file`</td>
+<td>The source file to modify.</td>
+</tr>
+<tr>
+<td>`function`</td>
+<td>The ImGui function name to module. Must contain the fully-qualified name if in a class.</td>
+</tr>
+<tr>
+<td>`include_file`</td>
+<td>The header file to include (where the callback function is declared).</td>
+</tr>
+<tr>
+<td>`callback`</td>
+<td>The callback function to add to the hook.</td>
+</tr>
+<tr>
+<td>`add_this`</td>
+<td>Whether to add the `this` parameter to the callback function. Only applicable to member functions.</td>
+</tr>
+</table>
+
+*/

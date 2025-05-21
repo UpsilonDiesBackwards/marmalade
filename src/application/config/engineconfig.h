@@ -51,7 +51,7 @@ namespace Marmalade {
     };
 
     struct WindowPosConfig {
-        int monitor{0};
+        int monitor{-1};
         int x{0};
         int y{0};
         int width{800};

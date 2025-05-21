@@ -41,7 +41,7 @@ void Marmalade::ECS::MaterialRenderer::Display(Entity* entity) {
 
         if (ImGui::Button(ICON_CI_FOLDER_OPENED " Load Material")) {
             IGFD::FileDialogConfig config;
-            config.path = GET_APP.GetCurrentProject()->basePath;
+            config.path = GET_APP.GetCurrentProject()->basePath.string();
             config.flags = ImGuiFileDialogFlags_Modal;
             ImGuiFileDialog::Instance()->OpenDialog("LoadMaterial", "Select Material", ".mmlmat", config);
         }
