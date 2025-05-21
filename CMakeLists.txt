@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.28)
 project(marmalade)
 include(ExternalProject)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
 set(CMAKE_CXX_STANDARD 20)
 
 if (MSVC)
@@ -190,6 +192,8 @@ list(APPEND IMGUI_SRC
         vendor/imgui/backends/imgui_impl_opengl3.h
         vendor/imgui/backends/imgui_impl_opengl3.cpp
 )
+
+include(ImGuiHooks/HookImGui)
 
 file(GLOB IMGUIZMO_SRC "vendor/imguizmo/*.h" "vendor/imguizmo/*.cpp")
 
