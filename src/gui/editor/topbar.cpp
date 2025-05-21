@@ -192,7 +192,7 @@ void Marmalade::GUI::TopBar::Show() {
             ImGui::BeginTooltip();
 
             ImGui::Text("Autosaved: %s", GET_APP.autoSave.lastSaveTimeStamp.c_str());
-            ImGui::Text("Autosaving in: %.0f", GET_APP.time.timeUntilNextAutosave);
+            ImGui::Text("Autosaving in: %.0f:%02d", GET_APP.time.timeUntilNextAutosave / 60, (int)GET_APP.time.timeUntilNextAutosave % 60);
 
             ImGui::EndTooltip();
         }
