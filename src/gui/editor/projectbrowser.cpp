@@ -577,7 +577,7 @@ void Marmalade::GUI::ProjectBrowser::CreateDirectory() {
 void Marmalade::GUI::ProjectBrowser::CreateMaterial() {
     if (_createMaterial) {
         IGFD::FileDialogConfig config;
-        config.path = EngineConfig::GetStoredConfig().defaultProjectPath;
+        config.path = GET_APP.GetCurrentProject()->basePath;
         config.flags = ImGuiFileDialogFlags_Modal;
         ImGuiFileDialog::Instance()->OpenDialog("CreateMaterial", "New Material", ".mmlmat", config);
         _createMaterial = false;

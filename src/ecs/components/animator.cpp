@@ -22,6 +22,7 @@
 
 #include "../../application/config/engineconfig.h"
 #include "../../application/util.h"
+#include "../../application/application.h"
 
 #include <imgui.h>
 #include <ImGuiFileDialog.h>
@@ -45,7 +46,7 @@ void Marmalade::ECS::AnimationPlayer::Display(Entity* entity) {
             ImGui::Text("Using driver: %s", driverPath.filename().string().c_str());
             if (ImGui::Button(ICON_CI_FOLDER_OPENED " Load Driver")) {
                 IGFD::FileDialogConfig config;
-                config.path = EngineConfig::GetStoredConfig().defaultProjectPath;
+                config.path = GET_APP.GetCurrentProject()->basePath;
                 config.flags = ImGuiFileDialogFlags_Modal;
                 ImGuiFileDialog::Instance()->OpenDialog("LoadDriver", "Load Driver", ".animdvr", config);
             }
@@ -112,7 +113,7 @@ void Marmalade::ECS::AnimationPlayer::showCreatePopup() {
 
         if (ImGui::Button(ICON_CI_FOLDER_OPENED " Choose location")) {
             IGFD::FileDialogConfig config;
-            config.path = EngineConfig::GetStoredConfig().defaultProjectPath;
+            config.path = GET_APP.GetCurrentProject()->basePath;;
             config.flags = ImGuiFileDialogFlags_Modal;
             ImGuiFileDialog::Instance()->OpenDialog("ChooseDriverPath", "Save Animation Driver", ".animdvr", config);
         }

@@ -61,6 +61,7 @@ namespace Marmalade::Project {
                 "assets",
                 "windows",
                 "logs"
+                "_build"
         };
 
         std::vector<std::string> baseFiles = { // Files auto-created when the project is made

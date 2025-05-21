@@ -389,7 +389,7 @@ void Marmalade::GUI::Animation::DrawSequenceSelector() {
 
         if (ImGui::Selectable(ICON_CI_PLUS "Create Animation")) {
             IGFD::FileDialogConfig config;
-            config.path = EngineConfig::GetStoredConfig().defaultProjectPath;
+            config.path = GET_APP.GetCurrentProject()->basePath;
             config.flags = ImGuiFileDialogFlags_Modal;
             ImGuiFileDialog::Instance()->OpenDialog("CreateAnimation", "Create New Animation", ".animseq", config);
         }
