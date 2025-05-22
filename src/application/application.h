@@ -199,6 +199,9 @@ private:
 
     std::unique_ptr<Marmalade::Project::Project> currentProject;
 
+    /**
+     * \brief Gets the graphics version from the engine config. Ambiguous name, should be changed
+     */
     void getGraphicsVersion();
 };
 
