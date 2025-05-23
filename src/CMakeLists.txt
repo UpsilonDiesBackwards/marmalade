@@ -23,6 +23,8 @@ list(APPEND ENGINE_SRC
         application/config/engineconfig.cpp
         application/config/engineconfig.h
         application/i18n.h
+        application/integration.cpp
+        application/integration.h
 
         application/plugins/pluginloader.cpp
         application/plugins/pluginloader.h

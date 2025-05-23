@@ -24,6 +24,7 @@
 #include "../../application/application.h"
 #include "../../application/plugins/pluginloader.h"
 #include "../../application/plugins/interfaceimpl.h"
+#include "../../application/integration.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -38,6 +39,7 @@ Marmalade::GUI::Preferences::Preferences() : Window() {
             {"appearance", PreferencesPane(drawGeneralAppearancePane)},
             {"projects", PreferencesPane(drawGeneralProjectsPane)},
             {"projectBrowser", PreferencesPane(drawGeneralProjectBrowserPane)},
+7            {"systemIntegration", PreferencesPane(drawGeneralSystemIntegrationPane)},
             {"plugins", PreferencesPane(drawGeneralPluginsPane)},
             {"input/output", PreferencesPane(drawAudioInputOutputPane)}};
 }
@@ -77,6 +79,15 @@ void Marmalade::GUI::Preferences::drawGeneralAppearancePane() {
 
     ImGui::SameLine();
     requiresRestartWarning();
+
+    static char languageC[16];
+    strncpy(languageC, EngineConfig::GetStoredConfig().appearance.language.c_str(), sizeof(themeFileC));
+
+    if (ImGui::InputText("Language", languageC, sizeof(languageC))) {
+        EngineConfig::GetStoredConfig().appearance.language = languageC;
+    }
+    ImGui::SameLine();
+    requiresRestartWarning();
 }
 
 void Marmalade::GUI::Preferences::drawGeneralProjectsPane() {
@@ -88,6 +99,27 @@ void Marmalade::GUI::Preferences::drawGeneralProjectsPane() {
     }
 
     ImGui::Checkbox("Show Welcome Screen on Startup", &Marmalade::EngineConfig::GetStoredConfig().appearance.showWelcomeScreen);
+}
+
+void Marmalade::GUI::Preferences::drawGeneralSystemIntegrationPane() {
+    using it = Application::Integration::IntegrationType;
+
+    static bool fileAssoc = true;
+    static bool launcher = true;
+
+    unsigned int type = it::IntegrationType_NONE;
+
+    if (fileAssoc)
+        type |= it::IntegrationType_FILE_ASSOCIATION;
+    if (launcher)
+        type |= it::IntegrationType_LAUNCHER;
+
+    ImGui::Checkbox("File Associations", &fileAssoc);
+    ImGui::Checkbox("Launcher", &launcher);
+
+    if (ImGui::Button("Add Integrations")) {
+        Application::Integration::AddSystemIntegrations(static_cast<it>(type));
+    }
 }
 
 void Marmalade::GUI::Preferences::drawGeneralPluginsPane() {
@@ -128,6 +160,7 @@ void Marmalade::GUI::Preferences::drawLeftPane() {
         selectableTreeNode("Appearance", "appearance");
         selectableTreeNode("Projects", "projects");
         selectableTreeNode("Project Browser", "projectBrowser");
+        selectableTreeNode("System Integration", "systemIntegration");
         selectableTreeNode("Loaded Plugins", "plugins");
 
         ImGui::TreePop();
@@ -225,7 +258,7 @@ void Marmalade::GUI::Preferences::drawGeneralProjectBrowserPane() {
 
 void Marmalade::GUI::Preferences::drawAudioInputOutputPane() {
     auto& engineConfig = EngineConfig::GetStoredConfig();
-    auto& audioManager = Application::GetInstance().audioManager->GetInstance();
+    auto& audioManager = ::Application::GetInstance().audioManager->GetInstance();
 
     std::vector<std::string> deviceList = audioManager.GetAvailableDevices();
 
