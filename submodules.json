@@ -71,6 +71,10 @@
       "patches": [
         "patches/libintl-lite/setmessage-func.patch"
       ]
+    },
+    {
+      "path": "vendor/zip",
+      "url": "https://github.com/kuba--/zip.git"
     }
   ]
 }

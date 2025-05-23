@@ -120,6 +120,8 @@ find_package(OpenAL REQUIRED)
 
 add_subdirectory(vendor/wasm3)
 
+add_subdirectory(vendor/zip)
+
 # ----- LOCALISATION -----
 add_subdirectory(vendor/libintl-lite)
 
@@ -307,3 +309,5 @@ add_custom_target(marmalade_publish ALL
         COMMENT "Publishing build to ${PUBLISH_DIR}"
         DEPENDS marmalade
 )
+
+add_subdirectory(tools/installer)

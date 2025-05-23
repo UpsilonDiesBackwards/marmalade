@@ -19,7 +19,9 @@
 
 #include "integration.h"
 
+#ifndef DISABLE_LOGGING
 #include "logger.h"
+#endif
 
 #include <filesystem>
 
@@ -33,7 +35,9 @@
 bool Marmalade::Application::Integration::SetRegistryValue(HKEY root, const std::wstring& subkey, const std::wstring& valName, const std::wstring& val) {
     HKEY key;
     if (RegCreateKeyExW(root, subkey.c_str(), 0, nullptr, 0, KEY_WRITE, nullptr, &key, nullptr) != ERROR_SUCCESS) {
+#ifndef DISABLE_LOGGING
         LOG_ERROR("RegCreateKeyExA failed");
+#endif
         return false;
     }
 
@@ -43,7 +47,9 @@ bool Marmalade::Application::Integration::SetRegistryValue(HKEY root, const std:
 
     RegCloseKey(key);
     if (res != ERROR_SUCCESS) {
+#ifndef DISABLE_LOGGING
         LOG_ERROR("RegSetValueExA failed: {}", res);
+#endif
         return false;
     }
     return true;
@@ -51,7 +57,9 @@ bool Marmalade::Application::Integration::SetRegistryValue(HKEY root, const std:
 #endif
 
 void Marmalade::Application::Integration::AddSystemIntegrations(IntegrationType types) {
+#ifndef DISABLE_LOGGING
     LOG_INFO("Adding system integrations");
+#endif
 
 #ifdef WIN32
     wchar_t exePath[MAX_PATH];
@@ -82,7 +90,9 @@ void Marmalade::Application::Integration::AddSystemIntegrations(IntegrationType 
         CComPtr<IShellLinkW> shellLink;
         HRESULT hr = CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellLink));
         if (FAILED(hr)) {
+#ifndef DISABLE_LOGGING
             LOG_ERROR("Failed to create shell link instance: {}", hr);
+#endif
             return;
         }
 
@@ -93,8 +103,10 @@ void Marmalade::Application::Integration::AddSystemIntegrations(IntegrationType 
 
         PWSTR startMenuPath = nullptr;
         hr = SHGetKnownFolderPath(FOLDERID_Programs, 0, nullptr, &startMenuPath);
-        if (FAILED(hr))  {
+        if (FAILED(hr)) {
+#ifndef DISABLE_LOGGING
             LOG_ERROR("Failed to find programs folder: {}", hr);
+#endif
             return;
         }
 
@@ -107,13 +119,17 @@ void Marmalade::Application::Integration::AddSystemIntegrations(IntegrationType 
         CComPtr<IPersistFile> persistFile;
         hr = shellLink->QueryInterface(IID_PPV_ARGS(&persistFile));
         if (FAILED(hr)) {
+#ifndef DISABLE_LOGGING
             LOG_ERROR("Failed to create file instance: {}", hr);
+#endif
             return;
         }
 
         hr = persistFile->Save(shortcutPath.wstring().c_str(), TRUE);
-        if (FAILED(hr))  {
+        if (FAILED(hr)) {
+#ifndef DISABLE_LOGGING
             LOG_ERROR("Failed to create shortcut: {}", hr);
+#endif
             return;
         }
 #endif

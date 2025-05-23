@@ -19,3 +19,4 @@ vendor/openal-soft
 misc/doxygen-awesome-css
 vendor/wasm3
 vendor/libintl-lite
+vendor/zip

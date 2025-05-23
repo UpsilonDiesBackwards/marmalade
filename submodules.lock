@@ -15,3 +15,4 @@ b18a234ed6af38638678a3338c0d7ed90210ae6c vendor/spdlog (v1.x)
 9760c30014131f4eacb8e96f15f3869c7bc5dd8c misc/doxygen-awesome-css (main)
 79d412ea5fcf92f0efe658d52827a0e0a96ff442 vendor/wasm3 (main)
 ba1514607d02ce3711d828e784a7e9e2bb25aa84 vendor/libintl-lite (master) *
+d7a2252a537926cbdef8512741a322a183fcfd09 vendor/zip (master)
