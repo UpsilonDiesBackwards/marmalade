@@ -310,4 +310,6 @@ add_custom_target(marmalade_publish ALL
         DEPENDS marmalade
 )
 
-add_subdirectory(tools/installer)
+if (WIN32)
+    add_subdirectory(tools/installer)
+endif()

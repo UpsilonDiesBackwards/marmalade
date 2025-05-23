@@ -39,7 +39,7 @@ Marmalade::GUI::Preferences::Preferences() : Window() {
             {"appearance", PreferencesPane(drawGeneralAppearancePane)},
             {"projects", PreferencesPane(drawGeneralProjectsPane)},
             {"projectBrowser", PreferencesPane(drawGeneralProjectBrowserPane)},
-7            {"systemIntegration", PreferencesPane(drawGeneralSystemIntegrationPane)},
+            {"systemIntegration", PreferencesPane(drawGeneralSystemIntegrationPane)},
             {"plugins", PreferencesPane(drawGeneralPluginsPane)},
             {"input/output", PreferencesPane(drawAudioInputOutputPane)}};
 }
