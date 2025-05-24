@@ -73,18 +73,20 @@ list(APPEND ENGINE_SRC
 list(APPEND ENGINE_SRC # ECS
         ecs/componentmanager.cpp
         ecs/components/transform.cpp
-        ecs/components/materialrenderer.cpp
+
+        ecs/components/rendering/materialrenderer.cpp
+        ecs/components/rendering/tilemap.cpp
 
         ecs/components/audio/audioplayer.cpp
 
-        ecs/components/lighting2d/light2d.cpp
+        ecs/components/light2d/light2d.cpp
 
         ecs/components/physics2d/rigidbody.cpp
         ecs/components/physics2d/colliderdata.cpp
         ecs/components/physics2d/boxcollider.cpp
         ecs/components/physics2d/circlecollider.cpp
 
-        ecs/components/animator.cpp
+        ecs/components/animation/animator.cpp
 )
 
 list(APPEND ENGINE_SRC # Mathematics

@@ -18,11 +18,13 @@ list(APPEND ENGINE_API
 
         ecs/componentmanager.h
         ecs/components/transform.h
-        ecs/components/materialrenderer.h
+
+        ecs/components/rendering/materialrenderer.h
+        ecs/components/rendering/tilemap.h
 
         ecs/components/audio/audioplayer.h
 
-        ecs/components/lighting2d/light2d.h
+        ecs/components/light2d/light2d.h
 
         ecs/components/physics2d/rigidbody.h
         ecs/components/physics2d/colliderbase.h
@@ -30,7 +32,7 @@ list(APPEND ENGINE_API
         ecs/components/physics2d/boxcollider.h
         ecs/components/physics2d/circlecollider.h
 
-        ecs/components/animator.h
+        ecs/components/animation/animator.h
 
         animation/sequence.h
         animation/animationdriver.h

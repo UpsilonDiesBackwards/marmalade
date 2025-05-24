@@ -20,7 +20,7 @@
 #ifndef MARMALADE_ECS_MATERIALRENDER_H
 #define MARMALADE_ECS_MATERIALRENDER_H
 
-#include "../component.h"
+#include "../../component.h"
 
 #include "graphics/renderable.h"
 

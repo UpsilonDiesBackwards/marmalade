@@ -154,7 +154,7 @@ void Renderable::ApplyLighting(const std::vector<Marmalade::ECS::Light2D*>& ligh
         auto light = lights[i];
         std::string baseName = "lights[" + std::to_string(i) + "]";
 
-        shaderProgram.SetVec3(baseName + ".position", glm::vec3(light->GetPosition(), 0.0f));
+        shaderProgram.SetVec3(baseName + ".position", glm::vec3(light->GetPosition().x, light->position.y + 0.5, 0.0f));
         shaderProgram.SetFloat(baseName + ".intensity", light->intensity);
         shaderProgram.SetVec3(baseName + ".color", light->color);
         shaderProgram.SetFloat(baseName + ".radius", light->radius);

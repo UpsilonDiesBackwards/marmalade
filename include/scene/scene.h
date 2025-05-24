@@ -21,7 +21,7 @@
 #define ENGINE_SCENE_H
 
 #include "entity.h"
-#include "ecs/components/lighting2d/light2d.h"
+#include "../ecs/components/light2d/light2d.h"
 
 #include <memory>
 

@@ -17,12 +17,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <ecs/components/materialrenderer.h>
+#include <../../../include/ecs/components/rendering/materialrenderer.h>
 
-#include "../../application/config/config.h"
-#include "../../application/application.h"
-#include "../../application/logger.h"
-#include "../../gui/components/backgroundlabel.h"
+#include "../../../application/config/config.h"
+#include "../../../application/application.h"
+#include "../../../application/logger.h"
+#include "../../../gui/components/backgroundlabel.h"
 
 #include <IconsCodicons.h>
 

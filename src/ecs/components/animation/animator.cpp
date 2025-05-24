@@ -18,11 +18,11 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <ecs/components/animator.h>
+#include <../../../include/ecs/components/animation/animator.h>
 
-#include "../../application/config/engineconfig.h"
-#include "../../application/util.h"
-#include "../../application/application.h"
+#include "../../../application/config/engineconfig.h"
+#include "../../../application/util.h"
+#include "../../../application/application.h"
 
 #include <imgui.h>
 #include <ImGuiFileDialog.h>

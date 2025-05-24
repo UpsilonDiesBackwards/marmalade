@@ -20,7 +20,7 @@
 #include "editorviewport.h"
 
 #include "../../application/application.h"
-#include "ecs/components/lighting2d/light2d.h"
+#include "ecs/components/light2d/light2d.h"
 
 #include <ecs/components/physics2d/colliderbase.h>
 

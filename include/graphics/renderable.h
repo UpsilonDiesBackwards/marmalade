@@ -21,7 +21,7 @@
 #define ENGINE_RENDERABLE_H
 
 #include "shader.h"
-#include "ecs/components/lighting2d/light2d.h"
+#include "../ecs/components/light2d/light2d.h"
 #include "material.h"
 
 #include <glad/glad.h>

@@ -18,7 +18,7 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ecs/components/lighting2d/light2d.h"
+#include "ecs/components/light2d/light2d.h"
 
 #include "ecs/components/transform.h"
 #include "scene/entity.h"

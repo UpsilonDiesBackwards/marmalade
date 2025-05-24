@@ -355,7 +355,6 @@ void Application::SetCurrentProject(std::unique_ptr<Marmalade::Project::Project>
     glfwSetWindowTitle(window, windowTitle.c_str());
 }
 
-
 /**
  * \brief Returns the currently opened project
  * \return Marmalade::Project::Project* current application
