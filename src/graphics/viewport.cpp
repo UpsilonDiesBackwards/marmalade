@@ -32,8 +32,8 @@ void Camera::Move(float xOffset, float yOffset, bool rawWorldUnits) {
         position.x += xOffset;
         position.y += yOffset;
     } else {
-        position.x += xOffset * panSpeed * Application::GetInstance().time.GetDeltaTime();
-        position.y += yOffset * panSpeed * Application::GetInstance().time.GetDeltaTime();
+        position.x += xOffset * _panSpeed * Application::GetInstance().time.GetDeltaTime();
+        position.y += yOffset * _panSpeed * Application::GetInstance().time.GetDeltaTime();
     }
 }
 
@@ -45,7 +45,7 @@ void Camera::Zoom(float amount) {
         zoom /= zoomFactor;
     }
 
-    zoom = glm::clamp(zoom, 0.02f, 200.0f);
+    zoom = glm::clamp(zoom, _zoomMin, _zoomMax);
 }
 
 void Camera::UpdateViewport(float newWidth, float newHeight) {

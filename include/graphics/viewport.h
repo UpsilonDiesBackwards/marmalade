@@ -46,7 +46,10 @@ private:
 
     glm::mat4 viewMatrix, projectionMatrix;
 
-    float panSpeed = 0.25f;
+    float _panSpeed = 0.3f;
+
+    float _zoomMin = 0.01f;
+    float _zoomMax = 2500.0f;
 };
 
 #endif

@@ -52,12 +52,12 @@
 /**
  * \param width Width of the application window
  * \param height Height of the application window
- * \param title Title of the application window - Most often times set the the name of the current project
+ * \param title Title of the application window - Most often times set the name of the current project
  *
  * \brief Application constructor, sets necessary variables
  */
-Application::Application(int width, int height, const char* title) : window(nullptr), width(width), height(height), title(title), inputManager(InputManager::GetInstance()),
-                                                                     input(&inputManager), camera(new Camera(1920, 1080, 1.0f)), audioManager(&AudioManager::GetInstance()) {
+Application::Application(int width, int height, const char* title) : window(nullptr), width(width), height(height), title(title),
+    inputManager(InputManager::GetInstance()), input(&inputManager), camera(new Camera(1920, 1080, 1.0f)), audioManager(&AudioManager::GetInstance()) {
 
     sceneManager = SceneManager();
     time = Time();
