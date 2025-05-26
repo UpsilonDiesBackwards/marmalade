@@ -32,6 +32,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "ecs/components/rendering/tilemap.h"
+
 int EditView::currentRenderMode = 1;
 
 /**
@@ -86,6 +88,13 @@ void EditView::Render() {
                        ImVec2(windowPos.x, windowPos.y),
                        ImVec2(windowPos.x + windowSize.x, windowPos.y + windowSize.y),
                        ImVec2(0, 1), ImVec2(1, 0));
+
+    for (const auto& entity : app.sceneManager.GetCurrentScene()->GetEntities()) {
+        auto tileMap = entity->componentManager.GetComponentOfType<Marmalade::ECS::TileMap>();
+        if (tileMap) {
+            tileMap->RenderGUIGrid(entity.get());
+        }
+    }
 
     for (const auto& entity : app.sceneManager.GetCurrentScene()->GetEntities()) {
         auto lightComponent = entity->componentManager.GetComponentOfType<Marmalade::ECS::Light2D>();

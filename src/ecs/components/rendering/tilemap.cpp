@@ -21,6 +21,7 @@
 
 #include <imgui.h>
 
+#include "../../../application/application.h"
 #include "scene/entity.h"
 
 void Marmalade::ECS::TileMap::Display(Entity* entity) {
@@ -59,7 +60,7 @@ void Marmalade::ECS::TileMap::Display(Entity* entity) {
         Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" X ", ImVec4(0.9f, 0.49f, 0.5f, 1.0f));
         ImGui::SameLine();
         ImGui::PushItemWidth(-1);
-        sizeChanged |= ImGui::DragFloat(("##Spacing" + std::to_string(entity->id)).c_str(), &TileGrid.spacing, 0.1f);
+        sizeChanged |= ImGui::DragFloat(("##Spacing" + std::to_string(entity->id)).c_str(), &TileGrid.spacing, 0.1f, 0.1f, 256.0f);
 
         ImGui::PopItemWidth();
 
@@ -68,27 +69,46 @@ void Marmalade::ECS::TileMap::Display(Entity* entity) {
 }
 
 void Marmalade::ECS::TileMap::Apply(Entity* entity) {
-    ImVec2 canvas_pos = ImGui::GetCursorScreenPos();
-    ImVec2 canvas_size = ImGui::GetContentRegionAvail();
-
     RenderGUIGrid(entity);
 }
 
 void Marmalade::ECS::TileMap::Setup(Entity* entity) {}
 
-void Marmalade::ECS::TileMap::RenderGUIGrid(Entity* entity) {
-    float entityPosX = entity->componentManager.GetComponentOfType<Transform>()->pos.x;
-    float entityPosY = entity->componentManager.GetComponentOfType<Transform>()->pos.y;
-
-    const ImVec2 origin = {entityPosX, entityPosY};
+void Marmalade::ECS::TileMap::RenderGUIGrid(Entity* entity) const {
+    auto transform = entity->componentManager.GetComponentOfType<Transform>();
+    float entityPosX = transform->pos.x;
+    float entityPosY = transform->pos.y;
 
     ImDrawList* drawList = ImGui::GetWindowDrawList();
-    ImU32 color = (200, 200, 200, 40);
+    ImU32 color = IM_COL32(200, 200, 200, 255);
 
-    for (float x = origin.x; x < origin.x + TileGrid.size.x; x += TileGrid.spacing) { drawList->AddLine(ImVec2(x, origin.y), ImVec2(x, origin.y + TileGrid.size.y), color); }
+    float spacing = TileGrid.spacing;
+    float gridWidth  = TileGrid.size.x;
+    float gridHeight = TileGrid.size.y;
 
-    for (float y = origin.y; y < origin.y + TileGrid.size.y; y += TileGrid.spacing) { drawList->AddLine(ImVec2(origin.x, y), ImVec2(origin.x + TileGrid.size.x, y), color); }
+    int columns = static_cast<int>(gridWidth  / spacing);
+    int rows    = static_cast<int>(gridHeight / spacing);
+
+    float startX = entityPosX - (TileGrid.size.x * 0.5f);
+    float startY = entityPosY - (TileGrid.size.y * 0.5f);
+
+    for (int i = 0; i <= columns; ++i) {
+        float x = startX + i * spacing;
+        if (i == columns) x = startX + gridWidth;
+        ImVec2 start = GET_APP.editorGUI->editorViews.WorldToScreenSpace({x, startY});
+        ImVec2 end   = GET_APP.editorGUI->editorViews.WorldToScreenSpace({x, startY + TileGrid.size.y});
+        drawList->AddLine(start, end, color);
+    }
+
+    for (int j = 0; j <= rows; ++j) {
+        float y = startY + j * spacing;
+        if (j == rows) y = startY + gridHeight;
+        ImVec2 start = GET_APP.editorGUI->editorViews.WorldToScreenSpace({startX, y});
+        ImVec2 end   = GET_APP.editorGUI->editorViews.WorldToScreenSpace({startX + TileGrid.size.x, y});
+        drawList->AddLine(start, end, color);
+    }
 }
+
 
 nlohmann::json Marmalade::ECS::TileMap::Serialize(const Entity* entity) {
     nlohmann::json j;
