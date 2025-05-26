@@ -1,4 +1,3 @@
-
 /*
  Marmalade - Lightweight Game Engine
  Copyright (C) 2025 Tayler Parsons
@@ -26,12 +25,24 @@
 
 std::unordered_map<std::string, Marmalade::Project::Assets::AssetMetadata> Marmalade::Project::Assets::Registry::assets;
 
+const std::map<std::string, std::string> Marmalade::Project::Assets::Registry::extensionType{
+        {".mmlmat", "Marmalade::Material"},
+        {".animdvr", "Marmalade::Animation::Driver"},
+        {".animseq", "Marmalade::Animation::Sequence"},
+        {".marm", "Marmalade::Files::Generic::Settings"},
+        {".marmalade", "Marmalade::Project::File"},
+};
+
+Marmalade::Project::Assets::Registry::Registry()
+    : Config(Application::GetInstance().GetCurrentProject()->basePath / ".assetreg") {
+}
+
 Marmalade::Project::Assets::Registry& Marmalade::Project::Assets::Registry::GetInstance() {
     static Registry instance;
     return instance;
 }
 
-void Marmalade::Project::Assets::Registry::RegisterAsset(const Marmalade::Project::Assets::Asset& asset) {
+void Marmalade::Project::Assets::Registry::RegisterAsset(const Asset& asset) {
     auto projectRoot = Application::GetInstance().GetCurrentProject()->basePath;
     auto relativePath = std::filesystem::relative(asset.path, projectRoot);
 
@@ -59,7 +70,7 @@ void Marmalade::Project::Assets::Registry::UnregisterAsset(const std::string& uu
 
 void Marmalade::Project::Assets::Registry::Save(std::filesystem::path filePath) {
     nlohmann::json j;
-    for (const auto& [uuid, meta] : assets) {
+    for (const auto& [uuid, meta]: assets) {
         nlohmann::json asset;
         asset["uuid"] = meta.uuid;
         asset["name"] = meta.name;
@@ -91,7 +102,7 @@ void Marmalade::Project::Assets::Registry::Load(std::filesystem::path filePath) 
 
     assets.clear();
 
-    for (const auto& elem : j) {
+    for (const auto& elem: j) {
         AssetMetadata meta;
 
         meta.uuid = elem.value("uuid", "");
@@ -107,12 +118,11 @@ void Marmalade::Project::Assets::Registry::Load(std::filesystem::path filePath) 
 void Marmalade::Project::Assets::Registry::RebuildRegistry() {
     assets.clear();
 
-    std::vector<std::string> assetPaths{ "assets" };
+    std::vector<std::string> assetPaths{"assets"};
 
-    for (std::string directory : assetPaths) {
-        for (const auto& entry : std::filesystem::recursive_directory_iterator(
+    for (std::string directory: assetPaths) {
+        for (const auto& entry: std::filesystem::recursive_directory_iterator(
                      Application::GetInstance().GetCurrentProject()->basePath / directory)) {
-
             if (!entry.is_regular_file()) { continue; }
 
             std::string ext = entry.path().extension().string();
@@ -120,9 +130,7 @@ void Marmalade::Project::Assets::Registry::RebuildRegistry() {
             auto it = extensionType.find(ext);
             if (it != extensionType.end()) {
                 std::ifstream file(entry.path().string());
-                if (!file.is_open()) {
-                    continue;
-                }
+                if (!file.is_open()) { continue; }
 
                 nlohmann::json assetConfig;
                 file >> assetConfig;
@@ -146,7 +154,6 @@ void Marmalade::Project::Assets::Registry::RebuildRegistry() {
 
                         continue;
                     }
-
                 }
 
                 Asset asset(uuid, name, path, type, version);
@@ -157,13 +164,9 @@ void Marmalade::Project::Assets::Registry::RebuildRegistry() {
 
     std::unordered_map<std::string, AssetMetadata> cleanedAssets;
 
-    for (const auto& [uuid, meta] : assets) {
+    for (const auto& [uuid, meta]: assets) {
         std::filesystem::path fullPath = Application::GetInstance().GetCurrentProject()->basePath / meta.filePath;
-        if (std::filesystem::exists(fullPath)) {
-            cleanedAssets[uuid] = meta;
-        } else {
-            LOG_INFO("Removing stale asset: {}", meta.filePath);
-        }
+        if (std::filesystem::exists(fullPath)) { cleanedAssets[uuid] = meta; } else { LOG_INFO("Removing stale asset: {}", meta.filePath); }
     }
 
     assets = std::move(cleanedAssets);
@@ -175,11 +178,21 @@ const Marmalade::Project::Assets::AssetMetadata* Marmalade::Project::Assets::Reg
 }
 
 const Marmalade::Project::Assets::AssetMetadata* Marmalade::Project::Assets::Registry::GetAssetFromName(const std::string& name) {
-    for (const auto& [uuid, meta] : assets) {
-        if (meta.name == name) {
-            return &meta;
-        }
-    }
+    for (const auto& [uuid, meta]: assets) { if (meta.name == name) { return &meta; } }
 
     return nullptr;
+}
+
+void Marmalade::Project::Assets::Registry::Deserialise(const nlohmann::json& json) {
+    storedConfig = json.get<AssetRegistryData>();
+    assets.clear();
+
+    for (const auto& meta: storedConfig.assets) { assets[meta.uuid] = meta; }
+}
+
+void Marmalade::Project::Assets::Registry::PrepareNewConfig() {
+    storedConfig.assets.clear();
+    for (const auto& [uuid, meta]: assets) { storedConfig.assets.push_back(meta); }
+
+    Config::PrepareNewConfig();
 }

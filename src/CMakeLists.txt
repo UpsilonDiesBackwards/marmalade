@@ -17,12 +17,15 @@ list(APPEND ENGINE_SRC
         application/config/plugins.h
         application/util.cpp
         application/util.h
+
         application/config/config.h
         application/config/configutil.h
         application/config/configutil.cpp
         application/config/engineconfig.cpp
         application/config/engineconfig.h
+
         application/i18n.h
+
         application/integration.cpp
         application/integration.h
 
@@ -57,8 +60,10 @@ list(APPEND ENGINE_SRC
         packages/package.cpp
         packages/package.h
 
+        project/assetmetadata.h
         project/assetregistry.cpp
         project/assetregistry.h
+        project/assetregistryconfig.h
         project/project.cpp
         project/project.h
         project/projectfile.cpp

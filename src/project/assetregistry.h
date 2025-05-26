@@ -21,37 +21,27 @@
 #ifndef MARMALADE_ASSETREGISTRY_H
 #define MARMALADE_ASSETREGISTRY_H
 
+#include "assetregistryconfig.h"
+#include "assetmetadata.h"
+
+#include "../application/config/config.h"
+
 #include <unordered_map>
 #include <string>
 #include <filesystem>
-#include <vector>
 #include <nlohmann/json.hpp>
-#include "../application/logger.h"
 
 namespace Marmalade::Project::Assets {
-    class Asset;
+    struct Asset;
 
-    struct AssetMetadata {
-        std::string uuid;
-        std::string name;
-        std::string filePath;
-        std::string type;
-        int version;
-    };
-
-    class Registry {
+    class Registry : public Config<AssetRegistryData> {
     public:
-        static std::unordered_map<std::string, AssetMetadata> assets;
-
-        std::map<std::string, std::string> extensionType{
-                {".mmlmat", "Marmalade::Material"},
-                {".animdvr", "Marmalade::Animation::Driver"},
-                {".animseq", "Marmalade::Animation::Sequence"},
-                {".marm", "Marmalade::Files::Generic::Settings"},
-                {".marmalade", "Marmalade::Project::File"},
-        };
 
         static Registry& GetInstance();
+        static std::unordered_map<std::string, AssetMetadata> assets;
+
+        static const std::map<std::string, std::string> extensionType;
+
 
         void RegisterAsset(const Asset& asset);
         static void UnregisterAsset(const std::string& uuid);
@@ -63,6 +53,12 @@ namespace Marmalade::Project::Assets {
 
         const AssetMetadata* GetAssetFromUUID(const std::string& uuid);
         const AssetMetadata* GetAssetFromName(const std::string& name);
+
+        void Deserialise(const nlohmann::json& json);
+        void PrepareNewConfig() override;
+
+    private:
+        Registry();
     };
 
     struct Asset {
