@@ -81,6 +81,7 @@ int main(int argc, char** argv) {
 #endif
     bool sameDirConfig{false};
     char* project = nullptr;
+    char* scene = nullptr;
 
     for (int i = 1; i < ARGC; ++i) {
         std::string arg = ARGV[i];
@@ -92,6 +93,13 @@ int main(int argc, char** argv) {
         if (arg == "--project") {
             if (ARGC > i) {
                 project = ARGV[i + 1];
+                i++;
+            }
+        }
+
+        if (arg == "--scene") {
+            if (ARGC > i) {
+                scene = ARGV[i + 1];
                 i++;
             }
         }
@@ -176,6 +184,22 @@ int main(int argc, char** argv) {
         NativeUI::SplashScreen::SetLoadingText(splashScreen, _("Opening project..."));
         if (application.OpenProject(project)) {
             Marmalade::GUI::WindowManager::GetInstance().welcomeScreen.visible = false;
+        }
+    }
+
+    if (scene != nullptr) {
+        auto* project = GET_APP.GetCurrentProject();
+        std::string sceneDir = project->basePath.string() + "/data/";
+        std::string uuid = application.sceneManager.FindSceneUUIDByName(scene, sceneDir);
+
+        if (!uuid.empty()) {
+            std::string sceneFileName = Marmalade::Project::ProjectScenes::GetSceneFileName(uuid);
+            Scene loadedScene = project->scenes.LoadScene(sceneFileName);
+            auto scenePtr = std::make_shared<Scene>(loadedScene);
+            application.sceneManager.AddScene(scenePtr);
+            application.sceneManager.SetCurrentScene(uuid);
+        } else {
+            LOG_ERROR("Failed to load scene program argument, scene not found: {}", scene);
         }
     }
 

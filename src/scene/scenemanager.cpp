@@ -61,6 +61,37 @@ std::shared_ptr<Scene> SceneManager::GetCurrentScene() const {
     return currentScene;
 }
 
+std::string SceneManager::FindSceneUUIDByName(const std::string& sceneName, const std::string& sceneDir) {
+    namespace fs = std::filesystem;
+    for (const auto& entry : fs::directory_iterator(sceneDir)) {
+        if (entry.path().extension() == ".json") {
+            std::ifstream file(entry.path());
+            if (!file.is_open()) {
+                continue;
+            }
+
+            try {
+                nlohmann::json data;
+                file >> data;
+
+                if (data.contains("name")) {
+                    std::string name = data["name"];
+
+                    if (name == sceneName && data.contains("uuid")) {
+                        std::string uuid = data["uuid"];
+                        return uuid;
+                    }
+                }
+            } catch (const std::exception& e) {
+                std::cout << "Failed to parse: " << entry.path() << " (" << e.what() << ")" << std::endl;
+            }
+        }
+    }
+
+    return "";
+}
+
+
 void SceneManager::SetCurrentScene(const std::string &uuid) {
     auto scene = scenes.find(uuid);
     if (scene != scenes.end()) {

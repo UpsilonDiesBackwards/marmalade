@@ -36,6 +36,8 @@ public:
     std::shared_ptr<Scene> GetSceneByUuid(const std::string& uuid) const;
     std::shared_ptr<Scene> GetCurrentScene() const;
 
+    std::string FindSceneUUIDByName(const std::string& sceneName, const std::string& sceneDir);
+
     void SetCurrentScene(const std::string& uuid);
 private:
     std::unordered_map<std::string, std::shared_ptr<Scene>> scenes; // UUID -> Scene
