@@ -18,8 +18,9 @@
 #ifndef MARMALADE_ECS_TILEMAP_H
 #define MARMALADE_ECS_TILEMAP_H
 
-#include "vec2.hpp"
 #include "ecs/component.h"
+
+#include <glm/vec2.hpp>
 
 namespace Marmalade::ECS {
     class TileMap : public Component {
@@ -32,7 +33,7 @@ namespace Marmalade::ECS {
     public:
         Grid TileGrid;
 
-        void RenderGUIGrid(Entity* entity);
+        void RenderGUIGrid(Entity* entity) const;
 
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;

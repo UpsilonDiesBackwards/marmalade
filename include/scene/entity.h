@@ -32,14 +32,6 @@
 #include <memory>
 #include <algorithm>
 
-enum EntityFlags {
-    ACTIVE = 1 << 0,
-    HAS_BOUNDS = 1 << 2,
-    PLAYER_CONTROLLED = 1 << 3,
-    RENDERABLE = 1 << 4,
-    NONE,
-};
-
 struct Entity {
 public:
     unsigned int id;
@@ -47,16 +39,15 @@ public:
     std::string name;
     std::string uuid;
 
-    EntityFlags flags;
     Renderable renderable;
     Marmalade::ECS::ComponentManager componentManager{};
 
     std::weak_ptr<Entity> parent;
     std::vector<std::shared_ptr<Entity>> children;
 
-    Entity(const std::string& name, const std::string& uuid, EntityFlags flags, bool withDefaultComponents = true);
+    Entity(const std::string& name, const std::string& uuid, bool withDefaultComponents = true);
 
-    Entity(const std::string& name, EntityFlags flags, bool withDefaultComponents = true);
+    Entity(const std::string& name, bool withDefaultComponents = true);
 
     glm::vec2 getPosition();
     float getRotation();

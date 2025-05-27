@@ -147,7 +147,7 @@ nlohmann::json Marmalade::Project::ProjectScenes::serializeEntity(const Entity* 
 std::shared_ptr<Entity> Marmalade::Project::ProjectScenes::deserializeEntity(const nlohmann::json& e) {
     std::string name = e["name"];
     std::string uuid = e["uuid"];
-    auto entity = std::make_shared<Entity>(name, uuid, EntityFlags::RENDERABLE, false);
+    auto entity = std::make_shared<Entity>(name, uuid, false);
 
     // Deserialize components
     for (const auto& componentJson: e["components"]) {

@@ -115,7 +115,7 @@ void SceneHierarchy::createEntity(const std::string& name) {
     auto currentScene = app.sceneManager.GetCurrentScene();
 
     if (!name.empty()) {
-        auto newEntity = std::make_unique<Entity>(name, EntityFlags::NONE);
+        auto newEntity = std::make_unique<Entity>(name);
 
         if (auto parentPtr = _parent.lock()) {
             parentPtr->AddChild(parentPtr, std::move(newEntity));

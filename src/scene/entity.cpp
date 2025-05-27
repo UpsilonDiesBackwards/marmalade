@@ -28,8 +28,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext/matrix_transform.hpp>
 
-Entity::Entity(const std::string& name, const std::string& uuid, EntityFlags flags, bool withDefaultComponents)
-    : name(name), uuid(uuid), flags(flags), renderable(0, 0, 0, Texture::LoadTexture("", Marmalade::Material::TextureSettings{})) {
+Entity::Entity(const std::string& name, const std::string& uuid, bool withDefaultComponents)
+    : name(name), uuid(uuid), renderable(0, 0, 0, Texture::LoadTexture("", Marmalade::Material::TextureSettings{})) {
 
     renderable.Initialise();
 
@@ -46,7 +46,7 @@ Entity::Entity(const std::string& name, const std::string& uuid, EntityFlags fla
     Render();
 }
 
-Entity::Entity(const std::string& name, EntityFlags flags, bool withDefaultComponents) : Entity(name, Marmalade::Util::GenerateUUIDv4(), flags, withDefaultComponents) {
+Entity::Entity(const std::string& name, bool withDefaultComponents) : Entity(name, Marmalade::Util::GenerateUUIDv4(), withDefaultComponents) {
 }
 
 void Entity::Render() {
@@ -61,14 +61,12 @@ void Entity::Render() {
         UpdateModelMatrix();
     }
 
-    if (RENDERABLE) {
-        bool hasTexture = componentManager.GetComponentOfType<Marmalade::ECS::MaterialRenderer>();
+    bool hasTexture = componentManager.GetComponentOfType<Marmalade::ECS::MaterialRenderer>();
 
-        renderable.Draw(this, transform->modelMatrix, hasTexture);
+    renderable.Draw(this, transform->modelMatrix, hasTexture);
 
-        renderable.ApplyLighting(Application::GetInstance().sceneManager.GetCurrentScene()->GetLights(),
-                                 glm::vec3(Application::GetInstance().camera->GetPosition(), 1.0f));
-    }
+    renderable.ApplyLighting(Application::GetInstance().sceneManager.GetCurrentScene()->GetLights(),
+                             glm::vec3(Application::GetInstance().camera->GetPosition(), 1.0f));
 
     for (auto& child: children) {
         child->Render();
