@@ -23,8 +23,12 @@
 #include "../application/logger.h"
 
 void Marmalade::ECS::ComponentManager::AddComponent(std::shared_ptr<Component> component) {
+    if (component == nullptr) {
+        return;
+    }
+
     if (!component->allowMultiple) {
-        for (const auto& existing : components) {
+        for (const auto& existing: components) {
             if (typeid(*component) == typeid(*existing)) {
                 LOG_ERROR("Can not add {}, component already exists", component->name);
                 return;
@@ -32,16 +36,16 @@ void Marmalade::ECS::ComponentManager::AddComponent(std::shared_ptr<Component> c
         }
     }
 
-    for (const auto& dependency : component->dependencies) { // Loop through each dependency...
+    for (const auto& dependency: component->dependencies) {// Loop through each dependency...
         bool hasDependency = false;
-        for (const auto& existing : components) {
+        for (const auto& existing: components) {
             if (existing->name == dependency) {
                 hasDependency = true;
                 break;
             }
         }
 
-        if (!hasDependency) { // ... and add any if it's not already added
+        if (!hasDependency) {// ... and add any if it's not already added
             auto newDependency = Marmalade::ECS::ComponentRegistry::Instance().CreateComponent(dependency, Util::GenerateUUIDv4());
             if (newDependency) {
                 components.push_back(std::move(newDependency));
@@ -50,12 +54,12 @@ void Marmalade::ECS::ComponentManager::AddComponent(std::shared_ptr<Component> c
         }
     }
 
-    components.push_back(component); // if a component has no dependencies, add it immediately
+    components.push_back(component);// if a component has no dependencies, add it immediately
 }
 
 void Marmalade::ECS::ComponentManager::RemoveComponent(Component* component) {
-    for (const auto& existing : components) { // Check for dependencies before removing a component
-        for (const auto& dependency : existing->dependencies) {
+    for (const auto& existing: components) {// Check for dependencies before removing a component
+        for (const auto& dependency: existing->dependencies) {
             if (component->name == dependency) {
                 LOG_ERROR("Could not remove {} because its a dependency of {}", component->name, existing->name);
                 return;
@@ -70,4 +74,3 @@ void Marmalade::ECS::ComponentManager::RemoveComponent(Component* component) {
                            }),
             components.end());
 }
-

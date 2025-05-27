@@ -27,6 +27,7 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 Entity::Entity(const std::string& name, const std::string& uuid, bool withDefaultComponents)
     : name(name), uuid(uuid), renderable(0, 0, 0, Texture::LoadTexture("", Marmalade::Material::TextureSettings{})) {
@@ -73,36 +74,35 @@ void Entity::Render() {
     }
 }
 
-glm::vec2 Entity::getPosition() {
+glm::vec3 Entity::getPosition() {
     auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
     return transform->pos;
 }
 
-void Entity::setPosition(glm::vec2 newPos) {
+void Entity::setPosition(glm::vec3 newPos) {
     auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
 
     transform->pos = newPos;
     transform->isDirty = true;
 }
 
-float Entity::getRotation() {
+glm::vec3 Entity::getRotation() {
     auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
-    return transform->rotation;
+    return glm::degrees(glm::eulerAngles(transform->rotation));
 }
 
-void Entity::setRotation(float newRot) {
+void Entity::setRotation(glm::vec3 eulerDegrees) {
     auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
-
-    transform->rotation = newRot;
+    transform->rotation = glm::quat(glm::radians(eulerDegrees));
     transform->isDirty = true;
 }
 
-glm::vec2 Entity::getScale() {
+glm::vec3 Entity::getScale() {
     auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
     return transform->scale;
 }
 
-void Entity::setScale(glm::vec2 newScale) {
+void Entity::setScale(glm::vec3 newScale) {
     auto transform = componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
 
     transform->scale = newScale;
@@ -114,21 +114,22 @@ void Entity::UpdateModelMatrix() {
 
     transform->modelMatrix = glm::mat4(1.0f);
 
-    transform->modelMatrix = glm::translate(transform->modelMatrix, glm::vec3(transform->pos, 0.0f));
-    transform->modelMatrix = glm::rotate(transform->modelMatrix, glm::radians(transform->rotation),
-                                         glm::vec3(0.0f, 0.0f, 1.0f));
-    transform->modelMatrix = glm::scale(transform->modelMatrix, glm::vec3(transform->scale, 1.0f));
+    transform->modelMatrix = glm::translate(glm::mat4(1.0f), transform->pos)
+                             * glm::mat4_cast(transform->rotation)
+                             * glm::scale(glm::mat4(1.0f), transform->scale);
 
     if (auto parentPtr = parent.lock()) {
-        transform->modelMatrix = parentPtr->componentManager.GetComponentOfType<Marmalade::ECS::Transform>()->modelMatrix * transform->modelMatrix;
+        const auto& parentMatrix = parentPtr->componentManager.GetComponentOfType<Marmalade::ECS::Transform>()->modelMatrix;
+        transform->modelMatrix = parentMatrix * transform->modelMatrix;
     }
 
-    for (auto& child: children) {
+    for (auto& child : children) {
         child->UpdateModelMatrix();
     }
 
     transform->isDirty = false;
 }
+
 
 void Entity::AddChild(std::shared_ptr<Entity> parent, std::shared_ptr<Entity> child) {
     child->parent = parent;

@@ -34,5 +34,9 @@ private:
     std::string stylePath;
 };
 
+#define COL_CATPPUCCIN_UI_RED ImVec4(0.95f, 0.54f, 0.65f, 1.0f)
+#define COL_CATPPUCCIN_UI_GREEN ImVec4(0.65f, 0.89f, 0.63f, 1.0f)
+#define COL_CATPPUCCIN_UI_BLUE ImVec4(0.53f, 0.70f, 0.98f, 1.0f)
+
 
 #endif

@@ -49,13 +49,13 @@ public:
 
     Entity(const std::string& name, bool withDefaultComponents = true);
 
-    glm::vec2 getPosition();
-    float getRotation();
-    glm::vec2 getScale();
+    glm::vec3 getPosition();
+    glm::vec3 getRotation();
+    glm::vec3 getScale();
 
-    void setPosition(glm::vec2 newPos);
-    void setRotation(float newRot);
-    void setScale(glm::vec2 newScale);
+    void setPosition(glm::vec3 newPos);
+    void setRotation(glm::vec3 newRot);
+    void setScale(glm::vec3 newScale);
 
     void UpdateModelMatrix();
 

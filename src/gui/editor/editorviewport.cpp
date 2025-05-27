@@ -22,7 +22,7 @@
 #include "../../application/application.h"
 #include "ecs/components/light2d/light2d.h"
 
-#include <ecs/components/physics2d/colliderbase.h>
+//#include <ecs/components/physics2d/colliderbase.h>
 
 #include <glad/glad.h>
 
@@ -56,6 +56,7 @@ void EditView::Render() {
     app.framebuffer->Bind();
 
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
     glClearColor(0.18f, 0.21f, 0.23f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -241,7 +242,7 @@ void EditView::RunInput() {
 void EditView::ShowEditorUIGuizmos() {
     if (selectedEntity) {
         ShowGizmo();
-        ShowColliderBounds();
+//        ShowColliderBounds();
     }
 }
 
@@ -268,9 +269,9 @@ void EditView::ShowGizmo() {
                                               glm::value_ptr(rotation),
                                               glm::value_ptr(scale));
 
-        selectedEntity->setPosition(glm::vec2(translation.x, translation.y));
-        selectedEntity->setRotation(rotation.z);
-        selectedEntity->setScale(glm::vec2(scale.x, scale.y));
+        selectedEntity->setPosition(translation);
+        selectedEntity->setRotation(rotation);
+        selectedEntity->setScale(scale);
 
         selectedEntity->UpdateModelMatrix();
 
@@ -291,15 +292,15 @@ void EditView::ShowGizmo() {
                          glm::value_ptr(transform->modelMatrix));
 }
 
-void EditView::ShowColliderBounds() {
-    auto comp = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::ColliderBase>();
-
-    if (!comp || !comp->showingBounds) { return; }// Collider component does not exist, or not showing bounds. Do not continue
-
-    auto* transform = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
-
-    comp->ShowBounds(selectedEntity->getPosition() , *transform);
-}
+//void EditView::ShowColliderBounds() {
+//    auto comp = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::ColliderBase>();
+//
+//    if (!comp || !comp->showingBounds) { return; }// Collider component does not exist, or not showing bounds. Do not continue
+//
+//    auto* transform = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
+//
+//    comp->ShowBounds(selectedEntity->getPosition() , *transform);
+//}
 
 void EditView::ShowLightBounds() {
     auto lightComp = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::Light2D>();

@@ -26,12 +26,6 @@ list(APPEND ENGINE_API
 
         ecs/components/light2d/light2d.h
 
-        ecs/components/physics2d/rigidbody.h
-        ecs/components/physics2d/colliderbase.h
-        ecs/components/physics2d/colliderdata.h
-        ecs/components/physics2d/boxcollider.h
-        ecs/components/physics2d/circlecollider.h
-
         ecs/components/animation/animator.h
 
         animation/sequence.h
