@@ -111,7 +111,7 @@ namespace Marmalade::GUI {
         BrowserMode _mode = BrowserMode_PROJECT;
         DisplayMode _displayMode = DisplayMode_TILES;
         float _thumbnailSize = 128.0f;
-        float _thumbnailPadding = 8.0f;
+        float _thumbnailPadding = 16.0f;
 
         // Only relevant for BrowserMode_PROJECT:
         bool _showAssets = true;
