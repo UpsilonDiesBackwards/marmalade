@@ -103,14 +103,20 @@ HWND hNextBtn;
 
 HBRUSH hWhiteBrush = GetSysColorBrush(COLOR_WINDOW);
 
-void CalculateSize() {
-    int size = 0;
+uint64_t GetInstallSize() {
+    uint64_t size = 0;
     for (const auto& com: state.Components) {
         if (com.Selected) {
             auto dirSize = state.ComponentSizes[com.DirName];
             size += dirSize;
         }
     }
+
+    return size;
+}
+
+void CalculateSize() {
+    uint64_t size = GetInstallSize();
 
     std::wstringstream ss;
     ss << "Estimated Size: " << size / (1024 * 1024) << " MB";
@@ -299,6 +305,41 @@ bool RelaunchElevated() {
     }
 
     return true;
+}
+
+bool RegisterAppInstalled() {
+    using namespace Marmalade::Application;
+
+    const std::wstring uninstallKey = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\MarmaladeEngine";
+
+    HKEY root = HKEY_CURRENT_USER;
+    if (state.Mode == InstallMode_SYSTEM) root = HKEY_LOCAL_MACHINE;
+
+    bool ok = true;
+    ok &= Integration::SetRegistryValue(root, uninstallKey, L"DisplayName", L"Marmalade Engine");
+    ok &= Integration::SetRegistryValue(root, uninstallKey, L"DisplayVersion", L"1.0.0");
+    ok &= Integration::SetRegistryValue(root, uninstallKey, L"Publisher", L"Upsilon");
+    ok &= Integration::SetRegistryValue(root, uninstallKey, L"InstallLocation", state.InstallPath.wstring());
+
+    std::wstringstream uninstallString;
+    uninstallString << "" << state.InstallPath / "marmalade_installer.exe" << "";
+    uninstallString << " --uninstall";
+
+    ok &= Integration::SetRegistryValue(root, uninstallKey, L"UninstallString", uninstallString.str());
+    ok &= Integration::SetRegistryValue(root, uninstallKey, L"DisplayIcon", state.InstallPath / "marmalade.exe");
+    {
+        HKEY key;
+        if (RegCreateKeyExW(root, uninstallKey.c_str(), 0, nullptr, 0, KEY_WRITE, nullptr, &key, nullptr) == ERROR_SUCCESS) {
+            DWORD estimatedSizeKB = GetInstallSize() / 1024;
+            LONG res = RegSetValueExW(key, L"EstimatedSize", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&estimatedSizeKB), sizeof(estimatedSizeKB));
+            RegCloseKey(key);
+            ok &= (res == ERROR_SUCCESS);
+        } else {
+            ok = false;
+        }
+    }
+
+    return ok;
 }
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -652,6 +693,14 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                         // Delete temp files
                         std::filesystem::remove_all(tempZipName);
                         std::filesystem::remove_all(tempDirName);
+
+
+                        // Copy installer itserf
+                        wchar_t installerPath[MAX_PATH];
+                        GetModuleFileNameW(nullptr, installerPath, MAX_PATH);
+                        std::filesystem::copy(installerPath, state.InstallPath / "marmalade_installer.exe", std::filesystem::copy_options::update_existing);
+
+                        RegisterAppInstalled();
 
                         break;
                     }
