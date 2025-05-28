@@ -23,6 +23,9 @@
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <shlobj.h>
+#include <objbase.h>
+#include <atlcomcli.h>
 #endif
 
 #include <string>
@@ -39,11 +42,13 @@ namespace Marmalade::Application {
 
 #ifdef WIN32
         static bool SetRegistryValue(HKEY root, const std::wstring& subkey, const std::wstring& valName, const std::wstring& val);
+
+        static void AddShortcut(const CComPtr<IShellLinkW>& shellLink, std::filesystem::path shortcutPath);
 #endif
 
-        static void AddSystemIntegrations(IntegrationType types);
+        static void AddSystemIntegrations(IntegrationType types, std::filesystem::path exePath = "");
 
-        static void MarkRecentFile(const std::filesystem::path &path);
+        static void MarkRecentFile(const std::filesystem::path& path);
     };
 }
 

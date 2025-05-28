@@ -24,6 +24,12 @@
 #include "../../../application/application.h"
 #include "scene/entity.h"
 
+#ifdef _MSC_VER
+Marmalade::ECS::TileMap::TileMap() {
+    TILEMAP_CTOR_BODY
+}
+#endif
+
 void Marmalade::ECS::TileMap::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
 

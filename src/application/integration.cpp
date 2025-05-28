@@ -54,19 +54,42 @@ bool Marmalade::Application::Integration::SetRegistryValue(HKEY root, const std:
     }
     return true;
 }
-#endif
 
-void Marmalade::Application::Integration::AddSystemIntegrations(IntegrationType types) {
+void Marmalade::Application::Integration::AddShortcut(const CComPtr<IShellLinkW>& shellLink, std::filesystem::path shortcutPath) {
+    CComPtr<IPersistFile> persistFile;
+    HRESULT hr = shellLink->QueryInterface(IID_PPV_ARGS(&persistFile));
+    if (FAILED(hr)) {
+#ifndef DISABLE_LOGGING
+        LOG_ERROR("Failed to create file instance: {}", hr);
+#endif
+        return;
+    }
+
+    hr = persistFile->Save(shortcutPath.wstring().c_str(), TRUE);
+    if (FAILED(hr)) {
+#ifndef DISABLE_LOGGING
+        LOG_ERROR("Failed to create shortcut: {}", hr);
+#endif
+        return;
+    }
+}
+
+#endif // WIN32
+
+void Marmalade::Application::Integration::AddSystemIntegrations(IntegrationType types, std::filesystem::path exePath) {
 #ifndef DISABLE_LOGGING
     LOG_INFO("Adding system integrations");
 #endif
 
 #ifdef WIN32
-    wchar_t exePath[MAX_PATH];
-    GetModuleFileNameW(nullptr, exePath, MAX_PATH);
-    std::filesystem::path exeDir = std::filesystem::path(exePath).parent_path();
-    SetCurrentDirectoryW(exeDir.c_str());
+    if (exePath.empty()) {
+        wchar_t exePathRaw[MAX_PATH];
+        GetModuleFileNameW(nullptr, exePathRaw, MAX_PATH);
+        exePath = std::filesystem::path(exePathRaw);
+    }
 #endif
+
+    std::filesystem::path exeDir = exePath.parent_path();
 
     if (types & IntegrationType_FILE_ASSOCIATION) {
 #ifdef WIN32
@@ -77,7 +100,7 @@ void Marmalade::Application::Integration::AddSystemIntegrations(IntegrationType 
         SetRegistryValue(HKEY_CURRENT_USER, std::wstring(L"Software\\Classes\\") + ext, L"", progId);
         SetRegistryValue(HKEY_CURRENT_USER, std::wstring(L"Software\\Classes\\") + progId, L"", description);
         SetRegistryValue(HKEY_CURRENT_USER, std::wstring(L"Software\\Classes\\") + progId + L"\\DefaultIcon", L"", std::wstring(exePath) + L",0");
-        SetRegistryValue(HKEY_CURRENT_USER, std::wstring(L"Software\\Classes\\") + progId + L"\\shell\\open\\command", L"", std::wstring(L"\"") + exePath + L"\" --project \"%1\"");
+        SetRegistryValue(HKEY_CURRENT_USER, std::wstring(L"Software\\Classes\\") + progId + L"\\shell\\open\\command", L"", std::wstring(L"\"") + exePath.wstring().c_str() + L"\" --project \"%1\"");
 
         SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
 #endif
@@ -96,7 +119,7 @@ void Marmalade::Application::Integration::AddSystemIntegrations(IntegrationType 
             return;
         }
 
-        shellLink->SetPath(exePath);
+        shellLink->SetPath(exePath.wstring().c_str());
         shellLink->SetArguments(L"--project \"%1\"");
         shellLink->SetIconLocation((exeDir / "res/icons/logo/logo.ico").wstring().c_str(), 0);
         shellLink->SetWorkingDirectory(exeDir.wstring().c_str());
@@ -116,22 +139,7 @@ void Marmalade::Application::Integration::AddSystemIntegrations(IntegrationType 
         std::filesystem::path shortcutPath = shortcutDir / "Marmalade Engine.lnk";
         CoTaskMemFree(startMenuPath);
 
-        CComPtr<IPersistFile> persistFile;
-        hr = shellLink->QueryInterface(IID_PPV_ARGS(&persistFile));
-        if (FAILED(hr)) {
-#ifndef DISABLE_LOGGING
-            LOG_ERROR("Failed to create file instance: {}", hr);
-#endif
-            return;
-        }
-
-        hr = persistFile->Save(shortcutPath.wstring().c_str(), TRUE);
-        if (FAILED(hr)) {
-#ifndef DISABLE_LOGGING
-            LOG_ERROR("Failed to create shortcut: {}", hr);
-#endif
-            return;
-        }
+        AddShortcut(shellLink, shortcutPath);
 #endif
     }
 }
@@ -141,3 +149,4 @@ void Marmalade::Application::Integration::MarkRecentFile(const std::filesystem::
     SHAddToRecentDocs(SHARD_PATHA, absolute(path).string().c_str());
 #endif
 }
+

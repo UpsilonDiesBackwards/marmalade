@@ -21,6 +21,7 @@ endif ()
 add_executable(marmalade_installer WIN32
         src/main.cpp
         src/resource.h
+        src/components.h
         ../../src/application/integration.h
         ../../src/application/integration.cpp
 )
@@ -52,7 +53,14 @@ target_link_libraries(marmalade_installer PRIVATE Shcore.lib ws2_32.lib comctl32
 # Compress marmalade publish directory
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/resources/marmalade.zip
-        COMMAND "C:/Program Files/7-Zip/7z.exe" a -tzip "${CMAKE_CURRENT_BINARY_DIR}/resources/marmalade.zip" "${CMAKE_BINARY_DIR}/publish/*"
+        COMMAND ${CMAKE_COMMAND} -E rm -rf "${CMAKE_BINARY_DIR}/ziptemp"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/ziptemp/_engine"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/publish" "${CMAKE_BINARY_DIR}/ziptemp/_engine"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/doxydocs" "${CMAKE_BINARY_DIR}/ziptemp/_docs"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}/ziptemp/_sdk"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}/ziptemp/_sdkdocs"
+        COMMAND "C:/Program Files/7-Zip/7z.exe" a -tzip "${CMAKE_CURRENT_BINARY_DIR}/resources/marmalade.zip" "${CMAKE_BINARY_DIR}/ziptemp/*"
+        COMMAND ${CMAKE_COMMAND} -E rm -r "${CMAKE_BINARY_DIR}/ziptemp"
         DEPENDS ${CMAKE_BINARY_DIR}/publish
         COMMENT "Compressing publish directory"
 )

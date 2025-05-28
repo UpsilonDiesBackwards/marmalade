@@ -26,11 +26,26 @@ namespace Marmalade::ECS {
     class TileMap : public Component {
         struct Grid {
             // vector of tiles
-            glm::vec2 size = { 10, 10 };
+            glm::vec2 size = {10, 10};
             float spacing = 1.0f;
         };
 
     public:
+#define TILEMAP_CTOR_BODY                   \
+    name = "TileMap";                       \
+    allowMultiple = true;                   \
+    categories = {"Rendering", "Graphics"}; \
+    description =                           \
+            "Adds a 2D tilemap component\n" \
+            "Allows the creation of 2D tilemap environments";
+
+#ifdef _MSC_VER
+        TileMap();
+#else
+        TileMap(){
+                TILEMAP_CTOR_BODY}
+#endif
+
         Grid TileGrid;
 
         void RenderGUIGrid(Entity* entity) const;
@@ -40,18 +55,9 @@ namespace Marmalade::ECS {
         void Setup(Entity* entity) override;
         nlohmann::json Serialize(const Entity* entity) override;
         void Deserialize(nlohmann::json json, Entity* entity) override;
-
-        TileMap() {
-            name = "TileMap";
-            allowMultiple = true;
-            categories = {"Rendering", "Graphics"};
-            description =
-                    "Adds a 2D tilemap component\n"
-                    "Allows the creation of 2D tilemap environments";
-        }
     };
 
     REGISTER_COMPONENT(TileMap);
 }
 
-#endif //MARMALADE_ECS_TILEMAP_H
+#endif//MARMALADE_ECS_TILEMAP_H

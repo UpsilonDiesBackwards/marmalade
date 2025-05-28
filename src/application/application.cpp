@@ -394,6 +394,7 @@ void Application::OnClose() {
  */
 
 void Application::getGraphicsVersion() {
+#undef interface // WIN32 COM causing problems
     std::stringstream ss(Marmalade::EngineConfig::GetStoredConfig().interface.graphicsVersion);
     int major, minor;
 
