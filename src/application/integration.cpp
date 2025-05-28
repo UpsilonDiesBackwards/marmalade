@@ -135,3 +135,9 @@ void Marmalade::Application::Integration::AddSystemIntegrations(IntegrationType 
 #endif
     }
 }
+
+void Marmalade::Application::Integration::MarkRecentFile(const std::filesystem::path& path) {
+#ifdef WIN32
+    SHAddToRecentDocs(SHARD_PATHA, absolute(path).string().c_str());
+#endif
+}

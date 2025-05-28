@@ -26,6 +26,7 @@
 #endif
 
 #include <string>
+#include <filesystem>
 
 namespace Marmalade::Application {
     class Integration {
@@ -41,6 +42,8 @@ namespace Marmalade::Application {
 #endif
 
         static void AddSystemIntegrations(IntegrationType types);
+
+        static void MarkRecentFile(const std::filesystem::path &path);
     };
 }
 

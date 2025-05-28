@@ -21,6 +21,7 @@
 
 #include "application.h"
 
+#include "integration.h"
 #include "logger.h"
 #include "config/engineconfig.h"
 #include "config/configutil.h"
@@ -307,6 +308,7 @@ void Application::SetupLogger() {
 bool Application::OpenProject(const std::filesystem::path& path) {
     try {
         auto project = std::make_unique<Marmalade::Project::Project>(Marmalade::Project::ProjectManager<>::OpenProject(path));
+        Marmalade::Application::Integration::MarkRecentFile(path);
         Marmalade::Recents::GetInstance().AddRecentProject(Marmalade::RecentProject{project->projectMarmalade->storedConfig.name, project->projectMarmalade->storedConfig.uuid, path.string()});
         Marmalade::Recents::GetInstance().SaveConfig();
 
