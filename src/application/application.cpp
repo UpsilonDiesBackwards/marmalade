@@ -191,6 +191,8 @@ void Application::Run() {
     time.Update();
     time.FixedUpdate();
 
+    physicsEngine2D.Update();
+
     ImVec4 backgroundCol = ImGui::ColorConvertU32ToFloat4(Marmalade::EngineConfig::GetStoredConfig().appearance.backgroundColor);
     glClearColor(backgroundCol.x, backgroundCol.y, backgroundCol.z, backgroundCol.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

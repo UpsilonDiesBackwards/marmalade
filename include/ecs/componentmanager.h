@@ -33,14 +33,18 @@ namespace Marmalade::ECS {
 
         template<typename T>
         T* GetComponentOfType() {
-            for (auto& component: components) {
-                if (auto derived = dynamic_cast<T*>(component.get())) {
-                    return derived;
-                }
-            }
+            for (auto& component: components) { if (auto derived = dynamic_cast<T*>(component.get())) { return derived; } }
 
             return nullptr;
         }
+
+        template<typename T>
+        const T* GetComponentOfType() const {
+            for (auto& component: components) { if (auto derived = dynamic_cast<T*>(component.get())) { return derived; } }
+
+            return nullptr;
+        }
+
     };
 }
 

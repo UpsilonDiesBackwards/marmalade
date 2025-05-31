@@ -24,7 +24,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include <typeindex>
 #include <functional>
 #include <utility>
 

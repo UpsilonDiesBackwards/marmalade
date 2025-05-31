@@ -28,6 +28,11 @@ list(APPEND ENGINE_API
 
         ecs/components/animation/animator.h
 
+        ecs/components/physics/rigidbody.h
+        ecs/components/physics/2d/rigidbody2d.h
+        ecs/components/physics/2d/boxcollider2d.h
+        ecs/components/physics/2d/circlecollider2d.h
+
         animation/sequence.h
         animation/animationdriver.h
         animation/animationframe.h
@@ -40,6 +45,10 @@ list(APPEND ENGINE_API
         imgui.inc
         interface.h
         wasm.h
+
+        physics/physicsengine.h
+        physics/2d/physicsengine2d.h
+        physics/2d/collisionevent2d.h
 )
 
 target_sources(marmalade PRIVATE ${ENGINE_API})

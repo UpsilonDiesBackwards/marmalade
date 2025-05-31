@@ -73,6 +73,9 @@ list(APPEND ENGINE_SRC
         project/projectscenes.cpp
         project/projectscenes.h
         project/projectpackages.h
+
+        physics/2d/physicsengine2d.cpp
+        physics/2d/collisionevent2d.cpp
 )
 
 list(APPEND ENGINE_SRC # ECS
@@ -87,6 +90,10 @@ list(APPEND ENGINE_SRC # ECS
         ecs/components/light2d/light2d.cpp
 
         ecs/components/animation/animator.cpp
+
+        ecs/components/physics/2d/rigidbody2d.cpp
+        ecs/components/physics/2d/boxcollider2d.cpp
+        ecs/components/physics/2d/circlecollider2d.cpp
 )
 
 list(APPEND ENGINE_SRC # Mathematics

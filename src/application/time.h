@@ -63,7 +63,7 @@ private:
     void PollAutoSave();
 };
 
-#define GET_DELTA_TIME GetDeltaTime()
-#define GET_FIXED_DELTA_TIME GetFixedDeltaTime()
+#define GET_DELTA_TIME GET_APP.time.GetDeltaTime()
+#define GET_FIXED_DELTA_TIME GET_APP.time.GetFixedDeltaTime()
 
 #endif

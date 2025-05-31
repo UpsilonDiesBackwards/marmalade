@@ -46,6 +46,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include "physics/2d/physicsengine2d.h"
+
 enum PlayState {
     PlayState_PLAY,
     PlayState_STOP,
@@ -180,6 +182,8 @@ public:
      */
     bool stepFrame = false;
 private:
+    Marmalade::Physics::PhysicsEngine2D physicsEngine2D;
+
     Application(int width, int height, const char* title);
 
     int _graphicsVersionMajor;
