@@ -30,9 +30,8 @@ namespace Marmalade::ECS {
         float gravity = -9.81f;
         float mass = 1.0f;
         float inverseMass = -mass;
-        float elasticity = 0.0f;
 
-        float restitution;
+        float restitution = 0.0f; // Additionally functions as friction
 
         VecType momentum;
 

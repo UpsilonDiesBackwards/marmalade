@@ -114,7 +114,7 @@ void Marmalade::ECS::Rigidbody2D::Display(Entity* entity) {
         Marmalade::GUI::Components::BackgroundLabel::DrawInlineLabelWithBackground(" X ", COL_CATPPUCCIN_UI_RED);
         ImGui::SameLine();
         ImGui::PushItemWidth(-1);
-        if (ImGui::SliderFloat(("##Elast" + std::to_string(entity->id)).c_str(), &body.elasticity, 0, 360)) { body.elasticity = body.elasticity; }
+        if (ImGui::SliderFloat(("##Elast" + std::to_string(entity->id)).c_str(), &body.restitution, 0, 360)) { body.restitution = body.restitution; }
         ImGui::PopItemWidth();
 
         ImGui::EndTable();
@@ -137,7 +137,7 @@ nlohmann::json Marmalade::ECS::Rigidbody2D::Serialize(const Entity* entity) {
     j["mass"] = body.mass;
     j["inverseMass"] = body.inverseMass;
 
-    j["elasticity"] = body.elasticity;
+    j["elasticity"] = body.restitution;
 
     return j;
 }
@@ -153,5 +153,5 @@ void Marmalade::ECS::Rigidbody2D::Deserialize(nlohmann::json json, Entity* entit
     body.mass = json["mass"].get<float>();
     body.inverseMass = json["inverseMass"].get<float>();
 
-    body.elasticity = json["elasticity"].get<float>();
+    body.restitution = json["elasticity"].get<float>();
 }
