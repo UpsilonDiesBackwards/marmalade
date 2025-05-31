@@ -17,8 +17,10 @@
 
 #include "../include/physics/2d/collisionevent2d.h"
 
+#include <glm/glm.hpp>
+
 #define GLM_ENABLE_EXPERIMENTAL
-#include <gtx/norm.hpp>
+#include <glm/gtx/norm.hpp>
 
 Marmalade::Physics::CollisionEvent Marmalade::Physics::CollisionEvents2D::BoxVsBox(std::shared_ptr<Entity> a, const ECS::Rigidbody2D& rbA,
                                                                                    std::shared_ptr<Entity> b, const ECS::Rigidbody2D& rbB) {
@@ -34,7 +36,6 @@ Marmalade::Physics::CollisionEvent Marmalade::Physics::CollisionEvents2D::Circle
 
     const glm::vec2 posA = a->componentManager.GetComponentOfType<ECS::Transform>()->pos;
     const glm::vec2 posB = b->componentManager.GetComponentOfType<ECS::Transform>()->pos;
-
 
     auto circleA = std::static_pointer_cast<CircleCollider2D>(rbA.body.collider.shape);
     auto circleB = std::static_pointer_cast<CircleCollider2D>(rbB.body.collider.shape);
