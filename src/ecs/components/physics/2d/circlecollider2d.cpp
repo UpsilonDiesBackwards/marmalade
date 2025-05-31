@@ -20,6 +20,12 @@
 #include "ecs/components/physics/2d/rigidbody2d.h"
 #include "scene/entity.h"
 
+#ifdef _MSC_VER
+Marmalade::ECS::CircleCollider2D::CircleCollider2D() {
+    CIRCLECOLLIDER2D_CTOR_BODY
+}
+#endif
+
 void Marmalade::ECS::CircleCollider2D::Display(Entity* entity) {}
 
 void Marmalade::ECS::CircleCollider2D::Apply(Entity* entity) {}

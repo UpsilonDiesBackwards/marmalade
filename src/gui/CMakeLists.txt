@@ -63,6 +63,8 @@ list(APPEND ENGINE_SRC_GUI
         windowmanager.h
         fontmanager.cpp
         fontmanager.h
+        workspaces.cpp
+        workspaces.h
 )
 
 target_sources(marmalade PRIVATE ${ENGINE_SRC_GUI})

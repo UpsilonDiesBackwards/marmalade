@@ -204,14 +204,19 @@ int main(int argc, char** argv) {
     }
 
     splashScreen.Close();
+
     while (!glfwWindowShouldClose(application.getWindow())) {
-        application.Run();
+        application.InitialiseImGui();
+        while (!application.NeedsImGuiRestart() && !glfwWindowShouldClose(application.getWindow())) {
+            application.Run();
+        }
+        application.TerminateImGui();
     }
 
     application.OnClose();
 
     Marmalade::PluginLoader::GetInstance().UnloadPlugins();
-    application.Terminate();
+    application.TerminateGlfw();
 
 #if defined(__linux__)
     // Wait for GTK thread

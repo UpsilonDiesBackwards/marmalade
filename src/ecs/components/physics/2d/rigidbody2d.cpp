@@ -21,6 +21,12 @@
 
 #include "../src/gui/components/backgroundlabel.h"
 
+#ifdef _MSC_VER
+Marmalade::ECS::Rigidbody2D::Rigidbody2D() {
+    RIGIDBODY2D_CTOR_BODY
+}
+#endif
+
 void Marmalade::ECS::Rigidbody2D::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
 

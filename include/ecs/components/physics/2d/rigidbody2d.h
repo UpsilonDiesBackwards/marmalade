@@ -29,13 +29,20 @@
 namespace Marmalade::ECS {
     class Rigidbody2D : public RigidbodyT<glm::vec2, Physics::Collider2D> {
     public:
+#define RIGIDBODY2D_CTOR_BODY                  \
+    name = "Rigidbody 2D";                     \
+    categories = {"Physics", "2D"};            \
+    description =                              \
+            "Adds a 2D Rigid Body component\n" \
+            "Allows an entity to be a physical object within the game world and to be affected by gravity, elasticity, and other parameters";
+
+#ifdef _MSC_VER
+        Rigidbody2D();
+#else
         Rigidbody2D() {
-            name = "Rigidbody 2D";
-            categories = {"Physics", "2D"};
-            description =
-                    "Adds a 2D Rigid Body component\n"
-                    "Allows an entity to be a physical object within the game world and to be affected by gravity, elasticity, and other parameters";
+            RIGIDBODY2D_CTOR_BODY
         }
+#endif
 
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
@@ -47,4 +54,4 @@ namespace Marmalade::ECS {
     REGISTER_COMPONENT(Rigidbody2D);
 }
 
-#endif //MARMALADE_RIGIDBODY2D_H
+#endif

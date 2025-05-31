@@ -58,7 +58,7 @@
  * \brief Application constructor, sets necessary variables
  */
 Application::Application(int width, int height, const char* title) : window(nullptr), width(width), height(height), title(title),
-    inputManager(InputManager::GetInstance()), input(&inputManager), camera(new Camera(1920, 1080, 1.0f)), audioManager(&AudioManager::GetInstance()) {
+                                                                     inputManager(InputManager::GetInstance()), input(&inputManager), camera(new Camera(1920, 1080, 1.0f)), audioManager(&AudioManager::GetInstance()) {
 
     sceneManager = SceneManager();
     time = Time();
@@ -71,13 +71,6 @@ Application::~Application() {
 
 void Application::Initialise() {
     SetupLogger();
-
-    static std::filesystem::path imguiIniPath = Marmalade::ConfigUtil::GetConfigDirectory() / "imgui.ini";
-    static std::string imguiIniPathStr = imguiIniPath.string();
-
-    std::ifstream imguiIni(imguiIniPath);
-    firstRun = !imguiIni.good();
-    imguiIni.close();
 
     if (!glfwInit()) {// Initialise GLFW
         std::cerr << "Failed to Initialise GLFW!" << std::endl;
@@ -136,35 +129,6 @@ void Application::Initialise() {
     } else
         std::cout << "GLAD Initialised" << std::endl;
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();// Create ImGui Context
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-
-    std::stringstream versionStream;
-    versionStream << "#version " << _graphicsVersionMajor << _graphicsVersionMinor << "0";
-    auto versionStr = versionStream.str();
-    ImGui_ImplOpenGL3_Init(versionStr.c_str());
-
-    ImNodes::CreateContext();
-    ImNodes::StyleColorsDark();
-
-    // Load ImGui custom style
-    if (!std::filesystem::exists(Marmalade::ConfigUtil::GetConfigDirectory() / "editorstyle.txt")) {
-        std::filesystem::copy_file("res/config/editorstyle.txt", Marmalade::ConfigUtil::GetConfigDirectory() / "editorstyle.txt");
-    }
-
-    styleManager.LoadStyle((Marmalade::ConfigUtil::GetConfigDirectory() / Marmalade::EngineConfig::GetStoredConfig().appearance.themeFile).string());
-
-    ImGuiIO& io = ImGui::GetIO();
-    io.IniFilename = imguiIniPathStr.c_str();
-    io.ConfigWindowsMoveFromTitleBarOnly = true;
-    io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable;
-    if (Marmalade::EngineConfig::GetStoredConfig().appearance.viewports) {
-        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-    }
-
-    Marmalade::GUI::FontManager::GetInstance().InitFonts();
-
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
 
@@ -185,6 +149,54 @@ void Application::Initialise() {
     for (const auto& component: Marmalade::EngineConfig::GetStoredConfig().favouriteComponents) {
         Marmalade::ECS::ComponentRegistry::Instance().SetFavourite(component);
     }
+
+    static std::filesystem::path workspacesDir = Marmalade::ConfigUtil::GetConfigDirectory() / "workspaces";
+    if (!exists(workspacesDir)) {
+        create_directories(workspacesDir);
+    }
+
+    static std::filesystem::path imguiIniPath = workspacesDir / "Default.ini";
+    static std::string imguiIniPathStr = imguiIniPath.string();
+
+    std::ifstream imguiIni(imguiIniPath);
+    firstRun = !imguiIni.good();
+    imguiIni.close();
+
+    _workspacePath = imguiIniPathStr;
+}
+
+void Application::InitialiseImGui() {
+    _requestWorkspaceChange = false;
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();// Create ImGui Context
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+
+    std::stringstream versionStream;
+    versionStream << "#version " << _graphicsVersionMajor << _graphicsVersionMinor << "0";
+    auto versionStr = versionStream.str();
+    ImGui_ImplOpenGL3_Init(versionStr.c_str());
+
+    ImNodes::CreateContext();
+    ImNodes::StyleColorsDark();
+
+    // Load ImGui custom style
+    if (!std::filesystem::exists(Marmalade::ConfigUtil::GetConfigDirectory() / "editorstyle.txt")) {
+        std::filesystem::copy_file("res/config/editorstyle.txt", Marmalade::ConfigUtil::GetConfigDirectory() / "editorstyle.txt");
+    }
+
+    styleManager.LoadStyle((Marmalade::ConfigUtil::GetConfigDirectory() / Marmalade::EngineConfig::GetStoredConfig().appearance.themeFile).string());
+
+    ImGuiIO& io = ImGui::GetIO();
+    _workspacePathStorage = _workspacePath;
+    io.IniFilename = _workspacePathStorage.c_str();
+    io.ConfigWindowsMoveFromTitleBarOnly = true;
+    io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable;
+    if (Marmalade::EngineConfig::GetStoredConfig().appearance.viewports) {
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    }
+
+    Marmalade::GUI::FontManager::GetInstance().InitFonts();
 }
 
 void Application::Run() {
@@ -218,7 +230,7 @@ void Application::Run() {
         stepFrame = true;
     }
 
-    if (stepFrame) { // Step one frame
+    if (stepFrame) {// Step one frame
         playState = PlayState::PlayState_PAUSE;
         stepFrame = false;
     }
@@ -264,13 +276,15 @@ void Application::SetupDocking() const {
     }
 }
 
-void Application::Terminate() {
+void Application::TerminateImGui() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
     ImNodes::DestroyContext();
+}
 
+void Application::TerminateGlfw() {
     glfwDestroyWindow(window);
     glfwTerminate();
 }
@@ -396,7 +410,7 @@ void Application::OnClose() {
  */
 
 void Application::getGraphicsVersion() {
-#undef interface // WIN32 COM causing problems
+#undef interface// WIN32 COM causing problems
     std::stringstream ss(Marmalade::EngineConfig::GetStoredConfig().interface.graphicsVersion);
     int major, minor;
 
@@ -405,4 +419,13 @@ void Application::getGraphicsVersion() {
 
     _graphicsVersionMajor = major;
     _graphicsVersionMinor = minor;
+}
+
+void Application::ChangeWorkspace(std::string workspacePath) {
+    _workspacePath = workspacePath;
+    _requestWorkspaceChange = true;
+}
+
+bool Application::NeedsImGuiRestart() {
+    return _requestWorkspaceChange;
 }

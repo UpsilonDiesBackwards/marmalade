@@ -81,6 +81,8 @@ public:
      */
     void Initialise();
 
+    void InitialiseImGui();
+
     /**
      * \brief Executes functions that need to be called per-frame, such as the input and render loop
      */
@@ -99,7 +101,9 @@ public:
     /**
      * \brief Terminate and cleanup application process
      */
-    void Terminate();
+    void TerminateImGui();
+
+    void TerminateGlfw();
 
     /**
      * \brief Returns the glfw application window
@@ -181,6 +185,11 @@ public:
      * \brief Used to determine whether the application should advance a single frame during Game mode
      */
     bool stepFrame = false;
+
+    void ChangeWorkspace(std::string workspacePath);
+
+    bool NeedsImGuiRestart();
+
 private:
     Marmalade::Physics::PhysicsEngine2D physicsEngine2D;
 
@@ -202,6 +211,10 @@ private:
     std::shared_ptr<spdlog::logger> logger;
 
     std::unique_ptr<Marmalade::Project::Project> currentProject;
+
+    bool _requestWorkspaceChange = false;
+    std::string _workspacePath;
+    std::string _workspacePathStorage;
 
     /**
      * \brief Gets the graphics version from the engine config. Ambiguous name, should be changed

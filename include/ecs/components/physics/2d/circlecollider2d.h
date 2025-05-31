@@ -28,13 +28,20 @@ namespace Marmalade::ECS {
         float radius = 1.0f;
         glm::vec2 offset = {0.0f, 0.0f};
 
+#define CIRCLECOLLIDER2D_CTOR_BODY              \
+    name = "Circle Collider 2D";                \
+    categories = {"Physics", "2D", "Collider"}; \
+    description =                               \
+            "Adds an circular collider shape\n" \
+            "Used for collision detection as a rectangle centered at position + offset";
+
+#ifdef _MSC_VER
+        CircleCollider2D();
+#else
         CircleCollider2D() {
-            name = "Circle Collider 2D";
-            categories = {"Physics", "2D", "Collider"};
-            description =
-                "Adds an circular collider shape\n"
-                "Used for collision detection as a rectangle centered at position + offset";
+            CIRCLECOLLIDER2D_CTOR_BODY
         }
+#endif
 
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
@@ -46,4 +53,4 @@ namespace Marmalade::ECS {
     REGISTER_COMPONENT(CircleCollider2D);
 }
 
-#endif //MARMALADE_CIRCLECOLLIDER2D_H
+#endif

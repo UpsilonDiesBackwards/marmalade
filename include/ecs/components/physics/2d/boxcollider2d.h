@@ -27,13 +27,20 @@ namespace Marmalade::ECS {
         glm::vec2 size = {1.0f, 1.0f};
         glm::vec2 offset = {0.0f, 0.0f};
 
+#define BOXCOLLIDER2D_CTOR_BODY                         \
+    name = "Box Collider 2D";                           \
+    categories = {"Physics", "2D", "Collider"};         \
+    description =                                       \
+            "Adds an axis-aligned box collider shape\n" \
+            "Used for collision detection as a rectangle centered at position + offset";
+
+#ifdef _MSC_VER
+        BoxCollider2D();
+#else
         BoxCollider2D() {
-            name = "Box Collider 2D";
-            categories = {"Physics", "2D", "Collider"};
-            description =
-                "Adds an axis-aligned box collider shape\n"
-                "Used for collision detection as a rectangle centered at position + offset";
+            BOXCOLLIDER2D_CTOR_BODY
         }
+#endif
 
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
@@ -46,4 +53,4 @@ namespace Marmalade::ECS {
 }
 
 
-#endif //MARMALADE_BOXCOLLIDER2D_H
+#endif

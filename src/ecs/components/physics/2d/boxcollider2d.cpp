@@ -22,6 +22,12 @@
 
 #include "physics/2d/collider2d.h"
 
+#ifdef _MSC_VER
+Marmalade::ECS::BoxCollider2D::BoxCollider2D() {
+    BOXCOLLIDER2D_CTOR_BODY
+}
+#endif
+
 void Marmalade::ECS::BoxCollider2D::Display(Entity* entity) {}
 
 void Marmalade::ECS::BoxCollider2D::Apply(Entity* entity) {}
