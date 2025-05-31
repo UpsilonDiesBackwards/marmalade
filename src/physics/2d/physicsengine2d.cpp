@@ -112,8 +112,8 @@ void Marmalade::Physics::PhysicsEngine2D::ResolveCollision(CollisionEvent event)
 
     float e = std::min(bodyA.restitution, bodyB.restitution);
 
-    float invMassA = bodyA.isStatic ? 0.0f : 1.0f / bodyA.mass;
-    float invMassB = bodyB.isStatic ? 0.0f : 1.0f / bodyB.mass;
+    float invMassA = bodyA.isStatic ? 0.0f : bodyA.inverseMass;
+    float invMassB = bodyB.isStatic ? 0.0f : bodyB.inverseMass;
 
     float j = -(1.0f + e) * velAlongNormal;
     j /= (invMassA + invMassB);
@@ -125,7 +125,7 @@ void Marmalade::Physics::PhysicsEngine2D::ResolveCollision(CollisionEvent event)
 }
 
 void Marmalade::Physics::PhysicsEngine2D::PositionCorrection(CollisionEvent event) {
-    const float percent = 0.2f;
+    const float percent = 1.0f;
     const float slop = 0.01f;
 
     auto& a = event.A;
@@ -137,8 +137,8 @@ void Marmalade::Physics::PhysicsEngine2D::PositionCorrection(CollisionEvent even
     auto& bodyA = rbA->body;
     auto& bodyB = rbB->body;
 
-    float invMassA = bodyA.isStatic ? 0.0f : 1.0f / bodyA.mass;
-    float invMassB = bodyB.isStatic ? 0.0f : 1.0f / bodyB.mass;
+    float invMassA = bodyA.isStatic ? 0.0f : bodyA.inverseMass;
+    float invMassB = bodyB.isStatic ? 0.0f : bodyB.inverseMass;
 
     float correctionMagnitude = std::max(event.penetration - slop, 0.0f) / (invMassA + invMassB) * percent;
     glm::vec2 correction = correctionMagnitude * event.normal;

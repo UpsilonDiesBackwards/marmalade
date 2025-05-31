@@ -15,10 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-//
-// Created by tayler on 5/31/25.
-//
-
 #ifndef MARMALADE_PHYSICS2DUTIL_H
 #define MARMALADE_PHYSICS2DUTIL_H
 
@@ -38,6 +34,12 @@ struct AABB {
     glm::vec2 min;
     glm::vec2 max;
 };
+struct OBB {
+    glm::vec2 center;
+    glm::vec2 axes[2];
+    glm::vec2 halfSize;
+};
+
 
 inline bool AABBsIntersect(const AABB& a, const AABB& b) {
     return (a.min.x <= b.max.x && a.max.x >= b.min.x) &&
@@ -62,5 +64,30 @@ inline AABB GetAABB(const std::shared_ptr<Entity> entity) {
     return {pos, pos};
 }
 
+inline bool OverlapOnAxis(const OBB& a, const OBB& b, const glm::vec2& axis) {
+    auto Project = [](const OBB& obb, const glm::vec2& axis) {
+        float projectionCenter = glm::dot(obb.center, axis);
+        float projectionRadius =
+                obb.halfSize.x * std::abs(glm::dot(obb.axes[0], axis)) +
+                obb.halfSize.y * std::abs(glm::dot(obb.axes[1], axis));
+        return std::make_pair(projectionCenter - projectionRadius, projectionCenter + projectionRadius);
+    };
+
+    auto [minA, maxA] = Project(a, axis);
+    auto [minB, maxB] = Project(b, axis);
+
+    return !(maxA < minB || maxB < minA);
+}
+
+inline bool IsOBBvsOBB(const OBB& a, const OBB& b) {
+    glm::vec2 axesToTest[4] = { a.axes[0], a.axes[1], b.axes[0], b.axes[1] };
+
+    for (int i = 0; i < 4; ++i) {
+        if (!OverlapOnAxis(a, b, axesToTest[i])) {
+            return false;
+        }
+    }
+    return true;
+}
 
 #endif

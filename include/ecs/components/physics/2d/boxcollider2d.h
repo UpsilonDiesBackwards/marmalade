@@ -20,6 +20,7 @@
 
 #include <glm/vec2.hpp>
 #include "ecs/component.h"
+#include "ecs/components/transform.h"
 
 namespace Marmalade::ECS {
     class BoxCollider2D : public Component {

@@ -15,10 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-//
-// Created by tayler on 5/31/25.
-//
-
 #ifndef MARMALADE_RIGIDBODY2D_H
 #define MARMALADE_RIGIDBODY2D_H
 

@@ -33,6 +33,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "ecs/components/rendering/tilemap.h"
+#include "ecs/components/physics/2d/rigidbody2d.h"
 
 int EditView::currentRenderMode = 1;
 
@@ -242,7 +243,7 @@ void EditView::RunInput() {
 void EditView::ShowEditorUIGuizmos() {
     if (selectedEntity) {
         ShowGizmo();
-//        ShowColliderBounds();
+        ShowColliderBounds();
     }
 }
 
@@ -292,15 +293,21 @@ void EditView::ShowGizmo() {
                          glm::value_ptr(transform->modelMatrix));
 }
 
-//void EditView::ShowColliderBounds() {
-//    auto comp = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::ColliderBase>();
-//
-//    if (!comp || !comp->showingBounds) { return; }// Collider component does not exist, or not showing bounds. Do not continue
-//
-//    auto* transform = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>();
-//
-//    comp->ShowBounds(selectedEntity->getPosition() , *transform);
-//}
+void EditView::ShowColliderBounds() {
+    for (auto& entity : GET_APP.sceneManager.GetCurrentScene()->GetEntities()) {
+        auto rb = entity->componentManager.GetComponentOfType<Marmalade::ECS::Rigidbody2D>();
+        if (!rb) continue;
+
+        const auto& collider = rb->body.collider;
+        if (collider.shape) {
+            glm::vec3 pos = entity->getPosition();
+            glm::quat rot = entity->getRotation();
+            if (auto transformPtr = entity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>()) {
+                collider.shape->ShowBounds({pos.x, pos.y}, *transformPtr);
+            }
+        }
+    }
+}
 
 void EditView::ShowLightBounds() {
     auto lightComp = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::Light2D>();

@@ -33,6 +33,15 @@ namespace Marmalade::Physics {
         static CollisionEvent CircleVsBox(std::shared_ptr<Entity> a, const ECS::Rigidbody2D& rbA,
                              std::shared_ptr<Entity> b, const ECS::Rigidbody2D& rbB);
 
+        static CollisionEvent OBBVsOBB(std::shared_ptr<Entity> a, const ECS::Rigidbody2D& rbA,
+                                       std::shared_ptr<Entity> b, const ECS::Rigidbody2D& rbB);
+
+        static CollisionEvent OBBVsBox(std::shared_ptr<Entity> a, const ECS::Rigidbody2D& rbA,
+                                       std::shared_ptr<Entity> b, const ECS::Rigidbody2D& rbB);
+
+        static CollisionEvent OBBVsCircle(std::shared_ptr<Entity> a, const ECS::Rigidbody2D& rbA,
+                                          std::shared_ptr<Entity> b, const ECS::Rigidbody2D& rbB);
+
     };
 }
 

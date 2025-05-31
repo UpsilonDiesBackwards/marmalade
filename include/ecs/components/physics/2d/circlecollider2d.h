@@ -21,6 +21,7 @@
 
 #include <glm/vec2.hpp>
 #include "ecs/component.h"
+#include "ecs/components/transform.h"
 
 namespace Marmalade::ECS {
     class CircleCollider2D : public Component {
