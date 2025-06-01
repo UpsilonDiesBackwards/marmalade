@@ -31,6 +31,7 @@
 #include "editor/projectbrowser.h"
 #include "dialogs/about.h"
 #include "dialogs/configerror.h"
+#include "dialogs/saveworkspace.h"
 #include "windows/animation.h"
 #include "windows/versioncontrol.h"
 
@@ -53,6 +54,8 @@ namespace Marmalade::GUI {
         VersionControl versionControl{};
         About about{};
         ConfigErrorDialog configErrorDlg{};
+        SaveWorkspaceDialog saveWorkspaceDlg{};
+        SaveWorkspaceAsDialog saveWorkspaceAsDlg{};
 
         std::vector<Window*> windows{};
 

@@ -22,12 +22,57 @@
 
 #include <filesystem>
 
+#define WORKSPACES_DIR_NAME "workspaces"
+
 namespace Marmalade::GUI {
+    /**
+     * \brief Manages Workspaces
+     */
     class WorkspaceManager {
     public:
-        static void LoadWorkspace(std::filesystem::path iniFilePath);
+        /**
+         * \brief Loads a workspace from disk.
+         * \param workspacePath The absolute path to the workspace file.
+         */
+        static void LoadWorkspace(const std::filesystem::path& workspacePath);
+
+        /**
+         * \brief Saves the current workspace to the disk.
+         * \param workspacePath The absolute path to the workspace file. Uses the currentWorkspacePath if empty.
+         */
+        static void SaveCurrentWorkspace(std::filesystem::path workspacePath = "");
+
+        /**
+         * \brief Copies a workspace file to a new file. Sets the current workspace to the new path.
+         * \param newWorkspacePath The new workspace path.
+         */
+        static void DuplicateWorkspace(std::filesystem::path newWorkspacePath);
+
+        /**
+         * \brief Deletes the current workspace.
+         * \param nextWorkspace The workspace to switch to. If empty switches to Default.
+         */
+        static void DeleteCurrentWorkspace(std::filesystem::path nextWorkspace = "");
+
+        static std::filesystem::path GetWorkspacesDir();
+
+        static std::vector<std::string> GetWorkspaces(bool ignoreCache = false);
+
+        static std::string GetCurrentWorkspaceName();
+
+        /**
+         * \brief The target workspace path, used when requesting change of workspace.
+         */
+        static std::string targetWorkspacePath;
+
+        /**
+         * \brief The current workspace path.
+         */
+        static std::string currentWorkspacePath;
+
+    private:
+        static std::vector<std::string> _workspaceCache;
     };
 }
-
 
 #endif

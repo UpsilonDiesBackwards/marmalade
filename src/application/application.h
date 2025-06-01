@@ -186,7 +186,7 @@ public:
      */
     bool stepFrame = false;
 
-    void ChangeWorkspace(std::string workspacePath);
+    void ChangeWorkspace();
 
     bool NeedsImGuiRestart();
 
@@ -213,8 +213,6 @@ private:
     std::unique_ptr<Marmalade::Project::Project> currentProject;
 
     bool _requestWorkspaceChange = false;
-    std::string _workspacePath;
-    std::string _workspacePathStorage;
 
     /**
      * \brief Gets the graphics version from the engine config. Ambiguous name, should be changed

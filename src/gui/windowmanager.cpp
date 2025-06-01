@@ -36,6 +36,8 @@ Marmalade::GUI::WindowManager::WindowManager() {
     windows.push_back(&versionControl);
     windows.push_back(&about);
     windows.push_back(&configErrorDlg);
+    windows.push_back(&saveWorkspaceDlg);
+    windows.push_back(&saveWorkspaceAsDlg);
 }
 
 void Marmalade::GUI::WindowManager::ToggleDebugWindow() {

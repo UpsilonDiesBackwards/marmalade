@@ -30,6 +30,7 @@
 #include "../project/projectmanager.h"
 #include "../project/assetregistry.h"
 #include "../gui/fontmanager.h"
+#include "../gui/workspaces.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>// Only for docking API
@@ -150,7 +151,7 @@ void Application::Initialise() {
         Marmalade::ECS::ComponentRegistry::Instance().SetFavourite(component);
     }
 
-    static std::filesystem::path workspacesDir = Marmalade::ConfigUtil::GetConfigDirectory() / "workspaces";
+    static std::filesystem::path workspacesDir = Marmalade::GUI::WorkspaceManager::GetWorkspacesDir();
     if (!exists(workspacesDir)) {
         create_directories(workspacesDir);
     }
@@ -162,7 +163,7 @@ void Application::Initialise() {
     firstRun = !imguiIni.good();
     imguiIni.close();
 
-    _workspacePath = imguiIniPathStr;
+    Marmalade::GUI::WorkspaceManager::targetWorkspacePath = imguiIniPathStr;
 }
 
 void Application::InitialiseImGui() {
@@ -186,11 +187,16 @@ void Application::InitialiseImGui() {
     }
 
     styleManager.LoadStyle((Marmalade::ConfigUtil::GetConfigDirectory() / Marmalade::EngineConfig::GetStoredConfig().appearance.themeFile).string());
-
+    Marmalade::GUI::WorkspaceManager::currentWorkspacePath = Marmalade::GUI::WorkspaceManager::targetWorkspacePath;
     ImGuiIO& io = ImGui::GetIO();
-    _workspacePathStorage = _workspacePath;
-    io.IniFilename = _workspacePathStorage.c_str();
+    // Ini file saving is handled by the WorkspaceManager.
+    io.IniFilename = nullptr;
     io.ConfigWindowsMoveFromTitleBarOnly = true;
+
+    ImGui::LoadIniSettingsFromDisk(Marmalade::GUI::WorkspaceManager::currentWorkspacePath.c_str());
+    ImGui::GetCurrentContext()->SettingsLoaded = true;
+
+
     io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable;
     if (Marmalade::EngineConfig::GetStoredConfig().appearance.viewports) {
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
@@ -421,8 +427,7 @@ void Application::getGraphicsVersion() {
     _graphicsVersionMinor = minor;
 }
 
-void Application::ChangeWorkspace(std::string workspacePath) {
-    _workspacePath = workspacePath;
+void Application::ChangeWorkspace() {
     _requestWorkspaceChange = true;
 }
 

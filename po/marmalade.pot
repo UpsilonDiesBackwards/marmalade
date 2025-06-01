@@ -20,8 +20,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Marmalade 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-19 19:26+0100\n"
-"PO-Revision-Date: 2025-05-19 19:26+0100\n"
+"POT-Creation-Date: 2025-06-01 21:39+0100\n"
+"PO-Revision-Date: 2025-06-01 21:39+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: \n"
@@ -29,155 +29,236 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/gui/dialogs/about.cpp:63
+#: ../src/application/autosave.h:34
+msgid "Not yet"
+msgstr ""
+
+#: ../src/gui/dialogs/about.cpp:71
 msgid "A lightweight 2D game engine"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:47
+#: ../src/gui/dialogs/saveworkspace.cpp:32
+msgid "Save Changes to Workspace"
+msgstr ""
+
+#: ../src/gui/dialogs/saveworkspace.cpp:34
+#, c-format
+msgid "Changes have been made to the workspace: %s."
+msgstr ""
+
+#: ../src/gui/dialogs/saveworkspace.cpp:36
+msgid "Would you like to save these changes?"
+msgstr ""
+
+#: ../src/gui/dialogs/saveworkspace.cpp:38
+msgid "Yes"
+msgstr ""
+
+#: ../src/gui/dialogs/saveworkspace.cpp:44
+msgid "No"
+msgstr ""
+
+#: ../src/gui/dialogs/saveworkspace.cpp:50
+#: ../src/gui/dialogs/saveworkspace.cpp:84
+msgid "Cancel"
+msgstr ""
+
+#: ../src/gui/dialogs/saveworkspace.cpp:67
+msgid "Save to New Workspace"
+msgstr ""
+
+#: ../src/gui/dialogs/saveworkspace.cpp:69
+msgid "Duplicate Workspace"
+msgstr ""
+
+#: ../src/gui/dialogs/saveworkspace.cpp:74
+msgid "Name for the new workspace:"
+msgstr ""
+
+#: ../src/gui/dialogs/saveworkspace.cpp:78
+msgid "OK"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:46
 msgctxt "Menu|"
 msgid "File"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:48
+#: ../src/gui/editor/topbar.cpp:47
 msgctxt "Menu|File|"
 msgid "New Project"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:51
+#: ../src/gui/editor/topbar.cpp:50
 msgctxt "Menu|File|"
 msgid "Open Project"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:58
+#: ../src/gui/editor/topbar.cpp:57
 msgctxt "Menu|File|"
 msgid "New Scene"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:61
+#: ../src/gui/editor/topbar.cpp:60
 msgctxt "Menu|File|"
 msgid "Open Scene"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:65
+#: ../src/gui/editor/topbar.cpp:64
 msgctxt "Menu|File|"
 msgid "Welcome Screen"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:68
+#: ../src/gui/editor/topbar.cpp:67
 msgctxt "Menu|File|"
 msgid "Quit"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:74
+#: ../src/gui/editor/topbar.cpp:73
 msgctxt "Menu|"
 msgid "Entity"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:77
+#: ../src/gui/editor/topbar.cpp:76
 msgid "No entity selected"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:79
+#: ../src/gui/editor/topbar.cpp:78
 msgctxt "Menu|Entity|AddComponent|"
 msgid "Add Component"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:80
+#: ../src/gui/editor/topbar.cpp:79
 msgctxt "Menu|Entity|AddComponent|"
 msgid "Favourites"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:88
+#: ../src/gui/editor/topbar.cpp:87
 msgctxt "Menu|Entity|AddComponent|"
 msgid "All"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:110
+#: ../src/gui/editor/topbar.cpp:109
 msgctxt "Menu|Entity|AddComponent|"
 msgid "Add Component..."
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:121
+#: ../src/gui/editor/topbar.cpp:120
 msgctxt "Menu|"
 msgid "Settings"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:122
+#: ../src/gui/editor/topbar.cpp:121
 msgctxt "Menu|Settings|"
 msgid "Project Settings"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:123
+#: ../src/gui/editor/topbar.cpp:122
 msgctxt "Menu|Settings|"
 msgid "Style Editor"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:124
+#: ../src/gui/editor/topbar.cpp:123
 msgctxt "Menu|Settings|"
 msgid "Preferences"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:129
+#: ../src/gui/editor/topbar.cpp:128
 msgctxt "Menu|"
 msgid "Window"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:130
+#: ../src/gui/editor/topbar.cpp:129
 msgctxt "Menu|Window|"
 msgid "Animation"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:132
+#: ../src/gui/editor/topbar.cpp:131
 msgctxt "Menu|Window|"
 msgid "Package Manager"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:134
+#: ../src/gui/editor/topbar.cpp:133
 msgctxt "Menu|Window|"
 msgid "Log"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:136
+#: ../src/gui/editor/topbar.cpp:135
 msgctxt "Menu|Window|"
 msgid "Version Control"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:138
+#: ../src/gui/editor/topbar.cpp:137
 msgctxt "Menu|Window|"
 msgid "Save Layout"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:149
+#: ../src/gui/editor/topbar.cpp:148
 msgctxt "Menu|Window|"
 msgid "ImGui Demo"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:156
+#: ../src/gui/editor/topbar.cpp:152
+msgctxt "Menu|Window|"
+msgid "Workspaces"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:178
+msgctxt "Menu|Window|Workspaces|"
+msgid "Save Current Workspace"
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:181
+msgctxt "Menu|Window|Workspaces|"
+msgid "Duplicate Workspace..."
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:196
+msgctxt "Menu|Window|Workspaces|"
+msgid "Save Workspace As..."
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:219
+msgctxt "Menu|Window|Workspaces|"
+msgid "Import Workspace..."
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:220
+msgctxt "Menu|Window|Workspaces|"
+msgid "Export Workspace..."
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:224
+msgctxt "Menu|Window|Workspaces|"
+msgid "Delete Current Workspace..."
+msgstr ""
+
+#: ../src/gui/editor/topbar.cpp:237
 msgctxt "Menu|"
 msgid "Help"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:157
+#: ../src/gui/editor/topbar.cpp:238
 msgctxt "Menu|Help|"
 msgid "About"
 msgstr ""
 
-#: ../src/main.cpp:150
+#: ../src/main.cpp:163
 msgid "Initialising application..."
 msgstr ""
 
-#: ../src/main.cpp:151 ../src/main.cpp:157
+#: ../src/main.cpp:164 ../src/main.cpp:170
 msgid "Marmalade Engine"
 msgstr ""
 
-#: ../src/main.cpp:157
+#: ../src/main.cpp:170
 msgid "Would you like to enable safe mode?"
 msgstr ""
 
-#: ../src/main.cpp:165
+#: ../src/main.cpp:178
 msgid "Loading plugins..."
 msgstr ""
 
-#: ../src/main.cpp:171
+#: ../src/main.cpp:184
 msgid "Opening project..."
 msgstr ""

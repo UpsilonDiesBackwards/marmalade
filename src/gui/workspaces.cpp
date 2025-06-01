@@ -18,10 +18,62 @@
  */
 
 #include "workspaces.h"
+
 #include "../application/application.h"
+#include "../application/config/configutil.h"
 
-void Marmalade::GUI::WorkspaceManager::LoadWorkspace(std::filesystem::path iniFilePath) {
-    std::string iniPathStr = iniFilePath.string();
+#include <filesystem>
 
-    GET_APP.ChangeWorkspace(iniPathStr);
+std::string Marmalade::GUI::WorkspaceManager::targetWorkspacePath;
+std::string Marmalade::GUI::WorkspaceManager::currentWorkspacePath;
+
+std::vector<std::string> Marmalade::GUI::WorkspaceManager::_workspaceCache{};
+
+void Marmalade::GUI::WorkspaceManager::LoadWorkspace(const std::filesystem::path& workspacePath) {
+    std::string iniPathStr = workspacePath.string();
+
+    targetWorkspacePath = iniPathStr;
+    GET_APP.ChangeWorkspace();
+}
+
+void Marmalade::GUI::WorkspaceManager::SaveCurrentWorkspace(std::filesystem::path workspacePath) {
+    if (workspacePath.empty()) {
+        workspacePath = currentWorkspacePath;
+    }
+
+    ImGui::SaveIniSettingsToDisk(workspacePath.string().c_str());
+}
+
+void Marmalade::GUI::WorkspaceManager::DuplicateWorkspace(std::filesystem::path newWorkspacePath) {
+    std::filesystem::copy(currentWorkspacePath, newWorkspacePath);
+    currentWorkspacePath = newWorkspacePath.string();
+}
+
+void Marmalade::GUI::WorkspaceManager::DeleteCurrentWorkspace(std::filesystem::path nextWorkspace) {
+    if (nextWorkspace.empty()) {
+        nextWorkspace = GetWorkspacesDir() / "Default.ini";
+    }
+
+    std::filesystem::remove(currentWorkspacePath);
+    LoadWorkspace(nextWorkspace);
+}
+
+std::filesystem::path Marmalade::GUI::WorkspaceManager::GetWorkspacesDir() {
+    return Marmalade::ConfigUtil::GetConfigDirectory() / WORKSPACES_DIR_NAME;
+}
+
+std::vector<std::string> Marmalade::GUI::WorkspaceManager::GetWorkspaces(bool ignoreCache) {
+    if (ignoreCache) _workspaceCache.clear();
+
+    if (!_workspaceCache.empty()) return _workspaceCache;
+
+    for (const auto& entry: std::filesystem::directory_iterator(GetWorkspacesDir())) {
+        _workspaceCache.push_back(entry.path().filename().replace_extension("").string());
+    }
+
+    return _workspaceCache;
+}
+
+std::string Marmalade::GUI::WorkspaceManager::GetCurrentWorkspaceName() {
+    return std::filesystem::path(currentWorkspacePath).filename().replace_extension("").string();
 }

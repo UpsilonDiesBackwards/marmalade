@@ -18,6 +18,8 @@ list(APPEND ENGINE_SRC_GUI
         dialogs/autosave.h
         dialogs/configerror.cpp
         dialogs/configerror.h
+        dialogs/saveworkspace.cpp
+        dialogs/saveworkspace.h
 
         editor/details.cpp
         editor/details.h

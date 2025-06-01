@@ -24,6 +24,7 @@
 #include "../../project/projectmanager.h"
 #include "../../application/config/configutil.h"
 #include "../../application/i18n.h"
+#include "../workspaces.h"
 
 #include <ecs/component.h>
 
@@ -56,14 +57,14 @@ void Marmalade::GUI::TopBar::Show() {
             if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_SCREEN_FULL, pgettext("Menu|File|", "New Scene")))) {
                 showSceneCreationPopUp = true;
             }
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_OPEN_PREVIEW, pgettext("Menu|File|","Open Scene")))) {
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_OPEN_PREVIEW, pgettext("Menu|File|", "Open Scene")))) {
                 showSceneOpenPopUp = true;
             }
             // TODO: Package Builder menu item, to open existing package builder window
             if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_STAR, pgettext("Menu|File|", "Welcome Screen")))) {
                 WindowManager::GetInstance().welcomeScreen.ToggleWindow();
             }
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_CLOSE_ALL, pgettext("Menu|File|",  "Quit")))) {
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_CLOSE_ALL, pgettext("Menu|File|", "Quit")))) {
                 glfwSetWindowShouldClose(Application::GetInstance().getWindow(), true);
             }
             ImGui::EndMenu();
@@ -74,7 +75,7 @@ void Marmalade::GUI::TopBar::Show() {
             if (inspectedEntity == nullptr) {
                 ImGui::MenuItem(_("No entity selected"), nullptr, nullptr, false);
             } else {
-                if (ImGui::BeginMenu(pgettext("Menu|Entity|AddComponent|","Add Component"))) {
+                if (ImGui::BeginMenu(pgettext("Menu|Entity|AddComponent|", "Add Component"))) {
                     if (ImGui::BeginMenu(pgettext("Menu|Entity|AddComponent|", "Favourites"))) {
                         for (const auto& component: Marmalade::ECS::ComponentRegistry::Instance().GetFavorites()) {
                             if (ImGui::MenuItem(component->Name.c_str())) {
@@ -117,7 +118,7 @@ void Marmalade::GUI::TopBar::Show() {
         }
 
         if (ImGui::BeginMenu(pgettext("Menu|", "Settings"))) {
-            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_SETTINGS,  pgettext("Menu|Settings|", "Project Settings")), nullptr, &WindowManager::GetInstance().settings.visible);
+            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_SETTINGS, pgettext("Menu|Settings|", "Project Settings")), nullptr, &WindowManager::GetInstance().settings.visible);
             ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_EDIT, pgettext("Menu|Settings|", "Style Editor")), nullptr, &showStyleEditor);
             ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_SETTINGS_GEAR, pgettext("Menu|Settings|", "Preferences")), nullptr, &WindowManager::GetInstance().preferences.visible);
 
@@ -148,6 +149,83 @@ void Marmalade::GUI::TopBar::Show() {
                 WindowManager::GetInstance().ToggleDebugWindow();
             }
 
+            if (ImGui::BeginMenu(ICON_WITH_TEXT(ICON_CI_BLANK, pgettext("Menu|Window|", "Workspaces")))) {
+                static std::filesystem::path workspacesDir = WorkspaceManager::GetWorkspacesDir();
+                auto workspaces = WorkspaceManager::GetWorkspaces();
+                for (const auto& workspace: workspaces) {
+                    if (ImGui::MenuItem(workspace.c_str())) {
+                        if (ImGui::GetIO().WantSaveIniSettings) {
+                            auto* saveDlg = &WindowManager::GetInstance().saveWorkspaceDlg;
+                            saveDlg->workspaceName = WorkspaceManager::currentWorkspacePath;
+                            saveDlg->callback = [workspace](bool cancelled, bool save) {
+                                if (cancelled) return;
+
+                                if (save) {
+                                    WorkspaceManager::SaveCurrentWorkspace();
+                                }
+
+                                WorkspaceManager::LoadWorkspace(workspacesDir / (workspace + ".ini"));
+                            };
+                            saveDlg->visible = true;
+                        } else {
+                            WorkspaceManager::LoadWorkspace(workspacesDir / (workspace + ".ini"));
+                        };
+                    }
+                }
+
+                ImGui::Separator();
+
+                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Save Current Workspace"))) {
+                    WorkspaceManager::SaveCurrentWorkspace();
+                }
+                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Duplicate Workspace..."))) {
+                    auto* saveAsDlg = &WindowManager::GetInstance().saveWorkspaceAsDlg;
+                    saveAsDlg->SetType(SaveWorkspaceAsDialog::DialogType_DUPLICATE);
+                    saveAsDlg->callback = [](bool cancelled, std::string name) {
+                        if (cancelled) return;
+
+                        std::filesystem::path newPath = WorkspaceManager::GetWorkspacesDir() / (name + ".ini");
+                        WorkspaceManager::DuplicateWorkspace(newPath);
+                        WorkspaceManager::LoadWorkspace(newPath);
+
+                        // Refresh workspaces list
+                        WorkspaceManager::GetWorkspaces(true);
+                    };
+                    saveAsDlg->visible = true;
+                }
+                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Save Workspace As..."))) {
+                    auto* saveAsDlg = &WindowManager::GetInstance().saveWorkspaceAsDlg;
+                    saveAsDlg->SetType(SaveWorkspaceAsDialog::DialogType_SAVE_AS);
+                    saveAsDlg->callback = [](bool cancelled, std::string name) {
+                        if (cancelled) return;
+
+                        std::filesystem::path newPath = WorkspaceManager::GetWorkspacesDir() / (name + ".ini");
+                        WorkspaceManager::SaveCurrentWorkspace(newPath);
+                        WorkspaceManager::LoadWorkspace(newPath);
+
+                        // Refresh workspaces list
+                        WorkspaceManager::GetWorkspaces(true);
+                    };
+                    saveAsDlg->visible = true;
+                }
+
+                ImGui::Separator();
+
+                ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Import Workspace..."));
+                ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Export Workspace..."));
+
+                ImGui::Separator();
+
+                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Delete Current Workspace..."))) {
+                    // TODO: We need a confirmation here
+                    WorkspaceManager::DeleteCurrentWorkspace();
+                    // Refresh workspaces list
+                    WorkspaceManager::GetWorkspaces(true);
+                }
+
+                ImGui::EndMenu();
+            }
+
             ImGui::EndMenu();
         }
 
@@ -175,8 +253,7 @@ void Marmalade::GUI::TopBar::Show() {
         std::string fpsText = std::format(
                 "FPS: {} | ({:.2f} ms)",
                 Application::GetInstance().time.GetCurrentFPS(),
-                Application::GetInstance().time.GetCurrentFrameTime()
-        );
+                Application::GetInstance().time.GetCurrentFrameTime());
 
         float fpsRegionWidth = 5.0f;
         float rightMargin = 100.0f;
@@ -186,9 +263,11 @@ void Marmalade::GUI::TopBar::Show() {
 
         ImGui::SetCursorPosX(windowWidth - totalWidth + 525.0f);
 
+        ImGui::Text("%s", WorkspaceManager::GetCurrentWorkspaceName().c_str());
+
         ImGui::TextColored(ImVec4(0.7f, 0.9f, 1.0f, 1.0f), ICON_CI_SAVE "");
 
-        if(ImGui::IsItemHovered()) {
+        if (ImGui::IsItemHovered()) {
             ImGui::BeginTooltip();
 
             ImGui::Text("Autosaved: %s", GET_APP.autoSave.lastSaveTimeStamp.c_str());
