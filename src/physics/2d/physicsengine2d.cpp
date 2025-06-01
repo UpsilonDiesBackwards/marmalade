@@ -50,10 +50,15 @@ void Marmalade::Physics::PhysicsEngine2D::EulerIntegration() {
 
         if (!rb.isStatic) {
             rb.momentum = rb.mass * rb.velocity;
-
             glm::vec3 newPos = glm::vec3(entity->getPosition().x, entity->getPosition().y, 0.0f) +
                                glm::vec3(rb.momentum * GET_FIXED_DELTA_TIME, 0.0f);
             entity->setPosition(newPos);
+
+            rb.angularMomentum += rb.torque * GET_FIXED_DELTA_TIME;
+            rb.angularVelocity = rb.angularMomentum * rb.inverseInertia;
+
+            float rotDelta = rb.angularVelocity * GET_FIXED_DELTA_TIME;
+            entity->setRotation(entity->getRotation() + rotDelta);
         }
     }
 }
@@ -103,9 +108,14 @@ void Marmalade::Physics::PhysicsEngine2D::ResolveCollision(CollisionEvent event)
     auto& bodyA = rbA->body;
     auto& bodyB = rbB->body;
 
+    glm::vec2 ra = event.contactPoint - glm::vec2(a->getPosition());
+    glm::vec2 rbVec = event.contactPoint - glm::vec2(b->getPosition());
+
     if (bodyA.isStatic && bodyB.isStatic) return;
 
-    glm::vec2 relativeVelocity = bodyB.velocity - bodyA.velocity;
+    glm::vec2 va = bodyA.velocity + Cross(bodyA.angularVelocity, ra);
+    glm::vec2 vb = bodyB.velocity + Cross(bodyB.angularVelocity, rbVec);
+    glm::vec2 relativeVelocity = vb - va;
 
     float velAlongNormal = glm::dot(relativeVelocity, glm::vec2(event.normal));
     if (velAlongNormal > 0.0f) return;
@@ -114,14 +124,27 @@ void Marmalade::Physics::PhysicsEngine2D::ResolveCollision(CollisionEvent event)
 
     float invMassA = bodyA.isStatic ? 0.0f : bodyA.inverseMass;
     float invMassB = bodyB.isStatic ? 0.0f : bodyB.inverseMass;
+    float invInertiaA = bodyA.isStatic ? 0.0f : bodyA.inverseInertia;
+    float invInertiaB = bodyB.isStatic ? 0.0f : bodyB.inverseInertia;
+
+    float raCrossN = Cross(ra, event.normal);
+    float rbCrossN = Cross(rbVec, event.normal);
+
+    float denominator = invMassA + invMassB +
+        (raCrossN * raCrossN) * invInertiaA +
+        (rbCrossN * rbCrossN) * invInertiaB;
+
 
     float j = -(1.0f + e) * velAlongNormal;
-    j /= (invMassA + invMassB);
+    j /= denominator;
 
     glm::vec2 impulse = j * event.normal;
 
     if (!bodyA.isStatic) bodyA.velocity -= impulse * invMassA;
     if (!bodyB.isStatic) bodyB.velocity += impulse * invMassB;
+
+    if (!bodyA.isStatic) bodyA.angularVelocity -= raCrossN * j * invInertiaA;
+    if (!bodyB.isStatic) bodyB.angularVelocity += rbCrossN * j * invInertiaB;
 }
 
 void Marmalade::Physics::PhysicsEngine2D::PositionCorrection(CollisionEvent event) {

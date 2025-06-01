@@ -79,6 +79,11 @@ Marmalade::Physics::CollisionEvents2D::BoxVsBox(std::shared_ptr<Entity> a, const
         }
     }
 
+    glm::vec2 contactMin = glm::max(minA, minB);
+    glm::vec2 contactMax = glm::min(maxA, maxB);
+    glm::vec2 contactCentre = 0.5f * (contactMin + contactMax);
+    event.contactPoint = glm::vec3(contactCentre, 0.0f);
+
     return event;
 }
 
@@ -119,6 +124,10 @@ Marmalade::Physics::CollisionEvents2D::CircleVsCircle(std::shared_ptr<Entity> a,
         event.normal = glm::vec3(1.0f, 0.0f, 0.0f);
     }
 
+    glm::vec2 pointA = colliderPosA + glm::vec2(event.normal) * circleA->radius;
+    glm::vec2 pointB = colliderPosB - glm::vec2(event.normal) * circleB->radius;
+    event.contactPoint = 0.5f * (pointA + pointB);
+
     return event;
 }
 
@@ -157,6 +166,9 @@ Marmalade::Physics::CollisionEvents2D::CircleVsBox(std::shared_ptr<Entity> a, co
         event.normal = glm::vec3(normalWorld, 0.0f);
         event.penetration = circle->radius - glm::sqrt(distanceSquared);
     }
+
+    glm::vec2 contactWorld = rotationMat * closestPoint + boxPos;
+    event.contactPoint = contactWorld;
 
     return event;
 }
@@ -203,6 +215,15 @@ Marmalade::Physics::CollisionEvents2D::OBBVsOBB(std::shared_ptr<Entity> a, const
         // Todo Calculate penetration amount ;)
         event.penetration = 0.0f;
     }
+
+    glm::vec2 centerA = posA + boxA->offset;
+    glm::vec2 centerB = posB + boxB->offset;
+
+    glm::vec2 pointA = centerA + glm::vec2(event.normal) * 0.5f;
+    glm::vec2 pointB = centerB - glm::vec2(event.normal) * 0.5f;
+
+    glm::vec2 contact = 0.5f * (pointA + pointB);
+    event.contactPoint = glm::vec3(contact, 0.0f);
 
     return event;
 }

@@ -31,9 +31,14 @@ namespace Marmalade::ECS {
         float mass = 1.0f;
         float inverseMass = -mass;
 
-        float restitution = 0.0f; // Additionally functions as friction
+        float angularVelocity = 0.0f;
+        float torque = 0.0f;
+        float angularMomentum = 0.0f;
+        float inertia = 1.0f;
+        float inverseInertia = -inertia;
 
         VecType momentum;
+        float restitution = 0.0f;// Additionally functions as friction
 
         ColliderType collider;
     };
@@ -43,6 +48,8 @@ namespace Marmalade::ECS {
     public:
         using Body = BodyT<VecType, ColliderType>;
         Body body;
+
+        VecType GetCentreOfMass() const { return (body.centreOfMass); }
 
         void Display(Entity* entity) override = 0;
         void Apply(Entity* entity) override = 0;

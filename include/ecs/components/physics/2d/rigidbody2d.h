@@ -25,6 +25,7 @@
 namespace Marmalade::ECS {
     class Rigidbody2D : public RigidbodyT<glm::vec2, Physics::Collider2D> {
     public:
+
 #define RIGIDBODY2D_CTOR_BODY                  \
     name = "Rigidbody 2D";                     \
     categories = {"Physics", "2D"};            \

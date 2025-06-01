@@ -20,6 +20,7 @@
 #include "../../../../application/application.h"
 
 #include "../src/gui/components/backgroundlabel.h"
+#include "physics/2d/physics2dutil.h"
 
 #ifdef _MSC_VER
 Marmalade::ECS::Rigidbody2D::Rigidbody2D() {
@@ -121,7 +122,10 @@ void Marmalade::ECS::Rigidbody2D::Display(Entity* entity) {
     }
 }
 
-void Marmalade::ECS::Rigidbody2D::Apply(Entity* entity) {}
+void Marmalade::ECS::Rigidbody2D::Apply(Entity* entity) {
+    body.inertia = body.isStatic ? 0.0f : ComputeInertia(body.collider, body.mass);
+    body.inverseInertia = body.inertia == 0.0f ? 0.0f : 1.0f / body.inertia;
+}
 
 void Marmalade::ECS::Rigidbody2D::Setup(Entity* entity) {}
 

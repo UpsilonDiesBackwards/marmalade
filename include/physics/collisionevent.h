@@ -28,6 +28,7 @@ namespace Marmalade::Physics {
         float penetration;
         std::shared_ptr<Entity> A;
         std::shared_ptr<Entity> B;
+        glm::vec2 contactPoint = {};
     };
 }
 

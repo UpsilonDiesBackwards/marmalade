@@ -29,6 +29,14 @@ namespace Marmalade::Physics {
         void Update() override;
         ~PhysicsEngine2D() override;
 
+        glm::vec2 Cross(float a, const glm::vec2& v) {
+            return glm::vec2(-a * v.y, a * v.x);
+        }
+
+        float Cross(const glm::vec2& a, const glm::vec2& b) {
+            return a.x * b.y - a.y * b.x;
+        }
+
     private:
         void EulerIntegration();
         void BroadPhase();
