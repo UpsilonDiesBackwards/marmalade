@@ -21,34 +21,60 @@
 #include "ecs/component.h"
 
 namespace Marmalade::ECS {
+    /*!
+     * \struct BodyT
+     * \brief Generic physics body data structure.
+     *
+     * Represents the physical properties of a rigid body, including linear and angular
+     * velocity, mass, momentum, and an associated collider. This is a pure data struct
+     * used to define physics state that can be simulated by the physics system.
+     *
+     * \tparam VecType The vector type (e.g., glm::vec2 or glm::vec3).
+     * \tparam ColliderType The collider type used (e.g., BoxCollider2D, SphereCollider3D).
+     */
     template<typename VecType, typename ColliderType>
     struct BodyT {
-        VecType velocity;
-        VecType centreOfMass;
+        VecType velocity; //!< Linear Velocity of the body
+        VecType centreOfMass; //!< Local centre of mass
 
-        bool isStatic;
-        float gravity = -9.81f;
-        float mass = 1.0f;
-        float inverseMass = -mass;
+        bool isStatic; //!< Determines if the body is static (immovable)
+        float gravity = -9.81f; //!< Gravitational factor
+        float mass = 1.0f; //!< Mass of the body
+        float inverseMass = -mass; //!< Inverse mass
 
-        float angularVelocity = 0.0f;
-        float torque = 0.0f;
-        float angularMomentum = 0.0f;
-        float inertia = 1.0f;
-        float inverseInertia = -inertia;
+        float angularVelocity = 0.0f; //!< Angular velocity of the body
+        float torque = 0.0f; //!< Torque applied to the body
+        float angularMomentum = 0.0f; //!< Angular momentum
+        float inertia = 1.0f; //!< Moment of Inertia
+        float inverseInertia = -inertia; //!< Inverse moment of inertia
 
-        VecType momentum;
-        float restitution = 0.0f;// Additionally functions as friction
+        VecType momentum; //!< Linear momentum
+        float restitution = 0.0f; //!< Restitution coefficient  (additionally functions as friction)
 
-        ColliderType collider;
+        ColliderType collider; //!< Collider
     };
 
+    /*!
+     * \class RigidbodyT
+     * \brief Generic component wrapper for a physics body.
+     *
+     * Templated base class that provides physics-related functionality to entities.
+     * Used to construct components like Rigidbody2D or Rigidbody3D by specifying
+     * vector and collider types.
+     *
+     * \tparam VecType The vector type (e.g., glm::vec2 or glm::vec3).
+     * \tparam ColliderType The type of collider shape used.
+     */
     template<typename VecType, typename ColliderType>
     class RigidbodyT : public Component {
     public:
         using Body = BodyT<VecType, ColliderType>;
-        Body body;
+        Body body;  //!< Rigidbody instance
 
+        /*!
+         * \brief Returns the current center of mass of the body.
+         * \return The center of mass as a generic 'VecType'.
+         */
         VecType GetCentreOfMass() const { return (body.centreOfMass); }
 
         void Display(Entity* entity) override = 0;

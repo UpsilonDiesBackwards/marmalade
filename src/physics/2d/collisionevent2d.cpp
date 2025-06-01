@@ -246,4 +246,3 @@ Marmalade::Physics::CollisionEvents2D::OBBVsCircle(std::shared_ptr<Entity> a, co
     }
     return result;
 }
-

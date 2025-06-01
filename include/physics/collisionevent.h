@@ -22,13 +22,21 @@
 #include "scene/entity.h"
 
 namespace Marmalade::Physics {
+    /**
+     * \struct CollisionEvent
+     * \brief Represents the details of a collision between two entities.
+     *
+     * Contains information about whether a collision occurred, the collision normal,
+     * penetration depth, the involved entities, and the contact point of collision.
+     */
     struct CollisionEvent {
-        bool colliding;
-        glm::vec3 normal;
-        float penetration;
-        std::shared_ptr<Entity> A;
-        std::shared_ptr<Entity> B;
-        glm::vec2 contactPoint = {};
+        bool colliding; //!< Returns true if two entities are currently colliding
+        glm::vec3 normal; //!< The collision normal vector pointing from entity A to B
+        float penetration; //!< The depth of the penetration (How much the colliders overlap)
+        std::shared_ptr<Entity> A; //!< First entity involved in collision
+        std::shared_ptr<Entity> B; //!< Second entity involved in collision
+        // TODO Make this a vec3
+        glm::vec2 contactPoint = {}; //!< Point of contact of the collision
     };
 }
 

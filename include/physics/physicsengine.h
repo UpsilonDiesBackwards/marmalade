@@ -20,8 +20,20 @@
 #define MARMALADE_PHYSICSENGINE_H
 
 namespace Marmalade::Physics {
+    /**
+     * \class PhysicsEngine
+     * \brief Abstract base class for physics engine implementations.
+     *
+     * Defines the interface for updating the physics simulation.
+     */
     class PhysicsEngine {
     public:
+        /**
+         * \brief Update the physics simulation.
+         *
+         * This method must be overridden by derived classes to perform
+         * physics calculations and state updates.
+         */
         virtual void Update() = 0;
         virtual ~PhysicsEngine() = default;
     };

@@ -30,23 +30,51 @@ namespace Marmalade::ECS {
     class CircleCollider2D;
 }
 
+/**
+ * \struct AABB
+ * \brief Axis-Aligned Bounding Box structure for 2D collision.
+ *
+ * Represents a bounding box defined by minimum and maximum points in 2D space.
+ */
 struct AABB {
-    glm::vec2 min;
-    glm::vec2 max;
+    glm::vec2 min; //!< Min (bottom-left) corner of the AABB
+    glm::vec2 max; //!< Max (top-right) corner of the AABB
 };
 
+/**
+ * \struct OBB
+ * \brief Oriented Bounding Box structure for 2D collision.
+ *
+ * Represents a bounding box with a position, orientation axes, and half sizes.
+ */
 struct OBB {
-    glm::vec2 center;
-    glm::vec2 axes[2];
-    glm::vec2 halfSize;
+    glm::vec2 center; //!< Centre point of the AABB
+    glm::vec2 axes[2]; //!< Normalised axes
+    glm::vec2 halfSize; //!< Half of the box's size
 };
 
-
+/**
+ * \brief Check if two AABBs intersect.
+ *
+ * \param a The first AABB.
+ * \param b The second AABB.
+ * \return true if the AABBs overlap, false otherwise.
+ */
 inline bool AABBsIntersect(const AABB& a, const AABB& b) {
     return (a.min.x <= b.max.x && a.max.x >= b.min.x) &&
            (a.min.y <= b.max.y && a.max.y >= b.min.y);
 }
 
+/**
+ * \brief Get the axis-aligned bounding box (AABB) for an entity.
+ *
+ * Calculates the AABB based on the entity's position and its collider shape
+ * (box or circle). Returns a degenerate AABB at the entity's position if no
+ * collider is found.
+ *
+ * \param entity Shared pointer to the entity.
+ * \return AABB representing the bounding box of the entity's collider.
+ */
 inline AABB GetAABB(const std::shared_ptr<Entity> entity) {
     const glm::vec2& pos = entity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>()->pos;
 
@@ -65,6 +93,17 @@ inline AABB GetAABB(const std::shared_ptr<Entity> entity) {
     return {pos, pos};
 }
 
+
+/**
+ * \brief Check if two OBBs overlap on a specified axis.
+ *
+ * Projects both OBBs onto the given axis and checks if their projections overlap.
+ *
+ * \param a The first OBB.
+ * \param b The second OBB.
+ * \param axis The axis to test overlap on.
+ * \return true if projections overlap on the axis, false otherwise.
+ */
 inline bool OverlapOnAxis(const OBB& a, const OBB& b, const glm::vec2& axis) {
     auto Project = [](const OBB& obb, const glm::vec2& axis) {
         float projectionCenter = glm::dot(obb.center, axis);
@@ -80,6 +119,16 @@ inline bool OverlapOnAxis(const OBB& a, const OBB& b, const glm::vec2& axis) {
     return !(maxA < minB || maxB < minA);
 }
 
+/**
+ * \brief Check if two OBBs are intersecting.
+ *
+ * Uses the Separating Axis Theorem (SAT) by testing overlap along all axes
+ * defined by both OBBs.
+ *
+ * \param a The first OBB.
+ * \param b The second OBB.
+ * \return true if the OBBs intersect, false otherwise.
+ */
 inline bool IsOBBvsOBB(const OBB& a, const OBB& b) {
     glm::vec2 axesToTest[4] = {a.axes[0], a.axes[1], b.axes[0], b.axes[1]};
 
@@ -87,6 +136,16 @@ inline bool IsOBBvsOBB(const OBB& a, const OBB& b) {
     return true;
 }
 
+/**
+ * \brief Compute the moment of inertia for a 2D collider shape.
+ *
+ * Calculates the rotational inertia of the collider based on its shape type
+ * and mass. Supports box and circle colliders.
+ *
+ * \param collider The collider whose inertia to compute.
+ * \param mass The mass of the entity owning the collider.
+ * \return The moment of inertia for the collider.
+ */
 inline float ComputeInertia(const Marmalade::Physics::Collider2D& collider, float mass) {
     using namespace Marmalade::Physics;
     using CT = ColliderType2D;
@@ -113,6 +172,5 @@ inline float ComputeInertia(const Marmalade::Physics::Collider2D& collider, floa
             return 0.0f;
     }
 }
-
 
 #endif

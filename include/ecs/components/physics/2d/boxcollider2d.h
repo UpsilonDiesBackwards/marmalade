@@ -23,9 +23,30 @@
 #include "ecs/components/transform.h"
 
 namespace Marmalade::ECS {
+    /*!
+     * \class BoxCollider2D
+     * \brief Represents a 2D axis-aligned box collider component.
+     *
+     * This component adds an axis-aligned rectangular collider to an entity,
+     * used for 2D physics-based collision detection. The collider is centered at
+     * the entity's position plus an offset, and sized based on the `size` member.
+     *
+     * It is intended to be used alongside a Rigidbody2D component to participate in collision handling.
+     *
+     * \author Marmalade Engine
+     */
     class BoxCollider2D : public Component {
     public:
+        /*!
+         * \brief The size of the box collider in 2D space (width and height).
+         * Default is {1.0f, 1.0f}.
+         */
         glm::vec2 size = {1.0f, 1.0f};
+
+        /*!
+         * \brief The positional offset of the collider relative to the entity's transform.
+         * Default is {0.0f, 0.0f}.
+         */
         glm::vec2 offset = {0.0f, 0.0f};
 
 #define BOXCOLLIDER2D_CTOR_BODY                         \
@@ -52,6 +73,5 @@ namespace Marmalade::ECS {
 
     REGISTER_COMPONENT(BoxCollider2D);
 }
-
 
 #endif

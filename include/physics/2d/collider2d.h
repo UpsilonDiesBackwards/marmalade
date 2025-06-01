@@ -30,21 +30,43 @@
 #include "../../../include/ecs/components/transform.h"
 
 namespace Marmalade::Physics {
+    /*!
+     * \enum ColliderType2D
+     * \brief Enum for different 2D collider types.
+     */
     enum class ColliderType2D {
         Box,
         Circle,
         OBB
     };
 
+    /*!
+     * \struct ShapeData2D
+     * \brief Abstract base class for all 2D collider shapes.
+     *
+     * Provides a virtual interface for drawing collider shapes in the editor.
+     */
     struct ShapeData2D {
         virtual void ShowBounds(const glm::vec2& entityPosition, Marmalade::ECS::Transform transform) = 0;
         virtual ~ShapeData2D() = default;
     };
 
+    /*!
+     * \struct BoxCollider2D
+     * \brief Represents a 2D box collider shape.
+     *
+     * A rectangular collider with customizable size and offset. Can be rotated if
+     * the entity's transform has rotation.
+     */
     struct BoxCollider2D : public ShapeData2D {
-        glm::vec2 size = {1.0f, 1.0f};
-        glm::vec2 offset = {0.0f, 0.0f};
+        glm::vec2 size = {1.0f, 1.0f}; //!< Width and height of the 2D Box Collider
+        glm::vec2 offset = {0.0f, 0.0f}; //!< Offset of the box collider
 
+        /*!
+         * \brief Draws the box collider shape using ImGui overlay.
+         * \param entityPosition The world position of the entity.
+         * \param transform The transform of the entity.
+         */
         void ShowBounds(const glm::vec2 &entityPosition, ECS::Transform transform) override {
             glm::vec2 center = glm::vec2(transform.pos) + offset;
 
@@ -77,10 +99,20 @@ namespace Marmalade::Physics {
         }
     };
 
-    struct CircleCollider2D : public ShapeData2D {
-        float radius = 1.0f;
-        glm::vec2 offset = {0.0f, 0.0f};
 
+    /*!
+     * \struct CircleCollider2D
+     * \brief Represents a circular 2D collider shape.
+     */
+    struct CircleCollider2D : public ShapeData2D {
+        float radius = 1.0f; //!< Radius of the 2D circle collider
+        glm::vec2 offset = {0.0f, 0.0f}; //!< Offset of the circle collider
+
+        /*!
+         * \brief Draws the circle collider shape using ImGui overlay.
+         * \param entityPosition The world position of the entity.
+         * \param transform The transform of the entity.
+         */
         void ShowBounds(const glm::vec2 &entityPosition, ECS::Transform transform) override {
             glm::vec2 center = glm::vec2(transform.pos) + offset;
             ImVec2 screenCenter = EditorViews::WorldToScreenSpace(center);
@@ -98,9 +130,17 @@ namespace Marmalade::Physics {
         }
     };
 
+
+    /*!
+     * \struct Collider2D
+     * \brief Wrapper that holds the type and shape data for a collider.
+     *
+     * Used to store collider metadata in a general way, allowing runtime polymorphism
+     * and type-based handling (e.g., during collision resolution).
+     */
     struct Collider2D {
-        ColliderType2D type;
-        std::shared_ptr<ShapeData2D> shape;
+        ColliderType2D type;  //!< Type of the collider
+        std::shared_ptr<ShapeData2D> shape;  //!< Shared ptr to the shape data
     };
 }
 

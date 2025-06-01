@@ -22,11 +22,39 @@
 #include "physics/collisionevent.h"
 
 namespace Marmalade::Physics {
+    /**
+     * \class CollisionEvents2D
+     * \brief Provides static methods for detecting collisions between 2D physics shapes.
+     *
+     * This class contains static collision detection functions for various 2D collider types
+     * including boxes, circles, and oriented bounding boxes (OBBs). Each function
+     * returns a CollisionEvent struct that details whether a collision occurred and
+     * relevant collision information such as contact points, penetration depth, and collision normals.
+     */
     class CollisionEvents2D {
     public:
+
+        /**
+         * \brief Detects collision between two axis-aligned boxes (AABB).
+         *
+         * \param a Shared pointer to the first entity.
+         * \param rbA The Rigidbody2D component of the first entity containing collider info.
+         * \param b Shared pointer to the second entity.
+         * \param rbB The Rigidbody2D component of the second entity containing collider info.
+         * \return CollisionEvent Contains collision data and whether the two boxes overlap.
+         */
         static CollisionEvent BoxVsBox(std::shared_ptr<Entity> a, const ECS::Rigidbody2D& rbA,
                              std::shared_ptr<Entity> b, const ECS::Rigidbody2D& rbB);
 
+        /**
+         * \brief Detects collision between two circles.
+         *
+         * \param a Shared pointer to the first entity.
+         * \param rbA The Rigidbody2D component of the first entity containing collider info.
+         * \param b Shared pointer to the second entity.
+         * \param rbB The Rigidbody2D component of the second entity containing collider info.
+         * \return CollisionEvent Contains collision data and whether the two circles overlap.
+         */
         static CollisionEvent CircleVsCircle(std::shared_ptr<Entity> a, const ECS::Rigidbody2D& rbA,
                              std::shared_ptr<Entity> b, const ECS::Rigidbody2D& rbB);
 
@@ -44,6 +72,5 @@ namespace Marmalade::Physics {
 
     };
 }
-
 
 #endif //COLLISIONEVENTS2D_H

@@ -23,6 +23,18 @@
 #include "physics/2d/collider2d.h"
 
 namespace Marmalade::ECS {
+    /*!
+    * \class Rigidbody2D
+    * \brief 2D physics body component for entities in the Marmalade engine.
+    *
+    * Adds a 2D rigid body to an entity, enabling it to be influenced by forces,
+    * collisions, gravity, and other physical interactions in the 2D game world.
+    *
+    * This component is typically used in conjunction with 2D colliders
+    * (e.g. BoxCollider2D, CircleCollider2D) to define the shape of the body.
+    *
+    * \note This class derives from RigidbodyT specialized for 2D with glm::vec2 and Collider2D.
+    */
     class Rigidbody2D : public RigidbodyT<glm::vec2, Physics::Collider2D> {
     public:
 

@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-
 #ifndef MARMALADE_CIRCLECOLLIDER2D_H
 #define MARMALADE_CIRCLECOLLIDER2D_H
 
@@ -24,9 +23,34 @@
 #include "ecs/components/transform.h"
 
 namespace Marmalade::ECS {
+    /*!
+     * \class BoxCollider2D
+     * \brief Represents a 2D circular collider component.
+     *
+     * This component adds an circular collider to an entity,
+     * used for 2D physics-based collision detection. The collider is centered at
+     * the entity's position plus an offset, and sized based on the `radius` member.
+     *
+     * It is intended to be used alongside a Rigidbody2D component to participate in collision handling.
+     *
+     * \author Marmalade Engine
+     */
     class CircleCollider2D : public Component {
     public:
+        /*!
+         * \brief Radius of the circle collider.
+         *
+         * Defines the size of the circular shape.
+         * Default value is 1.0.
+         */
         float radius = 1.0f;
+
+        /*!
+         * \brief Positional offset of the circle collider.
+         *
+         * Offset is relative to the entity's position.
+         * Useful for displacing the circle without modifying the transform.
+         */
         glm::vec2 offset = {0.0f, 0.0f};
 
 #define CIRCLECOLLIDER2D_CTOR_BODY              \
@@ -39,9 +63,7 @@ namespace Marmalade::ECS {
 #ifdef _MSC_VER
         CircleCollider2D();
 #else
-        CircleCollider2D() {
-            CIRCLECOLLIDER2D_CTOR_BODY
-        }
+        CircleCollider2D() { CIRCLECOLLIDER2D_CTOR_BODY }
 #endif
 
         void Display(Entity* entity) override;
