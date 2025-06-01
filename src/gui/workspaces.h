@@ -21,6 +21,7 @@
 #define MARMALADE_GUI_WORKSPACES_H
 
 #include <filesystem>
+#include <vector>
 
 #define WORKSPACES_DIR_NAME "workspaces"
 
