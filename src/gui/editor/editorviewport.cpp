@@ -42,11 +42,9 @@ int EditView::currentRenderMode = 1;
  * \param width Starting width of the viewport
  * \param height Starting height of the viewport
  */
-EditView::EditView(int width, int height) : width(width), height(height) {
-    Application::GetInstance().framebuffer = &framebuffer;
-}
+EditView::EditView(int width, int height) : width(width), height(height) { Application::GetInstance().framebuffer = &framebuffer; }
 
-EditView::~EditView() { }
+EditView::~EditView() {}
 
 /**
  * \brief Sets the framebuffer and shows editor viewport toolbar which includes drop down for render mode and guizmo mode toggles
@@ -72,9 +70,7 @@ void EditView::Render() {
     }
 
     // Render Space
-    for (const auto& entity: app.sceneManager.GetCurrentScene()->GetEntities()) {
-        entity->Render();
-    }
+    for (const auto& entity: app.sceneManager.GetCurrentScene()->GetEntities()) { entity->Render(); }
 
     Application::GetInstance().framebuffer->Unbind();
 
@@ -91,18 +87,14 @@ void EditView::Render() {
                        ImVec2(windowPos.x + windowSize.x, windowPos.y + windowSize.y),
                        ImVec2(0, 1), ImVec2(1, 0));
 
-    for (const auto& entity : app.sceneManager.GetCurrentScene()->GetEntities()) {
+    for (const auto& entity: app.sceneManager.GetCurrentScene()->GetEntities()) {
         auto tileMap = entity->componentManager.GetComponentOfType<Marmalade::ECS::TileMap>();
-        if (tileMap) {
-            tileMap->RenderGUIGrid(entity.get());
-        }
+        if (tileMap) { tileMap->RenderGUIGrid(entity.get()); }
     }
 
-    for (const auto& entity : app.sceneManager.GetCurrentScene()->GetEntities()) {
+    for (const auto& entity: app.sceneManager.GetCurrentScene()->GetEntities()) {
         auto lightComponent = entity->componentManager.GetComponentOfType<Marmalade::ECS::Light2D>();
-        if (lightComponent) {
-            lightComponent->ShowBounds(entity.get());
-        }
+        if (lightComponent) { lightComponent->ShowBounds(entity.get()); }
     }
 
     ImGui::SetCursorScreenPos(windowPos);
@@ -111,23 +103,18 @@ void EditView::Render() {
 
     ImVec2 toolbarSize = ImVec2(windowSize.x, 30.0f);
 
-    if (ImGui::BeginChild("EditViewTopBar", toolbarSize, true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
-    {
+    if (ImGui::BeginChild("EditViewTopBar", toolbarSize, true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
         if (_currentGuizmoOperation != ImGuizmo::SCALE) {
-            if (ImGui::RadioButton("World", _currentGuizmoMode == ImGuizmo::WORLD)) {
-                _currentGuizmoMode = ImGuizmo::WORLD;
-            }
+            if (ImGui::RadioButton("World", _currentGuizmoMode == ImGuizmo::WORLD)) { _currentGuizmoMode = ImGuizmo::WORLD; }
             ImGui::SameLine();
-            if (ImGui::RadioButton("Local", _currentGuizmoMode == ImGuizmo::LOCAL)) {
-                _currentGuizmoMode = ImGuizmo::LOCAL;
-            }
+            if (ImGui::RadioButton("Local", _currentGuizmoMode == ImGuizmo::LOCAL)) { _currentGuizmoMode = ImGuizmo::LOCAL; }
         }
 
         ImGui::SameLine();
 
         ImGui::SetNextItemWidth(95);
         if (ImGui::Combo("Render Mode", &currentRenderMode, renderModes, IM_ARRAYSIZE(renderModes))) {
-            for (const auto& entity : Application::GetInstance().sceneManager.GetCurrentScene()->GetEntities()) {
+            for (const auto& entity: Application::GetInstance().sceneManager.GetCurrentScene()->GetEntities()) {
                 entity->renderable.renderMode = static_cast<Renderable::RenderMode>(currentRenderMode);
                 entity->renderable.ApplyRenderMode();
             }
@@ -135,7 +122,32 @@ void EditView::Render() {
 
         ImGui::SameLine();
 
-        ImGui::Text("Light count: %zu", Application::GetInstance().sceneManager.GetCurrentScene()->GetLights().size());
+        static const char* cameraModes[] = {"Orthographic", "Perspective", "Top", "Bottom", "Left", "Right"};
+        static int currentCameraMode = 0;
+
+        Camera* cam = Application::GetInstance().camera;
+        switch (cam->GetViewportMode()) {
+            case Camera::ViewportMode_ORTHOGRAPHIC: currentCameraMode = 0; break;
+            case Camera::ViewportMode_PERSPECTIVE:  currentCameraMode = 1; break;
+            case Camera::ViewportMode_TOP:          currentCameraMode = 2; break;
+            case Camera::ViewportMode_BOTTOM:       currentCameraMode = 3; break;
+            case Camera::ViewportMode_LEFT:         currentCameraMode = 4; break;
+            case Camera::ViewportMode_RIGHT:        currentCameraMode = 5; break;
+            default:                                currentCameraMode = 0; break;
+        }
+
+        ImGui::SetNextItemWidth(110);
+
+        Camera::ViewportMode modes[] = {
+                Camera::ViewportMode_ORTHOGRAPHIC,
+                Camera::ViewportMode_PERSPECTIVE,
+                Camera::ViewportMode_TOP,
+                Camera::ViewportMode_BOTTOM,
+                Camera::ViewportMode_LEFT,
+                Camera::ViewportMode_RIGHT
+        };
+
+        if (ImGui::Combo("Camera", &currentCameraMode, cameraModes, IM_ARRAYSIZE(cameraModes))) { cam->SetViewportMode(modes[currentCameraMode]); }
     }
 
     ImGui::EndChild();
@@ -164,11 +176,28 @@ void EditView::RunInput() {
     if (ImGuizmo::IsUsing() ||
         ImGui::IsAnyItemActive() ||
         ImGui::IsAnyItemFocused() ||
-        ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopup)) {
+        ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopup)) { return; }
 
-        return;
+    Application& app = Application::GetInstance();
+
+    Camera::ViewportMode mode = GET_APP.camera->GetViewportMode();
+    switch (mode) {
+        case Camera::ViewportMode_PERSPECTIVE:
+            ViewportPerspectiveInput();
+            break;
+        case Camera::ViewportMode_TOP:
+        case Camera::ViewportMode_BOTTOM:
+        case Camera::ViewportMode_LEFT:
+        case Camera::ViewportMode_RIGHT:
+        case Camera::ViewportMode_ORTHOGRAPHIC:
+            ViewportOrthographicInput();
+            break;
+        default:
+            break;
     }
+}
 
+void EditView::ViewportOrthographicInput() {
     Application& app = Application::GetInstance();
 
     if (app.editorMode != EditorMode::EditorMode_EDIT) {
@@ -183,7 +212,6 @@ void EditView::RunInput() {
 
                                   if (mousePos.x >= imageMin.x && mousePos.x <= imageMax.x &&
                                       mousePos.y >= imageMin.y && mousePos.y <= imageMax.y) {
-
                                       float posX = app.inputManager.getMouseDeltaX();
                                       float posY = app.inputManager.getMouseDeltaY();
 
@@ -191,7 +219,6 @@ void EditView::RunInput() {
                                   }
                               });
 
-    // Select entities by holding ctrl
     app.input.BindKey(GLFW_KEY_LEFT_CONTROL, KEY_DOWN, [&app]() {
         ImVec2 mouseCoords = ImVec2(app.inputManager.getMouseX(), app.inputManager.getMouseY());
         auto worldCoords = EditorViews::ScreenToWorldSpace(mouseCoords);
@@ -209,35 +236,73 @@ void EditView::RunInput() {
                 auto screenMin = EditorViews::WorldToScreenSpace(minBounds);
                 auto screenMax = EditorViews::WorldToScreenSpace(maxBounds);
 
-                ImGui::GetForegroundDrawList(ImGui::GetMainViewport())->AddRect(screenMin, screenMax,
-                                                                                ImGui::GetColorU32(IM_COL32(249, 226, 175, 255)),
-                                                                                0.0f, ImDrawFlags_None, 2.0f);
+                ImGui::GetForegroundDrawList(ImGui::GetMainViewport())->AddRect(
+                        screenMin, screenMax,
+                        ImGui::GetColorU32(IM_COL32(249, 226, 175, 255)),
+                        0.0f, ImDrawFlags_None, 2.0f);
 
-                if (app.inputManager.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
-                    app.editorGUI->sceneHierarchy.SelectEntityByUuid(entity->uuid);
-                }
+                if (app.inputManager.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) { app.editorGUI->sceneHierarchy.SelectEntityByUuid(entity->uuid); }
             }
         }
     });
 
     app.input.BindScroll([&app, this](double xOffset, double yOffset) {
-        auto mousePos = ImGui::GetMousePos();
+        ImVec2 mousePos = ImGui::GetMousePos();
 
-        // Check if mouse is in bounds
-        bool withinBounds = (mousePos.x >= imageMin.x && mousePos.x <= imageMax.x) &&
-                            (mousePos.y >= imageMin.y && mousePos.y <= imageMax.y);
-
-        if (!withinBounds) return;
+        if (mousePos.x < imageMin.x || mousePos.x > imageMax.x ||
+            mousePos.y < imageMin.y || mousePos.y > imageMax.y) { return; }
 
         glm::vec2 worldBefore = EditorViews::ScreenToWorldSpace(mousePos);
-
         app.camera->Zoom(yOffset);
-
         glm::vec2 worldAfter = EditorViews::ScreenToWorldSpace(mousePos);
 
         glm::vec2 delta = worldBefore - worldAfter;
         app.camera->Move(delta.x, delta.y, true);
     });
+}
+
+void EditView::ViewportPerspectiveInput() {
+    Application& app = Application::GetInstance();
+    static float moveSpeed = 5.0f;
+    static float mouseSensitivity = 0.1f;
+
+    static bool rotating = false;
+
+    // Right Mouse Drag = Rotate
+    if (app.inputManager.isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+        rotating = true;
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;// Hide/lock mouse
+    } else {
+        rotating = false;
+        ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
+    }
+
+    if (rotating) {
+        float dx = app.inputManager.getMouseDeltaX();
+        float dy = app.inputManager.getMouseDeltaY();
+
+        Camera* cam = app.camera;
+        cam->yaw += dx * mouseSensitivity;
+        cam->pitch -= dy * mouseSensitivity;
+
+        cam->pitch = glm::clamp(cam->pitch, -89.0f, 89.0f);
+        cam->UpdateVectors();
+    }
+
+    Camera* cam = app.camera;
+    glm::vec3& pos = cam->position3D;
+
+    float deltaTime = app.time.GetDeltaTime();
+    float speed = moveSpeed * deltaTime;
+
+    if (app.inputManager.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) speed *= 2.0f;
+
+    if (app.inputManager.isKeyDown(GLFW_KEY_W)) pos += cam->front * speed;
+    if (app.inputManager.isKeyDown(GLFW_KEY_S)) pos -= cam->front * speed;
+    if (app.inputManager.isKeyDown(GLFW_KEY_A)) pos -= cam->right * speed;
+    if (app.inputManager.isKeyDown(GLFW_KEY_D)) pos += cam->right * speed;
+    if (app.inputManager.isKeyDown(GLFW_KEY_Q)) pos -= cam->up * speed;
+    if (app.inputManager.isKeyDown(GLFW_KEY_E)) pos += cam->up * speed;
 }
 
 void EditView::ShowEditorUIGuizmos() {
@@ -257,7 +322,6 @@ void EditView::ShowGizmo() {
           ImGui::IsAnyItemActive() ||
           ImGui::IsAnyItemFocused() ||
           ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopup))) {
-
         if (ImGui::IsKeyPressed(ImGuiKey_Q)) { _currentGuizmoOperation = ImGuizmo::TRANSLATE; }
         if (ImGui::IsKeyPressed(ImGuiKey_W)) { _currentGuizmoOperation = ImGuizmo::ROTATE; }
         if (ImGui::IsKeyPressed(ImGuiKey_E)) { _currentGuizmoOperation = ImGuizmo::SCALE; }
@@ -294,7 +358,7 @@ void EditView::ShowGizmo() {
 }
 
 void EditView::ShowColliderBounds() {
-    for (auto& entity : GET_APP.sceneManager.GetCurrentScene()->GetEntities()) {
+    for (auto& entity: GET_APP.sceneManager.GetCurrentScene()->GetEntities()) {
         auto rb = entity->componentManager.GetComponentOfType<Marmalade::ECS::Rigidbody2D>();
         if (!rb) continue;
 
@@ -302,9 +366,7 @@ void EditView::ShowColliderBounds() {
         if (collider.shape) {
             glm::vec3 pos = entity->getPosition();
             glm::quat rot = entity->getRotation();
-            if (auto transformPtr = entity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>()) {
-                collider.shape->ShowBounds({pos.x, pos.y}, *transformPtr);
-            }
+            if (auto transformPtr = entity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>()) { collider.shape->ShowBounds({pos.x, pos.y}, *transformPtr); }
         }
     }
 }
@@ -312,9 +374,7 @@ void EditView::ShowColliderBounds() {
 void EditView::ShowLightBounds() {
     auto lightComp = selectedEntity->componentManager.GetComponentOfType<Marmalade::ECS::Light2D>();
 
-    if (!lightComp || !lightComp->showingBounds) {
-        return;
-    }
+    if (!lightComp || !lightComp->showingBounds) { return; }
 
     lightComp->ShowBounds(selectedEntity);
 }

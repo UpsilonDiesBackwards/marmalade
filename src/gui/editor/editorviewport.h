@@ -36,7 +36,7 @@ class EditView {
      * \brief Current Render Mode of the application as an integer
      */
     static int currentRenderMode;
-    const char* renderModes[3] = { "RenderMode_LIT", "RenderMode_UNLIT", "RenderMode_WIREFRAME" };
+    const char* renderModes[3] = { "Lit", "Unlit", "Wireframe" };
 
 public:
     /**
@@ -63,6 +63,8 @@ public:
      * \brief Execute any editor viewport-specific input such as guizmo-control hotkeys
      */
     void RunInput();
+    void ViewportOrthographicInput();
+    void ViewportPerspectiveInput();
 private:
     MultiSampledFramebuffer framebuffer;
     int width, height;

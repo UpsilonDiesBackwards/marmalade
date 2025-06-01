@@ -54,27 +54,42 @@ void Camera::UpdateViewport(float newWidth, float newHeight) {
 }
 
 glm::mat4 Camera::GetProjection() {
-    float aspectRatio = width / height;
-    float orthoSize = 10.0f / zoom;
+    switch (viewportMode) {
+        case ViewportMode_PERSPECTIVE:
+            return glm::perspective(glm::radians(fov), width / height, nearClip, farClip);
 
-    glm::mat4 projection = glm::ortho(
-            -orthoSize * aspectRatio, orthoSize * aspectRatio,
-            -orthoSize, orthoSize,
-            -1.0f, 1.0f
-    );
+        case ViewportMode_ORTHOGRAPHIC:
+        case ViewportMode_TOP:
+        case ViewportMode_BOTTOM:
+        case ViewportMode_LEFT:
+        case ViewportMode_RIGHT: {
+            float orthoWidth = width * zoom;
+            float orthoHeight = height * zoom;
+            return glm::ortho(-orthoWidth / 2.0f, orthoWidth / 2.0f, -orthoHeight / 2.0f, orthoHeight / 2.0f, -farClip, farClip);
+        }
 
-    return projection;
+        default:
+            return glm::mat4(1.0f);
+    }
 }
 
 glm::mat4 Camera::GetView() {
-    glm::mat4 view_mat = glm::mat4(1.0f);
-
-    view_mat = glm::translate(view_mat, glm::vec3(-Application::GetInstance().camera->GetPosition(), 0.0f));
-//    view_mat = glm::scale(view_mat, glm::vec3(Application::GetInstance().camera->GetZoom(), Application::GetInstance().camera->GetZoom(), 1.0f));
-
-    return view_mat;
+    switch (viewportMode) {
+        case ViewportMode_PERSPECTIVE:
+            return glm::lookAt(position3D, position3D + front, up);
+        case ViewportMode_TOP:
+            return glm::lookAt(glm::vec3(0, 10, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, -1));
+        case ViewportMode_BOTTOM:
+            return glm::lookAt(glm::vec3(0, -10, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 1));
+        case ViewportMode_LEFT:
+            return glm::lookAt(glm::vec3(-10, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+        case ViewportMode_RIGHT:
+            return glm::lookAt(glm::vec3(10, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+        case ViewportMode_ORTHOGRAPHIC:
+        default:
+            return glm::translate(glm::mat4(1.0f), glm::vec3(-position, 0.0f));
+    }
 }
-
 
 glm::vec2 Camera::GetPosition() const {
     return position;
@@ -82,4 +97,27 @@ glm::vec2 Camera::GetPosition() const {
 
 float Camera::GetZoom() const {
     return zoom;
+}
+
+void Camera::SetViewportMode(ViewportMode targetMode) {
+    viewportMode = targetMode;
+
+    if (viewportMode != ViewportMode_PERSPECTIVE) {
+        position = {0.0f, 0.0f};
+        zoom = 1.0f;
+    }
+}
+
+Camera::ViewportMode Camera::GetViewportMode() const {
+    return viewportMode;
+}
+
+void Camera::UpdateVectors() {
+    glm::vec3 f;
+    f.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    f.y = sin(glm::radians(pitch));
+    f.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front = glm::normalize(f);
+    right = glm::normalize(glm::cross(front, glm::vec3(0.0f, 1.0f, 0.0f)));
+    up = glm::normalize(glm::cross(right, front));
 }
