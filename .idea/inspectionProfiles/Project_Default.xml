@@ -1,0 +1,27 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="CustomRegExpInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myConfigurations">
+        <list>
+          <RegExpInspectionConfiguration>
+            <option name="description" value="strcpy_s is not supported on Linux. Use std::strcpy instead." />
+            <option name="name" value="Avoid using strcpy_s" />
+            <option name="uuid" value="cb218475-f875-3a84-82d7-f9596be07bb7" />
+            <option name="patterns">
+              <list>
+                <InspectionPattern>
+                  <option name="regExp" value="strcpy_s\s*\(\s*(.+?)\s*,\s*.+?\s*,\s*(.+?)\s*\)" />
+                  <option name="_fileType" value="ObjectiveC" />
+                  <option name="searchContext" value="ANY" />
+                  <option name="replacement" value="std::strcpy($1, $2)" />
+                </InspectionPattern>
+              </list>
+            </option>
+          </RegExpInspectionConfiguration>
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="cb218475-f875-3a84-82d7-f9596be07bb7" enabled="true" level="ERROR" enabled_by_default="true" editorAttributes="ERRORS_ATTRIBUTES" />
+  </profile>
+</component>
