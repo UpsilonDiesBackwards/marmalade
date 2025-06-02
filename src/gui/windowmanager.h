@@ -22,13 +22,22 @@
 
 #include "../application/config/engineconfig.h"
 #include "window.h"
+#include "dialog.h"
+
 #include "windows/welcomescreen.h"
 #include "windows/packagemanager.h"
+#include "windows/animation.h"
+#include "windows/versioncontrol.h"
+
 #include "log/log.h"
+
 #include "wizards/projectwizard.h"
+
 #include "settings/preferences.h"
 #include "settings/settings.h"
+
 #include "editor/projectbrowser.h"
+
 #include "dialogs/about.h"
 #include "dialogs/configerror.h"
 #include "dialogs/saveworkspace.h"
@@ -37,12 +46,23 @@
 
 #include <vector>
 
+// Forward decl
+namespace IGFD {
+    struct FileDialogConfig;
+}
+typedef int ImGuiFileDialogFlags;
+const int FDF_Modal = 1 << 9;
+
 namespace Marmalade::GUI {
     class WindowManager {
     public:
+        struct FileDialogResult {
+            std::string FilePath;
+        };
+
         static WindowManager& GetInstance();
 
-        WelcomeScreen welcomeScreen{EngineConfig::GetStoredConfig().appearance.showWelcomeScreen};
+        Marmalade::GUI::WelcomeScreen welcomeScreen{Marmalade::EngineConfig::GetStoredConfig().appearance.showWelcomeScreen};
 
         Animation animationManager{};
         PackageManager packageManager{};
@@ -56,12 +76,30 @@ namespace Marmalade::GUI {
         ConfigErrorDialog configErrorDlg{};
         SaveWorkspaceDialog saveWorkspaceDlg{};
         SaveWorkspaceAsDialog saveWorkspaceAsDlg{};
+        Marmalade::GUI::Animation animationManager{};
+        Marmalade::GUI::PackageManager packageManager{};
+        Marmalade::GUI::Log log{true};
+        Marmalade::GUI::ProjectWizard projectWizard{};
+        Marmalade::GUI::Preferences preferences{};
+        Marmalade::GUI::ProjectSettings settings{};
+        Marmalade::GUI::ProjectBrowser projectBrowser{true};
+        Marmalade::GUI::VersionControl versionControl{};
+        Marmalade::GUI::About about{};
+        Marmalade::GUI::ConfigErrorDialog configErrorDlg{};
 
-        std::vector<Window*> windows{};
+        std::vector<Marmalade::GUI::Window*> windows{};
+        std::vector<Dialog> dialogs{};
+        std::vector<Dialog> fileDialogs{};
 
         bool showDebugWindow = false;
 
         void ToggleDebugWindow();
+
+        Dialog RegisterDialog(std::shared_ptr<CustomDialog> customDlg, const std::function<void(bool, void*)>& callback, bool reregister = false, ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse, ImVec2 minSize = ImVec2(800, 500));
+        void ShowDialog(std::string name);
+
+        static IGFD::FileDialogConfig PrepareFileDialogConfig(const std::string& path = "", int flags = FDF_Modal);
+        Dialog RegisterFileDialog(std::string name, const std::function<void(bool, void*)>& callback, ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse, ImVec2 minSize = ImVec2(800, 500));
 
     private:
         WindowManager();

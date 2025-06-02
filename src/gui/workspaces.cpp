@@ -22,6 +22,8 @@
 #include "../application/application.h"
 #include "../application/config/configutil.h"
 
+#include <zip.h>
+
 #include <filesystem>
 
 std::string Marmalade::GUI::WorkspaceManager::targetWorkspacePath;
@@ -58,6 +60,19 @@ void Marmalade::GUI::WorkspaceManager::DeleteCurrentWorkspace(std::filesystem::p
     LoadWorkspace(nextWorkspace);
 }
 
+void Marmalade::GUI::WorkspaceManager::ExportCurrentWorkspace(std::filesystem::path exportPath) {
+    struct zip_t* zip = zip_open(exportPath.string().c_str(), ZIP_DEFAULT_COMPRESSION_LEVEL, 'w');
+
+    auto topologies = GetTopologiesForWorkspace(currentWorkspacePath);
+    for (const auto& [topo, file]: topologies) {
+        zip_entry_open(zip, std::filesystem::path(file).filename().string().c_str());
+        zip_entry_fwrite(zip, file.c_str());
+        zip_entry_close(zip);
+    }
+
+    zip_close(zip);
+}
+
 std::filesystem::path Marmalade::GUI::WorkspaceManager::GetWorkspacesDir() {
     return Marmalade::ConfigUtil::GetConfigDirectory() / WORKSPACES_DIR_NAME;
 }
@@ -68,10 +83,51 @@ std::vector<std::string> Marmalade::GUI::WorkspaceManager::GetWorkspaces(bool ig
     if (!_workspaceCache.empty()) return _workspaceCache;
 
     for (const auto& entry: std::filesystem::directory_iterator(GetWorkspacesDir())) {
-        _workspaceCache.push_back(entry.path().filename().replace_extension("").string());
+        if (!entry.is_regular_file() || entry.path().extension() != ".ini") {
+            continue;
+        }
+
+        auto filename = entry.path().filename().replace_extension("").string();
+
+        size_t atPos = filename.find('@');
+        std::string workspaceName = (atPos != std::string::npos) ? filename.substr(0, atPos) : filename;
+
+        if (std::find(_workspaceCache.begin(), _workspaceCache.end(), workspaceName) == _workspaceCache.end()) {
+            _workspaceCache.push_back(workspaceName);
+        }
     }
 
     return _workspaceCache;
+}
+
+std::unordered_map<std::string, std::string> Marmalade::GUI::WorkspaceManager::GetTopologiesForWorkspace(std::filesystem::path workspace) {
+    std::unordered_map<std::string, std::string> topologies{};
+
+    auto targetWorkspace = workspace.filename().replace_extension("").string();
+
+    for (const auto& entry: std::filesystem::directory_iterator(GetWorkspacesDir())) {
+        if (!entry.is_regular_file() || entry.path().extension() != ".ini") {
+            continue;
+        }
+
+        auto filename = entry.path().filename().replace_extension("").string();
+
+        size_t atPos = filename.find('@');
+        if (atPos == std::string::npos) {
+            if (filename == targetWorkspace) {
+                topologies["*"] = entry.path().string();
+            }
+            continue;
+        }
+
+        std::string workspaceName = filename.substr(0, atPos);
+        if (workspaceName != targetWorkspace) continue;
+
+        std::string suffix = filename.substr(atPos + 1);
+        topologies[suffix] = entry.path().string();
+    }
+
+    return topologies;
 }
 
 std::string Marmalade::GUI::WorkspaceManager::GetCurrentWorkspaceName() {

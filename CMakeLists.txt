@@ -277,6 +277,7 @@ target_link_libraries(marmalade PRIVATE
         m3
         intl
         assimp
+        zip::zip
 )
 
 if (WIN32)
@@ -301,6 +302,7 @@ target_include_directories(marmalade PRIVATE
         vendor/openal-soft
         vendor/wasm3/source
         vendor/assimp
+        vendor/zip/src
         ${LibIntl_SOURCE_DIR}
 )
 

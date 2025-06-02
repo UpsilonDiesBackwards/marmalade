@@ -21,34 +21,37 @@
 #define MARMALADE_GUI_SAVEWORKSPACE_H
 
 #include "../window.h"
+#include "../dialog.h"
 
 #include <string>
 #include <functional>
 
 namespace Marmalade::GUI {
-    /**
-     * \brief Shows a dialog if a config error has occurred
-     */
-    class SaveWorkspaceDialog : public Window {
+    class SaveWorkspaceDialog : public CustomDialog {
     public:
+        struct CallbackData {
+            bool Save;
+        };
+
         std::string workspaceName{};
 
-        std::function<void(bool cancelled, bool save)> callback{nullptr};
-
         void Draw() override;
+        std::string GetName() override;
+
+        explicit SaveWorkspaceDialog(std::string workspaceName) : workspaceName(std::move(workspaceName)) {}
     };
 
-    class SaveWorkspaceAsDialog : public Window {
+    class SaveWorkspaceAsDialog : public CustomDialog {
     public:
         enum DialogType {
             DialogType_SAVE_AS,
             DialogType_DUPLICATE
         };
 
-        std::function<void(bool cancelled, std::string name)> callback{nullptr};
-
-        void SetType(DialogType type);
         void Draw() override;
+        std::string GetName() override;
+
+        explicit SaveWorkspaceAsDialog(DialogType type) : _name(""), _type(type) { }
 
     private:
         DialogType _type;

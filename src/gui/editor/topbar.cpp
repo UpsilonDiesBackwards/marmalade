@@ -25,6 +25,7 @@
 #include "../../application/config/configutil.h"
 #include "../../application/i18n.h"
 #include "../workspaces.h"
+#include "../dialogs/saveworkspace.h"
 
 #include <ecs/component.h>
 
@@ -155,18 +156,18 @@ void Marmalade::GUI::TopBar::Show() {
                 for (const auto& workspace: workspaces) {
                     if (ImGui::MenuItem(workspace.c_str())) {
                         if (ImGui::GetIO().WantSaveIniSettings) {
-                            auto* saveDlg = &WindowManager::GetInstance().saveWorkspaceDlg;
-                            saveDlg->workspaceName = WorkspaceManager::currentWorkspacePath;
-                            saveDlg->callback = [workspace](bool cancelled, bool save) {
-                                if (cancelled) return;
+                            auto dlg = WindowManager::GetInstance().RegisterDialog(std::make_shared<SaveWorkspaceDialog>(WorkspaceManager::GetCurrentWorkspaceName()), [workspace](bool result, void* data) {
+                                auto* save = static_cast<SaveWorkspaceDialog::CallbackData*>(data);
+                                if (!result) return;
 
-                                if (save) {
+                                if (save->Save) {
                                     WorkspaceManager::SaveCurrentWorkspace();
                                 }
 
                                 WorkspaceManager::LoadWorkspace(workspacesDir / (workspace + ".ini"));
-                            };
-                            saveDlg->visible = true;
+                            });
+                            WindowManager::GetInstance().ShowDialog(dlg.Name);
+
                         } else {
                             WorkspaceManager::LoadWorkspace(workspacesDir / (workspace + ".ini"));
                         };
@@ -179,40 +180,43 @@ void Marmalade::GUI::TopBar::Show() {
                     WorkspaceManager::SaveCurrentWorkspace();
                 }
                 if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Duplicate Workspace..."))) {
-                    auto* saveAsDlg = &WindowManager::GetInstance().saveWorkspaceAsDlg;
-                    saveAsDlg->SetType(SaveWorkspaceAsDialog::DialogType_DUPLICATE);
-                    saveAsDlg->callback = [](bool cancelled, std::string name) {
-                        if (cancelled) return;
+                    auto dlg = WindowManager::GetInstance().RegisterDialog(std::make_shared<SaveWorkspaceAsDialog>(SaveWorkspaceAsDialog::DialogType_DUPLICATE), [](bool result, void* data) {
+                        auto* name = static_cast<char*>(data);
+                        if (!result) return;
 
-                        std::filesystem::path newPath = WorkspaceManager::GetWorkspacesDir() / (name + ".ini");
+                        std::filesystem::path newPath = WorkspaceManager::GetWorkspacesDir() / (std::string(name) + ".ini");
                         WorkspaceManager::DuplicateWorkspace(newPath);
                         WorkspaceManager::LoadWorkspace(newPath);
 
                         // Refresh workspaces list
-                        WorkspaceManager::GetWorkspaces(true);
-                    };
-                    saveAsDlg->visible = true;
+                        WorkspaceManager::GetWorkspaces(true); }, true);
+                    WindowManager::GetInstance().ShowDialog(dlg.Name);
                 }
                 if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Save Workspace As..."))) {
-                    auto* saveAsDlg = &WindowManager::GetInstance().saveWorkspaceAsDlg;
-                    saveAsDlg->SetType(SaveWorkspaceAsDialog::DialogType_SAVE_AS);
-                    saveAsDlg->callback = [](bool cancelled, std::string name) {
-                        if (cancelled) return;
+                    auto dlg = WindowManager::GetInstance().RegisterDialog(std::make_shared<SaveWorkspaceAsDialog>(SaveWorkspaceAsDialog::DialogType_SAVE_AS), [](bool result, void* data) {
+                        auto* name = static_cast<char*>(data);
+                        if (!result) return;
 
-                        std::filesystem::path newPath = WorkspaceManager::GetWorkspacesDir() / (name + ".ini");
+                        std::filesystem::path newPath = WorkspaceManager::GetWorkspacesDir() / (std::string(name) + ".ini");
                         WorkspaceManager::SaveCurrentWorkspace(newPath);
                         WorkspaceManager::LoadWorkspace(newPath);
 
                         // Refresh workspaces list
-                        WorkspaceManager::GetWorkspaces(true);
-                    };
-                    saveAsDlg->visible = true;
+                        WorkspaceManager::GetWorkspaces(true); }, true);
+                    WindowManager::GetInstance().ShowDialog(dlg.Name);
                 }
 
                 ImGui::Separator();
 
                 ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Import Workspace..."));
-                ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Export Workspace..."));
+                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Export Workspace..."))) {
+                    IGFD::FileDialogConfig config = WindowManager::PrepareFileDialogConfig(WorkspaceManager::GetWorkspacesDir().string());
+                    auto dialog = WindowManager::GetInstance().RegisterFileDialog("ExportWorkspace", [](bool result, void* data) {
+                        auto* fileResult = static_cast<WindowManager::FileDialogResult*>(data);
+                        WorkspaceManager::ExportCurrentWorkspace(fileResult->FilePath);
+                    });
+                    ImGuiFileDialog::Instance()->OpenDialog(dialog.Name, "Export Workspace", ".marmws", config);
+                }
 
                 ImGui::Separator();
 
@@ -387,6 +391,22 @@ void Marmalade::GUI::TopBar::Show() {
 
     for (const auto& window: WindowManager::GetInstance().windows) {
         window->Show();
+    }
+
+    for (auto& dialog: WindowManager::GetInstance().dialogs) {
+        dialog.CustomDlg->SetDialog(&dialog);
+        dialog.CustomDlg->Draw();
+    }
+
+    for (const auto& fileDialog: WindowManager::GetInstance().fileDialogs) {
+        if (ImGuiFileDialog::Instance()->Display(fileDialog.Name, fileDialog.Flags, fileDialog.MinSize)) {
+            if (fileDialog.Callback != nullptr) {
+                WindowManager::FileDialogResult result{ImGuiFileDialog::Instance()->GetFilePathName()};
+
+                fileDialog.Callback(ImGuiFileDialog::Instance()->IsOk(), (void*) &result);
+            }
+            ImGuiFileDialog::Instance()->Close();
+        }
     }
 
     if (ImGui::BeginPopupModal("New Scene", &showSceneCreationPopUp, ImGuiWindowFlags_AlwaysAutoResize)) {

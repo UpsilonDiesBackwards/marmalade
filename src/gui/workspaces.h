@@ -22,6 +22,7 @@
 
 #include <filesystem>
 #include <vector>
+#include <unordered_map>
 
 #define WORKSPACES_DIR_NAME "workspaces"
 
@@ -55,9 +56,13 @@ namespace Marmalade::GUI {
          */
         static void DeleteCurrentWorkspace(std::filesystem::path nextWorkspace = "");
 
+        static void ExportCurrentWorkspace(std::filesystem::path exportPath);
+
         static std::filesystem::path GetWorkspacesDir();
 
         static std::vector<std::string> GetWorkspaces(bool ignoreCache = false);
+
+        static std::unordered_map<std::string, std::string> GetTopologiesForWorkspace(std::filesystem::path workspace);
 
         static std::string GetCurrentWorkspaceName();
 

@@ -21,46 +21,67 @@
 
 #include "../../application/plugins/interfaceimpl.h"
 #include "../../application/i18n.h"
+#include "../windowmanager.h"
 
 #include <imgui.h>
 
 #include <IconsCodicons.h>
 
-#include <cstring>
-
 void Marmalade::GUI::SaveWorkspaceDialog::Draw() {
-    WINDOW_BEGIN_MODAL(ICON_WITH_TEXT(ICON_CI_SAVE, _("Save Changes to Workspace")), ImGuiWindowFlags_AlwaysAutoResize)
+    WINDOW_BEGIN_MODAL(GetName().c_str(), ImGuiWindowFlags_AlwaysAutoResize)
 
     ImGui::Text(_("Changes have been made to the workspace: %s."), workspaceName.c_str());
 
     ImGui::Text(_("Would you like to save these changes?"));
 
     if (ImGui::Button(_("Yes"))) {
-        callback(false, true);
+        CallbackData data{true};
+        _dialog->Callback(true, &data);
         visible = false;
     }
 
     ImGui::SameLine();
     if (ImGui::Button(_("No"))) {
-        callback(false, false);
+        CallbackData data{false};
+        _dialog->Callback(true, &data);
         visible = false;
     }
 
     ImGui::SameLine();
     if (ImGui::Button(_("Cancel"))) {
-        callback(true, false);
+        CallbackData data{false};
+        _dialog->Callback(false, &data);
         visible = false;
     }
 
     WINDOW_END_MODAL()
 }
 
-void Marmalade::GUI::SaveWorkspaceAsDialog::SetType(Marmalade::GUI::SaveWorkspaceAsDialog::DialogType type) {
-    _type = type;
-    std::strcpy(_name, "");
+std::string Marmalade::GUI::SaveWorkspaceDialog::GetName() {
+    return ICON_WITH_TEXT(ICON_CI_SAVE, _("Save Changes to Workspace"));
 }
 
 void Marmalade::GUI::SaveWorkspaceAsDialog::Draw() {
+    WINDOW_BEGIN_MODAL(GetName().c_str(), ImGuiWindowFlags_AlwaysAutoResize)
+
+    ImGui::Text(_("Name for the new workspace:"));
+
+    ImGui::InputText("##WorkspaceName", _name, IM_ARRAYSIZE(_name));
+
+    if (ImGui::Button(_("OK"))) {
+        _dialog->Callback(true, _name);
+        visible = false;
+    }
+
+    ImGui::SameLine();
+    if (ImGui::Button(_("Cancel"))) {
+        _dialog->Callback(false, (void*) "");
+        visible = false;
+    }
+
+    WINDOW_END_MODAL()
+}
+std::string Marmalade::GUI::SaveWorkspaceAsDialog::GetName() {
     std::string title;
 
     if (_type == DialogType_SAVE_AS) {
@@ -69,22 +90,5 @@ void Marmalade::GUI::SaveWorkspaceAsDialog::Draw() {
         title = ICON_WITH_TEXT(ICON_CI_SAVE, _("Duplicate Workspace"));
     }
 
-    WINDOW_BEGIN_MODAL(title.c_str(), ImGuiWindowFlags_AlwaysAutoResize)
-
-    ImGui::Text(_("Name for the new workspace:"));
-
-    ImGui::InputText("##WorkspaceName", _name, IM_ARRAYSIZE(_name));
-
-    if (ImGui::Button(_("OK"))) {
-        callback(false, _name);
-        visible = false;
-    }
-
-    ImGui::SameLine();
-    if (ImGui::Button(_("Cancel"))) {
-        callback(true, "");
-        visible = false;
-    }
-
-    WINDOW_END_MODAL()
+    return title;
 }
