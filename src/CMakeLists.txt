@@ -84,6 +84,7 @@ list(APPEND ENGINE_SRC # ECS
 
         ecs/components/rendering/materialrenderer.cpp
         ecs/components/rendering/tilemap.cpp
+        ecs/components/rendering/modelrenderer.cpp
 
         ecs/components/audio/audioplayer.cpp
 

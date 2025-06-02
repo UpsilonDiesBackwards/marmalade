@@ -21,6 +21,7 @@ list(APPEND ENGINE_API
 
         ecs/components/rendering/materialrenderer.h
         ecs/components/rendering/tilemap.h
+        ecs/components/rendering/modelrenderer.h
 
         ecs/components/audio/audioplayer.h
 

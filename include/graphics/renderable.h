@@ -52,6 +52,11 @@ public:
      */
     RenderMode renderMode = RenderMode::RenderMode_UNLIT;
 
+    unsigned int VAO, VBO, EBO;
+
+    std::vector<float> vertices;
+    std::vector<unsigned int> indices;
+
     std::shared_ptr<Marmalade::Material::Material> material;
 
     Renderable(unsigned int VAO, unsigned int VBO, unsigned int EBO, unsigned int texture);
@@ -82,10 +87,11 @@ public:
      */
     void ApplyRenderMode();
 
+    void SetMeshData(std::vector<float> vert, std::vector<unsigned int> ind);
+
 private:
     RenderMode _previousRenderMode = RenderMode::RenderMode_WIREFRAME;
 
-    unsigned int VAO, VBO, EBO;
     Shader shaderProgram;
     unsigned int texture;
     glm::mat4 projectionMatrix;

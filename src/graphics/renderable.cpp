@@ -30,27 +30,6 @@
 #define OPENGL_VERSION "430"
 
 /**
- * \brief The vertex information for the base renderable square
- * \todo Add support for non-square renderable shapes, such as circular, triangular etc
- */
-float vertices[] = {
-        // Position                       // Normal                      // UV
-        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, // Bottom Left
-        0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, // Bottom Right
-        0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 1.0f, // Top Right
-        -0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f  // Top Left
-};
-
-/**
- * \brief The index information for the base renderable square
- * \todo When support for non-square renderable shapes are implemented, automatically generate the indices, or automatically update them depending on shape
- */
-unsigned int indices[] = {
-        0, 1, 2,
-        2, 3, 0
-};
-
-/**
  * \brief Renderable constructor, assign base variables
  * \param VAO Vertex array object
  * \param VBO Vertex buffer object
@@ -61,6 +40,16 @@ Renderable::Renderable(GLuint VAO, GLuint VBO, GLuint EBO, GLuint texture) : VAO
                                                                              texture(texture),
                                                                              shaderProgram(Shader("res/shaders/opengl/" OPENGL_VERSION "/shader.vert", "res/shaders/opengl/" OPENGL_VERSION "/shader.frag")) {
 
+    SetMeshData(
+        std::vector<float>{
+            -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,
+             0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,
+             0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 1.0f,
+            -0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f
+        },
+        std::vector<unsigned int>{0,1,2, 2,3,0}
+    );
+
     ApplyRenderMode();
 }
 
@@ -70,11 +59,11 @@ void Renderable::Initialise() {
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0); // Position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
@@ -139,7 +128,7 @@ void Renderable::Draw(Entity* entity, glm::mat4 modelMatrix, bool renderTexture)
         shaderProgram.SetBool("useLighting", false);
     }
 
-    glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(indices[0]), GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, nullptr);
 
     glDepthMask(GL_TRUE);
     glBindVertexArray(0);
@@ -188,4 +177,9 @@ void Renderable::ApplyRenderMode() {
     }
 
     _previousRenderMode = renderMode;
+}
+
+void Renderable::SetMeshData(std::vector<float> vert, std::vector<unsigned int> ind) {
+    vertices = vert;
+    indices = ind;
 }

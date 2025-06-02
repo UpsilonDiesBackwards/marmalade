@@ -75,6 +75,10 @@
     {
       "path": "vendor/zip",
       "url": "https://github.com/kuba--/zip.git"
+    },
+    {
+      "path": "vendor/assimp",
+      "url": "https://github.com/assimp/assimp.git"
     }
   ]
 }

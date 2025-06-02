@@ -268,10 +268,9 @@ void EditView::ViewportPerspectiveInput() {
 
     static bool rotating = false;
 
-    // Right Mouse Drag = Rotate
     if (app.inputManager.isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
         rotating = true;
-        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;// Hide/lock mouse
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;
     } else {
         rotating = false;
         ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
@@ -303,6 +302,33 @@ void EditView::ViewportPerspectiveInput() {
     if (app.inputManager.isKeyDown(GLFW_KEY_D)) pos += cam->right * speed;
     if (app.inputManager.isKeyDown(GLFW_KEY_Q)) pos -= cam->up * speed;
     if (app.inputManager.isKeyDown(GLFW_KEY_E)) pos += cam->up * speed;
+
+    app.input.BindKey(GLFW_KEY_LEFT_CONTROL, KEY_DOWN, [&app]() {
+        ImVec2 mouseCoords = ImVec2(app.inputManager.getMouseX(), app.inputManager.getMouseY());
+        auto worldCoords = EditorViews::ScreenToWorldSpace(mouseCoords);
+
+        for (const auto& entity: app.sceneManager.GetCurrentScene()->GetEntities()) {
+            auto entityPos = entity->getPosition();
+            auto entityScale = entity->getScale();
+
+            glm::vec2 minBounds = entityPos - entityScale * 0.5f;
+            glm::vec2 maxBounds = entityPos + entityScale * 0.5f;
+
+            bool withinBounds = (worldCoords.x >= minBounds.x && worldCoords.x <= maxBounds.x &&
+                                 worldCoords.y >= minBounds.y && worldCoords.y <= maxBounds.y);
+            if (withinBounds) {
+                auto screenMin = EditorViews::WorldToScreenSpace(minBounds);
+                auto screenMax = EditorViews::WorldToScreenSpace(maxBounds);
+
+                ImGui::GetForegroundDrawList(ImGui::GetMainViewport())->AddRect(
+                        screenMin, screenMax,
+                        ImGui::GetColorU32(IM_COL32(249, 226, 175, 255)),
+                        0.0f, ImDrawFlags_None, 2.0f);
+
+                if (app.inputManager.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) { app.editorGUI->sceneHierarchy.SelectEntityByUuid(entity->uuid); }
+            }
+        }
+    });
 }
 
 void EditView::ShowEditorUIGuizmos() {
@@ -322,9 +348,12 @@ void EditView::ShowGizmo() {
           ImGui::IsAnyItemActive() ||
           ImGui::IsAnyItemFocused() ||
           ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopup))) {
-        if (ImGui::IsKeyPressed(ImGuiKey_Q)) { _currentGuizmoOperation = ImGuizmo::TRANSLATE; }
-        if (ImGui::IsKeyPressed(ImGuiKey_W)) { _currentGuizmoOperation = ImGuizmo::ROTATE; }
-        if (ImGui::IsKeyPressed(ImGuiKey_E)) { _currentGuizmoOperation = ImGuizmo::SCALE; }
+
+        if (ImGui::IsKeyDown(ImGuiKey_LeftShift)) {
+            if (ImGui::IsKeyPressed(ImGuiKey_Q)) { _currentGuizmoOperation = ImGuizmo::TRANSLATE; }
+            if (ImGui::IsKeyPressed(ImGuiKey_W)) { _currentGuizmoOperation = ImGuizmo::ROTATE; }
+            if (ImGui::IsKeyPressed(ImGuiKey_E)) { _currentGuizmoOperation = ImGuizmo::SCALE; }
+        }
     }
 
     if (ImGuizmo::IsUsing()) {

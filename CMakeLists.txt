@@ -209,6 +209,18 @@ elseif (APPLE)
     set(EXECUTABLE_TYPE MACOSX_BUNDLE)
 endif ()
 
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
+
+# ZIP importer causes compilation errors on linux smh
+set(ASSIMP_BUILD_ZIP_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ZIP_READER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_NO_OWN_ZLIB ON CACHE BOOL "" FORCE)
+
+add_subdirectory(vendor/assimp)
+
 add_executable(marmalade
         ${EXECUTABLE_TYPE}
         vendor/glad/src/glad.c
@@ -263,6 +275,7 @@ target_link_libraries(marmalade PRIVATE
         OpenAL::OpenAL
         m3
         intl
+        assimp
 )
 
 if (WIN32)
@@ -286,6 +299,7 @@ target_include_directories(marmalade PRIVATE
         vendor/imnodes
         vendor/openal-soft
         vendor/wasm3/source
+        vendor/assimp
         ${LibIntl_SOURCE_DIR}
 )
 
@@ -295,7 +309,7 @@ endif ()
 
 target_include_directories(marmalade PRIVATE include)
 
-target_link_directories(marmalade PRIVATE vendor/nativefiledialog/lib vendor/luaaa ${GTK3_LIBRARIES})
+target_link_directories(marmalade PRIVATE vendor/nativefiledialog/lib vendor/luaaa ${GTK3_LIBRARIES} assimp)
 
 # Publish target
 set(PUBLISH_DIR "${CMAKE_BINARY_DIR}/publish")
