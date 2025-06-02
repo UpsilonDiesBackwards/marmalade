@@ -80,6 +80,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 int main(int argc, char** argv) {
 #endif
     bool sameDirConfig{false};
+    bool noSplash{false};
     char* project = nullptr;
     char* scene = nullptr;
 
@@ -88,6 +89,10 @@ int main(int argc, char** argv) {
 
         if (arg == "--same-dir-config") {
             sameDirConfig = true;
+        }
+
+        if (arg == "--no-splash") {
+            noSplash = true;
         }
 
         if (arg == "--project") {
@@ -106,48 +111,51 @@ int main(int argc, char** argv) {
     }
 
     auto splashScreen = NativeUI::Window(NativeUI::Util::utf8ToUtf16Str("Marmalade Engine Startup"), 800, 500);
-    splashScreen.SetCreateCallback([&] {
-        NativeUI::SplashScreen::Create(splashScreen);
-    });
 
-    splashScreen.SetPaintCallback([&] {
-        NativeUI::SplashScreen::Paint(splashScreen);
-    });
+    if (!noSplash) {
+        splashScreen.SetCreateCallback([&] {
+            NativeUI::SplashScreen::Create(splashScreen);
+        });
+
+        splashScreen.SetPaintCallback([&] {
+            NativeUI::SplashScreen::Paint(splashScreen);
+        });
 
 #if defined(__linux__)
-    // Create a native app
-    auto nativeApp = std::make_shared<NativeUI::App>();
+        // Create a native app
+        auto nativeApp = std::make_shared<NativeUI::App>();
 
-    nativeApp->SetCreateCallback([&](app_handle_type_t app) {
-        showSplashScreen(app, splashScreen);
-    });
+        nativeApp->SetCreateCallback([&](app_handle_type_t app) {
+            showSplashScreen(app, splashScreen);
+        });
 
-    // GTK application needs to be in another thread
-    // This can be disregarded for other platforms
-    std::thread gtkThread([&]() {
-        // Don't pass any other args to GTK; GTK doesn't like them
-        char* gtkArgv[] = {const_cast<char*>(ARGV[0]), nullptr};
-        nativeApp->Create(1, gtkArgv);
-    });
+        // GTK application needs to be in another thread
+        // This can be disregarded for other platforms
+        std::thread gtkThread([&]() {
+            // Don't pass any other args to GTK; GTK doesn't like them
+            char* gtkArgv[] = {const_cast<char*>(ARGV[0]), nullptr};
+            nativeApp->Create(1, gtkArgv);
+        });
 #elif defined(__APPLE__)
-    // We should be creating a nativeApp object here
-    // But that leads to a lot of threading problems on macOS...
-    showSplashScreen(nullptr, splashScreen);
+        // We should be creating a nativeApp object here
+        // But that leads to a lot of threading problems on macOS...
+        showSplashScreen(nullptr, splashScreen);
 #else
     // Call showSplashScreen directly
     showSplashScreen(nullptr, splashScreen);
 #endif
 
-    // Wait for splash screen to be shown
-    {
-        std::unique_lock<std::mutex> lock(splashMutex);
-        splashCV.wait(lock, [] { return splashReady; });
+        // Wait for splash screen to be shown
+        {
+            std::unique_lock<std::mutex> lock(splashMutex);
+            splashCV.wait(lock, [] { return splashReady; });
+        }
     }
 
-    NativeUI::SplashScreen::SetLoadingText(splashScreen, "Loading settings...");
+    if (!noSplash) NativeUI::SplashScreen::SetLoadingText(splashScreen, "Loading settings...");
     Marmalade::ConfigUtil::SetConfigDirectory(sameDirConfig);
     if (!Marmalade::EngineConfig::GetInstance().LoadConfig()) {
-        NativeUI::MsgBox::ShowMessage(splashScreen.GetHandle(), NativeUI::Util::utf8ToUtf16Str("Failed to load settings. See log for details."), NativeUI::Util::utf8ToUtf16Str("Marmalade Engine"), NativeUI::MsgBox::Style::Style_ERROR);
+        NativeUI::MsgBox::ShowMessage(noSplash ? nullptr : splashScreen.GetHandle(), NativeUI::Util::utf8ToUtf16Str("Failed to load settings. See log for details."), NativeUI::Util::utf8ToUtf16Str("Marmalade Engine"), NativeUI::MsgBox::Style::Style_ERROR);
         return 1;
     }
 
@@ -160,14 +168,14 @@ int main(int argc, char** argv) {
         Marmalade::Plugins::GetInstance().RecreateConfig();
     }
 
-    NativeUI::SplashScreen::SetLoadingText(splashScreen, _("Initialising application..."));
+    if (!noSplash) NativeUI::SplashScreen::SetLoadingText(splashScreen, _("Initialising application..."));
     Application& application = Application::GetInstance(1920, 1080, _("Marmalade Engine"));
     application.Initialise();
 
     bool safeMode = false;
     if (NativeUI::SplashScreen::AreSafeModeKeysHeld()) {
         std::cout << "Key down";
-        if (NativeUI::MsgBox::ShowMessage(splashScreen.GetHandle(), NativeUI::Util::utf8ToUtf16Str(_("Would you like to enable safe mode?")), NativeUI::Util::utf8ToUtf16Str(_("Marmalade Engine")),
+        if (NativeUI::MsgBox::ShowMessage(noSplash ? nullptr : splashScreen.GetHandle(), NativeUI::Util::utf8ToUtf16Str(_("Would you like to enable safe mode?")), NativeUI::Util::utf8ToUtf16Str(_("Marmalade Engine")),
                                           NativeUI::MsgBox::Style::Style_INFO, NativeUI::MsgBox::Buttons::Buttons_YES_NO) == NativeUI::MsgBox::Result::Result_YES) {
             safeMode = true;
         }
@@ -175,13 +183,13 @@ int main(int argc, char** argv) {
 
     if (!safeMode) {
         // Load plugins
-        NativeUI::SplashScreen::SetLoadingText(splashScreen, _("Loading plugins..."));
+        if (!noSplash) NativeUI::SplashScreen::SetLoadingText(splashScreen, _("Loading plugins..."));
         Marmalade::PluginLoader::GetInstance().LoadPlugins();
     }
 
     if (project != nullptr) {
         // Open specified project
-        NativeUI::SplashScreen::SetLoadingText(splashScreen, _("Opening project..."));
+        if (!noSplash) NativeUI::SplashScreen::SetLoadingText(splashScreen, _("Opening project..."));
         if (application.OpenProject(project)) {
             Marmalade::GUI::WindowManager::GetInstance().welcomeScreen.visible = false;
         }
@@ -203,7 +211,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    splashScreen.Close();
+    if (!noSplash) splashScreen.Close();
 
     while (!glfwWindowShouldClose(application.getWindow())) {
         application.InitialiseImGui();
