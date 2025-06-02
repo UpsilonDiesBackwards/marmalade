@@ -261,7 +261,7 @@ void Marmalade::GUI::TopBar::Show() {
         float totalButtonWidth = (editorButtonSize.x + editorButtonSize.x) * 3;
         float totalWidth = (totalButtonWidth + fpsRegionWidth + rightMargin);
 
-        ImGui::SetCursorPosX(windowWidth - totalWidth + 525.0f);
+        ImGui::SetCursorPosX(windowWidth - totalWidth + 475.0f);
 
         ImGui::Text("%s", WorkspaceManager::GetCurrentWorkspaceName().c_str());
 
