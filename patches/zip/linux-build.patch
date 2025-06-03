@@ -1,0 +1,36 @@
+﻿diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1df1fc8..1c1397a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,5 +1,6 @@
+ cmake_minimum_required(VERSION 3.14)
+ 
++set(CMAKE_C_STANDARD 11)
+ project(zip
+   LANGUAGES C
+   VERSION "0.3.0")
+@@ -60,7 +61,6 @@ if (CMAKE_ENABLE_SANITIZERS)
+   add_sanitizers(${PROJECT_NAME})
+ endif()
+ 
+-set(CMAKE_C_STANDARD 90)
+ if (MSVC)
+   # Use secure functions by default and suppress warnings about "deprecated" functions
+   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /D _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES=1")
+diff --git a/src/zip.c b/src/zip.c
+index d00cece..5f32cb0 100644
+--- a/src/zip.c
++++ b/src/zip.c
+@@ -9,6 +9,12 @@
+  */
+ #define __STDC_WANT_LIB_EXT1__ 1
+ 
++#if defined(__linux__)
++#define _DEFAULT_SOURCE
++#include <sys/types.h>
++#include <unistd.h>
++#endif
++
+ #include <errno.h>
+ #include <sys/stat.h>
+ #include <time.h>

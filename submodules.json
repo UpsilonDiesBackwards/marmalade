@@ -74,7 +74,10 @@
     },
     {
       "path": "vendor/zip",
-      "url": "https://github.com/kuba--/zip.git"
+      "url": "https://github.com/kuba--/zip.git",
+      "patches": [
+        "patches/zip/linux-build.patch"
+      ]
     },
     {
       "path": "vendor/assimp",

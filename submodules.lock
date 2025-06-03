@@ -17,3 +17,4 @@ b18a234ed6af38638678a3338c0d7ed90210ae6c vendor/spdlog (v1.x)
 ba1514607d02ce3711d828e784a7e9e2bb25aa84 vendor/libintl-lite (master) *
 d7a2252a537926cbdef8512741a322a183fcfd09 vendor/zip (master)
 c4515f53ca9a60cf4645b9bc837faaf14026b6d1 vendor/assimp (heads/master)
+d7a2252a537926cbdef8512741a322a183fcfd09 vendor/zip (master) *
