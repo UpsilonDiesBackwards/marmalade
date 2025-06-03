@@ -36,7 +36,7 @@ public:
      * \param world World position
      * \return ImVec2 Screen-space position
      */
-    static ImVec2 WorldToScreenSpace(const glm::vec2& world);
+    static ImVec2 WorldToScreenSpace(const glm::vec3& world);
 
     /**
      * \brief Converts a position from screen-space into world-space coordinates

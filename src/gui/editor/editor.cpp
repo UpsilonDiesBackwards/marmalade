@@ -79,14 +79,13 @@ void EditorViews::Show() {
     ImGui::End();
 }
 
-ImVec2 EditorViews::WorldToScreenSpace(const glm::vec2& world) {
+ImVec2 EditorViews::WorldToScreenSpace(const glm::vec3& world) {
     Application& app = Application::GetInstance();
 
     glm::vec2 framebufferSize = glm::vec2(app.framebuffer->width, app.framebuffer->height);
     glm::vec2 framebufferPos = glm::vec2(app.framebuffer->position.x, app.framebuffer->position.y);
 
-    glm::vec4 worldPos = glm::vec4(world, 0.0f, 1.0f);
-
+    glm::vec4 worldPos = glm::vec4(world, 1.0f);
     glm::vec4 clipSpace = app.camera->GetProjection() * app.camera->GetView() * worldPos;
 
     if (clipSpace.w != 0.0f) {
