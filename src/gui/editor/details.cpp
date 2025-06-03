@@ -28,50 +28,77 @@
 void Marmalade::GUI::Details::Draw() {
     WINDOW_BEGIN(ICON_CI_SEARCH " Details", ImGuiWindowFlags_None)
 
-    if (!inspectedEntity) {// Do not draw if there is no entity selected
-        visible = false;
-        ImGui::End();
-        return;
-    }
-
-    ImGui::Text(inspectedEntity->name.c_str());
-    ImGui::Separator();
-
-    for (auto& comp: inspectedEntity->componentManager.components) {
-        ImGui::PushID(comp.get());
-
-        if (ImGui::CollapsingHeader(comp->name.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
-            comp->Display(inspectedEntity);
-
-            if (comp->isMutable) {
-                float buttonWidth = ImGui::CalcTextSize(ICON_CI_TRASHCAN " Remove").x + ImGui::GetStyle().FramePadding.x * 2;
-                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - buttonWidth);
-
-                if (ImGui::Button(ICON_CI_TRASHCAN " Remove")) {
-                    _isRemovingComponent = true;
-                    _selectedComponent = comp.get();
-                }
-            }
+        if (!inspectedEntity) {
+            visible = false;
+            ImGui::End();
+            return;
         }
 
+        ImGui::Text(inspectedEntity->name.c_str());
         ImGui::Separator();
-        ImGui::PopID();
-    }
 
-    ImGui::SetCursorPosX((ImGui::GetWindowSize().x - 125) * 0.5f);
-    if (ImGui::Button(ICON_CI_PLUS " Add Component")) {
-        _addComponentDialog.visible = true;
-    }
+        for (int i = 0; i < inspectedEntity->componentManager.components.size(); ++i) {
+            auto& comp = inspectedEntity->componentManager.components[i];
+            ImGui::PushID(comp.get());
 
-    if (_isRemovingComponent) {
-        ImGui::OpenPopup("Remove Component");
-    }
+            bool open = ImGui::CollapsingHeader(comp->name.c_str(), ImGuiTreeNodeFlags_DefaultOpen);
 
-    ShowRemovePopup();
-    _addComponentDialog.Draw();
+            if (comp->isMutable) {
+                if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
+                        ImGui::SetDragDropPayload("COMPONENT_REORDER", &i, sizeof(int));
+                        ImGui::Text("Moving %s", comp->name.c_str());
+                        ImGui::EndDragDropSource();
+                    }
+                }
+            }
+
+            if (open) {
+                comp->Display(inspectedEntity);
+
+                if (comp->isMutable) {
+                    float buttonWidth = ImGui::CalcTextSize(ICON_CI_TRASHCAN " Remove").x + ImGui::GetStyle().FramePadding.x * 2;
+                    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - buttonWidth);
+                    if (ImGui::Button(ICON_CI_TRASHCAN " Remove")) {
+                        _isRemovingComponent = true;
+                        _selectedComponent = comp.get();
+                    }
+                }
+            }
+
+            if (comp->isMutable) {
+                if (ImGui::BeginDragDropTarget()) {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("COMPONENT_REORDER")) {
+                        IM_ASSERT(payload->DataSize == sizeof(int));
+                        int srcIndex = *(const int*) payload->Data;
+                        if (srcIndex != i) {
+                            auto compToMove = inspectedEntity->componentManager.components[srcIndex];
+                            inspectedEntity->componentManager.components.erase(
+                                    inspectedEntity->componentManager.components.begin() + srcIndex);
+                            inspectedEntity->componentManager.components.insert(
+                                    inspectedEntity->componentManager.components.begin() + i, compToMove);
+                        }
+                    }
+                    ImGui::EndDragDropTarget();
+                }
+            }
+
+            ImGui::Separator();
+            ImGui::PopID();
+        }
+
+
+        ImGui::SetCursorPosX((ImGui::GetWindowSize().x - 125) * 0.5f);
+        if (ImGui::Button(ICON_CI_PLUS " Add Component")) { _addComponentDialog.visible = true; }
+
+        if (_isRemovingComponent) { ImGui::OpenPopup("Remove Component"); }
+
+        ShowRemovePopup();
+        _addComponentDialog.Draw();
 
     WINDOW_END()
 }
+
 /**
  * \brief Shows the modal dialog for removing a component from an entity
  */
