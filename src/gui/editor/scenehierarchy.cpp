@@ -125,6 +125,14 @@ void SceneHierarchy::createEntity(const std::string& name) {
     }
 }
 
+std::vector<std::shared_ptr<Entity>>& SceneHierarchy::GetEntitiesVectorFor(std::shared_ptr<Entity> entity) {
+    if (auto parent = entity->parent.lock()) {
+        return parent->children;
+    } else {
+        return Application::GetInstance().sceneManager.GetCurrentScene()->GetEntities();
+    }
+}
+
 void SceneHierarchy::displayEntity(std::shared_ptr<Entity> entity, int index) {
     std::string nodeLabel = entity->name.empty() ? "New Entity" : entity->name;
     nodeLabel += "##" + std::to_string(index);
@@ -147,7 +155,31 @@ void SceneHierarchy::displayEntity(std::shared_ptr<Entity> entity, int index) {
         nodeFlags |= ImGuiTreeNodeFlags_Selected;
     }
 
+    ImGui::PushID(index);
+
     if (ImGui::TreeNodeEx(nodeLabel.c_str(), nodeFlags)) {
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
+            ImGui::SetDragDropPayload("ENTITY_REORDER", &index, sizeof(int));
+            ImGui::Text("Moving %s", entity->name.c_str());
+            ImGui::EndDragDropSource();
+        }
+
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_REORDER")) {
+                IM_ASSERT(payload->DataSize == sizeof(int));
+                int srcIndex = *(const int*)payload->Data;
+
+                if (srcIndex != index) {
+                    auto& entitiesVec = GetEntitiesVectorFor(entity);
+
+                    auto entityToMove = entitiesVec[srcIndex];
+                    entitiesVec.erase(entitiesVec.begin() + srcIndex);
+                    entitiesVec.insert(entitiesVec.begin() + index, entityToMove);
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
         if (ImGui::IsItemClicked()) {
             bool ctrlHeld = ImGui::GetIO().KeyCtrl;
             if (ctrlHeld) {
@@ -157,9 +189,9 @@ void SceneHierarchy::displayEntity(std::shared_ptr<Entity> entity, int index) {
                                        });
 
                 if (it != _selectedEntities.end()) {
-                    _selectedEntities.erase(it); // If already selected, then deselect
+                    _selectedEntities.erase(it);
                 } else {
-                    _selectedEntities.push_back(entity); // Select entity
+                    _selectedEntities.push_back(entity);
                 }
             } else {
                 _selectedEntities.clear();
@@ -177,13 +209,15 @@ void SceneHierarchy::displayEntity(std::shared_ptr<Entity> entity, int index) {
         }
 
         int i = 0;
-        for (auto& entity: entity->children) {
-            displayEntity(entity, i);
+        for (auto& child : entity->children) {
+            displayEntity(child, i);
             i++;
         }
 
         ImGui::TreePop();
     }
+
+    ImGui::PopID();
 }
 
 void SceneHierarchy::showCreatePopup() {
@@ -321,7 +355,7 @@ void SceneHierarchy::showDeletePopup() {
 
 void SceneHierarchy::SelectEntityByUuid(const std::string& uuid) {
     auto currentScene = Application::GetInstance().sceneManager.GetCurrentScene();
-    auto& entities = currentScene->GetEntities(); // Reference, nice.
+    auto& entities = currentScene->GetEntities();
 
     for (auto& entity : entities) {
         if (entity->uuid == uuid) {

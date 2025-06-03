@@ -42,6 +42,8 @@ private:
     void showDeletePopup();
     void showContextMenu();
     void createEntity(const std::string& name);
+
+    std::vector<std::shared_ptr<Entity>>& GetEntitiesVectorFor(std::shared_ptr<Entity> entity);
 };
 
 #endif
