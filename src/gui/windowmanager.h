@@ -74,18 +74,6 @@ namespace Marmalade::GUI {
         VersionControl versionControl{};
         About about{};
         ConfigErrorDialog configErrorDlg{};
-        SaveWorkspaceDialog saveWorkspaceDlg{};
-        SaveWorkspaceAsDialog saveWorkspaceAsDlg{};
-        Marmalade::GUI::Animation animationManager{};
-        Marmalade::GUI::PackageManager packageManager{};
-        Marmalade::GUI::Log log{true};
-        Marmalade::GUI::ProjectWizard projectWizard{};
-        Marmalade::GUI::Preferences preferences{};
-        Marmalade::GUI::ProjectSettings settings{};
-        Marmalade::GUI::ProjectBrowser projectBrowser{true};
-        Marmalade::GUI::VersionControl versionControl{};
-        Marmalade::GUI::About about{};
-        Marmalade::GUI::ConfigErrorDialog configErrorDlg{};
 
         std::vector<Marmalade::GUI::Window*> windows{};
         std::vector<Dialog> dialogs{};

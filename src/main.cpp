@@ -228,7 +228,7 @@ int main(int argc, char** argv) {
 
 #if defined(__linux__)
     // Wait for GTK thread
-    gtkThread.join();
+    // gtkThread.join();
 #endif
     return 0;
 }
