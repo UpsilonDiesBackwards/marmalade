@@ -85,7 +85,7 @@ glm::vec2 Marmalade::ECS::Light2D::GetPosition() {
 
 void Marmalade::ECS::Light2D::ShowBounds(Entity* entity) {
     glm::vec2 centre = entity->componentManager.GetComponentOfType<Marmalade::ECS::Transform>()->pos;
-    ImVec2 screenCentre = EditorViews::WorldToScreenSpace(centre);
+    ImVec2 screenCentre = EditorViews::WorldToScreenSpace(glm::vec3(centre, 0.0f));
 
     float screenRadius = WorldRadiusToScreenScale(radius);
     ImGui::GetWindowDrawList()->AddCircle(
@@ -105,8 +105,8 @@ void Marmalade::ECS::Light2D::ShowBounds(Entity* entity) {
 
 
 float Marmalade::ECS::Light2D::WorldRadiusToScreenScale(float radius) {
-    ImVec2 screenStart = EditorViews::WorldToScreenSpace(glm::vec2(0.0f, 0.0f));
-    ImVec2 screenEnd = EditorViews::WorldToScreenSpace(glm::vec2(radius, 0.0f));
+    ImVec2 screenStart = EditorViews::WorldToScreenSpace(glm::vec3(0.0f));
+    ImVec2 screenEnd = EditorViews::WorldToScreenSpace(glm::vec3(radius, 0.0f, 0.0f));
 
     glm::vec2 glmScreenStart(screenStart.x, screenStart.y);
     glm::vec2 glmScreenEnd(screenEnd.x, screenEnd.y);

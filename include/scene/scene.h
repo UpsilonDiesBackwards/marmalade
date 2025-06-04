@@ -35,6 +35,7 @@ public:
     void RemoveEntity(Entity* entity);
 
     std::vector<std::shared_ptr<Entity>>& GetEntities();
+    std::shared_ptr<Entity> GetEntity(Entity* ptr);
 
     void AddLight(Marmalade::ECS::Light2D* light);
     void RemoveLight(Marmalade::ECS::Light2D* light);

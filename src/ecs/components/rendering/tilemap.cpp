@@ -101,16 +101,16 @@ void Marmalade::ECS::TileMap::RenderGUIGrid(Entity* entity) const {
     for (int i = 0; i <= columns; ++i) {
         float x = startX + i * spacing;
         if (i == columns) x = startX + gridWidth;
-        ImVec2 start = GET_APP.editorGUI->editorViews.WorldToScreenSpace({x, startY});
-        ImVec2 end   = GET_APP.editorGUI->editorViews.WorldToScreenSpace({x, startY + TileGrid.size.y});
+        ImVec2 start = GET_APP.editorGUI->editorViews.WorldToScreenSpace(glm::vec3{x, startY, 0.0f});
+        ImVec2 end   = GET_APP.editorGUI->editorViews.WorldToScreenSpace(glm::vec3{x, startY + TileGrid.size.y,0.0f});
         drawList->AddLine(start, end, color);
     }
 
     for (int j = 0; j <= rows; ++j) {
         float y = startY + j * spacing;
         if (j == rows) y = startY + gridHeight;
-        ImVec2 start = GET_APP.editorGUI->editorViews.WorldToScreenSpace({startX, y});
-        ImVec2 end   = GET_APP.editorGUI->editorViews.WorldToScreenSpace({startX + TileGrid.size.x, y});
+        ImVec2 start = GET_APP.editorGUI->editorViews.WorldToScreenSpace(glm::vec3{startX, y,0.0f});
+        ImVec2 end   = GET_APP.editorGUI->editorViews.WorldToScreenSpace(glm::vec3{startX + TileGrid.size.x, y, 0.0f});
         drawList->AddLine(start, end, color);
     }
 }

@@ -22,60 +22,50 @@
 #include <iostream>
 #include <algorithm>
 
-Scene::Scene(const std::string& name, const std::string& uuid) : name(name), uuid(uuid) {
-}
+Scene::Scene(const std::string& name, const std::string& uuid) : name(name), uuid(uuid) {}
 
-Scene::~Scene() {
-}
+Scene::~Scene() {}
 
-void Scene::AddEntity(std::shared_ptr<Entity> entity) {
-    entities.push_back(entity);
-}
+void Scene::AddEntity(std::shared_ptr<Entity> entity) { entities.push_back(entity); }
 
-void Scene::RemoveEntity(std::shared_ptr<Entity> entity) {
-    entities.erase(std::find(entities.begin(), entities.end(), entity));
-}
+void Scene::RemoveEntity(std::shared_ptr<Entity> entity) { entities.erase(std::find(entities.begin(), entities.end(), entity)); }
 
 void Scene::RemoveEntity(Entity* entity) {
-    auto it = std::find_if(entities.begin(), entities.end(), [entity](const std::shared_ptr<Entity>& e) {
-        return e.get() == entity;
-    });
+    auto it = std::find_if(entities.begin(), entities.end(), [entity](const std::shared_ptr<Entity>& e) { return e.get() == entity; });
 
-    if (it != entities.end()) {
-        entities.erase(it);
-    }
+    if (it != entities.end()) { entities.erase(it); }
 }
 
-std::vector<std::shared_ptr<Entity>>& Scene::GetEntities() {
-    return entities;
+std::vector<std::shared_ptr<Entity>>& Scene::GetEntities() { return entities; }
+
+std::shared_ptr<Entity> Scene::GetEntity(Entity* ptr) {
+    std::function<std::shared_ptr<Entity>(std::vector<std::shared_ptr<Entity>>&)> recurse;
+    recurse = [&](std::vector<std::shared_ptr<Entity>>& entities) -> std::shared_ptr<Entity> {
+        for (auto& e: entities) {
+            if (e.get() == ptr) return e;
+            if (!e->children.empty()) {
+                auto found = recurse(e->children);
+                if (found) return found;
+            }
+        }
+        return nullptr;
+    };
+
+    return recurse(this->entities);
 }
 
-void Scene::AddLight(Marmalade::ECS::Light2D* light) {
-    lights.push_back(light);
-}
+void Scene::AddLight(Marmalade::ECS::Light2D* light) { lights.push_back(light); }
 
 void Scene::RemoveLight(Marmalade::ECS::Light2D* light) {
     auto it = std::find(lights.begin(), lights.end(), light);
 
-    if (it != lights.end()) {
-        lights.erase(it);
-    }
+    if (it != lights.end()) { lights.erase(it); }
 }
 
-std::vector<Marmalade::ECS::Light2D*> Scene::GetLights() {
-    return lights;
-}
+std::vector<Marmalade::ECS::Light2D*> Scene::GetLights() { return lights; }
 
-void Scene::Render() {
-    for (const auto& entity: entities) {
-        entity->Render();
-    }
-}
+void Scene::Render() { for (const auto& entity: entities) { entity->Render(); } }
 
-const std::string& Scene::GetName() const {
-    return name;
-}
+const std::string& Scene::GetName() const { return name; }
 
-const std::string& Scene::GetUuid() const {
-    return uuid;
-}
+const std::string& Scene::GetUuid() const { return uuid; }

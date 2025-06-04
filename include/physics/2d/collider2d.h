@@ -1,4 +1,3 @@
-
 // Marmalade - Lightweight Game Engine
 // Copyright (C) 2025 Tayler Parsons
 // Copyright (C) 2025 Ryan Bester
@@ -59,15 +58,15 @@ namespace Marmalade::Physics {
      * the entity's transform has rotation.
      */
     struct BoxCollider2D : public ShapeData2D {
-        glm::vec2 size = {1.0f, 1.0f}; //!< Width and height of the 2D Box Collider
-        glm::vec2 offset = {0.0f, 0.0f}; //!< Offset of the box collider
+        glm::vec2 size = {1.0f, 1.0f};//!< Width and height of the 2D Box Collider
+        glm::vec2 offset = {0.0f, 0.0f};//!< Offset of the box collider
 
         /*!
          * \brief Draws the box collider shape using ImGui overlay.
          * \param entityPosition The world position of the entity.
          * \param transform The transform of the entity.
          */
-        void ShowBounds(const glm::vec2 &entityPosition, ECS::Transform transform) override {
+        void ShowBounds(const glm::vec2& entityPosition, ECS::Transform transform) override {
             glm::vec2 center = glm::vec2(transform.pos) + offset;
 
             float angle = glm::eulerAngles(transform.rotation).z;
@@ -76,9 +75,9 @@ namespace Marmalade::Physics {
 
             glm::vec2 corners[4] = {
                     {-halfSize.x, -halfSize.y},
-                    { halfSize.x, -halfSize.y},
-                    { halfSize.x,  halfSize.y},
-                    {-halfSize.x,  halfSize.y}
+                    {halfSize.x, -halfSize.y},
+                    {halfSize.x, halfSize.y},
+                    {-halfSize.x, halfSize.y}
             };
 
             for (int i = 0; i < 4; ++i) {
@@ -88,14 +87,12 @@ namespace Marmalade::Physics {
             }
 
             ImVec2 screenCorners[4];
-            for (int i = 0; i < 4; ++i) {
-                screenCorners[i] = EditorViews::WorldToScreenSpace(corners[i]);
-            }
+            for (int i = 0; i < 4; ++i) { screenCorners[i] = EditorViews::WorldToScreenSpace(glm::vec3(corners[i], 0.0f)); }
 
             ImGui::GetWindowDrawList()->AddQuad(
                     screenCorners[0], screenCorners[1], screenCorners[2], screenCorners[3],
                     ImGui::GetColorU32(IM_COL32(0, 255, 0, 255)), 2.0f
-            );
+                    );
         }
     };
 
@@ -105,31 +102,35 @@ namespace Marmalade::Physics {
      * \brief Represents a circular 2D collider shape.
      */
     struct CircleCollider2D : public ShapeData2D {
-        float radius = 1.0f; //!< Radius of the 2D circle collider
-        glm::vec2 offset = {0.0f, 0.0f}; //!< Offset of the circle collider
+        float radius = 1.0f;//!< Radius of the 2D circle collider
+        glm::vec2 offset = {0.0f, 0.0f};//!< Offset of the circle collider
 
         /*!
          * \brief Draws the circle collider shape using ImGui overlay.
          * \param entityPosition The world position of the entity.
          * \param transform The transform of the entity.
          */
-        void ShowBounds(const glm::vec2 &entityPosition, ECS::Transform transform) override {
-            glm::vec2 center = glm::vec2(transform.pos) + offset;
-            ImVec2 screenCenter = EditorViews::WorldToScreenSpace(center);
+        void ShowBounds(const glm::vec2& entityPosition, ECS::Transform transform) override {
+            glm::vec3 center3D = transform.pos + glm::vec3(offset, 0.0f);
+            const int segments = 32;
+            const float angleStep = glm::two_pi<float>() / segments;
 
-            ImVec2 screenEdge = EditorViews::WorldToScreenSpace(center + glm::vec2(radius, 0));
-            float screenRadius = glm::distance(
-                    glm::vec2(screenCenter.x, screenCenter.y),
-                    glm::vec2(screenEdge.x, screenEdge.y)
-            );
+            ImVec2 screenPoints[segments];
 
-            ImGui::GetWindowDrawList()->AddCircle(
-                    screenCenter, screenRadius,
-                    ImGui::GetColorU32(IM_COL32(0, 255, 255, 255)), 32, 2.0f
-            );
+            for (int i = 0; i < segments; ++i) {
+                float angle = i * angleStep;
+                glm::vec2 localOffset = radius * glm::vec2(cos(angle), sin(angle));
+                glm::vec3 worldPoint = center3D + glm::vec3(localOffset, 0.0f); // on XY plane
+                screenPoints[i] = EditorViews::WorldToScreenSpace(worldPoint);
+            }
+
+            ImDrawList* drawList = ImGui::GetWindowDrawList();
+            for (int i = 0; i < segments; ++i) {
+                drawList->AddLine(screenPoints[i], screenPoints[(i + 1) % segments], ImGui::GetColorU32(IM_COL32(0, 255, 255, 255)), 1.5f);
+            }
         }
-    };
 
+    };
 
     /*!
      * \struct Collider2D
@@ -139,8 +140,8 @@ namespace Marmalade::Physics {
      * and type-based handling (e.g., during collision resolution).
      */
     struct Collider2D {
-        ColliderType2D type;  //!< Type of the collider
-        std::shared_ptr<ShapeData2D> shape;  //!< Shared ptr to the shape data
+        ColliderType2D type;//!< Type of the collider
+        std::shared_ptr<ShapeData2D> shape;//!< Shared ptr to the shape data
     };
 }
 

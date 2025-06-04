@@ -233,8 +233,8 @@ void EditView::ViewportOrthographicInput() {
             bool withinBounds = (worldCoords.x >= minBounds.x && worldCoords.x <= maxBounds.x &&
                                  worldCoords.y >= minBounds.y && worldCoords.y <= maxBounds.y);
             if (withinBounds) {
-                auto screenMin = EditorViews::WorldToScreenSpace(minBounds);
-                auto screenMax = EditorViews::WorldToScreenSpace(maxBounds);
+                auto screenMin = EditorViews::WorldToScreenSpace(glm::vec3(minBounds, 0.0f));
+                auto screenMax = EditorViews::WorldToScreenSpace(glm::vec3(maxBounds, 0.0f));
 
                 ImGui::GetForegroundDrawList(ImGui::GetMainViewport())->AddRect(
                         screenMin, screenMax,
@@ -317,8 +317,8 @@ void EditView::ViewportPerspectiveInput() {
             bool withinBounds = (worldCoords.x >= minBounds.x && worldCoords.x <= maxBounds.x &&
                                  worldCoords.y >= minBounds.y && worldCoords.y <= maxBounds.y);
             if (withinBounds) {
-                auto screenMin = EditorViews::WorldToScreenSpace(minBounds);
-                auto screenMax = EditorViews::WorldToScreenSpace(maxBounds);
+                auto screenMin = EditorViews::WorldToScreenSpace(glm::vec3(minBounds, 0.0f));
+                auto screenMax = EditorViews::WorldToScreenSpace(glm::vec3(maxBounds, 0.0f));
 
                 ImGui::GetForegroundDrawList(ImGui::GetMainViewport())->AddRect(
                         screenMin, screenMax,
