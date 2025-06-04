@@ -3,7 +3,10 @@
     {
       "path": "vendor/imgui",
       "url": "https://github.com/ocornut/imgui.git",
-      "branch": "docking"
+      "branch": "docking",
+      "patches": [
+        "patches/imgui/fix-monitor-crash.patch"
+      ]
     },
     {
       "path": "vendor/glfw",
