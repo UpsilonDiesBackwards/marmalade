@@ -26,6 +26,10 @@
 
 #define WORKSPACES_DIR_NAME "workspaces"
 
+/// \cond FORWARD_DECL_HIDE
+struct GLFWmonitor;
+/// \endcond
+
 namespace Marmalade::GUI {
     /**
      * \brief Manages Workspaces
@@ -71,6 +75,8 @@ namespace Marmalade::GUI {
         static bool IsTopologyWorkspace();
 
         static std::string GetCurrentTopology();
+
+        static void MonitorConfigCallback(GLFWmonitor *monitor, int event);
 
         /**
          * \brief The target workspace path, used when requesting change of workspace.

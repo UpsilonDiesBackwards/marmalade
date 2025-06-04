@@ -1,7 +1,34 @@
 ﻿diff --git a/backends/imgui_impl_glfw.cpp b/backends/imgui_impl_glfw.cpp
-index 0fc23003..76280c9a 100644
+index 0fc23003..465cb75a 100644
 --- a/backends/imgui_impl_glfw.cpp
 +++ b/backends/imgui_impl_glfw.cpp
+@@ -567,7 +567,7 @@ void ImGui_ImplGlfw_InstallCallbacks(GLFWwindow* window)
+     bd->PrevUserCallbackScroll = glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
+     bd->PrevUserCallbackKey = glfwSetKeyCallback(window, ImGui_ImplGlfw_KeyCallback);
+     bd->PrevUserCallbackChar = glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
+-    bd->PrevUserCallbackMonitor = glfwSetMonitorCallback(ImGui_ImplGlfw_MonitorCallback);
++    // bd->PrevUserCallbackMonitor = glfwSetMonitorCallback(ImGui_ImplGlfw_MonitorCallback);
+     bd->InstalledCallbacks = true;
+ }
+ 
+@@ -584,7 +584,7 @@ void ImGui_ImplGlfw_RestoreCallbacks(GLFWwindow* window)
+     glfwSetScrollCallback(window, bd->PrevUserCallbackScroll);
+     glfwSetKeyCallback(window, bd->PrevUserCallbackKey);
+     glfwSetCharCallback(window, bd->PrevUserCallbackChar);
+-    glfwSetMonitorCallback(bd->PrevUserCallbackMonitor);
++    // glfwSetMonitorCallback(bd->PrevUserCallbackMonitor);
+     bd->InstalledCallbacks = false;
+     bd->PrevUserCallbackWindowFocus = nullptr;
+     bd->PrevUserCallbackCursorEnter = nullptr;
+@@ -692,7 +692,7 @@ static bool ImGui_ImplGlfw_Init(GLFWwindow* window, bool install_callbacks, Glfw
+     // Update monitor a first time during init
+     // (note: monitor callback are broken in GLFW 3.2 and earlier, see github.com/glfw/glfw/issues/784)
+     ImGui_ImplGlfw_UpdateMonitors();
+-    glfwSetMonitorCallback(ImGui_ImplGlfw_MonitorCallback);
++    // glfwSetMonitorCallback(ImGui_ImplGlfw_MonitorCallback);
+ 
+     // Set platform dependent data in viewport
+     ImGuiViewport* main_viewport = ImGui::GetMainViewport();
 @@ -966,7 +966,8 @@ static void ImGui_ImplGlfw_UpdateMonitors()
          float x_scale, y_scale;
          glfwGetMonitorContentScale(glfw_monitors[n], &x_scale, &y_scale);

@@ -88,6 +88,9 @@ void Marmalade::GUI::Preferences::drawGeneralAppearancePane() {
     }
     ImGui::SameLine();
     requiresRestartWarning();
+
+    ImGui::Checkbox("Automatic Workspace Switching", &EngineConfig::GetStoredConfig().appearance.automaticWorkspaceSwitching);
+    ImGui::SetItemTooltip("Automatically switch to a different workspace topology when a monitor is connected or disconnected.");
 }
 
 void Marmalade::GUI::Preferences::drawGeneralProjectsPane() {

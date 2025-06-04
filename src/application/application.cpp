@@ -164,6 +164,8 @@ void Application::Initialise() {
     imguiIni.close();
 
     Marmalade::GUI::WorkspaceManager::targetWorkspacePath = imguiIniPathStr;
+
+    glfwSetMonitorCallback(&Marmalade::GUI::WorkspaceManager::MonitorConfigCallback);
 }
 
 void Application::InitialiseImGui() {

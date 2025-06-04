@@ -187,3 +187,9 @@ std::string Marmalade::GUI::WorkspaceManager::GetCurrentTopology() {
 
     return topo.str();
 }
+
+void Marmalade::GUI::WorkspaceManager::MonitorConfigCallback(GLFWmonitor* monitor, int event) {
+    if (EngineConfig::GetStoredConfig().appearance.automaticWorkspaceSwitching) {
+        LoadWorkspace(GetWorkspacesDir() / (GetCurrentWorkspaceName() + ".ini"));
+    }
+}
