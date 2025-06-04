@@ -58,6 +58,8 @@ namespace Marmalade::GUI {
 
         static void ExportCurrentWorkspace(std::filesystem::path exportPath);
 
+        static void ImportWorkspace(std::filesystem::path importPath);
+
         static std::filesystem::path GetWorkspacesDir();
 
         static std::vector<std::string> GetWorkspaces(bool ignoreCache = false);
@@ -65,6 +67,10 @@ namespace Marmalade::GUI {
         static std::unordered_map<std::string, std::string> GetTopologiesForWorkspace(std::filesystem::path workspace);
 
         static std::string GetCurrentWorkspaceName();
+
+        static bool IsTopologyWorkspace();
+
+        static std::string GetCurrentTopology();
 
         /**
          * \brief The target workspace path, used when requesting change of workspace.

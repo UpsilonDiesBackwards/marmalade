@@ -22,6 +22,8 @@
 #include "../application/application.h"
 #include "../application/config/configutil.h"
 
+#include <GLFW/glfw3.h>
+
 #include <zip.h>
 
 #include <filesystem>
@@ -33,6 +35,14 @@ std::vector<std::string> Marmalade::GUI::WorkspaceManager::_workspaceCache{};
 
 void Marmalade::GUI::WorkspaceManager::LoadWorkspace(const std::filesystem::path& workspacePath) {
     std::string iniPathStr = workspacePath.string();
+
+    // Find topology
+    auto targetTopo = GetCurrentTopology();
+    auto topos = GetTopologiesForWorkspace(iniPathStr);
+    auto it = topos.find(targetTopo);
+    if (it != topos.end()) {
+        iniPathStr = it->second;
+    }
 
     targetWorkspacePath = iniPathStr;
     GET_APP.ChangeWorkspace();
@@ -67,6 +77,20 @@ void Marmalade::GUI::WorkspaceManager::ExportCurrentWorkspace(std::filesystem::p
     for (const auto& [topo, file]: topologies) {
         zip_entry_open(zip, std::filesystem::path(file).filename().string().c_str());
         zip_entry_fwrite(zip, file.c_str());
+        zip_entry_close(zip);
+    }
+
+    zip_close(zip);
+}
+
+void Marmalade::GUI::WorkspaceManager::ImportWorkspace(std::filesystem::path importPath) {
+    struct zip_t* zip = zip_open(importPath.string().c_str(), 0, 'r');
+
+    int n = zip_entries_total(zip);
+    for (int i = 0; i < n; i++) {
+        zip_entry_openbyindex(zip, i);
+        const char* name = zip_entry_name(zip);
+        zip_entry_fread(zip, (GetWorkspacesDir() / name).string().c_str());
         zip_entry_close(zip);
     }
 
@@ -131,5 +155,35 @@ std::unordered_map<std::string, std::string> Marmalade::GUI::WorkspaceManager::G
 }
 
 std::string Marmalade::GUI::WorkspaceManager::GetCurrentWorkspaceName() {
-    return std::filesystem::path(currentWorkspacePath).filename().replace_extension("").string();
+    auto filename = std::filesystem::path(currentWorkspacePath).filename().replace_extension("").string();
+
+    size_t atPos = filename.find('@');
+    if (atPos == std::string::npos) {
+        return filename;
+    }
+
+    return filename.substr(0, atPos);
+}
+
+bool Marmalade::GUI::WorkspaceManager::IsTopologyWorkspace() {
+    size_t atPos = currentWorkspacePath.find('@');
+    return atPos != std::string::npos;
+}
+
+std::string Marmalade::GUI::WorkspaceManager::GetCurrentTopology() {
+    std::stringstream topo;
+
+    int count = 0;
+    GLFWmonitor** monitors = glfwGetMonitors(&count);
+    for (int i = 0; i < count; i++) {
+        int width, height = 0;
+        glfwGetMonitorWorkarea(monitors[i], nullptr, nullptr, &width, &height);
+        if (width > height) {
+            topo << "h";
+        } else {
+            topo << "v";
+        }
+    }
+
+    return topo.str();
 }

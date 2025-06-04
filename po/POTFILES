@@ -39,6 +39,7 @@
 ../src/ecs/components/physics/2d/circlecollider2d.cpp
 ../src/ecs/components/physics/2d/rigidbody2d.cpp
 ../src/ecs/components/rendering/materialrenderer.cpp
+../src/ecs/components/rendering/modelrenderer.cpp
 ../src/ecs/components/rendering/tilemap.cpp
 ../src/ecs/components/transform.cpp
 ../src/graphics/framebuffer.cpp
@@ -54,6 +55,7 @@
 ../src/gui/components/selectablelistview.h
 ../src/gui/components/tableview.h
 ../src/gui/components/util.h
+../src/gui/dialog.h
 ../src/gui/dialogs/about.cpp
 ../src/gui/dialogs/about.h
 ../src/gui/dialogs/addcomponent.cpp

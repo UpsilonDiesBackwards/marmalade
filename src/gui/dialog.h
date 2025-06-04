@@ -31,6 +31,14 @@
 namespace Marmalade::GUI {
     struct Dialog;
 
+    /**
+     * \brief Callback on dialog result.
+     *
+     * @param result Whether the dialog was confirmed (true) or cancelled (false).
+     * @param data A user-provided pointer passed to the callback.
+     */
+    using DialogCallback = std::function<void(bool result, void* data)>;
+
     class CustomDialog : public Window {
     public:
         virtual std::string GetName() = 0;
@@ -48,7 +56,7 @@ namespace Marmalade::GUI {
         std::string Name;
         ImGuiWindowFlags Flags;
         ImVec2 MinSize;
-        std::function<void(bool, void*)> Callback;
+        DialogCallback Callback;
     };
 }
 

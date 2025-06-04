@@ -189,7 +189,8 @@ void Marmalade::GUI::TopBar::Show() {
                         WorkspaceManager::LoadWorkspace(newPath);
 
                         // Refresh workspaces list
-                        WorkspaceManager::GetWorkspaces(true); }, true);
+                        WorkspaceManager::GetWorkspaces(true);
+                    }, true);
                     WindowManager::GetInstance().ShowDialog(dlg.Name);
                 }
                 if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Save Workspace As..."))) {
@@ -202,13 +203,36 @@ void Marmalade::GUI::TopBar::Show() {
                         WorkspaceManager::LoadWorkspace(newPath);
 
                         // Refresh workspaces list
-                        WorkspaceManager::GetWorkspaces(true); }, true);
+                        WorkspaceManager::GetWorkspaces(true);
+                    }, true);
                     WindowManager::GetInstance().ShowDialog(dlg.Name);
                 }
 
                 ImGui::Separator();
 
-                ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Import Workspace..."));
+                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Save for this Topology"))) {
+                    auto topo = WorkspaceManager::GetCurrentTopology();
+                    auto newPath = WorkspaceManager::GetWorkspacesDir() / (WorkspaceManager::GetCurrentWorkspaceName() + "@" + topo + ".ini");
+                    WorkspaceManager::SaveCurrentWorkspace(newPath);
+                    WorkspaceManager::LoadWorkspace(newPath);
+                }
+                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Revert this Topology"))) {
+                    if (WorkspaceManager::IsTopologyWorkspace()) {
+                        WorkspaceManager::DeleteCurrentWorkspace(WorkspaceManager::GetWorkspacesDir() / (WorkspaceManager::GetCurrentWorkspaceName() + ".ini"));
+                    }
+                }
+
+                ImGui::Separator();
+
+                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Import Workspace..."))) {
+                    IGFD::FileDialogConfig config = WindowManager::PrepareFileDialogConfig();
+                    auto dialog = WindowManager::GetInstance().RegisterFileDialog("ImportWorkspace", [](bool result, void* data) {
+                        auto* fileResult = static_cast<WindowManager::FileDialogResult*>(data);
+                        WorkspaceManager::ImportWorkspace(fileResult->FilePath);
+                        WorkspaceManager::GetWorkspaces(true);
+                    });
+                    ImGuiFileDialog::Instance()->OpenDialog(dialog.Name, "Import Workspace", ".marmws", config);
+                }
                 if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Export Workspace..."))) {
                     IGFD::FileDialogConfig config = WindowManager::PrepareFileDialogConfig(WorkspaceManager::GetWorkspacesDir().string());
                     auto dialog = WindowManager::GetInstance().RegisterFileDialog("ExportWorkspace", [](bool result, void* data) {
@@ -267,7 +291,7 @@ void Marmalade::GUI::TopBar::Show() {
 
         ImGui::SetCursorPosX(windowWidth - totalWidth + 475.0f);
 
-        ImGui::Text("%s", WorkspaceManager::GetCurrentWorkspaceName().c_str());
+        ImGui::Text("%s%s", WorkspaceManager::GetCurrentWorkspaceName().c_str(), WorkspaceManager::IsTopologyWorkspace() ? "*" : "");
 
         ImGui::TextColored(ImVec4(0.7f, 0.9f, 1.0f, 1.0f), ICON_CI_SAVE "");
 

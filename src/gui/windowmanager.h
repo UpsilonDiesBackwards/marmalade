@@ -46,14 +46,25 @@
 
 #include <vector>
 
+/// \cond IGFD_HIDE
 // Forward decl
 namespace IGFD {
     struct FileDialogConfig;
 }
 typedef int ImGuiFileDialogFlags;
 const int FDF_Modal = 1 << 9;
+/// \endcond
 
 namespace Marmalade::GUI {
+    /**
+     * \brief Manages visibility of windows and dialogs.
+     *
+     * Windows are stored in their own field, and are added to the \ref windows vector.
+     *
+     * Dialogs and file dialogs are registered with the `RegisterDialog()` and `RegisterFileDialog()` methods.
+     *
+     * See \ref cp-windows-and-dialogs for more information.
+     */
     class WindowManager {
     public:
         struct FileDialogResult {
@@ -74,6 +85,16 @@ namespace Marmalade::GUI {
         VersionControl versionControl{};
         About about{};
         ConfigErrorDialog configErrorDlg{};
+        Marmalade::GUI::Animation animationManager{};
+        Marmalade::GUI::PackageManager packageManager{};
+        Marmalade::GUI::Log log{true};
+        Marmalade::GUI::ProjectWizard projectWizard{};
+        Marmalade::GUI::Preferences preferences{};
+        Marmalade::GUI::ProjectSettings settings{};
+        Marmalade::GUI::ProjectBrowser projectBrowser{true};
+        Marmalade::GUI::VersionControl versionControl{};
+        Marmalade::GUI::About about{};
+        Marmalade::GUI::ConfigErrorDialog configErrorDlg{};
 
         std::vector<Marmalade::GUI::Window*> windows{};
         std::vector<Dialog> dialogs{};
@@ -83,11 +104,40 @@ namespace Marmalade::GUI {
 
         void ToggleDebugWindow();
 
-        Dialog RegisterDialog(std::shared_ptr<CustomDialog> customDlg, const std::function<void(bool, void*)>& callback, bool reregister = false, ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse, ImVec2 minSize = ImVec2(800, 500));
+        /**
+         * \brief Registers a custom dialog.
+         * \param customDlg Instance of an object extending `CustomDialog`.
+         * \param callback The callback function.
+         * \param reregister Whether the object should be reassigned.
+         * \param flags ImGui window flags.
+         * \param minSize The minimum size of the dialog.
+         * \return The `Dialog` object.
+         */
+        Dialog RegisterDialog(std::shared_ptr<CustomDialog> customDlg, const DialogCallback& callback, bool reregister = false, ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse, ImVec2 minSize = ImVec2(800, 500));
+
+        /**
+         * \brief Shows a custom dialog.
+         * \param name The name of the dialog.
+         */
         void ShowDialog(std::string name);
 
+        /**
+         * \brief Prepares the config for a file dialog.
+         * \param path The default path. If empty, set to the current project directory.
+         * \param flags File dialog flags.
+         * \return The `FileDialogConfig` object.
+         */
         static IGFD::FileDialogConfig PrepareFileDialogConfig(const std::string& path = "", int flags = FDF_Modal);
-        Dialog RegisterFileDialog(std::string name, const std::function<void(bool, void*)>& callback, ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse, ImVec2 minSize = ImVec2(800, 500));
+
+        /**
+         * \brief Registers a file dialog.
+         * \param name The name of the dialog.
+         * \param callback The callback function.
+         * \param flags ImGui window flags.
+         * \param minSize The minimum size of the dialog.
+         * \return The `Dialog` object.
+         */
+        Dialog RegisterFileDialog(std::string name, const DialogCallback& callback, ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse, ImVec2 minSize = ImVec2(800, 500));
 
     private:
         WindowManager();

@@ -46,7 +46,7 @@ void Marmalade::GUI::WindowManager::ToggleDebugWindow() {
     showDebugWindow = !showDebugWindow;
 }
 
-Marmalade::GUI::Dialog Marmalade::GUI::WindowManager::RegisterDialog(std::shared_ptr<CustomDialog> customDlg, const std::function<void(bool, void*)>& callback, bool reregister, ImGuiWindowFlags flags, ImVec2 minSize) {
+Marmalade::GUI::Dialog Marmalade::GUI::WindowManager::RegisterDialog(std::shared_ptr<CustomDialog> customDlg, const DialogCallback& callback, bool reregister, ImGuiWindowFlags flags, ImVec2 minSize) {
     auto it = std::find_if(dialogs.begin(), dialogs.end(), [&](const Dialog& d) {
         return d.Name == customDlg->GetName();
     });
@@ -89,7 +89,7 @@ IGFD::FileDialogConfig Marmalade::GUI::WindowManager::PrepareFileDialogConfig(co
     return config;
 }
 
-Marmalade::GUI::Dialog Marmalade::GUI::WindowManager::RegisterFileDialog(std::string name, const std::function<void(bool, void*)>& callback, ImGuiWindowFlags flags, ImVec2 minSize) {
+Marmalade::GUI::Dialog Marmalade::GUI::WindowManager::RegisterFileDialog(std::string name, const DialogCallback& callback, ImGuiWindowFlags flags, ImVec2 minSize) {
     auto it = std::find_if(fileDialogs.begin(), fileDialogs.end(), [&](const Dialog& d) {
         return d.Name == name;
     });
