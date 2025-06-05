@@ -1,0 +1,128 @@
+/** \page cp-config Config
+
+The `Marmalade::Config` API is a powerful API to manage configuration files, and update them between versions.
+
+\section basics Basics
+
+We'll go by example, generating a basic config file.
+
+```cpp
+using namespace Marmalade;
+
+// ----- myconfig.h -----
+
+// Structure representing the config
+// Default values can be placed inside curly brackets
+struct MyConfig {
+    std::string name{"Hello"};
+    int count{5};
+    std::vector<std::string> items{};
+};
+
+// Class for MyConfig
+class MyConfigObj : public Config<MyConfig> {
+    public:
+        explicit MyConfigObj();
+
+        // Declare a singleton
+        CONFIG_SINGLETON(MyConfigObj)
+
+        // Declare a getter for easy config access
+        CONFIG_DECL_GET_FUNC(MyConfigObj)
+};
+
+// Define JSON type for MyConfig
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(MyConfig, name, count);
+
+// ----- myconfig.cpp -----
+
+MyConfigObj::MyConfigObj() : Config<MyConfig>(ConfigUtil::GetConfigDirectory() / "myconfig.json") {
+    // Enable fancy GUI error handling
+    useGui = true;
+}
+```
+
+That is all that is required for basic config. For usage:
+
+```cpp
+// Pass config error dialog for fancy GUI error handling
+MyConfig::GetInstance().LoadConfig(&GUI::WindowManager::GetInstance().configErrorDlg);
+
+// Accessing data:
+std::cout << MyConfig::GetStoredConfig().name << std::endl;
+MyConfig::GetStoredConfig().name = "New name";
+
+// Saving
+MyConfig::GetInstance().SaveConfig();
+```
+
+\section preparing Preparing Config
+
+You may want to set some default data when preparing new config, such as adding an item to the `items` array.
+
+```cpp
+// ----- myconfig.h -----
+
+class MyConfigObj : public Config<MyConfig> {
+    public:
+        // ...
+        void PrepareNewConfig() override;
+};
+
+// ----- myconfig.cpp -----
+
+void MyConfig::PrepareNewConfig() {
+    storedConfig.items.push_back("My item");
+}
+```
+
+\section recreations Recreations
+
+If a config fails to load, there is the option for recreating it. This allows you to implement the `Marmalade::Config::PrepareConfigRecreation()` and `Marmalade::Config::EndConfigRecreation()` methods to try and extract any data.
+
+```cpp
+void MyConfig::PrepareConfigRecreation() {
+    // 1. Read file data
+    // 2. Use non-JSON parsing techniques to find data, e.g. regex
+    // 3. Save in a variable somewhere
+}
+
+void MyConfig::EndConfigRecreation() {
+    // Modify storedConfig to set saved variable
+}
+```
+
+\section migrations Migrations
+
+If a key is added or removed in a new version of the config, the config wil fail to load.
+
+Migrations allow you to fix the data before loading it into the structure.
+
+```cpp
+// ----- myconfig.h -----
+#define CONFIG_VERSION 2
+
+class MyConfigObj : public Config<MyConfig> {
+    // ...
+    private:
+        static void migrateFromVersion1(nlohmann::json& data);
+};
+
+// ----- myconfig.cpp -----
+MyConfigObj::MyConfigObj() : Config<MyConfig>(ConfigUtil::GetConfigDirectory() / "myconfig.json") {
+    // ...
+    version = CONFIG_VERSION;
+
+    AddMigration(1, migrateFromVersion1);
+}
+
+void MyConfig::migrateFromVersion1(nlohmann::json& data) {
+    // Add code here for adding or removing keys
+}
+```
+
+If the version property in the config is lower than `CONFIG_VERSION`, the migrations will run, in order.
+
+Note that the `data` provided here is not in a structure, it is a raw JSON object.
+
+*/

@@ -6,4 +6,5 @@ This section contains information about developing Marmalade.
 - \subpage cp-localisation
 - \subpage imgui-hooks
 - \subpage cp-windows-and-dialogs
+- \subpage cp-config
  */
