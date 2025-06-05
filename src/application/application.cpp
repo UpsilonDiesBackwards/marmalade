@@ -199,7 +199,7 @@ void Application::InitialiseImGui() {
     ImGui::GetCurrentContext()->SettingsLoaded = true;
 
 
-    io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_NavEnableKeyboard;
     if (Marmalade::EngineConfig::GetStoredConfig().appearance.viewports) {
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     }

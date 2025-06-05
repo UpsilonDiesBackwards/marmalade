@@ -37,8 +37,8 @@
 
 #include <libintl.h>
 
-void Marmalade::GUI::TopBar::Show() {
-    static bool showStyleEditor = false;
+void Marmalade::GUI::TopBar::Show()
+{
     static bool showSceneCreationPopUp = false;
     static char sceneNameBuffer[256] = "";
     static bool showSceneOpenPopUp = false;
@@ -120,7 +120,7 @@ void Marmalade::GUI::TopBar::Show() {
 
         if (ImGui::BeginMenu(pgettext("Menu|", "Settings"))) {
             ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_SETTINGS, pgettext("Menu|Settings|", "Project Settings")), nullptr, &WindowManager::GetInstance().settings.visible);
-            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_EDIT, pgettext("Menu|Settings|", "Style Editor")), nullptr, &showStyleEditor);
+            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_EDIT, pgettext("Menu|Settings|", "Style Editor")), nullptr, &WindowManager::GetInstance().showStyleEditor);
             ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_SETTINGS_GEAR, pgettext("Menu|Settings|", "Preferences")), nullptr, &WindowManager::GetInstance().preferences.visible);
 
             ImGui::EndMenu();
@@ -299,7 +299,7 @@ void Marmalade::GUI::TopBar::Show() {
             ImGui::BeginTooltip();
 
             ImGui::Text("Autosaved: %s", GET_APP.autoSave.lastSaveTimeStamp.c_str());
-            ImGui::Text("Autosaving in: %.0f:%02d", GET_APP.time.timeUntilNextAutosave / 60, (int)GET_APP.time.timeUntilNextAutosave % 60);
+            ImGui::Text("Autosaving in: %.0f:%02d", GET_APP.time.timeUntilNextAutosave / 60, static_cast<int>(GET_APP.time.timeUntilNextAutosave) % 60);
 
             ImGui::EndTooltip();
         }
@@ -397,10 +397,10 @@ void Marmalade::GUI::TopBar::Show() {
         ImGui::EndMainMenuBar();
     }
 
-    if (showStyleEditor) {
+    if (WindowManager::GetInstance().showStyleEditor) {
         ImGui::SetNextWindowPos(ImVec2(86, 53), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(388, 976), ImGuiCond_FirstUseEver);
-        ImGui::Begin("Style Editor", &showStyleEditor);
+        ImGui::Begin("Style Editor", &WindowManager::GetInstance().showStyleEditor);
         ImGui::ShowStyleEditor();
         ImGui::End();
     }

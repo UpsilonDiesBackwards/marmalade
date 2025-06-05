@@ -53,12 +53,18 @@ namespace Marmalade::GUI {
         void drawSplit();
 
         static void drawGeneralLoggingPane();
-        static void drawGeneralAppearancePane();
         static void drawGeneralProjectsPane();
-        static void drawGeneralProjectBrowserPane();
         static void drawGeneralSystemIntegrationPane();
         static void drawGeneralPluginsPane();
+
+        static void drawUIAppearancePane();
+        static void drawUIWorkspacesPane();
+        static void drawUIProjectBrowserPane();
+        static void drawUILocalizationPane();
+
         static void drawAudioInputOutputPane();
+
+        static void drawAdvancedGraphicsPane();
 
         static void requiresRestartWarning();
         static bool getLogLevels(void* data, int idx, const char** outText);

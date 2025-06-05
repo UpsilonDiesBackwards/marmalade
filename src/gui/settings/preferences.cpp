@@ -19,6 +19,7 @@
 
 #include "preferences.h"
 
+#include "../windowmanager.h"
 #include "../../application/config/engineconfig.h"
 #include "../../application/config/configutil.h"
 #include "../../application/application.h"
@@ -36,119 +37,25 @@
 Marmalade::GUI::Preferences::Preferences() : Window() {
     _panes = {
             {"logging", PreferencesPane(drawGeneralLoggingPane)},
-            {"appearance", PreferencesPane(drawGeneralAppearancePane)},
             {"projects", PreferencesPane(drawGeneralProjectsPane)},
-            {"projectBrowser", PreferencesPane(drawGeneralProjectBrowserPane)},
             {"systemIntegration", PreferencesPane(drawGeneralSystemIntegrationPane)},
+            {"appearance", PreferencesPane(drawUIAppearancePane)},
+            {"workspaces", PreferencesPane(drawUIWorkspacesPane)},
+            {"projectBrowser", PreferencesPane(drawUIProjectBrowserPane)},
+            {"localization", PreferencesPane(drawUILocalizationPane)},
             {"plugins", PreferencesPane(drawGeneralPluginsPane)},
-            {"input/output", PreferencesPane(drawAudioInputOutputPane)}};
+            {"input/output", PreferencesPane(drawAudioInputOutputPane)},
+            {"graphics", PreferencesPane(drawAdvancedGraphicsPane)}};
 }
 
-void Marmalade::GUI::Preferences::drawGeneralLoggingPane() {
-    ImGui::Combo("Log Level", reinterpret_cast<int*>(&EngineConfig::GetStoredConfig().logLevel), getLogLevels, nullptr, spdlog::level::n_levels);
-    ImGui::SameLine();
-    requiresRestartWarning();
-}
+void Marmalade::GUI::Preferences::Draw() {
+    ImGui::SetNextWindowSize(ImVec2(800, 500), ImGuiCond_FirstUseEver);
 
-void Marmalade::GUI::Preferences::drawGeneralAppearancePane() {
-    ImGui::Checkbox("ImGui Viewports", &EngineConfig::GetStoredConfig().appearance.viewports);
-    ImGui::SameLine();
-    requiresRestartWarning();
+    WINDOW_BEGIN(ICON_WITH_TEXT(ICON_CI_SETTINGS_GEAR, _("Preferences")), ImGuiWindowFlags_NoDocking)
 
-    static char themeFileC[512];
-    strncpy(themeFileC, EngineConfig::GetStoredConfig().appearance.themeFile.c_str(), sizeof(themeFileC));
+    drawSplit();
 
-    if (ImGui::InputText("Theme File", themeFileC, sizeof(themeFileC))) {
-        EngineConfig::GetStoredConfig().appearance.themeFile = themeFileC;
-    }
-    ImGui::SameLine();
-    requiresRestartWarning();
-
-    static auto backgroundCol = ImGui::ColorConvertU32ToFloat4(EngineConfig::GetStoredConfig().appearance.backgroundColor);
-    if (ImGui::ColorEdit4("Background Color", &backgroundCol.x)) {
-        EngineConfig::GetStoredConfig().appearance.backgroundColor = ImGui::ColorConvertFloat4ToU32(backgroundCol);
-    }
-
-    ImGui::BeginDisabled(EngineConfig::GetStoredConfig().appearance.useSystemScaleFactor);
-    ImGui::SetNextItemWidth(150.0f);
-    ImGui::DragFloat("Scale Factor", &EngineConfig::GetStoredConfig().appearance.scaleFactor, 0.1f, 0.0f, 5.0f);
-    ImGui::EndDisabled();
-
-    ImGui::SameLine();
-    ImGui::Checkbox("Use System", &EngineConfig::GetStoredConfig().appearance.useSystemScaleFactor);
-
-    ImGui::SameLine();
-    requiresRestartWarning();
-
-    static char languageC[16];
-    strncpy(languageC, EngineConfig::GetStoredConfig().appearance.language.c_str(), sizeof(themeFileC));
-
-    if (ImGui::InputText("Language", languageC, sizeof(languageC))) {
-        EngineConfig::GetStoredConfig().appearance.language = languageC;
-    }
-    ImGui::SameLine();
-    requiresRestartWarning();
-
-    ImGui::Checkbox("Automatic Workspace Switching", &EngineConfig::GetStoredConfig().appearance.automaticWorkspaceSwitching);
-    ImGui::SetItemTooltip("Automatically switch to a different workspace topology when a monitor is connected or disconnected.");
-}
-
-void Marmalade::GUI::Preferences::drawGeneralProjectsPane() {
-    static char defaultProjectPathC[512];
-    strncpy(defaultProjectPathC, EngineConfig::GetStoredConfig().defaultProjectPath.c_str(), sizeof(defaultProjectPathC));
-
-    if (ImGui::InputText("Default Project Path", defaultProjectPathC, sizeof(defaultProjectPathC))) {
-        EngineConfig::GetStoredConfig().defaultProjectPath = defaultProjectPathC;
-    }
-
-    ImGui::Checkbox("Show Welcome Screen on Startup", &Marmalade::EngineConfig::GetStoredConfig().appearance.showWelcomeScreen);
-}
-
-void Marmalade::GUI::Preferences::drawGeneralSystemIntegrationPane() {
-    using it = Application::Integration::IntegrationType;
-
-    static bool fileAssoc = true;
-    static bool launcher = true;
-
-    unsigned int type = it::IntegrationType_NONE;
-
-    if (fileAssoc)
-        type |= it::IntegrationType_FILE_ASSOCIATION;
-    if (launcher)
-        type |= it::IntegrationType_LAUNCHER;
-
-    ImGui::Checkbox("File Associations", &fileAssoc);
-    ImGui::Checkbox("Launcher", &launcher);
-
-    if (ImGui::Button("Add Integrations")) {
-        Application::Integration::AddSystemIntegrations(static_cast<it>(type));
-    }
-}
-
-void Marmalade::GUI::Preferences::drawGeneralPluginsPane() {
-    auto loadedPlugins = PluginLoader::GetInstance().GetLoadedPlugins();
-
-    ImGui::Text("%zu plugins loaded", loadedPlugins.size());
-
-    static int selected = -1;
-    auto pluginsDir = ConfigUtil::GetConfigDirectory() / "plugins";
-    if (ImGui::BeginTable("##Plugins", 2, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
-        ImGui::TableSetupColumn("File Name");
-        ImGui::TableSetupColumn("Type");
-        ImGui::TableHeadersRow();
-
-        for (size_t i = 0; i < loadedPlugins.size(); ++i) {
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-            auto relativePath = std::filesystem::relative(loadedPlugins[i].Path, pluginsDir).string();
-            const bool isSelected = (selected == (int)i);
-            if (ImGui::Selectable(relativePath.c_str(), isSelected)) selected = (int)i;
-
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text(loadedPlugins[i].Type == PluginType_WASM ? "WASM" : "Native");
-        }
-        ImGui::EndTable();
-    }
+    WINDOW_END()
 }
 
 void Marmalade::GUI::Preferences::selectableTreeNode(const char* title, const char* id) {
@@ -158,19 +65,32 @@ void Marmalade::GUI::Preferences::selectableTreeNode(const char* title, const ch
 }
 
 void Marmalade::GUI::Preferences::drawLeftPane() {
-    if (ImGui::TreeNodeEx("General", ImGuiTreeNodeFlags_DefaultOpen)) {
-        selectableTreeNode("Logging", "logging");
-        selectableTreeNode("Appearance", "appearance");
-        selectableTreeNode("Projects", "projects");
-        selectableTreeNode("Project Browser", "projectBrowser");
-        selectableTreeNode("System Integration", "systemIntegration");
-        selectableTreeNode("Loaded Plugins", "plugins");
+    if (ImGui::TreeNodeEx(pgettext("Preferences|", "General"), ImGuiTreeNodeFlags_DefaultOpen)) {
+        selectableTreeNode(pgettext("Preferences|General|", "Logging"), "logging");
+        selectableTreeNode(pgettext("Preferences|General|", "Projects"), "projects");
+        selectableTreeNode(pgettext("Preferences|General|", "System Integration"), "systemIntegration");
+        selectableTreeNode(pgettext("Preferences|General|", "Loaded Plugins"), "plugins");
 
         ImGui::TreePop();
     }
 
-    if (ImGui::TreeNodeEx("Audio", ImGuiTreeNodeFlags_DefaultOpen)) {
-        selectableTreeNode("Input/Output", "input/output");
+    if (ImGui::TreeNodeEx(pgettext("Preferences|", "User Interface"), ImGuiTreeNodeFlags_DefaultOpen)) {
+        selectableTreeNode(pgettext("Preferences|User Interface|", "Appearance"), "appearance");
+        selectableTreeNode(pgettext("Preferences|User Interface|", "Workspaces"), "workspaces");
+        selectableTreeNode(pgettext("Preferences|User Interface|", "Project Browser"), "projectBrowser");
+        selectableTreeNode(pgettext("Preferences|User Interface|", "Localization"), "localization");
+
+        ImGui::TreePop();
+    }
+
+    if (ImGui::TreeNodeEx(pgettext("Preferences|", "Audio"), ImGuiTreeNodeFlags_DefaultOpen)) {
+        selectableTreeNode(pgettext("Preferences|Input/Output|", "Input/Output"), "input/output");
+
+        ImGui::TreePop();
+    }
+
+    if (ImGui::TreeNodeEx(pgettext("Preferences|", "Advanced"), ImGuiTreeNodeFlags_DefaultOpen)) {
+        selectableTreeNode(pgettext("Preferences|Advanced|", "Graphics"), "graphics");
 
         ImGui::TreePop();
     }
@@ -185,7 +105,7 @@ void Marmalade::GUI::Preferences::drawRightPane() {
     ImVec2 area = ImGui::GetWindowSize();
     ImGui::SetCursorPos(ImVec2(area.x - 60.0f, area.y - 30.0f));
 
-    if (ImGui::Button("Save")) {
+    if (ImGui::Button(_("Save"))) {
         Marmalade::EngineConfig::GetInstance().SaveConfig();
 
         for (auto& pane: _panes) {
@@ -231,42 +151,157 @@ void Marmalade::GUI::Preferences::drawSplit() {
     ImGui::EndChild();
 }
 
-void Marmalade::GUI::Preferences::Draw() {
-    ImGui::SetNextWindowSize(ImVec2(800, 500));
+#pragma region General
 
-    WINDOW_BEGIN(ICON_CI_SETTINGS_GEAR " Preferences", ImGuiWindowFlags_None)
-
-    drawSplit();
-
-    WINDOW_END()
+void Marmalade::GUI::Preferences::drawGeneralLoggingPane() {
+    ImGui::Combo(_("Log Level"), reinterpret_cast<int*>(&EngineConfig::GetStoredConfig().logLevel), getLogLevels, nullptr, spdlog::level::n_levels);
+    ImGui::SameLine();
+    requiresRestartWarning();
 }
 
-void Marmalade::GUI::Preferences::drawGeneralProjectBrowserPane() {
+void Marmalade::GUI::Preferences::drawGeneralProjectsPane() {
+    static char defaultProjectPathC[512];
+    strncpy(defaultProjectPathC, EngineConfig::GetStoredConfig().defaultProjectPath.c_str(), sizeof(defaultProjectPathC));
+
+    if (ImGui::InputText(_("Default Project Path"), defaultProjectPathC, sizeof(defaultProjectPathC))) {
+        EngineConfig::GetStoredConfig().defaultProjectPath = defaultProjectPathC;
+    }
+
+    ImGui::Checkbox(_("Show Welcome Screen on Startup"), &Marmalade::EngineConfig::GetStoredConfig().appearance.showWelcomeScreen);
+}
+
+void Marmalade::GUI::Preferences::drawGeneralSystemIntegrationPane() {
+    using it = Application::Integration::IntegrationType;
+
+    static bool fileAssoc = true;
+    static bool launcher = true;
+
+    unsigned int type = it::IntegrationType_NONE;
+
+    if (fileAssoc)
+        type |= it::IntegrationType_FILE_ASSOCIATION;
+    if (launcher)
+        type |= it::IntegrationType_LAUNCHER;
+
+    ImGui::Checkbox(_("File Associations"), &fileAssoc);
+    ImGui::Checkbox(_("Launcher"), &launcher);
+
+    if (ImGui::Button(_("Add Integrations"))) {
+        Application::Integration::AddSystemIntegrations(static_cast<it>(type));
+    }
+}
+
+void Marmalade::GUI::Preferences::drawGeneralPluginsPane() {
+    auto loadedPlugins = PluginLoader::GetInstance().GetLoadedPlugins();
+
+    ImGui::Text(ngettext("1 plugin loaded", "%d plugins loaded", loadedPlugins.size()), loadedPlugins.size());
+
+    static int selected = -1;
+    auto pluginsDir = ConfigUtil::GetConfigDirectory() / "plugins";
+    if (ImGui::BeginTable("##Plugins", 2, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
+        ImGui::TableSetupColumn(_("File Name"));
+        ImGui::TableSetupColumn(_("Type"));
+        ImGui::TableHeadersRow();
+
+        for (size_t i = 0; i < loadedPlugins.size(); ++i) {
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            auto relativePath = std::filesystem::relative(loadedPlugins[i].Path, pluginsDir).string();
+            const bool isSelected = (selected == (int) i);
+            if (ImGui::Selectable(relativePath.c_str(), isSelected)) selected = (int) i;
+
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text(loadedPlugins[i].Type == PluginType_WASM ? _("WASM") : _("Native"));
+        }
+        ImGui::EndTable();
+    }
+}
+
+#pragma endregion
+
+#pragma region User Interface
+
+void Marmalade::GUI::Preferences::drawUIAppearancePane() {
+    ImGui::Checkbox(_("ImGui Viewports"), &EngineConfig::GetStoredConfig().appearance.viewports);
+    ImGui::SameLine();
+    requiresRestartWarning();
+
+    static char themeFileC[512];
+    strncpy(themeFileC, EngineConfig::GetStoredConfig().appearance.themeFile.c_str(), sizeof(themeFileC));
+
+    if (ImGui::InputText(_("Theme File"), themeFileC, sizeof(themeFileC))) {
+        EngineConfig::GetStoredConfig().appearance.themeFile = themeFileC;
+    }
+    ImGui::SameLine();
+    requiresRestartWarning();
+
+    if (ImGui::Button(ICON_WITH_TEXT(ICON_CI_EDIT, _("Open Style Editor")))) {
+        WindowManager::GetInstance().showStyleEditor = true;
+    }
+
+    static auto backgroundCol = ImGui::ColorConvertU32ToFloat4(EngineConfig::GetStoredConfig().appearance.backgroundColor);
+    if (ImGui::ColorEdit4(_("Background Color"), &backgroundCol.x)) {
+        EngineConfig::GetStoredConfig().appearance.backgroundColor = ImGui::ColorConvertFloat4ToU32(backgroundCol);
+    }
+
+    ImGui::BeginDisabled(EngineConfig::GetStoredConfig().appearance.useSystemScaleFactor);
+    ImGui::SetNextItemWidth(150.0f);
+    ImGui::DragFloat(_("Scale Factor"), &EngineConfig::GetStoredConfig().appearance.scaleFactor, 0.1f, 0.0f, 5.0f);
+    ImGui::EndDisabled();
+
+    ImGui::SameLine();
+    ImGui::Checkbox(_("Use System"), &EngineConfig::GetStoredConfig().appearance.useSystemScaleFactor);
+
+    ImGui::SameLine();
+    requiresRestartWarning();
+}
+
+void Marmalade::GUI::Preferences::drawUIWorkspacesPane() {
+    ImGui::Checkbox(_("Automatic Workspace Switching"), &EngineConfig::GetStoredConfig().appearance.automaticWorkspaceSwitching);
+    ImGui::SetItemTooltip(_("Automatically switch to a different workspace topology when a monitor is connected or disconnected."));
+}
+
+void Marmalade::GUI::Preferences::drawUIProjectBrowserPane() {
     static auto assetsCol = ImGui::ColorConvertU32ToFloat4(EngineConfig::GetStoredConfig().projectBrowser.colorAssets);
     static auto dataCol = ImGui::ColorConvertU32ToFloat4(EngineConfig::GetStoredConfig().projectBrowser.colorData);
     static auto srcCol = ImGui::ColorConvertU32ToFloat4(EngineConfig::GetStoredConfig().projectBrowser.colorSrc);
 
-    if (ImGui::ColorEdit4("Assets", &assetsCol.x)) {
+    if (ImGui::ColorEdit4(_("Assets"), &assetsCol.x)) {
         EngineConfig::GetStoredConfig().projectBrowser.colorAssets = ImGui::ColorConvertFloat4ToU32(assetsCol);
     }
 
-    if (ImGui::ColorEdit4("Data", &dataCol.x)) {
+    if (ImGui::ColorEdit4(_("Data"), &dataCol.x)) {
         EngineConfig::GetStoredConfig().projectBrowser.colorData = ImGui::ColorConvertFloat4ToU32(dataCol);
     }
 
-    if (ImGui::ColorEdit4("Src", &srcCol.x)) {
+    if (ImGui::ColorEdit4(_("Src"), &srcCol.x)) {
         EngineConfig::GetStoredConfig().projectBrowser.colorSrc = ImGui::ColorConvertFloat4ToU32(srcCol);
     }
 }
 
+void Marmalade::GUI::Preferences::drawUILocalizationPane() {
+    static char languageC[16];
+    strncpy(languageC, EngineConfig::GetStoredConfig().appearance.language.c_str(), sizeof(languageC));
+
+    if (ImGui::InputText(_("Language"), languageC, sizeof(languageC))) {
+        EngineConfig::GetStoredConfig().appearance.language = languageC;
+    }
+    ImGui::SameLine();
+    requiresRestartWarning();
+}
+
+#pragma endregion
+
+#pragma region Audio
+
 void Marmalade::GUI::Preferences::drawAudioInputOutputPane() {
     auto& engineConfig = EngineConfig::GetStoredConfig();
-    auto& audioManager = ::Application::GetInstance().audioManager->GetInstance();
+    auto& audioManager = ::GET_APP.audioManager->GetInstance();
 
     std::vector<std::string> deviceList = audioManager.GetAvailableDevices();
 
     std::vector<const char*> cstrings;
-    for (const auto& str : deviceList) {
+    for (const auto& str: deviceList) {
         cstrings.push_back(str.c_str());
     }
 
@@ -278,7 +313,7 @@ void Marmalade::GUI::Preferences::drawAudioInputOutputPane() {
         }
     }
 
-    if (ImGui::Combo("Output device", &selectedDeviceIndex, cstrings.data(), cstrings.size())) {
+    if (ImGui::Combo(_("Output device"), &selectedDeviceIndex, cstrings.data(), cstrings.size())) {
         const std::string& selectedDevice = deviceList[selectedDeviceIndex];
 
         audioManager.SetCurrentDevice(selectedDevice.c_str());
@@ -288,9 +323,36 @@ void Marmalade::GUI::Preferences::drawAudioInputOutputPane() {
     }
 }
 
+#pragma endregion
+
+#pragma region Advanced
+
+void Marmalade::GUI::Preferences::drawAdvancedGraphicsPane() {
+    ImGui::Text(_("Graphics system for the user interface:"));
+    requiresRestartWarning();
+
+    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ICON_WITH_TEXT(ICON_CI_WARNING, _("Do not change these unless you know what you're doing!")));
+
+#undef interface
+    static char graphicsSystem[32];
+    strncpy(graphicsSystem, EngineConfig::GetStoredConfig().interface.graphicsSystem.c_str(), sizeof(graphicsSystem));
+
+    if (ImGui::InputText(_("System"), graphicsSystem, sizeof(graphicsSystem))) {
+        EngineConfig::GetStoredConfig().interface.graphicsSystem = graphicsSystem;
+    }
+
+    static char graphicsVersion[16];
+    strncpy(graphicsVersion, EngineConfig::GetStoredConfig().interface.graphicsVersion.c_str(), sizeof(graphicsVersion));
+
+    if (ImGui::InputText(_("Version"), graphicsVersion, sizeof(graphicsVersion))) {
+        EngineConfig::GetStoredConfig().interface.graphicsVersion = graphicsVersion;
+    }
+}
+
+#pragma endregion
 
 void Marmalade::GUI::Preferences::requiresRestartWarning() {
-    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), ICON_CI_WARNING " Requires restart");
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), ICON_WITH_TEXT(ICON_CI_WARNING, _("Requires restart")));
 }
 
 bool Marmalade::GUI::Preferences::getLogLevels(void* data, int idx, const char** outText) {

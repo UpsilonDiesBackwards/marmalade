@@ -81,6 +81,7 @@ void Marmalade::GUI::SaveWorkspaceAsDialog::Draw() {
 
     WINDOW_END_MODAL()
 }
+
 std::string Marmalade::GUI::SaveWorkspaceAsDialog::GetName() {
     std::string title;
 

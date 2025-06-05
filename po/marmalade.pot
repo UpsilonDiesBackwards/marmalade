@@ -20,14 +20,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Marmalade 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-04 16:04+0100\n"
-"PO-Revision-Date: 2025-06-04 16:04+0100\n"
+"POT-Creation-Date: 2025-06-05 16:07+0100\n"
+"PO-Revision-Date: 2025-06-05 16:07+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
 #: ../src/application/autosave.h:34
 msgid "Not yet"
@@ -71,186 +72,385 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-#: ../src/gui/dialogs/saveworkspace.cpp:88
+#: ../src/gui/dialogs/saveworkspace.cpp:89
 msgid "Save to New Workspace"
 msgstr ""
 
-#: ../src/gui/dialogs/saveworkspace.cpp:90
+#: ../src/gui/dialogs/saveworkspace.cpp:91
 msgid "Duplicate Workspace"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:51
+#: ../src/gui/editor/topbar.cpp:47
 msgctxt "Menu|"
 msgid "File"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:52
+#: ../src/gui/editor/topbar.cpp:48
 msgctxt "Menu|File|"
 msgid "New Project"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:55
+#: ../src/gui/editor/topbar.cpp:51
 msgctxt "Menu|File|"
 msgid "Open Project"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:62
+#: ../src/gui/editor/topbar.cpp:58
 msgctxt "Menu|File|"
 msgid "New Scene"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:65
+#: ../src/gui/editor/topbar.cpp:61
 msgctxt "Menu|File|"
 msgid "Open Scene"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:69
+#: ../src/gui/editor/topbar.cpp:65
 msgctxt "Menu|File|"
 msgid "Welcome Screen"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:72
+#: ../src/gui/editor/topbar.cpp:68
 msgctxt "Menu|File|"
 msgid "Quit"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:78
+#: ../src/gui/editor/topbar.cpp:74
 msgctxt "Menu|"
 msgid "Entity"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:81
+#: ../src/gui/editor/topbar.cpp:77
 msgid "No entity selected"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:83
+#: ../src/gui/editor/topbar.cpp:79
 msgctxt "Menu|Entity|AddComponent|"
 msgid "Add Component"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:84
+#: ../src/gui/editor/topbar.cpp:80
 msgctxt "Menu|Entity|AddComponent|"
 msgid "Favourites"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:92
+#: ../src/gui/editor/topbar.cpp:88
 msgctxt "Menu|Entity|AddComponent|"
 msgid "All"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:114
+#: ../src/gui/editor/topbar.cpp:110
 msgctxt "Menu|Entity|AddComponent|"
 msgid "Add Component..."
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:125
+#: ../src/gui/editor/topbar.cpp:121
 msgctxt "Menu|"
 msgid "Settings"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:126
+#: ../src/gui/editor/topbar.cpp:122
 msgctxt "Menu|Settings|"
 msgid "Project Settings"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:127
+#: ../src/gui/editor/topbar.cpp:123
 msgctxt "Menu|Settings|"
 msgid "Style Editor"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:128
+#: ../src/gui/editor/topbar.cpp:124
 msgctxt "Menu|Settings|"
 msgid "Preferences"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:133
+#: ../src/gui/editor/topbar.cpp:129
 msgctxt "Menu|"
 msgid "Window"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:134
+#: ../src/gui/editor/topbar.cpp:130
 msgctxt "Menu|Window|"
 msgid "Animation"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:136
+#: ../src/gui/editor/topbar.cpp:132
 msgctxt "Menu|Window|"
 msgid "Package Manager"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:138
+#: ../src/gui/editor/topbar.cpp:134
 msgctxt "Menu|Window|"
 msgid "Log"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:140
+#: ../src/gui/editor/topbar.cpp:136
 msgctxt "Menu|Window|"
 msgid "Version Control"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:142
+#: ../src/gui/editor/topbar.cpp:138
 msgctxt "Menu|Window|"
 msgid "Save Layout"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:153
+#: ../src/gui/editor/topbar.cpp:149
 msgctxt "Menu|Window|"
 msgid "ImGui Demo"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:157
+#: ../src/gui/editor/topbar.cpp:153
 msgctxt "Menu|Window|"
 msgid "Workspaces"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:183
+#: ../src/gui/editor/topbar.cpp:179
 msgctxt "Menu|Window|Workspaces|"
 msgid "Save Current Workspace"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:186
+#: ../src/gui/editor/topbar.cpp:182
 msgctxt "Menu|Window|Workspaces|"
 msgid "Duplicate Workspace..."
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:200
+#: ../src/gui/editor/topbar.cpp:196
 msgctxt "Menu|Window|Workspaces|"
 msgid "Save Workspace As..."
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:217
+#: ../src/gui/editor/topbar.cpp:213
 msgctxt "Menu|Window|Workspaces|"
 msgid "Save for this Topology"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:223
+#: ../src/gui/editor/topbar.cpp:219
 msgctxt "Menu|Window|Workspaces|"
 msgid "Revert this Topology"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:231
+#: ../src/gui/editor/topbar.cpp:227
 msgctxt "Menu|Window|Workspaces|"
 msgid "Import Workspace..."
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:240
+#: ../src/gui/editor/topbar.cpp:236
 msgctxt "Menu|Window|Workspaces|"
 msgid "Export Workspace..."
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:251
+#: ../src/gui/editor/topbar.cpp:247
 msgctxt "Menu|Window|Workspaces|"
 msgid "Delete Current Workspace..."
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:264
+#: ../src/gui/editor/topbar.cpp:260
 msgctxt "Menu|"
 msgid "Help"
 msgstr ""
 
-#: ../src/gui/editor/topbar.cpp:265
+#: ../src/gui/editor/topbar.cpp:261
 msgctxt "Menu|Help|"
 msgid "About"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:54
+msgid "Preferences"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:68
+msgctxt "Preferences|"
+msgid "General"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:69
+msgctxt "Preferences|General|"
+msgid "Logging"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:70
+msgctxt "Preferences|General|"
+msgid "Projects"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:71
+msgctxt "Preferences|General|"
+msgid "System Integration"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:72
+msgctxt "Preferences|General|"
+msgid "Loaded Plugins"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:77
+msgctxt "Preferences|"
+msgid "User Interface"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:78
+msgctxt "Preferences|User Interface|"
+msgid "Appearance"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:79
+msgctxt "Preferences|User Interface|"
+msgid "Workspaces"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:80
+msgctxt "Preferences|User Interface|"
+msgid "Project Browser"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:81
+msgctxt "Preferences|User Interface|"
+msgid "Localization"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:86
+msgctxt "Preferences|"
+msgid "Audio"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:87
+msgctxt "Preferences|Input/Output|"
+msgid "Input/Output"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:92
+msgctxt "Preferences|"
+msgid "Advanced"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:93
+msgctxt "Preferences|Advanced|"
+msgid "Graphics"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:108
+msgid "Save"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:157
+msgid "Log Level"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:166
+msgid "Default Project Path"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:170
+msgid "Show Welcome Screen on Startup"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:186
+msgid "File Associations"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:187
+msgid "Launcher"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:189
+msgid "Add Integrations"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:197
+#, c-format
+msgid "1 plugin loaded"
+msgid_plural "%d plugins loaded"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/gui/settings/preferences.cpp:202
+msgid "File Name"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:203
+msgid "Type"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:214
+msgid "WASM"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:214
+msgid "Native"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:225
+msgid "ImGui Viewports"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:232
+msgid "Theme File"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:238
+msgid "Open Style Editor"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:243
+msgid "Background Color"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:249
+msgid "Scale Factor"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:253
+msgid "Use System"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:260
+msgid "Automatic Workspace Switching"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:261
+msgid ""
+"Automatically switch to a different workspace topology when a monitor is "
+"connected or disconnected."
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:269
+msgid "Assets"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:273
+msgid "Data"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:277
+msgid "Src"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:286
+msgid "Language"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:316
+msgid "Output device"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:331
+msgid "Graphics system for the user interface:"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:334
+msgid "Do not change these unless you know what you're doing!"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:340
+msgid "System"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:347
+msgid "Version"
+msgstr ""
+
+#: ../src/gui/settings/preferences.cpp:355
+msgid "Requires restart"
 msgstr ""
 
 #: ../src/main.cpp:171
