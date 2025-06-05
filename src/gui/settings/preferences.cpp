@@ -254,6 +254,8 @@ void Marmalade::GUI::Preferences::drawUIAppearancePane() {
 
     ImGui::SameLine();
     requiresRestartWarning();
+
+    ImGui::Checkbox(_("Invert message box button order"), &EngineConfig::GetStoredConfig().appearance.alternateButtonOrder);
 }
 
 void Marmalade::GUI::Preferences::drawUIWorkspacesPane() {

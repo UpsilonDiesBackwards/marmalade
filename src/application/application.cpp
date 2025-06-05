@@ -198,11 +198,14 @@ void Application::InitialiseImGui() {
     ImGui::LoadIniSettingsFromDisk(Marmalade::GUI::WorkspaceManager::currentWorkspacePath.c_str());
     ImGui::GetCurrentContext()->SettingsLoaded = true;
 
-
     io.ConfigFlags |= ImGuiConfigFlags_None | ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_NavEnableKeyboard;
     if (Marmalade::EngineConfig::GetStoredConfig().appearance.viewports) {
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     }
+
+#ifndef DEBUG
+    io.ConfigDebugHighlightIdConflicts = false;
+#endif
 
     Marmalade::GUI::FontManager::GetInstance().InitFonts();
 }

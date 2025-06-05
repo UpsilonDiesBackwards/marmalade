@@ -34,8 +34,8 @@ namespace Marmalade::GUI {
     /**
      * \brief Callback on dialog result.
      *
-     * @param result Whether the dialog was confirmed (true) or cancelled (false).
-     * @param data A user-provided pointer passed to the callback.
+     * \param result Whether the dialog was confirmed (true) or cancelled (false).
+     * \param data A user-provided pointer passed to the callback.
      */
     using DialogCallback = std::function<void(bool result, void* data)>;
 
@@ -57,6 +57,21 @@ namespace Marmalade::GUI {
         ImGuiWindowFlags Flags;
         ImVec2 MinSize;
         DialogCallback Callback;
+    };
+
+    class DialogButtons {
+    public:
+        static void AddButton(const char* primaryLbl, const std::function<void()>& primaryFunc);
+        static void AddTwoButtons(const char* primaryLbl, const std::function<void()>& primaryFunc, const char* secondaryLbl, const std::function<void()>& secondaryFunc);
+        static void AddThreeButtons(const char* primaryLbl, const std::function<void()>& primaryFunc, const char* secondaryLbl, const std::function<void()>& secondaryFunc, const char* ternaryLbl, const std::function<void()>& ternaryFunc);
+
+        static void Ok(const std::function<void()>& okFunc);
+        static void OkCancel(const std::function<void()>& okFunc, const std::function<void()>& cancelFunc);
+        static void YesNo(const std::function<void()>& yesFunc, const std::function<void()>& noFunc);
+        static void YesNoCancel(const std::function<void()>& yesFunc, const std::function<void()>& noFunc, const std::function<void()>& cancelFunc);
+
+    private:
+        static bool shouldInvertOrder();
     };
 }
 

@@ -67,6 +67,7 @@ list(APPEND ENGINE_SRC_GUI
         fontmanager.h
         workspaces.cpp
         workspaces.h
+        dialog.cpp
         dialog.h
 )
 

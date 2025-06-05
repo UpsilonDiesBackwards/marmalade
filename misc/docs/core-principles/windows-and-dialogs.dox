@@ -88,18 +88,17 @@ void Marmalade::GUI::MyDialog::Draw() {
 
     // Draw content here
 
-    if (ImGui::Button(_("Yes"))) {
+    DialogButtons::YesNo([&] {
+        // Yes callback
         CallbackData data{"My data"};
         _dialog->Callback(true, &data);
         visible = false;
-    }
-
-    ImGui::SameLine();
-    if (ImGui::Button(_("No"))) {
+    }, [&] {
+        // No callback
         CallbackData data{"My data"};
         _dialog->Callback(true, &data);
         visible = false;
-    }
+    });
 
     WINDOW_END_MODAL()
 }

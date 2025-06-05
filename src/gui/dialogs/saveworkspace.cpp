@@ -34,25 +34,19 @@ void Marmalade::GUI::SaveWorkspaceDialog::Draw() {
 
     ImGui::Text(_("Would you like to save these changes?"));
 
-    if (ImGui::Button(_("Yes"))) {
+    DialogButtons::YesNoCancel([&] {
         CallbackData data{true};
         _dialog->Callback(true, &data);
         visible = false;
-    }
-
-    ImGui::SameLine();
-    if (ImGui::Button(_("No"))) {
+    }, [&] {
         CallbackData data{false};
         _dialog->Callback(true, &data);
         visible = false;
-    }
-
-    ImGui::SameLine();
-    if (ImGui::Button(_("Cancel"))) {
+    }, [&] {
         CallbackData data{false};
         _dialog->Callback(false, &data);
         visible = false;
-    }
+    });
 
     WINDOW_END_MODAL()
 }
@@ -68,16 +62,13 @@ void Marmalade::GUI::SaveWorkspaceAsDialog::Draw() {
 
     ImGui::InputText("##WorkspaceName", _name, IM_ARRAYSIZE(_name));
 
-    if (ImGui::Button(_("OK"))) {
+    DialogButtons::OkCancel([&] {
         _dialog->Callback(true, _name);
         visible = false;
-    }
-
-    ImGui::SameLine();
-    if (ImGui::Button(_("Cancel"))) {
+    }, [&] {
         _dialog->Callback(false, (void*) "");
         visible = false;
-    }
+    });
 
     WINDOW_END_MODAL()
 }
