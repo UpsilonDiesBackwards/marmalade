@@ -8,6 +8,7 @@ Marmalade provides the following types of Windows:
 - \ref modal-windows
 - \ref dialogs
 - \ref file-dialogs
+- \ref msgbox
 - \ref native-ui-dialogs
 
 \section windows Windows
@@ -137,6 +138,24 @@ auto dialog = WindowManager::GetInstance().RegisterFileDialog("MyFileDialog", []
 
 // Show the dialog
 ImGuiFileDialog::Instance()->OpenDialog(dialog.Name, "My File Dialog", ".ext", config);
+```
+
+\section msgbox MsgBox
+
+The `Marmalade::GUI::MsgBox` class provides basic easy-to-use dialog functionality.
+
+The simplest usage is:
+
+```cpp
+MsgBox::ShowMsgBox("Title", "Message");
+```
+
+This can be extended with additional parameters:
+
+```cpp
+MsgBox::ShowMsgBox("Title", "Message", MsgBox::Buttons_YES_NO_CANCEL, [](const MsgBox::Result* result) {
+    std::cout << "Got result: " << result->Result << std::endl;
+});
 ```
 
 \section native-ui-dialogs NativeUI Dialogs

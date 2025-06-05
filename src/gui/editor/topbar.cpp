@@ -37,8 +37,7 @@
 
 #include <libintl.h>
 
-void Marmalade::GUI::TopBar::Show()
-{
+void Marmalade::GUI::TopBar::Show() {
     static bool showSceneCreationPopUp = false;
     static char sceneNameBuffer[256] = "";
     static bool showSceneOpenPopUp = false;
