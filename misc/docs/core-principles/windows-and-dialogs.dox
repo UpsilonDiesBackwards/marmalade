@@ -1,0 +1,156 @@
+/** \page cp-windows-and-dialogs Windows and Dialogs
+
+The Window Manager manages the visibility of every window, dialog, and file dialog in Marmalade.
+
+Marmalade provides the following types of Windows:
+
+- \ref windows
+- \ref modal-windows
+- \ref dialogs
+- \ref file-dialogs
+- \ref native-ui-dialogs
+
+\section windows Windows
+
+Windows in Marmalade extend the `Marmalade::GUI::Window` abstract class. This requires the `Marmalade::GUI::Window::Draw()` method to be implemented.
+
+The `WINDOW_BEGIN()` and `WINDOW_END()` macros should be used. These automatically handle visibility and plugin hooks.
+
+```cpp
+void Marmalade::GUI::MyWindow::Draw() {
+    // Set default window size
+    ImGui::SetNextWindowSize(ImVec2(800, 500), ImGuiCond_FirstUseEver);
+
+    // Create the window. This example provides an icon.
+    WINDOW_BEGIN(ICON_WITH_TEXT(ICON_CI_SETTINGS_GEAR, _("My Window")), ImGuiWindowFlags_None)
+
+    // Draw content here
+
+    WINDOW_END()
+}
+```
+
+The window is stored as a field in `Marmalade::GUI::WindowManager`, and added to the `windows` vector.
+
+```cpp
+// windowmanager.h:
+MyWindow myWindow{};
+
+// windowmanager.cpp:
+Marmalade::GUI::WindowManager::WindowManager() {
+    // ...
+    windows.push_back(&myWindow);
+}
+```
+
+The window visibility can be controlled be either setting the `Marmalade::GUI::Window::visible` field, or by calling the `Marmalade::GUI::Window::ToggleWindow()` method.
+
+```cpp
+namespace Marmalade::GUI;
+
+WindowManager::GetInstance().myWindow.visible = true;
+WindowManager::GetInstance().myWindow.ToggleWindow();
+
+// Or even directly through a menu item
+ImGui::MenuItem(_("My Window"), nullptr, &WindowManager::GetInstance().myWindow.visible);
+```
+
+\section modal-windows Modal Windows
+
+Modal windows are the same as standard windows, except they use the `WINDOW_BEGIN_MODAL()` and `WINDOW_END_MODAL()` macros.
+
+```cpp
+Marmalade::GUI::MyWindow::Draw() {
+    WINDOW_BEGIN_MODAL(_("My Window"), ImGuiWindowFlags_None)
+
+    // Draw content here
+
+    WINDOW_END_MODAL()
+}
+```
+
+\section dialogs Dialogs
+
+Dialogs are similar to modal windows, but are registered differently.
+
+A key difference in modal windows and dialogs is dialogs provide a callback on result, whereas modal windows are pretty much just windows.
+
+A dialog extends the `Marmalade::GUI::CustomDialog` abstract class, which in turn extends `Marmalade::GUI::Window`. The
+`Marmalade::GUI::Window::Draw()` method has to be implemented, as well as the `Marmalade::GUI::CustomDialog::GetName()` method.
+
+```cpp
+std::string Marmalade::GUI::MyDialog::GetName() {
+    return _("My Dialog");
+}
+
+void Marmalade::GUI::MyDialog::Draw() {
+    WINDOW_BEGIN_MODAL(GetName().c_str(), ImGuiWindowFlags_AlwaysAutoResize)
+
+    // Draw content here
+
+    if (ImGui::Button(_("Yes"))) {
+        CallbackData data{"My data"};
+        _dialog->Callback(true, &data);
+        visible = false;
+    }
+
+    ImGui::SameLine();
+    if (ImGui::Button(_("No"))) {
+        CallbackData data{"My data"};
+        _dialog->Callback(true, &data);
+        visible = false;
+    }
+
+    WINDOW_END_MODAL()
+}
+```
+
+The dialog callback contains two parameters: the result, and the custom data. The custom data is a `void *` so can be
+casted to any data type.
+
+When the dialog needs to be displayed, it is registered with the window manager, and shown.
+
+```cpp
+auto dlg = WindowManager::GetInstance().RegisterDialog(std::make_shared<MyDialog>(), [](bool result, void* data) {
+    // Extract custom data
+    auto* customData = static_cast<CallbackData*>(data);
+
+    // Do stuff here
+});
+
+// Show the dialog
+WindowManager::GetInstance().ShowDialog(dlg.Name);
+```
+
+\section file-dialogs File Dialogs
+
+File dialogs are similar to dialogs, but the content is handled automatically by the ImGuiFileDialog library.
+
+The `data` callback parameter is of type `Marmalade::GUI::WindowManager::FileDialogResult`.
+
+```cpp
+// If no path specified, defaults to project directory
+IGFD::FileDialogConfig config = WindowManager::PrepareFileDialogConfig();
+auto dialog = WindowManager::GetInstance().RegisterFileDialog("MyFileDialog", [](bool result, void* data) {
+    auto* fileResult = static_cast<WindowManager::FileDialogResult*>(data);
+    // Do stuff here
+});
+
+// Show the dialog
+ImGuiFileDialog::Instance()->OpenDialog(dialog.Name, "My File Dialog", ".ext", config);
+```
+
+\section native-ui-dialogs NativeUI Dialogs
+
+NativeUI dialogs call native operating system functions to display dialogs. This is useful if the GL system is broken, or
+if you just want a consistent user interface.
+
+```cpp
+NativeUI::MsgBox::ShowMessage(NativeUI::Window::WrapGlfwWindow(GET_APP.getWindow()), u"My message", u"My title", NativeUI::MsgBox::Style::Style_INFO);
+
+// Converting strings:
+std::string someStr = "Some String";
+std::u16string = NativeUI::Util::utf8ToUtf16Str(someStr);
+```
+
+*/
