@@ -46,6 +46,8 @@ list(APPEND ENGINE_SRC
         graphics/multisampledframebuffer.cpp
         graphics/material.cpp
 
+        graphics/components/billboardtexture.cpp
+
         io/audiomanager.cpp
         io/input.cpp
         io/inputmanager.cpp

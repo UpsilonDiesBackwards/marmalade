@@ -23,6 +23,7 @@
 #include "ecs/components/transform.h"
 #include "scene/entity.h"
 #include "../../../application/application.h"
+#include "graphics/components/billboardtexture.h"
 
 #include <imgui.h>
 
@@ -31,6 +32,9 @@ Marmalade::ECS::Light2D::Light2D() {
     LIGHT2D_CTOR_BODY
 }
 #endif
+
+Shader* Marmalade::ECS::Light2D::billboardShader = nullptr;
+BillboardTexture* Marmalade::ECS::Light2D::lightBillboard = nullptr;
 
 void Marmalade::ECS::Light2D::Display(Entity* entity) {
     ImGui::Text("%s", name.c_str());
@@ -43,9 +47,19 @@ void Marmalade::ECS::Light2D::Display(Entity* entity) {
 
 void Marmalade::ECS::Light2D::Apply(Entity* entity) {
     position = entity->getPosition();
+
+    lightBillboard->SetPosition(glm::vec3(position, 0.0f));
+    lightBillboard->Draw(GET_APP.camera->GetView(), GET_APP.camera->GetProjection());
 }
 
 void Marmalade::ECS::Light2D::Setup(Entity* entity) {
+
+    if (!billboardShader)
+        billboardShader = new Shader("res/shaders/opengl/430/graphical/billboard.vert",
+                                     "res/shaders/opengl/430/graphical/billboard.frag");
+
+    if (!lightBillboard)
+        lightBillboard = new BillboardTexture( "res/icons/ui/light_on.png", billboardShader);
 }
 
 nlohmann::json Marmalade::ECS::Light2D::Serialize(const Entity* entity) {
@@ -102,7 +116,6 @@ void Marmalade::ECS::Light2D::ShowBounds(Entity* entity) {
             32, 1.0f
     );
 }
-
 
 float Marmalade::ECS::Light2D::WorldRadiusToScreenScale(float radius) {
     ImVec2 screenStart = EditorViews::WorldToScreenSpace(glm::vec3(0.0f));

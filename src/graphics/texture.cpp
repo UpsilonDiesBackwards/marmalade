@@ -55,6 +55,7 @@ GLuint Texture::LoadTexture(const std::string& filePath, const Marmalade::Materi
         glGenerateMipmap(GL_TEXTURE_2D);
     } else {
         std::cout << "Failed to load texture from file: " << filePath << std::endl;
+        return 0;
     }
 
     stbi_image_free(data);

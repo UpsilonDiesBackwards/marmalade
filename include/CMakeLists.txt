@@ -8,6 +8,8 @@ list(APPEND ENGINE_API
         graphics/texture.h
         graphics/viewport.h
 
+        graphics/components/billboardtexture.h
+
         io/audiomanager.h
         io/input.h
         io/inputmanager.h

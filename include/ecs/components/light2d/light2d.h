@@ -24,6 +24,9 @@
 #include "ecs/component.h"
 #include "glad/glad.h"
 #include "graphics/material.h"
+#include "graphics/shader.h"
+#include "graphics/components/billboardtexture.h"
+
 #include <glm/vec3.hpp>
 #include <glm/glm.hpp>
 
@@ -66,6 +69,10 @@ namespace Marmalade::ECS {
 
         void ShowBounds(Entity* entity);
         float WorldRadiusToScreenScale(float radius);
+
+    private:
+        static Shader* billboardShader;
+        static BillboardTexture* lightBillboard;
     };
 
     REGISTER_COMPONENT(Light2D);
