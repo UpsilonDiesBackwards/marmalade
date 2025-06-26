@@ -25,7 +25,9 @@
 #include "../../application/config/configutil.h"
 #include "../../application/i18n.h"
 #include "../workspaces.h"
+#include "../dialogs/messagebox.h"
 #include "../dialogs/saveworkspace.h"
+#include "../remember.h"
 
 #include <ecs/component.h>
 
@@ -149,10 +151,11 @@ void Marmalade::GUI::TopBar::Show() {
                 WindowManager::GetInstance().ToggleDebugWindow();
             }
 
+            static auto workspaces = Remember(WorkspaceManager::GetWorkspaces);
+
             if (ImGui::BeginMenu(ICON_WITH_TEXT(ICON_CI_BLANK, pgettext("Menu|Window|", "Workspaces")))) {
                 static std::filesystem::path workspacesDir = WorkspaceManager::GetWorkspacesDir();
-                auto workspaces = WorkspaceManager::GetWorkspaces();
-                for (const auto& workspace: workspaces) {
+                for (const auto& workspace: workspaces.get()) {
                     if (ImGui::MenuItem(workspace.c_str())) {
                         if (ImGui::GetIO().WantSaveIniSettings) {
                             auto dlg = WindowManager::GetInstance().RegisterDialog(std::make_shared<SaveWorkspaceDialog>(WorkspaceManager::GetCurrentWorkspaceName()), [workspace](bool result, void* data) {
@@ -188,7 +191,7 @@ void Marmalade::GUI::TopBar::Show() {
                         WorkspaceManager::LoadWorkspace(newPath);
 
                         // Refresh workspaces list
-                        WorkspaceManager::GetWorkspaces(true);
+                        workspaces.reset();
                     }, true);
                     WindowManager::GetInstance().ShowDialog(dlg.Name);
                 }
@@ -202,7 +205,7 @@ void Marmalade::GUI::TopBar::Show() {
                         WorkspaceManager::LoadWorkspace(newPath);
 
                         // Refresh workspaces list
-                        WorkspaceManager::GetWorkspaces(true);
+                        workspaces.reset();
                     }, true);
                     WindowManager::GetInstance().ShowDialog(dlg.Name);
                 }
@@ -228,7 +231,7 @@ void Marmalade::GUI::TopBar::Show() {
                     auto dialog = WindowManager::GetInstance().RegisterFileDialog("ImportWorkspace", [](bool result, void* data) {
                         auto* fileResult = static_cast<WindowManager::FileDialogResult*>(data);
                         WorkspaceManager::ImportWorkspace(fileResult->FilePath);
-                        WorkspaceManager::GetWorkspaces(true);
+                        workspaces.reset();
                     });
                     ImGuiFileDialog::Instance()->OpenDialog(dialog.Name, "Import Workspace", ".marmws", config);
                 }
@@ -244,10 +247,13 @@ void Marmalade::GUI::TopBar::Show() {
                 ImGui::Separator();
 
                 if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Delete Current Workspace..."))) {
-                    // TODO: We need a confirmation here
-                    WorkspaceManager::DeleteCurrentWorkspace();
-                    // Refresh workspaces list
-                    WorkspaceManager::GetWorkspaces(true);
+                    MsgBox::ShowMsgBox("Delete Workspace", "Are you sure you want to delete the workspace: " + WorkspaceManager::GetCurrentWorkspaceName() + "?", MsgBox::Buttons_YES_NO_CANCEL, [](MsgBox::Result* result) {
+                        if (result->Result == MsgBox::ResultType_YES) {
+                            WorkspaceManager::DeleteCurrentWorkspace();
+                            // Refresh workspaces list
+                            workspaces.reset();
+                        }
+                    });
                 }
 
                 ImGui::EndMenu();

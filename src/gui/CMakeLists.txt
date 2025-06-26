@@ -69,6 +69,7 @@ list(APPEND ENGINE_SRC_GUI
         workspaces.h
         dialog.cpp
         dialog.h
+        remember.h
 )
 
 target_sources(marmalade PRIVATE ${ENGINE_SRC_GUI})
