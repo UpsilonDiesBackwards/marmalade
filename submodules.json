@@ -85,6 +85,10 @@
     {
       "path": "vendor/assimp",
       "url": "https://github.com/assimp/assimp.git"
+    },
+    {
+      "path": "vendor/libuv",
+      "url": "https://github.com/libuv/libuv.git"
     }
   ]
 }

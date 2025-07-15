@@ -126,6 +126,10 @@ add_subdirectory(vendor/zip)
 # ----- LOCALISATION -----
 add_subdirectory(vendor/libintl-lite)
 
+if (NOT TARGET uv)
+    add_subdirectory(vendor/libuv)
+endif()
+
 if (WIN32)
     set(GETTEXT_MSGMERGE_EXECUTABLE "msgmerge.exe" CACHE FILEPATH "gettext msgmerge executable")
     set(GETTEXT_MSGFMT_EXECUTABLE "msgfmt.exe" CACHE FILEPATH "gettext msgfmt executable")
@@ -278,6 +282,7 @@ target_link_libraries(marmalade PRIVATE
         intl
         assimp
         zip::zip
+        uv_a
 )
 
 if (WIN32)
@@ -304,6 +309,7 @@ target_include_directories(marmalade PRIVATE
         vendor/assimp
         vendor/zip/src
         ${LibIntl_SOURCE_DIR}
+        vendor/libuv/include
 )
 
 if (APPLE)
