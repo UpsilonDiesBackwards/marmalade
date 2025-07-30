@@ -28,6 +28,8 @@
 
 #define CONFIG_VERSION 1
 
+#undef interface
+
 namespace Marmalade {
     struct Repository {
         std::string name;
@@ -49,7 +51,7 @@ namespace Marmalade {
         bool useSystemScaleFactor{true};
         std::string language{"en"};
         bool automaticWorkspaceSwitching{true};
-        bool alternateButtonOrder{false};
+        bool alternativeButtonOrder{false};
     };
 
     struct WindowPosConfig {
@@ -108,7 +110,7 @@ namespace Marmalade {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::InterfaceConfig, graphicsSystem, graphicsVersion);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::AppearanceConfig, viewports, themeFile, showWelcomeScreen, backgroundColor, scaleFactor, useSystemScaleFactor, language, automaticWorkspaceSwitching, alternateButtonOrder);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::AppearanceConfig, viewports, themeFile, showWelcomeScreen, backgroundColor, scaleFactor, useSystemScaleFactor, language, automaticWorkspaceSwitching, alternativeButtonOrder);
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::WindowPosConfig, monitor, x, y, width, height, maximised);
 

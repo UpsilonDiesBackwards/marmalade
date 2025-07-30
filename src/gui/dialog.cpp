@@ -157,6 +157,6 @@ bool Marmalade::GUI::DialogButtons::shouldInvertOrder() {
 #else
             true;
 #endif
-    invertOrder ^= EngineConfig::GetStoredConfig().appearance.alternateButtonOrder;
+    invertOrder ^= EngineConfig::GetStoredConfig().appearance.alternativeButtonOrder;
     return invertOrder;
 }
