@@ -38,7 +38,8 @@
  */
 Renderable::Renderable(GLuint VAO, GLuint VBO, GLuint EBO, GLuint texture) : VAO(0), VBO(0), EBO(0),
                                                                              texture(texture),
-                                                                             shaderProgram(Shader("res/shaders/opengl/" OPENGL_VERSION "/shader.vert", "res/shaders/opengl/" OPENGL_VERSION "/shader.frag")) {
+                                                                             shaderProgram(Shader("res/shaders/opengl/" OPENGL_VERSION "/graphical/default_lit.vert",
+                                                                                 "res/shaders/opengl/" OPENGL_VERSION "/graphical/default_lit.frag")) {
 
     SetMeshData(
         std::vector<float>{

@@ -47,6 +47,7 @@ list(APPEND ENGINE_SRC
         graphics/material.cpp
 
         graphics/components/billboardtexture.cpp
+        graphics/components/tileset.cpp
 
         io/audiomanager.cpp
         io/input.cpp
@@ -85,8 +86,8 @@ list(APPEND ENGINE_SRC # ECS
         ecs/components/transform.cpp
 
         ecs/components/rendering/materialrenderer.cpp
-        ecs/components/rendering/tilemap.cpp
         ecs/components/rendering/modelrenderer.cpp
+        ecs/components/rendering/tilemap.cpp
 
         ecs/components/audio/audioplayer.cpp
 

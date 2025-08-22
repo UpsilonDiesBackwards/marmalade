@@ -32,8 +32,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "ecs/components/rendering/tilemap.h"
 #include "ecs/components/physics/2d/rigidbody2d.h"
+#include "ecs/components/rendering/tilemap.h"
 
 int EditView::currentRenderMode = 1;
 
@@ -88,8 +88,8 @@ void EditView::Render() {
                        ImVec2(0, 1), ImVec2(1, 0));
 
     for (const auto& entity: app.sceneManager.GetCurrentScene()->GetEntities()) {
-        auto tileMap = entity->componentManager.GetComponentOfType<Marmalade::ECS::TileMap>();
-        if (tileMap) { tileMap->RenderGUIGrid(entity.get()); }
+        auto tileMap = entity->componentManager.GetComponentOfType<Marmalade::ECS::Tilemap>();
+        if (tileMap) { tileMap->RenderGrid(entity.get()); }
     }
 
     for (const auto& entity: app.sceneManager.GetCurrentScene()->GetEntities()) {

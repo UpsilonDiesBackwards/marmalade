@@ -70,8 +70,8 @@ void Marmalade::ECS::ModelRenderer::Deserialize(nlohmann::json json, Entity* ent
 void Marmalade::ECS::ModelRenderer::LoadModel(Entity* entity, const std::string& path) {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path.c_str(),
-                                             aiProcess_Triangulate |
-                                             aiProcess_JoinIdenticalVertices | aiProcess_CalcTangentSpace);
+                                             aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_CalcTangentSpace |
+                                             aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_FlipWindingOrder);
 
     if (!scene || !scene->mRootNode) {
         LOG_ERROR("Failed to load model {}, {}", path.c_str(), importer.GetErrorString());

@@ -24,6 +24,45 @@
 #include <stb/stb_image.h>
 #include <iostream>
 
+GLuint Texture::LoadTexture(const std::string& filePath) {
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    // Apply settings
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    int width, height, channels;
+    stbi_set_flip_vertically_on_load(true);
+
+    unsigned char* data;
+    if (filePath.empty()) {
+        data = stbi_load("res/textures/UVFallback.png", &width, &height, &channels, 4);
+    } else {
+        data = stbi_load(filePath.c_str(), &width, &height, &channels, 4);
+    }
+
+    if (data) {
+        GLenum format = GL_RGB;
+        if (channels == 1) format = GL_RED;
+        else if (channels == 3) format = GL_RGB;
+        else if (channels == 4) format = GL_RGBA;
+
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    } else {
+        LOG_ERROR("Failed to load texture from file: {}", filePath);
+        return 0;
+    }
+
+    stbi_image_free(data);
+
+    return texture;
+}
+
 GLuint Texture::LoadTexture(const std::string& filePath, const Marmalade::Material::TextureSettings& settings) {
     GLuint texture;
     glGenTextures(1, &texture);
@@ -54,11 +93,23 @@ GLuint Texture::LoadTexture(const std::string& filePath, const Marmalade::Materi
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     } else {
-        std::cout << "Failed to load texture from file: " << filePath << std::endl;
+        LOG_ERROR("Failed to load texture from file: {}", filePath);
         return 0;
     }
 
     stbi_image_free(data);
 
     return texture;
+}
+
+glm::uvec2 Texture::GetDimensions(const std::string& filePath) {
+    int width, height, channels;
+
+    if (stbi_info(filePath.c_str(), &width, &height, &channels)) {
+        return glm::uvec2{width, height};
+    } else {
+        LOG_ERROR("Failed to get dimensions for image texture file: {}", filePath);
+    }
+
+    return glm::uvec2{0, 0};
 }

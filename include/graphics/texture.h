@@ -32,8 +32,10 @@ namespace Marmalade::Material {
 
 class Texture {
 public:
-
+    static GLuint LoadTexture(const std::string& filePath);
     static GLuint LoadTexture(const std::string& filePath, const Marmalade::Material::TextureSettings& settings);
+
+    static glm::uvec2 GetDimensions(const std::string& filePath);
 };
 
 #endif

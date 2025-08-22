@@ -124,7 +124,7 @@ void Application::Initialise() {
 
     inputManager.SetWindow(window);
 
-    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {// Initialise GLAD
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) { // Initialise GLAD
         std::cout << "Failed to initialize GLAD" << std::endl;
         return;
     } else

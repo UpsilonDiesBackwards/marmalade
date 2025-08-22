@@ -9,6 +9,7 @@ list(APPEND ENGINE_API
         graphics/viewport.h
 
         graphics/components/billboardtexture.h
+        graphics/components/tileset.h
 
         io/audiomanager.h
         io/input.h
@@ -22,8 +23,9 @@ list(APPEND ENGINE_API
         ecs/components/transform.h
 
         ecs/components/rendering/materialrenderer.h
-        ecs/components/rendering/tilemap.h
         ecs/components/rendering/modelrenderer.h
+        ecs/components/rendering/tiledata.h
+        ecs/components/rendering/tilemap.h
 
         ecs/components/audio/audioplayer.h
 
