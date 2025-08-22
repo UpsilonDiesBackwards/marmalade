@@ -90,6 +90,7 @@ namespace Marmalade::GUI {
         std::vector<Dialog> dialogs{};
         std::vector<Dialog> fileDialogs{};
 
+        bool showStyleEditor = false;
         bool showDebugWindow = false;
 
         void ToggleDebugWindow();

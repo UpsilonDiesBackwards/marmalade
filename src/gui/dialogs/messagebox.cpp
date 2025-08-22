@@ -63,7 +63,7 @@ void Marmalade::GUI::MsgBox::Draw() {
     WINDOW_END_MODAL()
 }
 
-void Marmalade::GUI::MsgBox::ShowMsgBox(const std::string& title, const std::string& message, const Buttons buttons, std::function<void(Result*)> callback) {
+void Marmalade::GUI::MsgBox::ShowMsgBox(const std::string& title, const std::string& message, Buttons buttons, std::function<void(Result*)> callback) {
     auto dlg = WindowManager::GetInstance().RegisterDialog(std::make_shared<MsgBox>(title, message, buttons), [callback](bool, void* data) {
                         auto *res = static_cast<Result*>(data);
                         if (callback != nullptr) callback(res);

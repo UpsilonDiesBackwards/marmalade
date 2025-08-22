@@ -46,9 +46,7 @@ void Marmalade::GUI::TopBar::Show() {
 
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu(pgettext("Menu|", "File"))) {
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_ADD, pgettext("Menu|File|", "New Project")))) {
-                WindowManager::GetInstance().projectWizard.ToggleWindow();
-            }
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_ADD, pgettext("Menu|File|", "New Project")))) { WindowManager::GetInstance().projectWizard.ToggleWindow(); }
             if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_FOLDER_OPENED, pgettext("Menu|File|", "Open Project")))) {
                 IGFD::FileDialogConfig config;
                 config.path = EngineConfig::GetStoredConfig().defaultProjectPath;
@@ -56,61 +54,37 @@ void Marmalade::GUI::TopBar::Show() {
                 config.flags = ImGuiFileDialogFlags_Modal;
                 ImGuiFileDialog::Instance()->OpenDialog("ChooseProject", "Choose Project File", ".marmalade", config);
             }
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_SCREEN_FULL, pgettext("Menu|File|", "New Scene")))) {
-                showSceneCreationPopUp = true;
-            }
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_OPEN_PREVIEW, pgettext("Menu|File|", "Open Scene")))) {
-                showSceneOpenPopUp = true;
-            }
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_SCREEN_FULL, pgettext("Menu|File|", "New Scene")))) { showSceneCreationPopUp = true; }
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_OPEN_PREVIEW, pgettext("Menu|File|", "Open Scene")))) { showSceneOpenPopUp = true; }
             // TODO: Package Builder menu item, to open existing package builder window
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_STAR, pgettext("Menu|File|", "Welcome Screen")))) {
-                WindowManager::GetInstance().welcomeScreen.ToggleWindow();
-            }
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_CLOSE_ALL, pgettext("Menu|File|", "Quit")))) {
-                glfwSetWindowShouldClose(Application::GetInstance().getWindow(), true);
-            }
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_STAR, pgettext("Menu|File|", "Welcome Screen")))) { WindowManager::GetInstance().welcomeScreen.ToggleWindow(); }
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_CLOSE_ALL, pgettext("Menu|File|", "Quit")))) { glfwSetWindowShouldClose(Application::GetInstance().getWindow(), true); }
             ImGui::EndMenu();
         }
 
         if (ImGui::BeginMenu(pgettext("Menu|", "Entity"))) {
             auto* inspectedEntity = Application::GetInstance().editorGUI->details.inspectedEntity;
-            if (inspectedEntity == nullptr) {
-                ImGui::MenuItem(_("No entity selected"), nullptr, nullptr, false);
-            } else {
+            if (inspectedEntity == nullptr) { ImGui::MenuItem(_("No entity selected"), nullptr, nullptr, false); } else {
                 if (ImGui::BeginMenu(pgettext("Menu|Entity|AddComponent|", "Add Component"))) {
                     if (ImGui::BeginMenu(pgettext("Menu|Entity|AddComponent|", "Favourites"))) {
-                        for (const auto& component: Marmalade::ECS::ComponentRegistry::Instance().GetFavorites()) {
-                            if (ImGui::MenuItem(component->Name.c_str())) {
-                                inspectedEntity->componentManager.AddComponent(component->Factory->Create(Util::GenerateUUIDv4()));
-                            }
-                        }
+                        for (const auto& component: Marmalade::ECS::ComponentRegistry::Instance().GetFavorites()) { if (ImGui::MenuItem(component->Name.c_str())) { inspectedEntity->componentManager.AddComponent(component->Factory->Create(Util::GenerateUUIDv4())); } }
                         ImGui::EndMenu();
                     }
                     if (ImGui::BeginMenu(pgettext("Menu|Entity|AddComponent|", "All"))) {
-                        for (const auto& [_, component]: Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()) {
-                            if (ImGui::MenuItem(component.Name.c_str())) {
-                                inspectedEntity->componentManager.AddComponent(component.Factory->Create(Util::GenerateUUIDv4()));
-                            }
-                        }
+                        for (const auto& [_, component]: Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()) { if (ImGui::MenuItem(component.Name.c_str())) { inspectedEntity->componentManager.AddComponent(component.Factory->Create(Util::GenerateUUIDv4())); } }
                         ImGui::EndMenu();
                     }
                     ImGui::Separator();
                     for (const auto& [category, components]: Marmalade::ECS::ComponentRegistry::Instance().GetCategoryTree()) {
                         if (ImGui::BeginMenu(category.c_str())) {
-                            for (const auto& component: components) {
-                                if (ImGui::MenuItem(component->Name.c_str())) {
-                                    inspectedEntity->componentManager.AddComponent(component->Factory->Create(Util::GenerateUUIDv4()));
-                                }
-                            }
+                            for (const auto& component: components) { if (ImGui::MenuItem(component->Name.c_str())) { inspectedEntity->componentManager.AddComponent(component->Factory->Create(Util::GenerateUUIDv4())); } }
                             ImGui::EndMenu();
                         }
                     }
 
                     ImGui::Separator();
 
-                    if (ImGui::MenuItem(pgettext("Menu|Entity|AddComponent|", "Add Component..."))) {
-                        Application::GetInstance().editorGUI->details.SetAddingComponent(true);
-                    }
+                    if (ImGui::MenuItem(pgettext("Menu|Entity|AddComponent|", "Add Component..."))) { Application::GetInstance().editorGUI->details.SetAddingComponent(true); }
 
                     ImGui::EndMenu();
                 }
@@ -147,40 +121,39 @@ void Marmalade::GUI::TopBar::Show() {
                 ImGui::EndPopup();
             }
 
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_DEBUG, pgettext("Menu|Window|", "ImGui Demo")))) {
-                WindowManager::GetInstance().ToggleDebugWindow();
-            }
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_DEBUG, pgettext("Menu|Window|", "ImGui Demo")))) { WindowManager::GetInstance().ToggleDebugWindow(); }
 
-            static auto workspaces = Remember(WorkspaceManager::GetWorkspaces);
+            static auto workspaces = Remember([] { return WorkspaceManager::GetWorkspaces(); });
 
             if (ImGui::BeginMenu(ICON_WITH_TEXT(ICON_CI_BLANK, pgettext("Menu|Window|", "Workspaces")))) {
                 static std::filesystem::path workspacesDir = WorkspaceManager::GetWorkspacesDir();
-                for (const auto& workspace: workspaces.get()) {
+                for (const auto& workspace : workspaces.get()) {
                     if (ImGui::MenuItem(workspace.c_str())) {
                         if (ImGui::GetIO().WantSaveIniSettings) {
-                            auto dlg = WindowManager::GetInstance().RegisterDialog(std::make_shared<SaveWorkspaceDialog>(WorkspaceManager::GetCurrentWorkspaceName()), [workspace](bool result, void* data) {
-                                auto* save = static_cast<SaveWorkspaceDialog::CallbackData*>(data);
-                                if (!result) return;
+                            auto dlg = WindowManager::GetInstance().RegisterDialog(
+                                std::make_shared<SaveWorkspaceDialog>(WorkspaceManager::GetCurrentWorkspaceName()),
+                                [workspace = workspace](bool result, void* data) {
+                                    auto* save = static_cast<SaveWorkspaceDialog::CallbackData*>(data);
+                                    if (!result) return;
 
-                                if (save->Save) {
-                                    WorkspaceManager::SaveCurrentWorkspace();
+                                    if (save->Save) {
+                                        WorkspaceManager::SaveCurrentWorkspace();
+                                    }
+
+                                    WorkspaceManager::LoadWorkspace(WorkspaceManager::GetWorkspacesDir() / (workspace + ".ini"));
                                 }
-
-                                WorkspaceManager::LoadWorkspace(workspacesDir / (workspace + ".ini"));
-                            });
+                            );
                             WindowManager::GetInstance().ShowDialog(dlg.Name);
 
                         } else {
                             WorkspaceManager::LoadWorkspace(workspacesDir / (workspace + ".ini"));
-                        };
+                        }
                     }
                 }
 
                 ImGui::Separator();
 
-                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Save Current Workspace"))) {
-                    WorkspaceManager::SaveCurrentWorkspace();
-                }
+                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Save Current Workspace"))) { WorkspaceManager::SaveCurrentWorkspace(); }
                 if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Duplicate Workspace..."))) {
                     auto dlg = WindowManager::GetInstance().RegisterDialog(std::make_shared<SaveWorkspaceAsDialog>(SaveWorkspaceAsDialog::DialogType_DUPLICATE), [](bool result, void* data) {
                         auto* name = static_cast<char*>(data);
@@ -218,11 +191,7 @@ void Marmalade::GUI::TopBar::Show() {
                     WorkspaceManager::SaveCurrentWorkspace(newPath);
                     WorkspaceManager::LoadWorkspace(newPath);
                 }
-                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Revert this Topology"))) {
-                    if (WorkspaceManager::IsTopologyWorkspace()) {
-                        WorkspaceManager::DeleteCurrentWorkspace(WorkspaceManager::GetWorkspacesDir() / (WorkspaceManager::GetCurrentWorkspaceName() + ".ini"));
-                    }
-                }
+                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Revert this Topology"))) { if (WorkspaceManager::IsTopologyWorkspace()) { WorkspaceManager::DeleteCurrentWorkspace(WorkspaceManager::GetWorkspacesDir() / (WorkspaceManager::GetCurrentWorkspaceName() + ".ini")); } }
 
                 ImGui::Separator();
 
@@ -271,9 +240,7 @@ void Marmalade::GUI::TopBar::Show() {
 #ifdef DEBUG
         ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Debug mode");
 
-        if (Util::IsDebuggerAttached()) {
-            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Debugger attached");
-        }
+        if (Util::IsDebuggerAttached()) { ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Debugger attached"); }
 #endif
 
         if (WindowManager::GetInstance().showDebugWindow) ImGui::ShowDemoWindow();
@@ -311,7 +278,7 @@ void Marmalade::GUI::TopBar::Show() {
 
         if (Application::GetInstance().playState == PlayState::PlayState_PLAY || Application::GetInstance().playState == PlayState::PlayState_PAUSE) {
             if (ImGui::Button("Stop", editorButtonSize)) {
-                Application::GetInstance().playState = PlayState::PlayState_STOP; // Change application play state
+                Application::GetInstance().playState = PlayState::PlayState_STOP;// Change application play state
 
                 // Load scene again to revert any changes made in Play mode
                 auto& sceneManager = Application::GetInstance().sceneManager;
@@ -336,9 +303,7 @@ void Marmalade::GUI::TopBar::Show() {
                 Application::GetInstance().editorMode = EditorMode::EditorMode_EDIT;
 
                 // Reselect entity
-                if (!entityUuid.empty()) {
-                    Application::GetInstance().editorGUI->sceneHierarchy.SelectEntityByUuid(entityUuid);
-                }
+                if (!entityUuid.empty()) { Application::GetInstance().editorGUI->sceneHierarchy.SelectEntityByUuid(entityUuid); }
             }
         } else {
             if (ImGui::Button("Play", editorButtonSize)) {
@@ -362,15 +327,7 @@ void Marmalade::GUI::TopBar::Show() {
         bool isPlaying = (Application::GetInstance().playState == PlayState::PlayState_PLAY || Application::GetInstance().playState == PlayState::PlayState_PAUSE);
         if (!isPlaying) { ImGui::BeginDisabled(); }
 
-        if (Application::GetInstance().playState == PlayState::PlayState_PAUSE) {
-            if (ImGui::Button("Resume", editorButtonSize)) {
-                Application::GetInstance().playState = PlayState::PlayState_PLAY;
-            }
-        } else {
-            if (ImGui::Button("Pause", editorButtonSize)) {
-                Application::GetInstance().playState = PlayState::PlayState_PAUSE;
-            }
-        }
+        if (Application::GetInstance().playState == PlayState::PlayState_PAUSE) { if (ImGui::Button("Resume", editorButtonSize)) { Application::GetInstance().playState = PlayState::PlayState_PLAY; } } else { if (ImGui::Button("Pause", editorButtonSize)) { Application::GetInstance().playState = PlayState::PlayState_PAUSE; } }
 
         if (!isPlaying) { ImGui::EndDisabled(); }
 
@@ -378,7 +335,8 @@ void Marmalade::GUI::TopBar::Show() {
         bool isPaused = (Application::GetInstance().playState == PlayState::PlayState_PAUSE);
         if (!isPaused) { ImGui::BeginDisabled(); }
 
-        if (ImGui::Button("Step", editorButtonSize)) { // Put the game in to play...
+        if (ImGui::Button("Step", editorButtonSize)) {
+            // Put the game in to play...
             Application::GetInstance().playState = PlayState::PlayState_STEP;
             LOG_INFO("Stepped one frame");
         }
@@ -410,17 +368,11 @@ void Marmalade::GUI::TopBar::Show() {
         ImGui::End();
     }
 
-    if (showSceneCreationPopUp) {
-        ImGui::OpenPopup("New Scene");
-    }
+    if (showSceneCreationPopUp) { ImGui::OpenPopup("New Scene"); }
 
-    if (showSceneOpenPopUp) {
-        ImGui::OpenPopup("Open Scene");
-    }
+    if (showSceneOpenPopUp) { ImGui::OpenPopup("Open Scene"); }
 
-    for (const auto& window: WindowManager::GetInstance().windows) {
-        window->Show();
-    }
+    for (const auto& window: WindowManager::GetInstance().windows) { window->Show(); }
 
     for (auto& dialog: WindowManager::GetInstance().dialogs) {
         dialog.CustomDlg->SetDialog(&dialog);
@@ -461,9 +413,7 @@ void Marmalade::GUI::TopBar::Show() {
                 memset(sceneNameBuffer, 0, sizeof(sceneNameBuffer));
 
                 showSceneCreationPopUp = false;
-            } else {
-                ImGui::Text("Invalid scene name.");
-            }
+            } else { ImGui::Text("Invalid scene name."); }
         }
         ImGui::EndPopup();
     }
@@ -488,9 +438,7 @@ void Marmalade::GUI::TopBar::Show() {
             }
         }
 
-        if (ImGui::Button("Cancel")) {
-            showSceneOpenPopUp = false;
-        }
+        if (ImGui::Button("Cancel")) { showSceneOpenPopUp = false; }
 
         ImGui::EndPopup();
     }

@@ -46,7 +46,7 @@ namespace Marmalade::GUI {
         void Draw() override;
         std::string GetName() override;
 
-        MsgBox(const std::string& title, const std::string& message, const Buttons buttons) : _title(title), _message(message), _buttons(buttons) {}
+        MsgBox(const std::string& title, const std::string& message, Buttons buttons) : _title(title), _message(message), _buttons(buttons) {}
 
         static void ShowMsgBox(const std::string& title, const std::string& message, Buttons buttons = Buttons_OK, std::function<void(Result*)> callback = nullptr);
 
