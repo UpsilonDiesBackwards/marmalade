@@ -119,6 +119,9 @@ if (WIN32)
 endif ()
 find_package(OpenAL REQUIRED)
 
+set(WITH_SYSTEM_LIBUV ON)
+set(LIBUV_INCLUDE_DIR vendor/libuv/include)
+set(LIBUV_LIBRARIES uv_a)
 add_subdirectory(vendor/wasm3)
 
 add_subdirectory(vendor/zip)
