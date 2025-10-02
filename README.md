@@ -1,5 +1,10 @@
 # Marmalade
 
+![Nightly stable build Windows](https://img.shields.io/endpoint?url=https://www.ryanbester.com/badge.php?url=http%3A%2F%2Fteamcity.diesbackwards.com%3A8111%2Fapp%2Frest%2Fbuilds%2FbuildType%3Aid%3AMarmalade_NightlyStableWin%2Cbranch%3Aname%3Adev%2FstatusIcon.svg&label=Nightly%20%28stable%29%20Windows)
+![Nightly stable build Linux](https://img.shields.io/endpoint?url=https://www.ryanbester.com/badge.php?url=http%3A%2F%2Fteamcity.diesbackwards.com%3A8111%2Fapp%2Frest%2Fbuilds%2FbuildType%3Aid%3AMarmalade_NightlyStableLinux%2Cbranch%3Aname%3Adev%2FstatusIcon.svg&label=Nightly%20%28stable%29%20Linux)
+![Nightly dev build Windows](https://img.shields.io/endpoint?url=https://www.ryanbester.com/badge.php?url=http%3A%2F%2Fteamcity.diesbackwards.com%3A8111%2Fapp%2Frest%2Fbuilds%2FbuildType%3Aid%3AMarmalade_NightlyDevWin%2Cbranch%3Aname%3Adev%2FstatusIcon.svg&label=Nightly%20%28dev%29%20Windows)
+![Nightly dev build Linux](https://img.shields.io/endpoint?url=https://www.ryanbester.com/badge.php?url=http%3A%2F%2Fteamcity.diesbackwards.com%3A8111%2Fapp%2Frest%2Fbuilds%2FbuildType%3Aid%3AMarmalade_NightlyDevLinux%2Cbranch%3Aname%3Adev%2FstatusIcon.svg&label=Nightly%20%28dev%29%20Linux)
+
 <img src="res/icons/logo/logo192.png" alt="Marmalade Logo" height="128">
 
 Marmalade is a modular 2D game engine.
