@@ -1,5 +1,7 @@
 # Marmalade
 
+<img src="res/icons/logo/logo192.png" alt="Marmalade Logo" height="128">
+
 Marmalade is a modular 2D game engine.
 
 ## Features
@@ -25,3 +27,11 @@ Multiple built-in packages and plugins are contained in `packages` and `plugins`
 1. Clone the repository
 2. Run `python submodules.py restore`
 3. Build with CMake
+
+## Acknowledgements
+
+This project is made possible thanks to the generous support of:
+
+|   |
+|:-:|
+| [<img src="misc/readme-res/sentry.svg" alt="Sentry" height="64">](https://sentry.io) |
