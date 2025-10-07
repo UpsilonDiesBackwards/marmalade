@@ -64,7 +64,7 @@ void Marmalade::GUI::About::Draw() {
 
     if (ImGui::BeginTabBar("AboutTabs")) {
         if (ImGui::BeginTabItem("About")) {
-            ImGui::PushFont(FontManager::GetInstance().fontTitle);
+            ImGui::PushFont(nullptr, FontManager::GetInstance().titleSize);
             ImGui::Text("Marmalade Engine");
             ImGui::PopFont();
 
@@ -74,7 +74,7 @@ void Marmalade::GUI::About::Draw() {
 
             ImGui::Text("Copyright (C) 2025");
 
-            ImGui::PushFont(FontManager::GetInstance().fontSubheading);
+            ImGui::PushFont(nullptr, FontManager::GetInstance().subheadingSize);
             ImGui::Text("Contributors:");
             ImGui::PopFont();
 

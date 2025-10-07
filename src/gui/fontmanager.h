@@ -25,10 +25,11 @@
 namespace Marmalade::GUI {
     class FontManager {
     public:
-        ImFont* fontTitle;
-        ImFont* fontHeading;
-        ImFont* fontSubheading;
         ImFont* fontNormal;
+
+        float titleSize = 34.0f;
+        float headingSize = 28.0f;
+        float subheadingSize = 22.0f;
 
         static FontManager& GetInstance();
 

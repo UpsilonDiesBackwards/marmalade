@@ -46,19 +46,21 @@ void Marmalade::GUI::FontManager::InitFonts() {
     fontSubheading = io.Fonts->AddFontFromFileTTF("res/fonts/Cabin/static/Cabin-Regular.ttf", 22 * scaleFactor);
     fontNormal = io.Fonts->AddFontFromFileTTF("res/fonts/Cabin/static/Cabin-Regular.ttf", 16 * scaleFactor);
 
+    ImGui::GetStyle().FontScaleMain = scaleFactor;
+
+    fontNormal = io.Fonts->AddFontFromFileTTF("res/fonts/Cabin/static/Cabin-Regular.ttf", 0.0f);
     io.FontDefault = fontNormal;
 
     static const ImWchar icons_ranges[] = {ICON_MIN_CI, ICON_MAX_16_CI, 0};
-
     ImFontConfig icons_config;
     icons_config.MergeMode = true;
     icons_config.PixelSnapH = true;
-    float font_size = 16.0f * scaleFactor;
-    icons_config.GlyphMinAdvanceX = font_size;
+    icons_config.GlyphMinAdvanceX = 16.0f;
     icons_config.GlyphOffset.y = 3.0f * scaleFactor;
-    io.Fonts->AddFontFromFileTTF("res/fonts/codicon.ttf", font_size, &icons_config, icons_ranges);
+    io.Fonts->AddFontFromFileTTF("res/fonts/codicon.ttf", 16.0f, &icons_config, icons_ranges);
 
     rebuildFontAtlas(io, scaleFactor);
+    // rebuildFontAtlas(io, scaleFactor);
 }
 
 float Marmalade::GUI::FontManager::getMonitorScale() {

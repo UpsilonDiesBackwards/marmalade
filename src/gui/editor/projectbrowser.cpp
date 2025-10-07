@@ -161,6 +161,7 @@ void Marmalade::GUI::ProjectBrowser::drawItemTile(Marmalade::GUI::DirectoryEntry
     ImGui::TextWrapped("%s", label.c_str());
 
     ImGui::SetCursorScreenPos(ImVec2(rectMin.x, rectMax.y + 4.0f));
+    ImGui::Dummy(ImVec2(0,0));
 }
 
 void Marmalade::GUI::ProjectBrowser::drawItemList(Marmalade::GUI::DirectoryEntry item, int i) {
@@ -577,7 +578,7 @@ void Marmalade::GUI::ProjectBrowser::CreateDirectory() {
 void Marmalade::GUI::ProjectBrowser::CreateMaterial() {
     if (_createMaterial) {
         IGFD::FileDialogConfig config;
-        config.path = GET_APP.GetCurrentProject()->basePath;
+        config.path = GET_APP.GetCurrentProject()->basePath.string();
         config.flags = ImGuiFileDialogFlags_Modal;
         ImGuiFileDialog::Instance()->OpenDialog("CreateMaterial", "New Material", ".mmlmat", config);
         _createMaterial = false;

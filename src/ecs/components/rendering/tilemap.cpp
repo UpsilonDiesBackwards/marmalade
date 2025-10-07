@@ -29,6 +29,12 @@
 #include "../../../gui/editor/editor.h"
 #include "scene/entity.h"
 
+#ifdef _MSC_VER
+Marmalade::ECS::Tilemap::Tilemap() {
+    TILEMAP_CTOR_BODY
+}
+#endif
+
 void Marmalade::ECS::Tilemap::Display(Entity* entity) {
     if (ImGui::BeginTable("TransformTable", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersInnerV)) {
         ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 65.0f);
@@ -221,7 +227,7 @@ void Marmalade::ECS::Tilemap::Deserialize(nlohmann::json json, Entity* entity) {
 
         tileSet->storedConfig = json["tileSet"].get<TileSetData>();
         tileSet->filePath = tileSet->storedConfig.atlas.path;
-        tileSet->texture = Texture::LoadTexture(tileSet->filePath);
+        tileSet->texture = Texture::LoadTexture(tileSet->filePath.string());
 
         tileSet->tiles.clear();
         for (const TileData& td: tileSet->storedConfig.tiles) {

@@ -40,21 +40,21 @@ void Marmalade::GUI::Components::MarkdownParser::formatCallback(const ImGui::Mar
             switch (info.level) {
                 case 1:
                     if (start) {
-                        ImGui::PushFont(Marmalade::GUI::FontManager::GetInstance().fontTitle);
+                        ImGui::PushFont(nullptr, FontManager::GetInstance().titleSize);
                     } else {
                         ImGui::PopFont();
                     }
                     break;
                 case 2:
                     if (start) {
-                        ImGui::PushFont(Marmalade::GUI::FontManager::GetInstance().fontHeading);
+                        ImGui::PushFont(nullptr, FontManager::GetInstance().headingSize);
                     } else {
                         ImGui::PopFont();
                     }
                     break;
                 case 3:
                     if (start) {
-                        ImGui::PushFont(Marmalade::GUI::FontManager::GetInstance().fontSubheading);
+                        ImGui::PushFont(nullptr, FontManager::GetInstance().subheadingSize);
                     } else {
                         ImGui::PopFont();
                     }
