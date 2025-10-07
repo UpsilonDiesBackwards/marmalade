@@ -41,11 +41,6 @@ void Marmalade::GUI::FontManager::InitFonts() {
     auto scaleFactor = EngineConfig::GetStoredConfig().appearance.scaleFactor;
     if (EngineConfig::GetStoredConfig().appearance.useSystemScaleFactor) scaleFactor = getMonitorScale();
 
-    fontTitle = io.Fonts->AddFontFromFileTTF("res/fonts/Cabin/static/Cabin-Regular.ttf", 34 * scaleFactor);
-    fontHeading = io.Fonts->AddFontFromFileTTF("res/fonts/Cabin/static/Cabin-Regular.ttf", 28 * scaleFactor);
-    fontSubheading = io.Fonts->AddFontFromFileTTF("res/fonts/Cabin/static/Cabin-Regular.ttf", 22 * scaleFactor);
-    fontNormal = io.Fonts->AddFontFromFileTTF("res/fonts/Cabin/static/Cabin-Regular.ttf", 16 * scaleFactor);
-
     ImGui::GetStyle().FontScaleMain = scaleFactor;
 
     fontNormal = io.Fonts->AddFontFromFileTTF("res/fonts/Cabin/static/Cabin-Regular.ttf", 0.0f);
@@ -59,7 +54,6 @@ void Marmalade::GUI::FontManager::InitFonts() {
     icons_config.GlyphOffset.y = 3.0f * scaleFactor;
     io.Fonts->AddFontFromFileTTF("res/fonts/codicon.ttf", 16.0f, &icons_config, icons_ranges);
 
-    rebuildFontAtlas(io, scaleFactor);
     // rebuildFontAtlas(io, scaleFactor);
 }
 
