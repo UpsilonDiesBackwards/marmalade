@@ -18,17 +18,18 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Marmalade 0.0.1\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-07 17:41+0100\n"
-"PO-Revision-Date: 2025-10-07 17:41+0100\n"
+"PO-Revision-Date: 2025-10-07 17:42+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: \n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.6\n"
 
 #: ../src/application/autosave.h:34
 msgid "Not yet"
@@ -82,37 +83,37 @@ msgstr ""
 #: ../src/gui/editor/topbar.cpp:48
 msgctxt "Menu|"
 msgid "File"
-msgstr ""
+msgstr "File"
 
 #: ../src/gui/editor/topbar.cpp:49
 msgctxt "Menu|File|"
 msgid "New Project"
-msgstr ""
+msgstr "New Project"
 
 #: ../src/gui/editor/topbar.cpp:50
 msgctxt "Menu|File|"
 msgid "Open Project"
-msgstr ""
+msgstr "Open Project"
 
 #: ../src/gui/editor/topbar.cpp:57
 msgctxt "Menu|File|"
 msgid "New Scene"
-msgstr ""
+msgstr "New Scene"
 
 #: ../src/gui/editor/topbar.cpp:58
 msgctxt "Menu|File|"
 msgid "Open Scene"
-msgstr ""
+msgstr "Open Scene"
 
 #: ../src/gui/editor/topbar.cpp:60
 msgctxt "Menu|File|"
 msgid "Welcome Screen"
-msgstr ""
+msgstr "Welcome Screen"
 
 #: ../src/gui/editor/topbar.cpp:61
 msgctxt "Menu|File|"
 msgid "Quit"
-msgstr ""
+msgstr "Quit"
 
 #: ../src/gui/editor/topbar.cpp:65
 msgctxt "Menu|"
@@ -268,9 +269,12 @@ msgid "Logging"
 msgstr ""
 
 #: ../src/gui/settings/preferences.cpp:71
+#, fuzzy
+#| msgctxt "Menu|File|"
+#| msgid "New Project"
 msgctxt "Preferences|General|"
 msgid "Projects"
-msgstr ""
+msgstr "New Project"
 
 #: ../src/gui/settings/preferences.cpp:72
 msgctxt "Preferences|General|"
@@ -345,8 +349,11 @@ msgid "Default Project Path"
 msgstr ""
 
 #: ../src/gui/settings/preferences.cpp:172
+#, fuzzy
+#| msgctxt "Menu|File|"
+#| msgid "Welcome Screen"
 msgid "Show Welcome Screen on Startup"
-msgstr ""
+msgstr "Welcome Screen"
 
 #: ../src/gui/settings/preferences.cpp:188
 msgid "File Associations"
@@ -368,8 +375,11 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: ../src/gui/settings/preferences.cpp:204
+#, fuzzy
+#| msgctxt "Menu|"
+#| msgid "File"
 msgid "File Name"
-msgstr ""
+msgstr "File"
 
 #: ../src/gui/settings/preferences.cpp:205
 msgid "Type"
@@ -504,3 +514,10 @@ msgstr ""
 #: ../src/main.cpp:232
 msgid "Opening project..."
 msgstr ""
+
+#~ msgctxt "context"
+#~ msgid "Print"
+#~ msgstr "Print with context"
+
+#~ msgid "Test"
+#~ msgstr "Test"

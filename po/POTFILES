@@ -13,9 +13,20 @@
 ../src/application/config/plugins.h
 ../src/application/config/recents.cpp
 ../src/application/config/recents.h
+../src/application/crashreporter/crashreporter.h
+../src/application/crashreporter/crashreporter_darwin.cpp
+../src/application/crashreporter/crashreporter_linux.cpp
+../src/application/crashreporter/crashreporter_win32.cpp
+../src/application/crashreporter/phroggy/main.cpp
 ../src/application/guilogsink.cpp
 ../src/application/guilogsink.h
 ../src/application/i18n.h
+../src/application/instancemgr/client.cpp
+../src/application/instancemgr/client.h
+../src/application/instancemgr/packet.cpp
+../src/application/instancemgr/packet.h
+../src/application/instancemgr/server.cpp
+../src/application/instancemgr/server.h
 ../src/application/integration.cpp
 ../src/application/integration.h
 ../src/application/logger.h
@@ -42,6 +53,8 @@
 ../src/ecs/components/rendering/modelrenderer.cpp
 ../src/ecs/components/rendering/tilemap.cpp
 ../src/ecs/components/transform.cpp
+../src/graphics/components/billboardtexture.cpp
+../src/graphics/components/tileset.cpp
 ../src/graphics/framebuffer.cpp
 ../src/graphics/material.cpp
 ../src/graphics/multisampledframebuffer.cpp
@@ -55,6 +68,7 @@
 ../src/gui/components/selectablelistview.h
 ../src/gui/components/tableview.h
 ../src/gui/components/util.h
+../src/gui/dialog.cpp
 ../src/gui/dialog.h
 ../src/gui/dialogs/about.cpp
 ../src/gui/dialogs/about.h
@@ -64,6 +78,8 @@
 ../src/gui/dialogs/autosave.h
 ../src/gui/dialogs/configerror.cpp
 ../src/gui/dialogs/configerror.h
+../src/gui/dialogs/messagebox.cpp
+../src/gui/dialogs/messagebox.h
 ../src/gui/dialogs/saveworkspace.cpp
 ../src/gui/dialogs/saveworkspace.h
 ../src/gui/editor/details.cpp
@@ -108,6 +124,7 @@
 ../src/gui/packagebuilder/packagebuilder.h
 ../src/gui/packagebuilder/publish.cpp
 ../src/gui/packagebuilder/publish.h
+../src/gui/remember.h
 ../src/gui/settings/preferences.cpp
 ../src/gui/settings/preferences.h
 ../src/gui/settings/settings.cpp
