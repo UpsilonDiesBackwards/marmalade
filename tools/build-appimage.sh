@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 APPIMAGETOOL="${APPIMAGETOOL:-appimagetool-x86_64.AppImage}"
+LINUXDEPLOY="${LINUXDEPLOY:-linuxdeploy-x86_64.AppImage}"
 BUILDDIR="${BUILDDIR:-build}"
 
 echo "Using appimagetool: $APPIMAGETOOL, build dir: $BUILDDIR"
@@ -14,12 +15,13 @@ if [ ! -d "$BUILDDIR/publish" ]; then
 fi
 
 
-rm -rf $APPDIR
-mkdir -p $APPDIR/usr/bin
+rm -rf "$APPDIR"
+mkdir -p "$APPDIR"/usr/bin
 mkdir -p "${APPDIR}/usr/share/applications"
 
-cp $BUILDDIR/publish/marmalade $APPDIR/usr/bin
-cp -r $BUILDDIR/publish/res $APPDIR/res
+cp "$BUILDDIR"/publish/marmalade "$APPDIR"/usr/bin
+cp -r "$BUILDDIR"/publish/res "$APPDIR"/res
+cp -r res/icons/logo/logo_dark256.png "$APPDIR"/marmalade.png
 
 # Desktop entry
 cat > "${APPDIR}/usr/share/applications/marmalade.desktop" <<'EOF'
@@ -35,11 +37,11 @@ EOF
 cat > "${APPDIR}/AppRun" <<'EOF'
 #!/bin/bash
 HERE="$(dirname "$(readlink -f "$0")")"
-cd "$HERE/usr/bin"
 exec "$HERE/usr/bin/marmalade" "$@"
 EOF
 
-chmod +x "${APPDIR}/usr/share/applications/marmalade.desktop"
 chmod +x "${APPDIR}/AppRun"
+
+"$LINUXDEPLOY" --appdir "$APPDIR"
 
 "$APPIMAGETOOL" "$APPDIR" "$OUTPUT" --no-appstream
