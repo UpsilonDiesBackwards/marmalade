@@ -292,6 +292,10 @@ if (WIN32)
     target_link_libraries(marmalade PRIVATE Shcore.lib ws2_32.lib)
 endif ()
 
+if (UNIX AND NOT APPLE)
+    target_link_libraries(marmalade PRIVATE X11)
+endif()
+
 target_include_directories(marmalade PRIVATE
         vendor/glad/include
         vendor/glfw-3.4/include
