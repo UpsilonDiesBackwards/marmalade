@@ -3,7 +3,7 @@
 ![Nightly dev build Windows](https://img.shields.io/endpoint?url=https://www.ryanbester.com/badge.php?url=http%3A%2F%2Fteamcity.diesbackwards.com%2Fapp%2Frest%2Fbuilds%2FbuildType%3Aid%3AMarmalade_NightlyDevWindows%2Cbranch%3Aname%3Adev%2FstatusIcon.svg&label=Nightly%20%28dev%29%20Windows)
 ![Nightly dev build Linux](https://img.shields.io/endpoint?url=https://www.ryanbester.com/badge.php?url=http%3A%2F%2Fteamcity.diesbackwards.com%2Fapp%2Frest%2Fbuilds%2FbuildType%3Aid%3AMarmalade_NightlyDevLinux%2Cbranch%3Aname%3Adev%2FstatusIcon.svg&label=Nightly%20%28dev%29%20Linux)
 
-<img src="res/icons/logo/logo192.png" alt="Marmalade Logo" height="128">
+<img src="https://raw.githubusercontent.com/Marmalade-Engine/marmalade/dev/res/icons/logo/logo192.png" alt="Marmalade Logo" height="128">
 
 Marmalade is a modular 2D game engine.
 
@@ -37,4 +37,4 @@ This project is made possible thanks to the generous support of:
 
 |   |
 |:-:|
-| [<img src="misc/readme-res/sentry.svg" alt="Sentry" height="64">](https://sentry.io) |
+| [<img src="https://raw.githubusercontent.com/Marmalade-Engine/marmalade/dev/misc/readme-res/sentry.svg" alt="Sentry" height="64">](https://sentry.io) |
