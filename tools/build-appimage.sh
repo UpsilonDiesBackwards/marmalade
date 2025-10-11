@@ -40,6 +40,10 @@ HERE="$(dirname "$(readlink -f "$0")")"
 exec "$HERE/usr/bin/marmalade" "$@"
 EOF
 
+cat > "${APPDIR}/.disttype" <<'EOF'
+appimage
+EOF
+
 chmod +x "${APPDIR}/AppRun"
 
 "$LINUXDEPLOY" --appdir "$APPDIR"
