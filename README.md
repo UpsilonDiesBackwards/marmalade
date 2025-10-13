@@ -37,4 +37,4 @@ This project is made possible thanks to the generous support of:
 
 |   |
 |:-:|
-| [<img src="https://raw.githubusercontent.com/Marmalade-Engine/marmalade/dev/misc/readme-res/sentry.svg" alt="Sentry" height="64">](https://sentry.io) |
+| <a href="https://sentry.io"><img src="https://raw.githubusercontent.com/Marmalade-Engine/marmalade/dev/misc/readme-res/sentry.svg" alt="Sentry" height="64"></a>  |
