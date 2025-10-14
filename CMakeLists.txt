@@ -203,9 +203,14 @@ list(APPEND IMGUI_SRC
         vendor/imgui/backends/imgui_impl_opengl3.cpp
 )
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    file(GLOB IMGUI_TEST_SRC "vendor/imgui_test_engine/imgui_test_engine/*.h", "vendor/imgui_test_engine/imgui_test_engine/*.cpp")
+endif()
+
 include(ImGuiHooks/HookImGui)
 
 file(GLOB IMGUIZMO_SRC "vendor/imguizmo/*.h" "vendor/imguizmo/*.cpp")
+file (GLOB IMPLOT_SRC "vendor/implot/.*" "vendor/implot/*.cpp")
 
 # We can't do add_subdirectory, since the imgui header is undefined
 list(APPEND IMNODES_SRC vendor/imnodes/imnodes.h vendor/imnodes/imnodes_internal.h vendor/imnodes/imnodes.cpp)
@@ -232,8 +237,10 @@ add_subdirectory(vendor/assimp)
 add_executable(marmalade
         ${EXECUTABLE_TYPE}
         vendor/glad/src/glad.c
+        $<IF:$<CONFIG:Debug>,${IMGUI_TEST_SRC},>
         ${IMGUI_SRC}
         ${IMGUIZMO_SRC}
+        ${IMPLOT_SRC}
         ${IMNODES_SRC}
         vendor/imguifiledialog/ImGuiFileDialog.cpp
         vendor/imgui_markdown/imgui_markdown.h
@@ -287,9 +294,10 @@ target_link_libraries(marmalade PRIVATE
         zip::zip
         uv_a
 )
+target_compile_definitions(marmalade PRIVATE IMGUI_USER_CONFIG="../../src/gui/imconfig.h")
 
 if (WIN32)
-    target_link_libraries(marmalade PRIVATE Shcore.lib ws2_32.lib)
+    target_link_libraries(marmalade PRIVATE Shcore.lib ws2_32.lib Dbghelp.lib)
 endif ()
 
 if (UNIX AND NOT APPLE)
@@ -299,10 +307,12 @@ endif()
 target_include_directories(marmalade PRIVATE
         vendor/glad/include
         vendor/glfw-3.4/include
+        $<IF:$<CONFIG:Debug>,${CMAKE_SOURCE_DIR}/vendor/imgui_test_engine/imgui_test_engine,>
         vendor/imgui
         vendor/imguifiledialog
         vendor/imgui_markdown
         vendor/imguizmo
+        vendor/implot
         vendor/glm/glm
         ${LUA_INCLUDE_DIR}
         vendor/luaaa

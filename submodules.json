@@ -89,6 +89,14 @@
     {
       "path": "vendor/libuv",
       "url": "https://github.com/libuv/libuv.git"
+    },
+    {
+      "path": "vendor/imgui_test_engine",
+      "url": "https://github.com/ocornut/imgui_test_engine.git"
+    },
+    {
+      "path": "vendor/implot",
+      "url": "https://github.com/epezent/implot.git"
     }
   ]
 }

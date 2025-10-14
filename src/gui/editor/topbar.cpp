@@ -19,6 +19,10 @@
 
 #include "topbar.h"
 
+#if DEBUG
+#include <imgui_te_ui.h>
+#endif
+
 #include "../../application/application.h"
 #include "../../application/util.h"
 #include "../../project/projectmanager.h"
@@ -122,6 +126,11 @@ void Marmalade::GUI::TopBar::Show() {
             }
 
             if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_DEBUG, pgettext("Menu|Window|", "ImGui Demo")))) { WindowManager::GetInstance().ToggleDebugWindow(); }
+#if DEBUG
+            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_BEAKER, pgettext("Menu|Window|", "ImGui Test Engine")))) {
+                WindowManager::GetInstance().ToggleImGuiTestsWindow();
+            }
+#endif
 
             static auto workspaces = Remember([] { return WorkspaceManager::GetWorkspaces(); });
 
@@ -244,6 +253,11 @@ void Marmalade::GUI::TopBar::Show() {
 #endif
 
         if (WindowManager::GetInstance().showDebugWindow) ImGui::ShowDemoWindow();
+#if DEBUG
+        if (WindowManager::GetInstance().showImGuiTestsWindow) {
+            ImGuiTestEngine_ShowTestEngineWindows(Application::GetInstance().GetImGuiTestEngine(), nullptr);
+        }
+#endif
 
         float windowWidth = ImGui::GetContentRegionAvail().x;
 

@@ -38,6 +38,11 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <ImGuizmo.h>
 
+#if DEBUG
+#include <imgui_te_internal.h>
+#include <imgui_te_ui.h>
+#endif
+
 #include <imnodes.h>
 
 #include <IconsCodicons.h>
@@ -175,6 +180,18 @@ void Application::InitialiseImGui() {
     ImGui::CreateContext();// Create ImGui Context
     ImGui_ImplGlfw_InitForOpenGL(window, true);
 
+#if DEBUG
+    _imguiTestEngine = ImGuiTestEngine_CreateContext();
+    ImGuiTestEngineIO& testIo = ImGuiTestEngine_GetIO(_imguiTestEngine);
+    testIo.ConfigVerboseLevel = ImGuiTestVerboseLevel_Info;
+    testIo.ConfigVerboseLevelOnError = ImGuiTestVerboseLevel_Debug;
+
+    registerImGuiTests();
+
+    ImGuiTestEngine_Start(_imguiTestEngine, ImGui::GetCurrentContext());
+    ImGuiTestEngine_InstallDefaultCrashHandler();
+#endif
+
     std::stringstream versionStream;
     versionStream << "#version " << _graphicsVersionMajor << _graphicsVersionMinor << "0";
     auto versionStr = versionStream.str();
@@ -262,6 +279,10 @@ void Application::Run() {
 
     glfwSwapBuffers(window);
 
+#if DEBUG
+    ImGuiTestEngine_PostSwap(_imguiTestEngine);
+#endif
+
     firstLoop = false;
 }
 
@@ -288,9 +309,17 @@ void Application::SetupDocking() const {
 }
 
 void Application::TerminateImGui() {
+#if DEBUG
+    ImGuiTestEngine_Stop(_imguiTestEngine);
+#endif
+
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+
+#if DEBUG
+    ImGuiTestEngine_DestroyContext(_imguiTestEngine);
+#endif
 
     ImNodes::DestroyContext();
 }
@@ -439,3 +468,31 @@ void Application::ChangeWorkspace() {
 bool Application::NeedsImGuiRestart() {
     return _requestWorkspaceChange;
 }
+
+#if DEBUG
+void Application::registerImGuiTests() {
+    static bool b = false;
+
+    // Demo test
+    ImGuiTest* t = IM_REGISTER_TEST(_imguiTestEngine, "demo_tests", "test1");
+    t->GuiFunc = [](ImGuiTestContext* ctx) {
+        ImGui::Begin("Test Window", nullptr, ImGuiWindowFlags_NoSavedSettings);
+        ImGui::Text("Hello, world");
+        ImGui::Button("Click Me");
+        if (ImGui::TreeNode("Node")) {
+            ImGui::Checkbox("Checkbox", &b);
+            ImGui::TreePop();
+        }
+        ImGui::End();
+    };
+    t->TestFunc = [](ImGuiTestContext* ctx) {
+        ctx->SetRef("Test Window");
+        ctx->ItemClick("Click Me");
+        ctx->ItemOpen("Node");
+        ctx->ItemCheck("Node/Checkbox");
+        IM_CHECK_EQ(b, true);
+        ctx->ItemUncheck("Node/Checkbox");
+        IM_CHECK_EQ(b, false);
+    };
+}
+#endif

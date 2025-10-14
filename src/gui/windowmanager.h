@@ -92,8 +92,15 @@ namespace Marmalade::GUI {
 
         bool showStyleEditor = false;
         bool showDebugWindow = false;
+#if DEBUG
+        bool showImGuiTestsWindow = false;
+#endif
 
         void ToggleDebugWindow();
+
+#if DEBUG
+        void ToggleImGuiTestsWindow();
+#endif
 
         /**
          * \brief Registers a custom dialog.

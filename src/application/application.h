@@ -34,6 +34,11 @@
 
 #include <GLFW/glfw3.h>
 
+#if DEBUG
+#include <imgui_te_engine.h>
+#include <imgui_te_context.h>
+#endif
+
 #include <scene/entity.h>
 #include <graphics/multisampledframebuffer.h>
 #include "io/audiomanager.h"
@@ -190,6 +195,10 @@ public:
 
     bool NeedsImGuiRestart();
 
+#if DEBUG
+    ImGuiTestEngine* GetImGuiTestEngine() { return _imguiTestEngine; }
+#endif
+
 private:
     Marmalade::Physics::PhysicsEngine2D physicsEngine2D;
 
@@ -213,6 +222,12 @@ private:
     std::unique_ptr<Marmalade::Project::Project> currentProject;
 
     bool _requestWorkspaceChange = false;
+
+#if DEBUG
+    ImGuiTestEngine* _imguiTestEngine = nullptr;
+
+    void registerImGuiTests();
+#endif
 
     /**
      * \brief Gets the graphics version from the engine config. Ambiguous name, should be changed

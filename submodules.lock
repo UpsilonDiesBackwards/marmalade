@@ -18,3 +18,5 @@ edbb3064b2ee7ed42ffc5a4b9e0b8c3616d54cbf vendor/libintl-lite (master) *
 d7a2252a537926cbdef8512741a322a183fcfd09 vendor/zip (master) *
 b3a47a68fa0a379b1fa0788e4a5f448111cd2012 vendor/assimp (heads/master)
 9424da3e46f485d103a40e0a9b4ba1e8bfea4c9c vendor/libuv (v1.x)
+1918dc90b5f661bfddcef71e19ce5c86dc8d9b9b vendor/imgui_test_engine (main)
+3da8bd34299965d3b0ab124df743fe3e076fa222 vendor/implot (master)

@@ -46,6 +46,12 @@ void Marmalade::GUI::WindowManager::ToggleDebugWindow() {
     showDebugWindow = !showDebugWindow;
 }
 
+#if DEBUG
+void Marmalade::GUI::WindowManager::ToggleImGuiTestsWindow() {
+    showImGuiTestsWindow = !showImGuiTestsWindow;
+}
+#endif
+
 Marmalade::GUI::Dialog Marmalade::GUI::WindowManager::RegisterDialog(std::shared_ptr<CustomDialog> customDlg, const DialogCallback& callback, bool reregister, ImGuiWindowFlags flags, ImVec2 minSize) {
     auto it = std::find_if(dialogs.begin(), dialogs.end(), [&](const Dialog& d) {
         return d.Name == customDlg->GetName();

@@ -22,3 +22,5 @@ vendor/libintl-lite
 vendor/zip
 vendor/assimp
 vendor/libuv
+vendor/imgui_test_engine
+vendor/implot
