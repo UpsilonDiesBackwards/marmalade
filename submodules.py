@@ -21,6 +21,7 @@ import os.path
 import shutil
 import subprocess
 from os import system, getcwd
+import stat
 
 SUBMODULES_FILE = 'submodules.json'
 SUBMODULES_LOCK_FILE = 'submodules.lock'
@@ -107,29 +108,52 @@ def handle_delete(args):
     write_lock_file()
 
 
-def restore_submodule(submodule):
-    print("Restoring {} to {}".format(submodule['url'], submodule['path']))
-    if 'branch' in submodule:
-        system('git clone --branch {} {} {}'.format(submodule['branch'], submodule['url'], submodule['path']))
+def handle_remove_readonly(func, path, exc):
+    excvalue = exc[1]
+    if func in (os.rmdir, os.remove, os.unlink) and excvalue.errno == 13:
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
     else:
-        system('git clone {} {}'.format(submodule['url'], submodule['path']))
+        raise
+
+def restore_submodule(submodule, update=False):
+    path = submodule['path']
+    url = submodule['url']
+
+    if update and os.path.exists(path):
+        print("Updating existing submodule at {}".format(path))
+        try:
+            subprocess.run(['git', '-C', path, 'fetch'], check=True)
+            subprocess.run(
+                ['git', '-C', path, 'reset', '--hard', 'origin/{}'.format(submodule.get('branch', 'main'))],
+                check=True)
+        except subprocess.CalledProcessError:
+            print("Failed to update {}, recloning instead".format(path))
+            shutil.rmtree(path, onerror=handle_remove_readonly)
+
+    if not update or (update and not os.path.exists(path)):
+        print("Restoring {} to {}".format(url, path))
+        if 'branch' in submodule:
+            system('git clone --branch {} {} {}'.format(submodule['branch'], url, path))
+        else:
+            system('git clone {} {}'.format(url, path))
 
     if 'commit' in submodule:
-        subprocess.run(['git', 'checkout', submodule['commit']], cwd=submodule['path'])
+        subprocess.run(['git', 'checkout', submodule['commit']], cwd=path)
 
     patched = ''
     if 'patches' in submodule:
         for patch in submodule['patches']:
             print('Applying patch {}'.format(patch))
-            subprocess.run(['git', 'apply', os.path.join(getcwd(), patch)], cwd=submodule['path'])
+            subprocess.run(['git', 'apply', os.path.join(getcwd(), patch)], cwd=path)
             patched = ' *'
 
-    commit_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=submodule['path']).strip().decode('utf-8')
+    commit_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path).strip().decode('utf-8')
     branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
-                                     cwd=submodule['path']).strip().decode('utf-8')
+                                     cwd=path).strip().decode('utf-8')
     if branch == 'HEAD':
         branch = 'detached'
-    locks.append('{} {} ({}){}'.format(commit_hash, submodule['path'], branch, patched))
+    locks.append('{} {} ({}){}'.format(commit_hash, path, branch, patched))
 
 
 def handle_restore(args):
@@ -137,6 +161,55 @@ def handle_restore(args):
     print('Restoring {} submodules'.format(len(submodules)))
     for submodule in submodules:
         restore_submodule(submodule)
+    write_lock_file()
+
+def get_submodule_by_path(path):
+    submodules = get_submodules()
+    for sub in submodules:
+        if sub['path'] == path:
+            return sub
+    return None
+
+def handle_sync(args):
+    read_lock_file()
+    for entry in locks:
+        parts = entry.split(' ')
+        commit = parts[0]
+        path = parts[1]
+        branch = parts[2].strip('()')
+        patches_applied = parts[-1] == '*'
+
+        if not os.path.exists(path):
+            submodule = get_submodule_by_path(path)
+            if submodule is None:
+                print("Submodule {} not found in JSON, skipping".format(path))
+                continue
+            restore_submodule(submodule, update=True)
+
+        try:
+            subprocess.run(['git', 'reset', '--hard'], cwd=path, check=True)
+            subprocess.run(['git', 'checkout', branch], cwd=path, check=True)
+            subprocess.run(['git', 'checkout', commit], cwd=path, check=True)
+        except subprocess.CalledProcessError as e:
+            print("Failed to sync {}: {}".format(path, e))
+            continue
+
+
+        if patches_applied:
+            submodule = get_submodule_by_path(path)
+            if submodule and 'patches' in submodule:
+                for patch in submodule['patches']:
+                    patch_path = os.path.join(os.getcwd(), patch)
+                    print("Reapplying patch {} to {}".format(patch_path, path))
+                    subprocess.run(['git', 'apply', patch_path], cwd=path, check=False)
+
+    print("Sync complete!")
+
+def handle_update(args):
+    submodules = get_submodules()
+    print('Restoring {} submodules'.format(len(submodules)))
+    for submodule in submodules:
+        restore_submodule(submodule, True)
     write_lock_file()
 
 
@@ -175,6 +248,12 @@ def main():
 
     parser_restore = subparsers.add_parser('restore', help='Restore submodules for project')
     parser_restore.set_defaults(func=handle_restore)
+
+    parser_sync = subparsers.add_parser('sync', help='Sync submodules with lock file')
+    parser_sync.set_defaults(func=handle_sync)
+
+    parser_update = subparsers.add_parser('update', help='Update submodules to latest remote versions')
+    parser_update.set_defaults(func=handle_update)
 
     args = parser.parse_args()
     args.func(args)
