@@ -341,7 +341,7 @@ endif ()
 
 target_include_directories(marmalade PRIVATE include)
 
-target_link_directories(marmalade PRIVATE vendor/nativefiledialog/lib vendor/luaaa ${GTK3_LIBRARIES} assimp)
+target_link_directories(marmalade PRIVATE vendor/luaaa ${GTK3_LIBRARIES})
 
 # Publish target
 set(PUBLISH_DIR "${CMAKE_BINARY_DIR}/publish")
