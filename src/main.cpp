@@ -83,6 +83,7 @@ int main(int argc, char** argv) {
     bool noSplash{false};
     char* project = nullptr;
     char* scene = nullptr;
+        bool secretDebugMenu{false};
 
     for (int i = 1; i < ARGC; ++i) {
         std::string arg = ARGV[i];
@@ -101,6 +102,9 @@ int main(int argc, char** argv) {
                 i++;
             }
         }
+            if (arg == "--secret-debug-menu") {
+                secretDebugMenu = true;
+            }
 
         if (arg == "--scene") {
             if (ARGC > i) {
@@ -180,6 +184,7 @@ int main(int argc, char** argv) {
             safeMode = true;
         }
     }
+        application.enableDebugMenu = secretDebugMenu;
 
     if (!safeMode) {
         // Load plugins

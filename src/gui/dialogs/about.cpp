@@ -21,6 +21,7 @@
 
 #include "../../application/util.h"
 #include "../fontmanager.h"
+#include "../../application/application.h"
 #include "../../application/plugins/interfaceimpl.h"
 #include "../../application/i18n.h"
 
@@ -80,6 +81,8 @@ void Marmalade::GUI::About::Draw() {
 
             ImGui::Text("Tayler Parsons");
             ImGui::Text("Ryan Bester");
+
+            ImGui::Text("Commit: %s", Application::GetInstance().COMMIT);
 
             ImGui::EndTabItem();
         }

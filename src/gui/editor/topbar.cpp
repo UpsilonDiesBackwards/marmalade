@@ -125,13 +125,6 @@ void Marmalade::GUI::TopBar::Show() {
                 ImGui::EndPopup();
             }
 
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_DEBUG, pgettext("Menu|Window|", "ImGui Demo")))) { WindowManager::GetInstance().ToggleDebugWindow(); }
-#if DEBUG
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_BEAKER, pgettext("Menu|Window|", "ImGui Test Engine")))) {
-                WindowManager::GetInstance().ToggleImGuiTestsWindow();
-            }
-#endif
-
             static auto workspaces = Remember([] { return WorkspaceManager::GetWorkspaces(); });
 
             if (ImGui::BeginMenu(ICON_WITH_TEXT(ICON_CI_BLANK, pgettext("Menu|Window|", "Workspaces")))) {
@@ -244,6 +237,25 @@ void Marmalade::GUI::TopBar::Show() {
             ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_INFO, pgettext("Menu|Help|", "About")), nullptr, &WindowManager::GetInstance().about.visible);
 
             ImGui::EndMenu();
+        }
+
+        if (Application::GetInstance().enableDebugMenu) {
+            if (ImGui::BeginMenu(pgettext("Menu|", "Internal Debug"))) {
+                if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_DEBUG, pgettext("Menu|Internal Debug|", "ImGui Demo")))) { WindowManager::GetInstance().ToggleDebugWindow(); }
+#if DEBUG
+                if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_BEAKER, pgettext("Menu|Internal Debug|", "ImGui Test Engine")))) {
+                    WindowManager::GetInstance().ToggleImGuiTestsWindow();
+                }
+#endif
+                ImGui::Separator();
+
+                if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_ERROR, pgettext("Menu|Internal Debug|", "Simulate Crash")))) {
+                    char *p = 0;
+                    *p = 5;
+                }
+
+                ImGui::EndMenu();
+            }
         }
 
 #ifdef DEBUG

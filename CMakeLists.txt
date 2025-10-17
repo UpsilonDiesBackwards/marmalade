@@ -204,7 +204,7 @@ list(APPEND IMGUI_SRC
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    file(GLOB IMGUI_TEST_SRC "vendor/imgui_test_engine/imgui_test_engine/*.h", "vendor/imgui_test_engine/imgui_test_engine/*.cpp")
+    file(GLOB IMGUI_TEST_SRC "vendor/imgui_test_engine/imgui_test_engine/*.h" "vendor/imgui_test_engine/imgui_test_engine/*.cpp")
 endif()
 
 include(ImGuiHooks/HookImGui)
@@ -278,6 +278,12 @@ if (APPLE)
             ${RESOURCE_DEST}
     )
 endif ()
+
+if(NOT DEFINED COMMIT_HASH)
+    set(COMMIT_HASH "Unknown")
+endif()
+
+target_compile_definitions(marmalade PRIVATE COMMIT_HASH="${COMMIT_HASH}")
 
 target_link_libraries(marmalade PRIVATE
         glfw

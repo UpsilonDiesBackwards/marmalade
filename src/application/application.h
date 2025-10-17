@@ -173,6 +173,11 @@ public:
 
     std::shared_ptr<GuiLogSink> guiSink;
 
+
+    bool enableDebugMenu = false;
+
+    const char* COMMIT = COMMIT_HASH;
+
     /**
      * \brief Opens a marmalade project and sets it as the current application project
      */
