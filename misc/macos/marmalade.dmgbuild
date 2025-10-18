@@ -1,0 +1,17 @@
+import os
+
+volume_name = "Marmalade"
+format = "UDZO"
+background = "misc/macos/marmalade.tiff"
+badge_icon = "res/icons/logo/logo192.png"
+icon_size = 128
+
+window_rect = ((100, 100), (640, 480))
+files = [os.environ["BUILD_DIR"] + "/Marmalade.app"]
+symlinks = {"Applications": "/Applications"}
+
+icon_locations = {
+    "Marmalade.app": (140, 300),
+    "Applications": (520, 300),
+    ".background.tiff": (9999,9999)
+}
