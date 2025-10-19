@@ -250,8 +250,12 @@ void Marmalade::GUI::TopBar::Show() {
                 ImGui::Separator();
 
                 if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_ERROR, pgettext("Menu|Internal Debug|", "Simulate Crash")))) {
+#ifdef APPLE
+                    __builtin_trap();
+#else
                     char *p = 0;
                     *p = 5;
+#endif
                 }
 
                 ImGui::EndMenu();
