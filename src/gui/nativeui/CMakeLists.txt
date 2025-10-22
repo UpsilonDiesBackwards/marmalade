@@ -61,8 +61,6 @@ if (WIN32)
         endif ()
     endif ()
 elseif (APPLE)
-    set(CMAKE_OSX_ARCHITECTURES "arm64")
-
     find_library(COCOA_LIBRARY Cocoa)
 
     set_target_properties(marmalade PROPERTIES
