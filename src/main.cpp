@@ -77,90 +77,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     std::filesystem::path exeDir = std::filesystem::path(exePath).parent_path();
     SetCurrentDirectoryW(exeDir.c_str());
 #else
-int main(int argc, char** argv) {
-#endif
-    bool sameDirConfig{false};
-    bool noSplash{false};
-    char* project = nullptr;
-    char* scene = nullptr;
-        bool secretDebugMenu{false};
 
-    for (int i = 1; i < ARGC; ++i) {
-        std::string arg = ARGV[i];
-
-        if (arg == "--same-dir-config") {
-            sameDirConfig = true;
-        }
-
-        if (arg == "--no-splash") {
-            noSplash = true;
-        }
-
-        if (arg == "--project") {
-            if (ARGC > i) {
-                project = ARGV[i + 1];
-                i++;
-            }
-        }
-            if (arg == "--secret-debug-menu") {
-                secretDebugMenu = true;
-            }
-
-        if (arg == "--scene") {
-            if (ARGC > i) {
-                scene = ARGV[i + 1];
-                i++;
-            }
-        }
-    }
-
-    auto splashScreen = NativeUI::Window(NativeUI::Util::utf8ToUtf16Str("Marmalade Engine Startup"), 800, 500);
-
-    if (!noSplash) {
-        splashScreen.SetCreateCallback([&] {
-            NativeUI::SplashScreen::Create(splashScreen);
-        });
-
-        splashScreen.SetPaintCallback([&] {
-            NativeUI::SplashScreen::Paint(splashScreen);
-        });
-
-#if defined(__linux__)
-        // Create a native app
-        auto nativeApp = std::make_shared<NativeUI::App>();
-
-        nativeApp->SetCreateCallback([&](app_handle_type_t app) {
-            showSplashScreen(app, splashScreen);
-        });
-
-        // GTK application needs to be in another thread
-        // This can be disregarded for other platforms
-        std::thread gtkThread([&]() {
-            // Don't pass any other args to GTK; GTK doesn't like them
-            char* gtkArgv[] = {const_cast<char*>(ARGV[0]), nullptr};
-            nativeApp->Create(1, gtkArgv);
-        });
-#elif defined(__APPLE__)
-        // We should be creating a nativeApp object here
-        // But that leads to a lot of threading problems on macOS...
-        showSplashScreen(nullptr, splashScreen);
-#else
-    // Call showSplashScreen directly
-    showSplashScreen(nullptr, splashScreen);
-#endif
-
-        // Wait for splash screen to be shown
-        {
-            std::unique_lock<std::mutex> lock(splashMutex);
-            splashCV.wait(lock, [] { return splashReady; });
-        }
-    }
-
+bool engineMain(bool sameDirConfig, bool noSplash, char* project, char* scene, bool secretDebugMenu, NativeUI::Window& splashScreen) {
     if (!noSplash) NativeUI::SplashScreen::SetLoadingText(splashScreen, "Loading settings...");
     Marmalade::ConfigUtil::SetConfigDirectory(sameDirConfig);
     if (!Marmalade::EngineConfig::GetInstance().LoadConfig()) {
         NativeUI::MsgBox::ShowMessage(noSplash ? nullptr : splashScreen.GetHandle(), NativeUI::Util::utf8ToUtf16Str("Failed to load settings. See log for details."), NativeUI::Util::utf8ToUtf16Str("Marmalade Engine"), NativeUI::MsgBox::Style::Style_ERROR);
-        return 1;
+        return false;
     }
 
     Marmalade::I18n::SetupI18n(Marmalade::EngineConfig::GetStoredConfig().appearance.language.c_str());
@@ -184,7 +107,7 @@ int main(int argc, char** argv) {
             safeMode = true;
         }
     }
-        application.enableDebugMenu = secretDebugMenu;
+    application.enableDebugMenu = secretDebugMenu;
 
     if (!safeMode) {
         // Load plugins
@@ -216,8 +139,130 @@ int main(int argc, char** argv) {
         }
     }
 
+
+    return true;
+}
+
+int main(int argc, char** argv) {
+#endif
+    bool sameDirConfig{false};
+    bool noSplash{false};
+    char* project = nullptr;
+    char* scene = nullptr;
+    bool secretDebugMenu{false};
+
+    for (int i = 1; i < ARGC; ++i) {
+        std::string arg = ARGV[i];
+
+        if (arg == "--same-dir-config") {
+            sameDirConfig = true;
+        }
+
+        if (arg == "--no-splash") {
+            noSplash = true;
+        }
+
+        if (arg == "--project") {
+            if (ARGC > i) {
+                project = ARGV[i + 1];
+                i++;
+            }
+        }
+        if (arg == "--secret-debug-menu") {
+            secretDebugMenu = true;
+        }
+
+        if (arg == "--scene") {
+            if (ARGC > i) {
+                scene = ARGV[i + 1];
+                i++;
+            }
+        }
+    }
+
+    auto splashScreen = NativeUI::Window(NativeUI::Util::utf8ToUtf16Str("Marmalade Engine Startup"), 800, 500);
+
+#if defined(__APPLE__)
+    auto nativeApp = std::make_shared<NativeUI::App>();
+#endif
+
+    if (!noSplash) {
+        splashScreen.SetCreateCallback([&] {
+            NativeUI::SplashScreen::Create(splashScreen);
+        });
+
+        splashScreen.SetPaintCallback([&] {
+            NativeUI::SplashScreen::Paint(splashScreen);
+        });
+
+#if defined(__linux__)
+        // Create a native app
+        auto nativeApp = std::make_shared<NativeUI::App>();
+
+        nativeApp->SetCreateCallback([&](app_handle_type_t app) {
+            showSplashScreen(app, splashScreen);
+        });
+
+        // GTK application needs to be in another thread
+        // This can be disregarded for other platforms
+        std::thread gtkThread([&]() {
+            // Don't pass any other args to GTK; GTK doesn't like them
+            char* gtkArgv[] = {const_cast<char*>(ARGV[0]), nullptr};
+            nativeApp->Create(1, gtkArgv);
+        });
+#elif defined(__APPLE__)
+        nativeApp->SetCreateCallback([&](app_handle_type_t app) {
+            showSplashScreen(app, splashScreen);
+
+
+            std::thread loadingThread([&]() {
+                engineMain(sameDirConfig, noSplash, project, scene, secretDebugMenu, splashScreen);
+
+                if (!noSplash) splashScreen.Close();
+
+
+                auto& application = Application::GetInstance();
+                nativeApp->RunOnMainThread([&application, &nativeApp] {
+                    application.InitialiseWindow();
+
+
+                    while (!glfwWindowShouldClose(application.getWindow())) {
+                        application.InitialiseImGui();
+                        while (!application.NeedsImGuiRestart() && !glfwWindowShouldClose(application.getWindow())) {
+                            application.Run();
+                        }
+                        application.TerminateImGui();
+                    }
+
+                    application.OnClose();
+
+                    nativeApp->Terminate();
+
+                    Marmalade::PluginLoader::GetInstance().UnloadPlugins();
+                    application.TerminateGlfw();
+                });
+            });
+            loadingThread.detach();
+        });
+
+        nativeApp->Create(ARGC, ARGV);
+#else
+    // Call showSplashScreen directly
+    showSplashScreen(nullptr, splashScreen);
+#endif
+
+        // Wait for splash screen to be shown
+        {
+            std::unique_lock<std::mutex> lock(splashMutex);
+            splashCV.wait(lock, [] { return splashReady; });
+        }
+    }
+
+
     if (!noSplash) splashScreen.Close();
 
+    auto& application = Application::GetInstance();
+    application.InitialiseWindow();
     while (!glfwWindowShouldClose(application.getWindow())) {
         application.InitialiseImGui();
         while (!application.NeedsImGuiRestart() && !glfwWindowShouldClose(application.getWindow())) {
@@ -230,6 +275,10 @@ int main(int argc, char** argv) {
 
     Marmalade::PluginLoader::GetInstance().UnloadPlugins();
     application.TerminateGlfw();
+
+    if (!engineMain(sameDirConfig, noSplash, project, scene, secretDebugMenu, splashScreen)) {
+        return 1;
+    }
 
 #if defined(__linux__)
     // Wait for GTK thread

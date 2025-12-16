@@ -51,7 +51,11 @@ namespace Marmalade::GUI::NativeUI {
     public:
         App() = default;
 
-        void Create(int argc, char **argv);
+        void Create(int argc, char** argv);
+
+        void RunOnMainThread(std::function<void()> func);
+
+        void Terminate();
 
         void SetCreateCallback(std::function<void(app_handle_type_t)> createCallback) {
             _createCallback = createCallback;
@@ -60,6 +64,7 @@ namespace Marmalade::GUI::NativeUI {
         std::function<void(app_handle_type_t)> GetCreateCallback() {
             return _createCallback;
         }
+
     private:
         std::function<void(app_handle_type_t)> _createCallback = nullptr;
     };

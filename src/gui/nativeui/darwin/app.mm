@@ -24,15 +24,30 @@
 #include <Cocoa/Cocoa.h>
 
 void Marmalade::GUI::NativeUI::App::Create(int argc, char** argv) {
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    [NSApplication sharedApplication];
+    @autoreleasepool {
+        [NSApplication sharedApplication];
 
-    AppDelegate* appDelegate = [[AppDelegate alloc] init];
-    [appDelegate setLaunchCallback:[&]{
-        if (_createCallback != nullptr) _createCallback(nullptr);
-    }];
-    [NSApp setDelegate:appDelegate];
-    [NSApp run];
+        [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
 
-    [pool release];
+        AppDelegate* appDelegate = [[AppDelegate alloc] init];
+        [appDelegate setLaunchCallback:[&]{
+            if (_createCallback != nullptr) _createCallback(nullptr);
+        }];
+        [NSApp setDelegate:appDelegate];
+
+        //[NSApp finishLaunching];
+        [NSApp run];
+    }
+}
+
+void Marmalade::GUI::NativeUI::App::RunOnMainThread(std::function<void()> func) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        func();
+    });
+}
+
+void Marmalade::GUI::NativeUI::App::Terminate() {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSApp terminate:nil];
+    });
 }

@@ -82,9 +82,14 @@ public:
     ~Application();
 
     /**
-     * \brief Initialises the project on startup. Performs tasks such as initialising GLFW and loading engine config
+     * \brief Initialises the project on startup. Performs tasks such as initialising and loading engine config
      */
     void Initialise();
+
+    /**
+     * \brief Initialises the GLFW window. This must be run on the main thread.
+     */
+    void InitialiseWindow();
 
     void InitialiseImGui();
 

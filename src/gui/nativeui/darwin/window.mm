@@ -33,8 +33,11 @@ bool Marmalade::GUI::NativeUI::Window::Create(bool borderless) {
                                                 styleMask:styleMask
                                                   backing:NSBackingStoreBuffered
                                                     defer:NO];
+    [win retain];
+
     [win setTitle:Marmalade::GUI::NativeUI::Util::utf16ToPlatformStr(_title)];
     [win center];
+    [win setReleasedWhenClosed:NO];
 
     this->_handle = new DarwinObjWrapper<NSWindow*>(win);
 
@@ -53,5 +56,11 @@ bool Marmalade::GUI::NativeUI::Window::Show(bool topmost) {
 }
 
 void Marmalade::GUI::NativeUI::Window::Close() {
-    [this->_handle->GetObject() close];
+    if (this->_handle == nullptr) {
+        NSLog(@"Handle is null");
+        return;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [this->_handle->GetObject() close];
+    });
 }

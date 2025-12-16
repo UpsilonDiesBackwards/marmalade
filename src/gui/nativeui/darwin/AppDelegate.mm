@@ -33,9 +33,9 @@
 - (void)applicationDidFinishLaunching:(NSNotification*)aNotification {
     [NSApp activateIgnoringOtherApps:YES];
 
-    launchCallback();
-
     [self createMenu];
+
+    launchCallback();
 }
 
 - (void)applicationWillTerminate:(NSNotification*)aNotification {

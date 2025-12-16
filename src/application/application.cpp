@@ -78,6 +78,35 @@ Application::~Application() {
 void Application::Initialise() {
     SetupLogger();
 
+    const auto uuid = Marmalade::Util::GenerateUUIDv4();
+    auto scene = std::make_shared<Scene>("Default", uuid);
+    sceneManager.AddScene(scene);
+    sceneManager.SetCurrentScene(uuid);
+
+    // Build component category tree
+    Marmalade::ECS::ComponentRegistry::Instance().BuildCategoryTree();
+    for (const auto& component: Marmalade::EngineConfig::GetStoredConfig().favouriteComponents) {
+        Marmalade::ECS::ComponentRegistry::Instance().SetFavourite(component);
+    }
+
+    static std::filesystem::path workspacesDir = Marmalade::GUI::WorkspaceManager::GetWorkspacesDir();
+    if (!exists(workspacesDir)) {
+        create_directories(workspacesDir);
+    }
+
+    static std::filesystem::path imguiIniPath = workspacesDir / "Default.ini";
+    static std::string imguiIniPathStr = imguiIniPath.string();
+
+    std::ifstream imguiIni(imguiIniPath);
+    firstRun = !imguiIni.good();
+    imguiIni.close();
+
+    Marmalade::GUI::WorkspaceManager::targetWorkspacePath = imguiIniPathStr;
+
+    glfwSetMonitorCallback(&Marmalade::GUI::WorkspaceManager::MonitorConfigCallback);
+}
+
+void Application::InitialiseWindow() {
     if (!glfwInit()) {// Initialise GLFW
         std::cerr << "Failed to Initialise GLFW!" << std::endl;
         return;
@@ -129,7 +158,7 @@ void Application::Initialise() {
 
     inputManager.SetWindow(window);
 
-    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) { // Initialise GLAD
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {// Initialise GLAD
         std::cout << "Failed to initialize GLAD" << std::endl;
         return;
     } else
@@ -138,39 +167,10 @@ void Application::Initialise() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
 
+
+
     gameView = new GameView(width, height);
     editView = new EditView(width, height);
-
-    const auto uuid = Marmalade::Util::GenerateUUIDv4();
-    auto scene = std::make_shared<Scene>("Default", uuid);
-    sceneManager.AddScene(scene);
-    sceneManager.SetCurrentScene(uuid);
-
-    Marmalade::ECS::Transform defaultTransform;
-    Entity* newEntity = new Entity("New Entity");
-    sceneManager.GetCurrentScene()->AddEntity(std::shared_ptr<Entity>(newEntity));
-
-    // Build component category tree
-    Marmalade::ECS::ComponentRegistry::Instance().BuildCategoryTree();
-    for (const auto& component: Marmalade::EngineConfig::GetStoredConfig().favouriteComponents) {
-        Marmalade::ECS::ComponentRegistry::Instance().SetFavourite(component);
-    }
-
-    static std::filesystem::path workspacesDir = Marmalade::GUI::WorkspaceManager::GetWorkspacesDir();
-    if (!exists(workspacesDir)) {
-        create_directories(workspacesDir);
-    }
-
-    static std::filesystem::path imguiIniPath = workspacesDir / "Default.ini";
-    static std::string imguiIniPathStr = imguiIniPath.string();
-
-    std::ifstream imguiIni(imguiIniPath);
-    firstRun = !imguiIni.good();
-    imguiIni.close();
-
-    Marmalade::GUI::WorkspaceManager::targetWorkspacePath = imguiIniPathStr;
-
-    glfwSetMonitorCallback(&Marmalade::GUI::WorkspaceManager::MonitorConfigCallback);
 }
 
 void Application::InitialiseImGui() {

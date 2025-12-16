@@ -39,7 +39,7 @@ namespace Marmalade {
 
     struct InterfaceConfig {
         std::string graphicsSystem{"opengl"};
-#ifdef APPLE
+#ifdef __APPLE__
         std::string graphicsVersion{"4.1"};
 #else
         std::string graphicsVersion{"4.3"};
