@@ -28,6 +28,7 @@
 #include "../gui/editor/topbar.h"
 #include "../gui/editor/editor.h"
 #include "../gui/editor.h"
+#include "../gui/nativeui/app.h"
 #include "guilogsink.h"
 
 #include "time.h"
@@ -123,6 +124,8 @@ public:
      * \brief Returns the application camera
      */
     Camera* getCamera();
+
+    std::shared_ptr<Marmalade::GUI::NativeUI::App> nativeApp = nullptr;
 
     /**
      * \brief The PlayState of the engine

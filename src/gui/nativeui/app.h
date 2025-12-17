@@ -36,7 +36,7 @@ using app_handle_type_t = void*;
 
 #include "darwin/DarwinObjWrapper.h"
 
-using app_handle_type_t = void*;
+using app_handle_type_t = Marmalade::GUI::NativeUI::DarwinObjWrapper<void*>*;
 
 #else
 

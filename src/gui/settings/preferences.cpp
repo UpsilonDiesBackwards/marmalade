@@ -256,6 +256,8 @@ void Marmalade::GUI::Preferences::drawUIAppearancePane() {
     requiresRestartWarning();
 
     ImGui::Checkbox(_("Invert message box button order"), &EngineConfig::GetStoredConfig().appearance.alternativeButtonOrder);
+
+    ImGui::Checkbox(_("Use native menu bar on macOS"), &EngineConfig::GetStoredConfig().appearance.useNativeMenubar);
 }
 
 void Marmalade::GUI::Preferences::drawUIWorkspacesPane() {

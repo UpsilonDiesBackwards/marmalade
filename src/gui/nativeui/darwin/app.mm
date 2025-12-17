@@ -25,7 +25,9 @@
 
 void Marmalade::GUI::NativeUI::App::Create(int argc, char** argv) {
     @autoreleasepool {
-        [NSApplication sharedApplication];
+        NSApplication* app = [NSApplication sharedApplication];
+
+        _handle = new DarwinObjWrapper<void*>((__bridge void*)app);
 
         [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
 
@@ -35,7 +37,6 @@ void Marmalade::GUI::NativeUI::App::Create(int argc, char** argv) {
         }];
         [NSApp setDelegate:appDelegate];
 
-        //[NSApp finishLaunching];
         [NSApp run];
     }
 }

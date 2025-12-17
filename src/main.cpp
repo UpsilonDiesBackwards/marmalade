@@ -69,15 +69,6 @@ void showSplashScreen(app_handle_type_t app, NativeUI::Window& splashScreen) {
     splashCV.notify_one();
 }
 
-#ifdef _WIN32
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-    // Set working directory to same path as executable
-    wchar_t exePath[MAX_PATH];
-    GetModuleFileNameW(nullptr, exePath, MAX_PATH);
-    std::filesystem::path exeDir = std::filesystem::path(exePath).parent_path();
-    SetCurrentDirectoryW(exeDir.c_str());
-#else
-
 bool engineMain(bool sameDirConfig, bool noSplash, char* project, char* scene, bool secretDebugMenu, NativeUI::Window& splashScreen) {
     if (!noSplash) NativeUI::SplashScreen::SetLoadingText(splashScreen, "Loading settings...");
     Marmalade::ConfigUtil::SetConfigDirectory(sameDirConfig);
@@ -142,6 +133,15 @@ bool engineMain(bool sameDirConfig, bool noSplash, char* project, char* scene, b
 
     return true;
 }
+
+#ifdef _WIN32
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+    // Set working directory to same path as executable
+    wchar_t exePath[MAX_PATH];
+    GetModuleFileNameW(nullptr, exePath, MAX_PATH);
+    std::filesystem::path exeDir = std::filesystem::path(exePath).parent_path();
+    SetCurrentDirectoryW(exeDir.c_str());
+#else
 
 int main(int argc, char** argv) {
 #endif
@@ -222,6 +222,7 @@ int main(int argc, char** argv) {
 
 
                 auto& application = Application::GetInstance();
+                application.nativeApp = nativeApp;
                 nativeApp->RunOnMainThread([&application, &nativeApp] {
                     application.InitialiseWindow();
 

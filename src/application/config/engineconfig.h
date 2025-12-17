@@ -56,6 +56,7 @@ namespace Marmalade {
         std::string language{"en"};
         bool automaticWorkspaceSwitching{true};
         bool alternativeButtonOrder{false};
+        bool useNativeMenubar{true};
     };
 
     struct WindowPosConfig {
@@ -114,7 +115,7 @@ namespace Marmalade {
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::InterfaceConfig, graphicsSystem, graphicsVersion);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::AppearanceConfig, viewports, themeFile, showWelcomeScreen, backgroundColor, scaleFactor, useSystemScaleFactor, language, automaticWorkspaceSwitching, alternativeButtonOrder);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::AppearanceConfig, viewports, themeFile, showWelcomeScreen, backgroundColor, scaleFactor, useSystemScaleFactor, language, automaticWorkspaceSwitching, alternativeButtonOrder, useNativeMenubar);
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::WindowPosConfig, monitor, x, y, width, height, maximised);
 

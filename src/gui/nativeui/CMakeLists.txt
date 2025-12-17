@@ -7,6 +7,7 @@ list(APPEND ENGINE_SRC_NATIVE_UI
         nativeobject.h
         splashscreen.h
         splashscreen.cpp
+        menubar.h
 )
 
 if (UNIX AND NOT APPLE)
@@ -15,6 +16,7 @@ if (UNIX AND NOT APPLE)
             linux/util.cpp
             linux/msgbox.cpp
             linux/window.cpp
+            linux/menubar.cpp
     )
 elseif (WIN32)
     list(APPEND ENGINE_SRC_NATIVE_UI
@@ -22,6 +24,7 @@ elseif (WIN32)
             win32/util.cpp
             win32/msgbox.cpp
             win32/window.cpp
+            win32/menubar.cpp
     )
 elseif (APPLE)
     list(APPEND ENGINE_SRC_NATIVE_UI
@@ -32,6 +35,7 @@ elseif (APPLE)
             darwin/app.mm
             darwin/msgbox.mm
             darwin/window.mm
+            darwin/menubar.mm
     )
 endif ()
 

@@ -32,6 +32,7 @@
 #include "../dialogs/messagebox.h"
 #include "../dialogs/saveworkspace.h"
 #include "../remember.h"
+#include "../nativeui/menubar.h"
 
 #include <ecs/component.h>
 
@@ -49,72 +50,72 @@ void Marmalade::GUI::TopBar::Show() {
     static bool showSceneOpenPopUp = false;
 
     if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu(pgettext("Menu|", "File"))) {
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_ADD, pgettext("Menu|File|", "New Project")))) { WindowManager::GetInstance().projectWizard.ToggleWindow(); }
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_FOLDER_OPENED, pgettext("Menu|File|", "Open Project")))) {
+        if (NativeUI::MenuBar::BeginMenu(pgettext("Menu|", "File"))) {
+            if (NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_ADD, pgettext("Menu|File|", "New Project")))) { WindowManager::GetInstance().projectWizard.ToggleWindow(); }
+            if (NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_FOLDER_OPENED, pgettext("Menu|File|", "Open Project")))) {
                 IGFD::FileDialogConfig config;
                 config.path = EngineConfig::GetStoredConfig().defaultProjectPath;
                 config.fileName = "project.marmalade";
                 config.flags = ImGuiFileDialogFlags_Modal;
                 ImGuiFileDialog::Instance()->OpenDialog("ChooseProject", "Choose Project File", ".marmalade", config);
             }
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_SCREEN_FULL, pgettext("Menu|File|", "New Scene")))) { showSceneCreationPopUp = true; }
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_OPEN_PREVIEW, pgettext("Menu|File|", "Open Scene")))) { showSceneOpenPopUp = true; }
+            if (NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_SCREEN_FULL, pgettext("Menu|File|", "New Scene")))) { showSceneCreationPopUp = true; }
+            if (NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_OPEN_PREVIEW, pgettext("Menu|File|", "Open Scene")))) { showSceneOpenPopUp = true; }
             // TODO: Package Builder menu item, to open existing package builder window
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_STAR, pgettext("Menu|File|", "Welcome Screen")))) { WindowManager::GetInstance().welcomeScreen.ToggleWindow(); }
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_CLOSE_ALL, pgettext("Menu|File|", "Quit")))) { glfwSetWindowShouldClose(Application::GetInstance().getWindow(), true); }
-            ImGui::EndMenu();
+            if (NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_STAR, pgettext("Menu|File|", "Welcome Screen")))) { WindowManager::GetInstance().welcomeScreen.ToggleWindow(); }
+            if (NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_CLOSE_ALL, pgettext("Menu|File|", "Quit")))) { glfwSetWindowShouldClose(Application::GetInstance().getWindow(), true); }
+            NativeUI::MenuBar::EndMenu();
         }
 
-        if (ImGui::BeginMenu(pgettext("Menu|", "Entity"))) {
+        if (NativeUI::MenuBar::BeginMenu(pgettext("Menu|", "Entity"))) {
             auto* inspectedEntity = Application::GetInstance().editorGUI->details.inspectedEntity;
-            if (inspectedEntity == nullptr) { ImGui::MenuItem(_("No entity selected"), nullptr, nullptr, false); } else {
-                if (ImGui::BeginMenu(pgettext("Menu|Entity|AddComponent|", "Add Component"))) {
-                    if (ImGui::BeginMenu(pgettext("Menu|Entity|AddComponent|", "Favourites"))) {
+            if (inspectedEntity == nullptr) { NativeUI::MenuBar::MenuItem(_("No entity selected"), nullptr, nullptr, false); } else {
+                if (NativeUI::MenuBar::BeginMenu(pgettext("Menu|Entity|AddComponent|", "Add Component"))) {
+                    if (NativeUI::MenuBar::BeginMenu(pgettext("Menu|Entity|AddComponent|", "Favourites"))) {
                         for (const auto& component: Marmalade::ECS::ComponentRegistry::Instance().GetFavorites()) { if (ImGui::MenuItem(component->Name.c_str())) { inspectedEntity->componentManager.AddComponent(component->Factory->Create(Util::GenerateUUIDv4())); } }
-                        ImGui::EndMenu();
+                        NativeUI::MenuBar::EndMenu();
                     }
-                    if (ImGui::BeginMenu(pgettext("Menu|Entity|AddComponent|", "All"))) {
+                    if (NativeUI::MenuBar::BeginMenu(pgettext("Menu|Entity|AddComponent|", "All"))) {
                         for (const auto& [_, component]: Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()) { if (ImGui::MenuItem(component.Name.c_str())) { inspectedEntity->componentManager.AddComponent(component.Factory->Create(Util::GenerateUUIDv4())); } }
-                        ImGui::EndMenu();
+                        NativeUI::MenuBar::EndMenu();
                     }
-                    ImGui::Separator();
+                    NativeUI::MenuBar::Separator();
                     for (const auto& [category, components]: Marmalade::ECS::ComponentRegistry::Instance().GetCategoryTree()) {
-                        if (ImGui::BeginMenu(category.c_str())) {
+                        if (NativeUI::MenuBar::BeginMenu(category.c_str())) {
                             for (const auto& component: components) { if (ImGui::MenuItem(component->Name.c_str())) { inspectedEntity->componentManager.AddComponent(component->Factory->Create(Util::GenerateUUIDv4())); } }
-                            ImGui::EndMenu();
+                            NativeUI::MenuBar::EndMenu();
                         }
                     }
 
-                    ImGui::Separator();
+                    NativeUI::MenuBar::Separator();
 
-                    if (ImGui::MenuItem(pgettext("Menu|Entity|AddComponent|", "Add Component..."))) { Application::GetInstance().editorGUI->details.SetAddingComponent(true); }
+                    if (NativeUI::MenuBar::MenuItem(pgettext("Menu|Entity|AddComponent|", "Add Component..."))) { Application::GetInstance().editorGUI->details.SetAddingComponent(true); }
 
-                    ImGui::EndMenu();
+                    NativeUI::MenuBar::EndMenu();
                 }
             }
 
-            ImGui::EndMenu();
+            NativeUI::MenuBar::EndMenu();
         }
 
-        if (ImGui::BeginMenu(pgettext("Menu|", "Settings"))) {
-            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_SETTINGS, pgettext("Menu|Settings|", "Project Settings")), nullptr, &WindowManager::GetInstance().settings.visible);
-            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_EDIT, pgettext("Menu|Settings|", "Style Editor")), nullptr, &WindowManager::GetInstance().showStyleEditor);
-            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_SETTINGS_GEAR, pgettext("Menu|Settings|", "Preferences")), nullptr, &WindowManager::GetInstance().preferences.visible);
+        if (NativeUI::MenuBar::BeginMenu(pgettext("Menu|", "Settings"))) {
+            NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_SETTINGS, pgettext("Menu|Settings|", "Project Settings")), nullptr, &WindowManager::GetInstance().settings.visible);
+            NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_EDIT, pgettext("Menu|Settings|", "Style Editor")), nullptr, &WindowManager::GetInstance().showStyleEditor);
+            NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_SETTINGS_GEAR, pgettext("Menu|Settings|", "Preferences")), nullptr, &WindowManager::GetInstance().preferences.visible);
 
-            ImGui::EndMenu();
+            NativeUI::MenuBar::EndMenu();
         }
 
-        if (ImGui::BeginMenu(pgettext("Menu|", "Window"))) {
-            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_DEVICE_CAMERA_VIDEO, pgettext("Menu|Window|", "Animation")), nullptr, &WindowManager::GetInstance().animationManager.visible);
+        if (NativeUI::MenuBar::BeginMenu(pgettext("Menu|", "Window"))) {
+            NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_DEVICE_CAMERA_VIDEO, pgettext("Menu|Window|", "Animation")), nullptr, &WindowManager::GetInstance().animationManager.visible);
 
-            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_PACKAGE, pgettext("Menu|Window|", "Package Manager")), nullptr, &WindowManager::GetInstance().packageManager.visible);
+            NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_PACKAGE, pgettext("Menu|Window|", "Package Manager")), nullptr, &WindowManager::GetInstance().packageManager.visible);
 
-            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_FILE_TEXT, pgettext("Menu|Window|", "Log")), nullptr, &WindowManager::GetInstance().log.visible);
+            NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_FILE_TEXT, pgettext("Menu|Window|", "Log")), nullptr, &WindowManager::GetInstance().log.visible);
 
-            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_GIT_COMMIT, pgettext("Menu|Window|", "Version Control")), nullptr, &WindowManager::GetInstance().versionControl.visible);
+            NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_GIT_COMMIT, pgettext("Menu|Window|", "Version Control")), nullptr, &WindowManager::GetInstance().versionControl.visible);
 
-            if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_SAVE, pgettext("Menu|Window|", "Save Layout")))) {
+            if (NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_SAVE, pgettext("Menu|Window|", "Save Layout")))) {
                 Application::GetInstance().styleManager.SaveStyle((Marmalade::ConfigUtil::GetConfigDirectory() / Marmalade::EngineConfig::GetStoredConfig().appearance.themeFile).string());
 
                 ImGui::OpenPopup("LayoutSavePopup");
@@ -127,10 +128,10 @@ void Marmalade::GUI::TopBar::Show() {
 
             static auto workspaces = Remember([] { return WorkspaceManager::GetWorkspaces(); });
 
-            if (ImGui::BeginMenu(ICON_WITH_TEXT(ICON_CI_BLANK, pgettext("Menu|Window|", "Workspaces")))) {
+            if (NativeUI::MenuBar::BeginMenu(ICON_WITH_TEXT(ICON_CI_BLANK, pgettext("Menu|Window|", "Workspaces")))) {
                 static std::filesystem::path workspacesDir = WorkspaceManager::GetWorkspacesDir();
                 for (const auto& workspace : workspaces.get()) {
-                    if (ImGui::MenuItem(workspace.c_str())) {
+                    if (NativeUI::MenuBar::MenuItem(workspace.c_str())) {
                         if (ImGui::GetIO().WantSaveIniSettings) {
                             auto dlg = WindowManager::GetInstance().RegisterDialog(
                                 std::make_shared<SaveWorkspaceDialog>(WorkspaceManager::GetCurrentWorkspaceName()),
@@ -153,10 +154,10 @@ void Marmalade::GUI::TopBar::Show() {
                     }
                 }
 
-                ImGui::Separator();
+                NativeUI::MenuBar::Separator();
 
-                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Save Current Workspace"))) { WorkspaceManager::SaveCurrentWorkspace(); }
-                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Duplicate Workspace..."))) {
+                if (NativeUI::MenuBar::MenuItem(pgettext("Menu|Window|Workspaces|", "Save Current Workspace"))) { WorkspaceManager::SaveCurrentWorkspace(); }
+                if (NativeUI::MenuBar::MenuItem(pgettext("Menu|Window|Workspaces|", "Duplicate Workspace..."))) {
                     auto dlg = WindowManager::GetInstance().RegisterDialog(std::make_shared<SaveWorkspaceAsDialog>(SaveWorkspaceAsDialog::DialogType_DUPLICATE), [](bool result, void* data) {
                         auto* name = static_cast<char*>(data);
                         if (!result) return;
@@ -170,7 +171,7 @@ void Marmalade::GUI::TopBar::Show() {
                     }, true);
                     WindowManager::GetInstance().ShowDialog(dlg.Name);
                 }
-                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Save Workspace As..."))) {
+                if (NativeUI::MenuBar::MenuItem(pgettext("Menu|Window|Workspaces|", "Save Workspace As..."))) {
                     auto dlg = WindowManager::GetInstance().RegisterDialog(std::make_shared<SaveWorkspaceAsDialog>(SaveWorkspaceAsDialog::DialogType_SAVE_AS), [](bool result, void* data) {
                         auto* name = static_cast<char*>(data);
                         if (!result) return;
@@ -185,19 +186,19 @@ void Marmalade::GUI::TopBar::Show() {
                     WindowManager::GetInstance().ShowDialog(dlg.Name);
                 }
 
-                ImGui::Separator();
+                NativeUI::MenuBar::Separator();
 
-                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Save for this Topology"))) {
+                if (NativeUI::MenuBar::MenuItem(pgettext("Menu|Window|Workspaces|", "Save for this Topology"))) {
                     auto topo = WorkspaceManager::GetCurrentTopology();
                     auto newPath = WorkspaceManager::GetWorkspacesDir() / (WorkspaceManager::GetCurrentWorkspaceName() + "@" + topo + ".ini");
                     WorkspaceManager::SaveCurrentWorkspace(newPath);
                     WorkspaceManager::LoadWorkspace(newPath);
                 }
-                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Revert this Topology"))) { if (WorkspaceManager::IsTopologyWorkspace()) { WorkspaceManager::DeleteCurrentWorkspace(WorkspaceManager::GetWorkspacesDir() / (WorkspaceManager::GetCurrentWorkspaceName() + ".ini")); } }
+                if (NativeUI::MenuBar::MenuItem(pgettext("Menu|Window|Workspaces|", "Revert this Topology"))) { if (WorkspaceManager::IsTopologyWorkspace()) { WorkspaceManager::DeleteCurrentWorkspace(WorkspaceManager::GetWorkspacesDir() / (WorkspaceManager::GetCurrentWorkspaceName() + ".ini")); } }
 
-                ImGui::Separator();
+                NativeUI::MenuBar::Separator();
 
-                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Import Workspace..."))) {
+                if (NativeUI::MenuBar::MenuItem(pgettext("Menu|Window|Workspaces|", "Import Workspace..."))) {
                     IGFD::FileDialogConfig config = WindowManager::PrepareFileDialogConfig();
                     auto dialog = WindowManager::GetInstance().RegisterFileDialog("ImportWorkspace", [](bool result, void* data) {
                         auto* fileResult = static_cast<WindowManager::FileDialogResult*>(data);
@@ -206,7 +207,7 @@ void Marmalade::GUI::TopBar::Show() {
                     });
                     ImGuiFileDialog::Instance()->OpenDialog(dialog.Name, "Import Workspace", ".marmws", config);
                 }
-                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Export Workspace..."))) {
+                if (NativeUI::MenuBar::MenuItem(pgettext("Menu|Window|Workspaces|", "Export Workspace..."))) {
                     IGFD::FileDialogConfig config = WindowManager::PrepareFileDialogConfig(WorkspaceManager::GetWorkspacesDir().string());
                     auto dialog = WindowManager::GetInstance().RegisterFileDialog("ExportWorkspace", [](bool result, void* data) {
                         auto* fileResult = static_cast<WindowManager::FileDialogResult*>(data);
@@ -215,9 +216,9 @@ void Marmalade::GUI::TopBar::Show() {
                     ImGuiFileDialog::Instance()->OpenDialog(dialog.Name, "Export Workspace", ".marmws", config);
                 }
 
-                ImGui::Separator();
+                NativeUI::MenuBar::Separator();
 
-                if (ImGui::MenuItem(pgettext("Menu|Window|Workspaces|", "Delete Current Workspace..."))) {
+                if (NativeUI::MenuBar::MenuItem(pgettext("Menu|Window|Workspaces|", "Delete Current Workspace..."))) {
                     MsgBox::ShowMsgBox("Delete Workspace", "Are you sure you want to delete the workspace: " + WorkspaceManager::GetCurrentWorkspaceName() + "?", MsgBox::Buttons_YES_NO_CANCEL, [](MsgBox::Result* result) {
                         if (result->Result == MsgBox::ResultType_YES) {
                             WorkspaceManager::DeleteCurrentWorkspace();
@@ -227,29 +228,29 @@ void Marmalade::GUI::TopBar::Show() {
                     });
                 }
 
-                ImGui::EndMenu();
+                NativeUI::MenuBar::EndMenu();
             }
 
-            ImGui::EndMenu();
+            NativeUI::MenuBar::EndMenu();
         }
 
-        if (ImGui::BeginMenu(pgettext("Menu|", "Help"))) {
-            ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_INFO, pgettext("Menu|Help|", "About")), nullptr, &WindowManager::GetInstance().about.visible);
+        if (NativeUI::MenuBar::BeginMenu(pgettext("Menu|", "Help"))) {
+            NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_INFO, pgettext("Menu|Help|", "About")), nullptr, &WindowManager::GetInstance().about.visible);
 
-            ImGui::EndMenu();
+            NativeUI::MenuBar::EndMenu();
         }
 
         if (Application::GetInstance().enableDebugMenu) {
-            if (ImGui::BeginMenu(pgettext("Menu|", "Internal Debug"))) {
-                if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_DEBUG, pgettext("Menu|Internal Debug|", "ImGui Demo")))) { WindowManager::GetInstance().ToggleDebugWindow(); }
+            if (NativeUI::MenuBar::BeginMenu(pgettext("Menu|", "Internal Debug"))) {
+                if (NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_DEBUG, pgettext("Menu|Internal Debug|", "ImGui Demo")))) { WindowManager::GetInstance().ToggleDebugWindow(); }
 #if DEBUG
-                if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_BEAKER, pgettext("Menu|Internal Debug|", "ImGui Test Engine")))) {
+                if (NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_BEAKER, pgettext("Menu|Internal Debug|", "ImGui Test Engine")))) {
                     WindowManager::GetInstance().ToggleImGuiTestsWindow();
                 }
 #endif
-                ImGui::Separator();
+                NativeUI::MenuBar::Separator();
 
-                if (ImGui::MenuItem(ICON_WITH_TEXT(ICON_CI_ERROR, pgettext("Menu|Internal Debug|", "Simulate Crash")))) {
+                if (NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_ERROR, pgettext("Menu|Internal Debug|", "Simulate Crash")))) {
 #ifdef APPLE
                     __builtin_trap();
 #else
@@ -258,7 +259,7 @@ void Marmalade::GUI::TopBar::Show() {
 #endif
                 }
 
-                ImGui::EndMenu();
+                NativeUI::MenuBar::EndMenu();
             }
         }
 
