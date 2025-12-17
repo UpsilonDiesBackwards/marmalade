@@ -20,6 +20,7 @@
 #ifndef MARMALADE_GUI_NATIVEUI_MENUBAR_H
 #define MARMALADE_GUI_NATIVEUI_MENUBAR_H
 
+#include <string>
 #include <functional>
 #include <map>
 #include <stack>
