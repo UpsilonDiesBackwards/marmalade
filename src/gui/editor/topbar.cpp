@@ -49,7 +49,7 @@ void Marmalade::GUI::TopBar::Show() {
     static char sceneNameBuffer[256] = "";
     static bool showSceneOpenPopUp = false;
 
-    if (ImGui::BeginMainMenuBar()) {
+    if (NativeUI::MenuBar::BeginMainMenuBar()) {
         if (NativeUI::MenuBar::BeginMenu(pgettext("Menu|", "File"))) {
             if (NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_ADD, pgettext("Menu|File|", "New Project")))) { WindowManager::GetInstance().projectWizard.ToggleWindow(); }
             if (NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_FOLDER_OPENED, pgettext("Menu|File|", "Open Project")))) {
@@ -251,7 +251,7 @@ void Marmalade::GUI::TopBar::Show() {
                 NativeUI::MenuBar::Separator();
 
                 if (NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_ERROR, pgettext("Menu|Internal Debug|", "Simulate Crash")))) {
-#ifdef APPLE
+#ifdef __APPLE__
                     __builtin_trap();
 #else
                     char *p = 0;
@@ -388,7 +388,7 @@ void Marmalade::GUI::TopBar::Show() {
             ImGuiFileDialog::Instance()->Close();
         }
 
-        ImGui::EndMainMenuBar();
+        NativeUI::MenuBar::EndMainMenuBar();
     }
 
     if (WindowManager::GetInstance().showStyleEditor) {

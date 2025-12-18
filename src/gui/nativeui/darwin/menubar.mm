@@ -49,6 +49,14 @@ static std::map<std::string, std::string> s_IconToSFSymbol = {
     {ICON_CI_BLANK, ""}
 };
 
+bool MenuBar::BeginMainMenuBar() {
+    return ImGui::BeginMainMenuBar();
+}
+
+void MenuBar::EndMainMenuBar() {
+    ImGui::EndMainMenuBar();
+}
+
 bool MenuBar::BeginMenu(const char* label) {
     if (!EngineConfig::GetStoredConfig().appearance.useNativeMenubar) {
         return ImGui::BeginMenu(label);

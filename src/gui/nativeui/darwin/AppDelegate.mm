@@ -45,37 +45,61 @@
     return YES;
 }
 
-- (void)createMenu {
-    self.mainMenu = [[NSMenu alloc] init];
+- (void)addSeparator:(NSMenu*)menu {
+    NSMenuItem *separator = [NSMenuItem separatorItem];
+    [menu addItem:separator];
+}
 
+- (void)addMenuItem:(NSMenu*)menu title:(nonnull NSString*)title action:(nullable SEL)selector keyEquivalent:(nonnull NSString*)charCode {
+    NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title
+                                                       action:selector
+                                                keyEquivalent:charCode];
+    [menu addItem:item];
+}
+
+- (void)addMenuItem:(NSMenu*)menu title:(nonnull NSString*)title action:(nullable SEL)selector keyEquivalent:(nonnull NSString*)charCode modifierMask:(NSEventModifierFlags)mask {
+    NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title
+                                                       action:selector
+                                                keyEquivalent:charCode];
+    [item setKeyEquivalentModifierMask:mask];
+    [menu addItem:item];
+}
+
+- (void)addAppMenu:(NSMenu*)mainMenu {
     NSMenuItem* appMenuItem = [[NSMenuItem alloc] init];
 
     [self.mainMenu addItem:appMenuItem];
-    [NSApp setMainMenu:self.mainMenu];
 
     NSMenu* appMenu = [[NSMenu alloc] init];
-    NSString* appName = [[NSProcessInfo processInfo] processName];
 
-    NSMenuItem* aboutItem = [[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"About %@", appName]
-                                                       action:@selector(orderFrontStandardAboutPanel:)
-                                                keyEquivalent:@""];
+    [self addMenuItem:appMenu title:@"About Marmalade Engine" action:@selector(orderFrontStandardAboutPanel:) keyEquivalent:@""];
+    [self addSeparator:appMenu];
 
-    NSMenuItem* prefsItem = [[NSMenuItem alloc] initWithTitle:@"Preferences..."
-                                                       action:@selector(openPreferences:)
-                                                keyEquivalent:@","];
+    [self addMenuItem:appMenu title:@"Preferences..." action:@selector(openPreferences:) keyEquivalent:@","];
+    [self addSeparator:appMenu];
 
-    NSMenuItem* separator = [NSMenuItem separatorItem];
+    NSMenuItem* servicesItem = [appMenu addItemWithTitle:@"Services" action:nil keyEquivalent:@""];
+    NSMenu* servicesMenu = [[NSMenu alloc] initWithTitle:@"Services"];
+    [servicesItem setSubmenu:servicesMenu];
+    [NSApp setServicesMenu:servicesMenu];
+    [self addSeparator:appMenu];
 
-    NSMenuItem* quitItem = [[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"Quit %@", appName]
-                                                      action:@selector(terminate:)
-                                               keyEquivalent:@"q"];
+    [self addMenuItem:appMenu title:@"Hide Marmalade Engine" action:@selector(hide:) keyEquivalent:@"h"];
+    [self addMenuItem:appMenu title:@"Hide Others" action:@selector(hideOtherApplications:) keyEquivalent:@"h" modifierMask:NSEventModifierFlagCommand | NSEventModifierFlagOption];
+    [self addMenuItem:appMenu title:@"Show All" action:@selector(unhideAllApplications:) keyEquivalent:@""];
 
-    [appMenu addItem:aboutItem];
-    [appMenu addItem:prefsItem];
-    [appMenu addItem:separator];
-    [appMenu addItem:quitItem];
+    [self addSeparator:appMenu];
+
+    [self addMenuItem:appMenu title:@"Quit Marmalade Engine" action:@selector(terminate:) keyEquivalent:@"q"];
 
     [appMenuItem setSubmenu:appMenu];
+}
+
+- (void)createMenu {
+    self.mainMenu = [[NSMenu alloc] init];
+    [NSApp setMainMenu:self.mainMenu];
+
+    [self addAppMenu:self.mainMenu];
 }
 
 @end
