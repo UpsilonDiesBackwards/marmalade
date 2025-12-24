@@ -20,7 +20,9 @@
 #ifndef MARMALADE_GUI_NATIVEUI_WINDOW_H
 #define MARMALADE_GUI_NATIVEUI_WINDOW_H
 
+#if NATIVEUI_GLFW_WRAPPER
 #include <GLFW/glfw3.h>
+#endif
 
 #include <iostream>
 #include <utility>
@@ -67,7 +69,9 @@ namespace Marmalade::GUI::NativeUI {
             _handle = handle;
         }
 
+#if NATIVEUI_GLFW_WRAPPER
         static Window WrapGlfwWindow(GLFWwindow* window);
+#endif
 
         void SetCreateCallback(std::function<void()> createCallback) {
             _createCallback = std::move(createCallback);

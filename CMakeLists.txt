@@ -4,6 +4,8 @@ include(ExternalProject)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+include(NativeUI)
+
 set(CMAKE_CXX_STANDARD 20)
 
 if (MSVC)
@@ -244,6 +246,7 @@ add_executable(marmalade
         ${IMNODES_SRC}
         vendor/imguifiledialog/ImGuiFileDialog.cpp
         vendor/imgui_markdown/imgui_markdown.h
+        $<TARGET_OBJECTS:marmalade_nativeui>
 )
 
 add_subdirectory(include)
@@ -272,6 +275,8 @@ file(COPY res DESTINATION ${CMAKE_BINARY_DIR})
 if (APPLE)
     set(RESOURCE_DEST "${CMAKE_BINARY_DIR}/marmalade.app/Contents/Resources/res")
 
+    file(COPY res/icon.icns DESTINATION "${CMAKE_BINARY_DIR}/marmalade.app/Contents/Resources")
+
     add_custom_command(TARGET marmalade POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_directory
             res
@@ -286,6 +291,7 @@ endif()
 target_compile_definitions(marmalade PRIVATE COMMIT_HASH="${COMMIT_HASH}")
 
 target_link_libraries(marmalade PRIVATE
+        marmalade_nativeui
         glfw
         OpenGL::GL
         ${OPENGL_gl_LIBRARY}
@@ -342,6 +348,8 @@ endif ()
 target_include_directories(marmalade PRIVATE include)
 
 target_link_directories(marmalade PRIVATE vendor/luaaa ${GTK3_LIBRARIES})
+
+set_native_properties(marmalade "Marmalade Engine" "1.0.0" "2025 Tayler Parsons" "com.diesbackwards.Marmalade")
 
 # Publish target
 set(PUBLISH_DIR "${CMAKE_BINARY_DIR}/publish")

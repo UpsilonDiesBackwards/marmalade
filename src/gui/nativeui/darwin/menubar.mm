@@ -17,12 +17,16 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#if NATIVEUI_ENABLE_MENUBAR
+
 #include "../menubar.h"
 
 #include <Cocoa/Cocoa.h>
 
+#if NATIVEUI_ENABLE_IMGUI
 #include <imgui.h>
 #include <IconsCodicons.h>
+#endif
 
 #include "../../../application/config/engineconfig.h"
 
@@ -178,3 +182,5 @@ void MenuBar::Separator() {
 
     [currentParent addItem:[NSMenuItem separatorItem]];
 }
+
+#endif

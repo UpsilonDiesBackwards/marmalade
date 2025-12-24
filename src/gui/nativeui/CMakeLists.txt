@@ -40,57 +40,49 @@ elseif (APPLE)
 endif ()
 
 if (WIN32)
-    configure_file(
-            ${CMAKE_SOURCE_DIR}/misc/resources/marmalade.in.rc
-            ${CMAKE_BINARY_DIR}/marmalade.rc)
-
-    configure_file(
-            ${CMAKE_SOURCE_DIR}/misc/resources/marmalade.exe.manifest
-            ${CMAKE_BINARY_DIR}/marmalade.exe.manifest
-    )
     list(APPEND ENGINE_SRC_NATIVE_UI
             ${CMAKE_SOURCE_DIR}/misc/resources/marmalade.exe.manifest
             ${CMAKE_BINARY_DIR}/marmalade.rc)
-
-    set_target_properties(marmalade PROPERTIES
-            VS_MANIFEST_FILE "${CMAKE_BINARY_DIR}/marmalade.exe.manifest"
-    )
-
-    if (MSVC)
-        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-            set_target_properties(marmalade PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")
-            target_compile_definitions(marmalade PRIVATE WINCONSOLE)
-        elseif ()
-            set_target_properties(marmalade PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
-        endif ()
-    endif ()
-elseif (APPLE)
-    find_library(COCOA_LIBRARY Cocoa)
-
-    set_target_properties(marmalade PROPERTIES
-            MACOSX_BUNDLE_BUNDLE_NAME "Marmalade Engine"
-            MACOSX_BUNDLE_BUNDLE_VERSION "1.0.0"
-            MACOSX_BUNDLE TRUE
-            MACOSX_BUNDLE_ICON_FILE icon.icns
-            MACOSX_BUNDLE_LONG_VERSION_STRING "1.0.0"
-            MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0.0"
-            MACOSX_BUNDLE_COPYRIGHT "2025 Tayler Parsons"
-            MACOSX_BUNDLE_GUI_IDENTIFIER com.diesbackwards.Marmalade
-            XCODE_ATTRIBUTE_LD_RUNPATH_SEARCH_PATHS "@loader_path/Libraries"
-            XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME TRUE
-            XCODE_ATTRIBUTE_EXECUTABLE_NAME "Marmalade")
 endif ()
 
+if (APPLE)
+    # Mark all files as objective-c++
+    enable_language(OBJC)
+    enable_language(OBJCXX)
+
+    set_source_files_properties(${ENGINE_SRC_NATIVE_UI} PROPERTIES COMPILE_FLAGS "-x objective-c++")
+    set_source_files_properties(${ENGINE_SRC_NATIVE_UI} PROPERTIES LANGUAGE OBJCXX)
+endif ()
+
+
+if (NOT TARGET marmalade_nativeui)
+    add_library(marmalade_nativeui OBJECT ${ENGINE_SRC_NATIVE_UI})
+    target_compile_definitions(marmalade_nativeui PRIVATE NATIVEUI_GLFW_WRAPPER NATIVEUI_ENABLE_IMGUI NATIVEUI_ENABLE_MENUBAR)
+endif ()
+
+if (NOT TARGET phroggy_nativeui)
+    add_library(phroggy_nativeui OBJECT ${ENGINE_SRC_NATIVE_UI})
+endif ()
+
+target_link_libraries(marmalade_nativeui PUBLIC glfw nlohmann_json::nlohmann_json)
+target_link_libraries(phroggy_nativeui PUBLIC glfw nlohmann_json::nlohmann_json)
+
+target_include_directories(marmalade_nativeui PRIVATE ${CMAKE_SOURCE_DIR}/vendor/imgui ${CMAKE_SOURCE_DIR}/vendor/iconfontcppheaders ${CMAKE_SOURCE_DIR}/vendor/spdlog/include)
+target_include_directories(phroggy_nativeui PRIVATE ${CMAKE_SOURCE_DIR}/vendor/spdlog/include)
+
 if (WIN32)
-    target_link_libraries(marmalade PRIVATE comctl32.lib)
+    target_link_libraries(marmalade_nativeui PUBLIC comctl32.lib)
+    target_link_libraries(phroggy_nativeui PUBLIC comctl32.lib)
 ENDIF ()
 
 if (APPLE)
-    target_link_libraries(marmalade PRIVATE ${COCOA_LIBRARY})
+    find_library(COCOA_LIBRARY Cocoa)
+
+    target_link_libraries(marmalade_nativeui PUBLIC ${COCOA_LIBRARY})
+    target_link_libraries(phroggy_nativeui PUBLIC ${COCOA_LIBRARY})
 ENDIF ()
 
 if (UNIX AND NOT APPLE)
-    target_link_libraries(marmalade PRIVATE ${GTK3_LIBRARIES})
+    target_link_libraries(marmalade_nativeui PUBLIC ${GTK3_LIBRARIES})
+    target_link_libraries(phroggy_nativeui PUBLIC ${GTK3_LIBRARIES})
 endif ()
-
-target_sources(marmalade PRIVATE ${ENGINE_SRC_NATIVE_UI})
