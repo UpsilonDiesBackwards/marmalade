@@ -189,7 +189,7 @@ void Application::InitialiseImGui() {
     registerImGuiTests();
 
     ImGuiTestEngine_Start(_imguiTestEngine, ImGui::GetCurrentContext());
-    ImGuiTestEngine_InstallDefaultCrashHandler();
+    // ImGuiTestEngine_InstallDefaultCrashHandler();
 #endif
 
     std::stringstream versionStream;

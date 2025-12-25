@@ -1,3 +1,4 @@
+add_subdirectory(application/crashreporter)
 add_subdirectory(gui)
 
 # Application

@@ -23,8 +23,9 @@
 #include "application/config/recents.h"
 #include "application/config/plugins.h"
 #include "application/plugins/pluginloader.h"
-#include "gui/windowmanager.h"
+#include "application/crashreporter/crashreporter.h"
 
+#include "gui/windowmanager.h"
 #include "gui/nativeui/app.h"
 #include "gui/nativeui/window.h"
 #include "gui/nativeui/splashscreen.h"
@@ -134,7 +135,7 @@ bool engineMain(bool sameDirConfig, bool noSplash, char* project, char* scene, b
     return true;
 }
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(WINCONSOLE)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     // Set working directory to same path as executable
     wchar_t exePath[MAX_PATH];
@@ -145,6 +146,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 int main(int argc, char** argv) {
 #endif
+#if defined(_WIN32) && defined(DEBUG)
+    try {
+#endif
+    Marmalade::CrashReporter::SetLaunchArgs(ARGC, ARGV);
+    Marmalade::CrashReporter::Install();
+
+    bool isInstanceManager{false};
     bool sameDirConfig{false};
     bool noSplash{false};
     char* project = nullptr;
@@ -153,6 +161,10 @@ int main(int argc, char** argv) {
 
     for (int i = 1; i < ARGC; ++i) {
         std::string arg = ARGV[i];
+
+        if (arg == "--instance-manager") {
+            isInstanceManager = true;
+        }
 
         if (arg == "--same-dir-config") {
             sameDirConfig = true;
@@ -285,5 +297,13 @@ int main(int argc, char** argv) {
     // Wait for GTK thread
     // gtkThread.join();
 #endif
+
+#if defined(_WIN32) && defined(DEBUG)
+    } catch (const std::exception& ex) {
+        Marmalade::CrashReporter::ExceptionHandler(ex);
+        return 1;
+    }
+#endif
+
     return 0;
 }
