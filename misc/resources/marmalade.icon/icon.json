@@ -1,0 +1,47 @@
+{
+  "fill" : "system-light",
+  "groups" : [
+    {
+      "blur-material" : null,
+      "layers" : [
+        {
+          "fill" : "automatic",
+          "glass" : true,
+          "image-name-specializations" : [
+            {
+              "value" : "icon_light.png"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "icon_dark.png"
+            }
+          ],
+          "name" : "icon_dark",
+          "position" : {
+            "scale" : 1.5,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "lighting" : "individual",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

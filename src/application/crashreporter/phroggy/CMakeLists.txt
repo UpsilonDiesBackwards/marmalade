@@ -3,6 +3,8 @@ project(marmalade_phroggy)
 
 set(CMAKE_CXX_STANDARD 20)
 
+include(MacOSIcon)
+
 if (MSVC)
     add_definitions(-DUNICODE -D_UNICODE)
     add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")

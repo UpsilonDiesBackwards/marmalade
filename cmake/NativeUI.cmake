@@ -26,7 +26,8 @@ function(set_native_properties target name version copyright identifier)
                 MACOSX_BUNDLE_BUNDLE_NAME "${name}"
                 MACOSX_BUNDLE_BUNDLE_VERSION "${version}"
                 MACOSX_BUNDLE TRUE
-                MACOSX_BUNDLE_ICON_FILE icon
+                MACOSX_BUNDLE_ICON_FILE marmalade
+                MACOSX_BUNDLE_ICON_NAME marmalade
                 MACOSX_BUNDLE_LONG_VERSION_STRING "${version}"
                 MACOSX_BUNDLE_SHORT_VERSION_STRING "${version}"
                 MACOSX_BUNDLE_COPYRIGHT "${copyright}"

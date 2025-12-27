@@ -275,13 +275,13 @@ file(COPY res DESTINATION ${CMAKE_BINARY_DIR})
 if (APPLE)
     set(RESOURCE_DEST "${CMAKE_BINARY_DIR}/marmalade.app/Contents/Resources/res")
 
-    file(COPY res/icon.icns DESTINATION "${CMAKE_BINARY_DIR}/marmalade.app/Contents/Resources")
-
     add_custom_command(TARGET marmalade POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_directory
             res
             ${RESOURCE_DEST}
     )
+
+    compile_icon(marmalade "${CMAKE_SOURCE_DIR}/misc/resources/marmalade.icon" "${CMAKE_BINARY_DIR}/marmalade.app")
 endif ()
 
 if(NOT DEFINED COMMIT_HASH)
