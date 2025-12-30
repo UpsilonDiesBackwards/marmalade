@@ -272,6 +272,10 @@ int main(int argc, char** argv) {
     }
 
 
+    if (!engineMain(sameDirConfig, noSplash, project, scene, secretDebugMenu, splashScreen)) {
+        return 1;
+    }
+
     if (!noSplash) splashScreen.Close();
 
     auto& application = Application::GetInstance();
@@ -288,10 +292,6 @@ int main(int argc, char** argv) {
 
     Marmalade::PluginLoader::GetInstance().UnloadPlugins();
     application.TerminateGlfw();
-
-    if (!engineMain(sameDirConfig, noSplash, project, scene, secretDebugMenu, splashScreen)) {
-        return 1;
-    }
 
 #if defined(__linux__)
     // Wait for GTK thread

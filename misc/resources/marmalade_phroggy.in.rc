@@ -1,0 +1,37 @@
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "phroggy.exe.manifest"
+
+#define IDI_ICON1 101
+IDI_ICON1 ICON "../../../res/icons/logo/logo.ico"
+
+1 VERSIONINFO
+    FILEVERSION 1,0,0,0
+    PRODUCTVERSION 1,0,0,0
+    FILEFLAGSMASK 0x17L
+    #ifdef _DEBUG
+        FILEFLAGS 0x1L
+    #else
+        FILEFLAGS 0x0L
+    #endif
+    FILEOS 0x4L
+    FILETYPE 0x1L
+    FILESUBTYPE 0x0L
+    BEGIN
+        BLOCK "StringFileInfo"
+        BEGIN
+            BLOCK "080904b0"
+            BEGIN
+                VALUE "Comments", "Marmalade Engine Crash Reporter"
+                VALUE "CompanyName", "Upsilon"
+                VALUE "FileDescription", "Marmalade Engine Crash Reporter"
+                VALUE "FileVersion", "1, 0, 0, 0"
+                VALUE "InternalName", "Marmalade Engine Phroggy"
+                VALUE "LegalCopyright", "2025 Tayler Parsons"
+                VALUE "ProductName", "Marmalade Engine Phroggy"
+                VALUE "ProductVersion", "1, 0, 0, 0"
+            END
+        END
+        BLOCK "VarFileInfo"
+        BEGIN
+            VALUE "Translation", 0x809, 1200
+        END
+    END

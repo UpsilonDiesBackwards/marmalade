@@ -43,23 +43,9 @@ set_target_properties(marmalade_phroggy PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 if (MSVC)
-    configure_file(
-            ${CMAKE_CURRENT_SOURCE_DIR}/phroggy.in.rc
-            ${CMAKE_CURRENT_BINARY_DIR}/phroggy.rc)
-
-    configure_file(
-            ${CMAKE_CURRENT_SOURCE_DIR}/phroggy.exe.manifest
-            ${CMAKE_CURRENT_BINARY_DIR}/phroggy.exe.manifest
-    )
     target_sources(marmalade_phroggy PRIVATE
-            ${CMAKE_CURRENT_SOURCE_DIR}/phroggy.exe.manifest
+            ${CMAKE_SOURCE_DIR}/misc/resources/marmalade_phroggy.exe.manifest
             ${CMAKE_CURRENT_BINARY_DIR}/phroggy.rc)
-
-    set_target_properties(marmalade_phroggy PROPERTIES
-            VS_MANIFEST_FILE "${CMAKE_CURRENT_BINARY_DIR}/phroggy.exe.manifest"
-    )
-
-    set_target_properties(marmalade_phroggy PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 endif ()
 
 target_include_directories(marmalade_phroggy PRIVATE ../../../gui/nativeui)
