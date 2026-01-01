@@ -247,6 +247,7 @@ add_executable(marmalade
         vendor/imguifiledialog/ImGuiFileDialog.cpp
         vendor/imgui_markdown/imgui_markdown.h
         $<TARGET_OBJECTS:marmalade_nativeui>
+        vendor/sqlite3/sqlite3.c
 )
 
 add_subdirectory(include)
@@ -339,6 +340,7 @@ target_include_directories(marmalade PRIVATE
         vendor/zip/src
         ${LibIntl_SOURCE_DIR}
         vendor/libuv/include
+        vendor/sqlite3
 )
 
 if (APPLE)
