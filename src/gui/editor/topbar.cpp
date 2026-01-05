@@ -72,17 +72,17 @@ void Marmalade::GUI::TopBar::Show() {
             if (inspectedEntity == nullptr) { NativeUI::MenuBar::MenuItem(_("No entity selected"), nullptr, nullptr, false); } else {
                 if (NativeUI::MenuBar::BeginMenu(pgettext("Menu|Entity|AddComponent|", "Add Component"))) {
                     if (NativeUI::MenuBar::BeginMenu(pgettext("Menu|Entity|AddComponent|", "Favourites"))) {
-                        for (const auto& component: Marmalade::ECS::ComponentRegistry::Instance().GetFavorites()) { if (ImGui::MenuItem(component->Name.c_str())) { inspectedEntity->componentManager.AddComponent(component->Factory->Create(Util::GenerateUUIDv4())); } }
+                        for (const auto& component: Marmalade::ECS::ComponentRegistry::Instance().GetFavorites()) { if (NativeUI::MenuBar::MenuItem(component->Name.c_str())) { inspectedEntity->componentManager.AddComponent(component->Factory->Create(Util::GenerateUUIDv4())); } }
                         NativeUI::MenuBar::EndMenu();
                     }
                     if (NativeUI::MenuBar::BeginMenu(pgettext("Menu|Entity|AddComponent|", "All"))) {
-                        for (const auto& [_, component]: Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()) { if (ImGui::MenuItem(component.Name.c_str())) { inspectedEntity->componentManager.AddComponent(component.Factory->Create(Util::GenerateUUIDv4())); } }
+                        for (const auto& [_, component]: Marmalade::ECS::ComponentRegistry::Instance().GetRegisteredComponents()) { if (NativeUI::MenuBar::MenuItem(component.Name.c_str())) { inspectedEntity->componentManager.AddComponent(component.Factory->Create(Util::GenerateUUIDv4())); } }
                         NativeUI::MenuBar::EndMenu();
                     }
                     NativeUI::MenuBar::Separator();
                     for (const auto& [category, components]: Marmalade::ECS::ComponentRegistry::Instance().GetCategoryTree()) {
                         if (NativeUI::MenuBar::BeginMenu(category.c_str())) {
-                            for (const auto& component: components) { if (ImGui::MenuItem(component->Name.c_str())) { inspectedEntity->componentManager.AddComponent(component->Factory->Create(Util::GenerateUUIDv4())); } }
+                            for (const auto& component: components) { if (NativeUI::MenuBar::MenuItem(component->Name.c_str())) { inspectedEntity->componentManager.AddComponent(component->Factory->Create(Util::GenerateUUIDv4())); } }
                             NativeUI::MenuBar::EndMenu();
                         }
                     }

@@ -9,6 +9,7 @@ list(APPEND ENGINE_SRC_GUI
         components/selectablelistview.h
         components/markdownparser.cpp
         components/markdownparser.h
+        components/form.h
 
         dialogs/about.cpp
         dialogs/about.h
