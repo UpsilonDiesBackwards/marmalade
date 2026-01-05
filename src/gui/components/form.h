@@ -42,6 +42,7 @@ namespace Marmalade::GUI::Components {
         ControlType_XYZ,
         ControlType_XY,
         ControlType_Multiline,
+        ControlType_DROPDOWN,
     };
 
     using EntryValuePtr = std::variant<bool*, int*, float*, ImVec4*, std::string*, CustomEntry*>;
@@ -72,11 +73,12 @@ namespace Marmalade::GUI::Components {
 
         float min = 0;
         float max = 0;
-        std::string format = "%.3f";
+        std::string format;
         float step = 0;
         float stepFast = 0;
         float speed = 1;
         float maxWidth = -FLT_MIN;
+        std::vector<std::string> dropdownOptions;
 
         std::function<void()> valueChangeCallback = nullptr;
 
@@ -115,6 +117,12 @@ namespace Marmalade::GUI::Components {
             return *this;
         }
 
+        FormEntry& AsDropdown(const std::vector<std::string>& options) {
+            this->control = ControlType::ControlType_DROPDOWN;
+            this->dropdownOptions = options;
+            return *this;
+        }
+
         FormEntry& SetValueChangeCallback(const std::function<void()>& valueChangeCallback) {
             this->valueChangeCallback = valueChangeCallback;
             return *this;
@@ -138,13 +146,35 @@ namespace Marmalade::GUI::Components {
     template<>
     struct ControlRenderer<int> {
         static bool Draw(const std::string& id, int* value, const FormEntry& entry) {
+            const char* fmt = entry.format.empty() ? "%d" : entry.format.c_str();
+
             switch (entry.control) {
+                case ControlType::ControlType_DROPDOWN: {
+                    bool changed = false;
+                    const char* preview = (value && *value >= 0 && *value < entry.dropdownOptions.size())
+                                                  ? entry.dropdownOptions[*value].c_str()
+                                                  : "Select...";
+
+                    if (ImGui::BeginCombo(id.c_str(), preview)) {
+                        for (int n = 0; n < entry.dropdownOptions.size(); n++) {
+                            const bool is_selected = (*value == n);
+                            if (ImGui::Selectable(entry.dropdownOptions[n].c_str(), is_selected)) {
+                                *value = n;
+                                changed = true;
+                            }
+
+                            if (is_selected) ImGui::SetItemDefaultFocus();
+                        }
+                        ImGui::EndCombo();
+                    }
+                    return changed;
+                }
                 case ControlType::ControlType_SLIDER:
-                    return ImGui::SliderInt(id.c_str(), value, entry.min, entry.max, entry.format.c_str());
+                    return ImGui::SliderInt(id.c_str(), value, entry.min, entry.max, fmt);
                 case ControlType::ControlType_INPUT:
                     return ImGui::InputInt(id.c_str(), value, entry.step, entry.stepFast);
                 default:// or ControlType_DRAG
-                    return ImGui::DragInt(id.c_str(), value, entry.speed, entry.min, entry.max, entry.format.c_str());
+                    return ImGui::DragInt(id.c_str(), value, entry.speed, entry.min, entry.max, fmt);
             }
         }
     };
@@ -152,13 +182,15 @@ namespace Marmalade::GUI::Components {
     template<>
     struct ControlRenderer<float> {
         static bool Draw(const std::string& id, float* value, const FormEntry& entry) {
+            const char* fmt = entry.format.empty() ? "%.3f" : entry.format.c_str();
+
             switch (entry.control) {
                 case ControlType::ControlType_SLIDER:
-                    return ImGui::SliderFloat(id.c_str(), value, entry.min, entry.max, entry.format.c_str());
+                    return ImGui::SliderFloat(id.c_str(), value, entry.min, entry.max, fmt);
                 case ControlType::ControlType_INPUT:
-                    return ImGui::InputFloat(id.c_str(), value, entry.step, entry.stepFast, entry.format.c_str());
+                    return ImGui::InputFloat(id.c_str(), value, entry.step, entry.stepFast, fmt);
                 default:// or ControlType_DRAG
-                    return ImGui::DragFloat(id.c_str(), value, entry.speed, entry.min, entry.max, entry.format.c_str());
+                    return ImGui::DragFloat(id.c_str(), value, entry.speed, entry.min, entry.max, fmt);
             }
         }
     };
@@ -166,6 +198,7 @@ namespace Marmalade::GUI::Components {
     template<>
     struct ControlRenderer<ImVec4> {
         static bool Draw(const std::string& id, ImVec4* value, const FormEntry& entry) {
+            const char* fmt = entry.format.empty() ? "%.3f" : entry.format.c_str();
             float availableWidth = ImGui::GetContentRegionAvail().x;
 
             switch (entry.control) {
@@ -175,19 +208,19 @@ namespace Marmalade::GUI::Components {
                     const float widthConstant = 8;
 
                     ImGui::SetNextItemWidth(width / 4 - widthConstant);
-                    valChanged |= ImGui::SliderFloat((id + "x").c_str(), &value->x, entry.min, entry.max, entry.format.c_str());
+                    valChanged |= ImGui::SliderFloat((id + "x").c_str(), &value->x, entry.min, entry.max, fmt);
 
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(width / 4 - widthConstant);
-                    valChanged |= ImGui::SliderFloat((id + "y").c_str(), &value->y, entry.min, entry.max, entry.format.c_str());
+                    valChanged |= ImGui::SliderFloat((id + "y").c_str(), &value->y, entry.min, entry.max, fmt);
 
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(width / 4 - widthConstant);
-                    valChanged |= ImGui::SliderFloat((id + "z").c_str(), &value->z, entry.min, entry.max, entry.format.c_str());
+                    valChanged |= ImGui::SliderFloat((id + "z").c_str(), &value->z, entry.min, entry.max, fmt);
 
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(width / 4 - widthConstant);
-                    valChanged |= ImGui::SliderFloat((id + "w").c_str(), &value->w, entry.min, entry.max, entry.format.c_str());
+                    valChanged |= ImGui::SliderFloat((id + "w").c_str(), &value->w, entry.min, entry.max, fmt);
                     return valChanged;
                 }
                 case ControlType::ControlType_INPUT: {
@@ -196,19 +229,19 @@ namespace Marmalade::GUI::Components {
                     const float widthConstant = 8;
 
                     ImGui::SetNextItemWidth(width / 4 - widthConstant);
-                    valChanged |= ImGui::InputFloat((id + "x").c_str(), &value->x, entry.step, entry.stepFast, entry.format.c_str());
+                    valChanged |= ImGui::InputFloat((id + "x").c_str(), &value->x, entry.step, entry.stepFast, fmt);
 
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(width / 4 - widthConstant);
-                    valChanged |= ImGui::InputFloat((id + "y").c_str(), &value->y, entry.step, entry.stepFast, entry.format.c_str());
+                    valChanged |= ImGui::InputFloat((id + "y").c_str(), &value->y, entry.step, entry.stepFast, fmt);
 
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(width / 4 - widthConstant);
-                    valChanged |= ImGui::InputFloat((id + "z").c_str(), &value->z, entry.step, entry.stepFast, entry.format.c_str());
+                    valChanged |= ImGui::InputFloat((id + "z").c_str(), &value->z, entry.step, entry.stepFast, fmt);
 
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(width / 4 - widthConstant);
-                    valChanged |= ImGui::InputFloat((id + "w").c_str(), &value->w, entry.step, entry.stepFast, entry.format.c_str());
+                    valChanged |= ImGui::InputFloat((id + "w").c_str(), &value->w, entry.step, entry.stepFast, fmt);
                     return valChanged;
                 }
                 case ControlType::ControlType_COLOR_EDIT: {
@@ -227,19 +260,19 @@ namespace Marmalade::GUI::Components {
                     BackgroundLabel::DrawInlineLabelWithBackground(" X ", COL_CATPPUCCIN_UI_RED);
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(width / 3 - widthConstant);
-                    valChanged |= ImGui::DragFloat((id + "x").c_str(), &value->x, entry.speed, entry.min, entry.max, entry.format.c_str());
+                    valChanged |= ImGui::DragFloat((id + "x").c_str(), &value->x, entry.speed, entry.min, entry.max, fmt);
 
                     ImGui::SameLine();
                     BackgroundLabel::DrawInlineLabelWithBackground(" Y ", COL_CATPPUCCIN_UI_GREEN);
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(width / 3 - widthConstant);
-                    valChanged |= ImGui::DragFloat((id + "y").c_str(), &value->y, entry.speed, entry.min, entry.max, entry.format.c_str());
+                    valChanged |= ImGui::DragFloat((id + "y").c_str(), &value->y, entry.speed, entry.min, entry.max, fmt);
 
                     ImGui::SameLine();
                     BackgroundLabel::DrawInlineLabelWithBackground(" Z ", COL_CATPPUCCIN_UI_BLUE);
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(width / 3 - widthConstant);
-                    valChanged |= ImGui::DragFloat((id + "z").c_str(), &value->z, entry.speed, entry.min, entry.max, entry.format.c_str());
+                    valChanged |= ImGui::DragFloat((id + "z").c_str(), &value->z, entry.speed, entry.min, entry.max, fmt);
                     return valChanged;
                 }
                 case ControlType::ControlType_XY: {
@@ -250,13 +283,13 @@ namespace Marmalade::GUI::Components {
                     BackgroundLabel::DrawInlineLabelWithBackground(" X ", COL_CATPPUCCIN_UI_RED);
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(width / 2 - widthConstant);
-                    valChanged |= ImGui::DragFloat((id + "x").c_str(), &value->x, entry.speed, entry.min, entry.max, entry.format.c_str());
+                    valChanged |= ImGui::DragFloat((id + "x").c_str(), &value->x, entry.speed, entry.min, entry.max, fmt);
 
                     ImGui::SameLine();
                     BackgroundLabel::DrawInlineLabelWithBackground(" Y ", COL_CATPPUCCIN_UI_GREEN);
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(width / 2 - widthConstant);
-                    valChanged |= ImGui::DragFloat((id + "y").c_str(), &value->y, entry.speed, entry.min, entry.max, entry.format.c_str());
+                    valChanged |= ImGui::DragFloat((id + "y").c_str(), &value->y, entry.speed, entry.min, entry.max, fmt);
 
                     return valChanged;
                 }
@@ -267,19 +300,19 @@ namespace Marmalade::GUI::Components {
                     const float widthConstant = 8;
 
                     ImGui::SetNextItemWidth(width / 4 - widthConstant);
-                    valChanged |= ImGui::DragFloat((id + "x").c_str(), &value->x, entry.speed, entry.min, entry.max, entry.format.c_str());
+                    valChanged |= ImGui::DragFloat((id + "x").c_str(), &value->x, entry.speed, entry.min, entry.max, fmt);
 
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(width / 4 - widthConstant);
-                    valChanged |= ImGui::DragFloat((id + "y").c_str(), &value->y, entry.speed, entry.min, entry.max, entry.format.c_str());
+                    valChanged |= ImGui::DragFloat((id + "y").c_str(), &value->y, entry.speed, entry.min, entry.max, fmt);
 
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(width / 4 - widthConstant);
-                    valChanged |= ImGui::DragFloat((id + "z").c_str(), &value->z, entry.speed, entry.min, entry.max, entry.format.c_str());
+                    valChanged |= ImGui::DragFloat((id + "z").c_str(), &value->z, entry.speed, entry.min, entry.max, fmt);
 
                     ImGui::SameLine();
                     ImGui::SetNextItemWidth(width / 4 - widthConstant);
-                    valChanged |= ImGui::DragFloat((id + "w").c_str(), &value->w, entry.speed, entry.min, entry.max, entry.format.c_str());
+                    valChanged |= ImGui::DragFloat((id + "w").c_str(), &value->w, entry.speed, entry.min, entry.max, fmt);
                     return valChanged;
                 }
             }
