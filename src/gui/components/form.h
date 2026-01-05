@@ -22,6 +22,8 @@
 
 #include <imgui.h>
 
+#include <IconsCodicons.h>
+
 #include <string>
 #include <variant>
 #include <vector>
@@ -71,6 +73,8 @@ namespace Marmalade::GUI::Components {
 
         ControlType control = ControlType::ControlType_DEFAULT;
 
+        bool disabled = false;
+        bool requiresRestartWarning = false;
         float min = 0;
         float max = 0;
         std::string format;
@@ -84,6 +88,16 @@ namespace Marmalade::GUI::Components {
 
         template<typename T>
         FormEntry(std::string label, T* value) : label(std::move(label)), value(value) {}
+
+        FormEntry& SetDisabled(bool disabled) {
+            this->disabled = disabled;
+            return *this;
+        }
+
+        FormEntry& SetRequiresRestartWarning(bool warning) {
+            this->requiresRestartWarning = warning;
+            return *this;
+        }
 
         FormEntry& SetControlType(const ControlType controlType) {
             control = controlType;
@@ -398,6 +412,13 @@ namespace Marmalade::GUI::Components {
                         ImGui::SetKeyboardFocusHere(0);
                     }
                     ImGui::PopStyleColor(2);
+                    if (entry.requiresRestartWarning) {
+                        const char* warning = ICON_WITH_TEXT(ICON_CI_WARNING, _("Requires restart"));
+                        float posX = ImGui::GetCursorPosX() + ImGui::GetColumnWidth() -
+                                     ImGui::CalcTextSize(warning).x - ImGui::GetStyle().FramePadding.x;
+                        ImGui::SetCursorPosX(posX);
+                        ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), warning);
+                    }
 
                     ImGui::TableSetColumnIndex(1);
 
@@ -408,10 +429,13 @@ namespace Marmalade::GUI::Components {
                         using PointerType = std::decay_t<T>;
                         using BaseType = std::remove_pointer_t<PointerType>;
 
+                        ImGui::BeginDisabled(entry.disabled);
                         if (bool valChanged = ControlRenderer<BaseType>::Draw(hiddenLabel, val, entry); valChanged && entry.valueChangeCallback) {
                             entry.valueChangeCallback();
                         }
-                    }, entry.value);
+                        ImGui::EndDisabled();
+                    },
+                               entry.value);
                     i++;
                 }
 

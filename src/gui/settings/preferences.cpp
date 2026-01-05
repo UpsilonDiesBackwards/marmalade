@@ -27,6 +27,8 @@
 #include "../../application/plugins/interfaceimpl.h"
 #include "../../application/integration.h"
 
+#include "../components/form.h"
+
 #include <imgui.h>
 #include <imgui_internal.h>
 
@@ -154,20 +156,24 @@ void Marmalade::GUI::Preferences::drawSplit() {
 #pragma region General
 
 void Marmalade::GUI::Preferences::drawGeneralLoggingPane() {
-    ImGui::Combo(_("Log Level"), reinterpret_cast<int*>(&EngineConfig::GetStoredConfig().logLevel), getLogLevels, nullptr, spdlog::level::n_levels);
-    ImGui::SameLine();
-    requiresRestartWarning();
+    Components::Form form;
+
+    std::vector<std::string> levels{"Trace", "Debug", "Info", "Warning", "Error", "Critical", "Off"};
+
+    form.AddEntry(Components::FormEntry(_("Log Level"), reinterpret_cast<int*>(&EngineConfig::GetStoredConfig().logLevel))
+                          .AsDropdown(levels)
+                          .SetRequiresRestartWarning(true));
+
+    form.DrawForm();
 }
 
 void Marmalade::GUI::Preferences::drawGeneralProjectsPane() {
-    static char defaultProjectPathC[512];
-    strncpy(defaultProjectPathC, EngineConfig::GetStoredConfig().defaultProjectPath.c_str(), sizeof(defaultProjectPathC));
+    Components::Form form;
 
-    if (ImGui::InputText(_("Default Project Path"), defaultProjectPathC, sizeof(defaultProjectPathC))) {
-        EngineConfig::GetStoredConfig().defaultProjectPath = defaultProjectPathC;
-    }
+    form.AddEntry(Components::FormEntry(_("Default Project Path"), &EngineConfig::GetStoredConfig().defaultProjectPath));
+    form.AddEntry(Components::FormEntry(_("Show Welcome Screen on Startup"), &EngineConfig::GetStoredConfig().appearance.showWelcomeScreen));
 
-    ImGui::Checkbox(_("Show Welcome Screen on Startup"), &Marmalade::EngineConfig::GetStoredConfig().appearance.showWelcomeScreen);
+    form.DrawForm();
 }
 
 void Marmalade::GUI::Preferences::drawGeneralSystemIntegrationPane() {
@@ -222,42 +228,39 @@ void Marmalade::GUI::Preferences::drawGeneralPluginsPane() {
 #pragma region User Interface
 
 void Marmalade::GUI::Preferences::drawUIAppearancePane() {
-    ImGui::Checkbox(_("ImGui Viewports"), &EngineConfig::GetStoredConfig().appearance.viewports);
-    ImGui::SameLine();
-    requiresRestartWarning();
+    Components::Form form;
 
-    static char themeFileC[512];
-    strncpy(themeFileC, EngineConfig::GetStoredConfig().appearance.themeFile.c_str(), sizeof(themeFileC));
+    form.AddEntry(Components::FormEntry(_("ImGui Viewports"), &EngineConfig::GetStoredConfig().appearance.viewports)
+                          .SetRequiresRestartWarning(true));
+    form.AddEntry(Components::FormEntry(_("Theme File"), &EngineConfig::GetStoredConfig().appearance.themeFile)
+                          .SetRequiresRestartWarning(true));
 
-    if (ImGui::InputText(_("Theme File"), themeFileC, sizeof(themeFileC))) {
-        EngineConfig::GetStoredConfig().appearance.themeFile = themeFileC;
-    }
-    ImGui::SameLine();
-    requiresRestartWarning();
-
-    if (ImGui::Button(ICON_WITH_TEXT(ICON_CI_EDIT, _("Open Style Editor")))) {
-        WindowManager::GetInstance().showStyleEditor = true;
-    }
+    Components::CustomEntry styleEditorEntry;
+    styleEditorEntry.DrawCallback = [] {
+        if (ImGui::Button(ICON_WITH_TEXT(ICON_CI_EDIT, _("Open Style Editor")))) {
+            WindowManager::GetInstance().showStyleEditor = true;
+        }
+    };
+    form.AddEntry(Components::FormEntry(_("Current Style"), &styleEditorEntry));
 
     static auto backgroundCol = ImGui::ColorConvertU32ToFloat4(EngineConfig::GetStoredConfig().appearance.backgroundColor);
-    if (ImGui::ColorEdit4(_("Background Color"), &backgroundCol.x)) {
-        EngineConfig::GetStoredConfig().appearance.backgroundColor = ImGui::ColorConvertFloat4ToU32(backgroundCol);
-    }
+    form.AddEntry(Components::FormEntry(_("Background Color"), &backgroundCol)
+                          .SetControlType(Components::ControlType::ControlType_COLOR_EDIT)
+                          .SetValueChangeCallback([] {
+                              EngineConfig::GetStoredConfig().appearance.backgroundColor = ImGui::ColorConvertFloat4ToU32(backgroundCol);
+                          }));
 
-    ImGui::BeginDisabled(EngineConfig::GetStoredConfig().appearance.useSystemScaleFactor);
-    ImGui::SetNextItemWidth(150.0f);
-    ImGui::DragFloat(_("Scale Factor"), &EngineConfig::GetStoredConfig().appearance.scaleFactor, 0.1f, 0.0f, 5.0f);
-    ImGui::EndDisabled();
+    form.AddEntry(Components::FormEntry(_("Scale Factor"), &EngineConfig::GetStoredConfig().appearance.scaleFactor)
+                          .SetDisabled(EngineConfig::GetStoredConfig().appearance.useSystemScaleFactor)
+                          .SetRange(0.25f, 5.0f));
+    form.AddEntry(Components::FormEntry(_("Use system scale cactor"), &EngineConfig::GetStoredConfig().appearance.useSystemScaleFactor)
+                          .SetRequiresRestartWarning(true));
 
-    ImGui::SameLine();
-    ImGui::Checkbox(_("Use System"), &EngineConfig::GetStoredConfig().appearance.useSystemScaleFactor);
+    form.AddEntry(Components::FormEntry(_("Invert message box button order"), &EngineConfig::GetStoredConfig().appearance.alternativeButtonOrder));
 
-    ImGui::SameLine();
-    requiresRestartWarning();
+    form.AddEntry(Components::FormEntry(_("Use native menu bar on macOS"), &EngineConfig::GetStoredConfig().appearance.useNativeMenubar));
 
-    ImGui::Checkbox(_("Invert message box button order"), &EngineConfig::GetStoredConfig().appearance.alternativeButtonOrder);
-
-    ImGui::Checkbox(_("Use native menu bar on macOS"), &EngineConfig::GetStoredConfig().appearance.useNativeMenubar);
+    form.DrawForm();
 }
 
 void Marmalade::GUI::Preferences::drawUIWorkspacesPane() {
@@ -266,32 +269,39 @@ void Marmalade::GUI::Preferences::drawUIWorkspacesPane() {
 }
 
 void Marmalade::GUI::Preferences::drawUIProjectBrowserPane() {
+    Components::Form form;
+
     static auto assetsCol = ImGui::ColorConvertU32ToFloat4(EngineConfig::GetStoredConfig().projectBrowser.colorAssets);
+    form.AddEntry(Components::FormEntry(_("Assets"), &assetsCol)
+                          .SetControlType(Components::ControlType::ControlType_COLOR_EDIT)
+                          .SetValueChangeCallback([] {
+                              EngineConfig::GetStoredConfig().projectBrowser.colorAssets = ImGui::ColorConvertFloat4ToU32(assetsCol);
+                          }));
+
     static auto dataCol = ImGui::ColorConvertU32ToFloat4(EngineConfig::GetStoredConfig().projectBrowser.colorData);
+    form.AddEntry(Components::FormEntry(_("Data"), &dataCol)
+                          .SetControlType(Components::ControlType::ControlType_COLOR_EDIT)
+                          .SetValueChangeCallback([] {
+                              EngineConfig::GetStoredConfig().projectBrowser.colorData = ImGui::ColorConvertFloat4ToU32(dataCol);
+                          }));
+
     static auto srcCol = ImGui::ColorConvertU32ToFloat4(EngineConfig::GetStoredConfig().projectBrowser.colorSrc);
+    form.AddEntry(Components::FormEntry(_("Src"), &srcCol)
+                          .SetControlType(Components::ControlType::ControlType_COLOR_EDIT)
+                          .SetValueChangeCallback([] {
+                              EngineConfig::GetStoredConfig().projectBrowser.colorSrc = ImGui::ColorConvertFloat4ToU32(srcCol);
+                          }));
 
-    if (ImGui::ColorEdit4(_("Assets"), &assetsCol.x)) {
-        EngineConfig::GetStoredConfig().projectBrowser.colorAssets = ImGui::ColorConvertFloat4ToU32(assetsCol);
-    }
-
-    if (ImGui::ColorEdit4(_("Data"), &dataCol.x)) {
-        EngineConfig::GetStoredConfig().projectBrowser.colorData = ImGui::ColorConvertFloat4ToU32(dataCol);
-    }
-
-    if (ImGui::ColorEdit4(_("Src"), &srcCol.x)) {
-        EngineConfig::GetStoredConfig().projectBrowser.colorSrc = ImGui::ColorConvertFloat4ToU32(srcCol);
-    }
+    form.DrawForm();
 }
 
 void Marmalade::GUI::Preferences::drawUILocalizationPane() {
-    static char languageC[16];
-    strncpy(languageC, EngineConfig::GetStoredConfig().appearance.language.c_str(), sizeof(languageC));
+    Components::Form form;
 
-    if (ImGui::InputText(_("Language"), languageC, sizeof(languageC))) {
-        EngineConfig::GetStoredConfig().appearance.language = languageC;
-    }
-    ImGui::SameLine();
-    requiresRestartWarning();
+    form.AddEntry(Components::FormEntry(_("Language"), &EngineConfig::GetStoredConfig().appearance.language)
+        .SetRequiresRestartWarning(true));
+
+    form.DrawForm();
 }
 
 #pragma endregion
@@ -338,30 +348,16 @@ void Marmalade::GUI::Preferences::drawAdvancedGraphicsPane() {
     ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), ICON_WITH_TEXT(ICON_CI_WARNING, _("Do not change these unless you know what you're doing!")));
 
 #undef interface
-    static char graphicsSystem[32];
-    strncpy(graphicsSystem, EngineConfig::GetStoredConfig().interface.graphicsSystem.c_str(), sizeof(graphicsSystem));
+    Components::Form form;
 
-    if (ImGui::InputText(_("System"), graphicsSystem, sizeof(graphicsSystem))) {
-        EngineConfig::GetStoredConfig().interface.graphicsSystem = graphicsSystem;
-    }
+    form.AddEntry(Components::FormEntry(_("System"), &EngineConfig::GetStoredConfig().interface.graphicsSystem));
+    form.AddEntry(Components::FormEntry(_("Version"), &EngineConfig::GetStoredConfig().interface.graphicsVersion));
 
-    static char graphicsVersion[16];
-    strncpy(graphicsVersion, EngineConfig::GetStoredConfig().interface.graphicsVersion.c_str(), sizeof(graphicsVersion));
-
-    if (ImGui::InputText(_("Version"), graphicsVersion, sizeof(graphicsVersion))) {
-        EngineConfig::GetStoredConfig().interface.graphicsVersion = graphicsVersion;
-    }
+    form.DrawForm();
 }
 
 #pragma endregion
 
 void Marmalade::GUI::Preferences::requiresRestartWarning() {
     ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), ICON_WITH_TEXT(ICON_CI_WARNING, _("Requires restart")));
-}
-
-bool Marmalade::GUI::Preferences::getLogLevels(void* data, int idx, const char** outText) {
-    static const char* levels[] = {"Trace", "Debug", "Info", "Warning", "Error", "Critical", "Off"};
-    if (idx < 0 || idx >= spdlog::level::n_levels) return false;
-    *outText = levels[idx];
-    return true;
 }

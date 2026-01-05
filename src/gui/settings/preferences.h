@@ -67,7 +67,6 @@ namespace Marmalade::GUI {
         static void drawAdvancedGraphicsPane();
 
         static void requiresRestartWarning();
-        static bool getLogLevels(void* data, int idx, const char** outText);
     };
 }
 
