@@ -264,6 +264,21 @@ if (APPLE)
     set_source_files_properties(${SOURCES} src/main.cpp PROPERTIES LANGUAGE OBJCXX)
 endif ()
 
+if (WIN32)
+    configure_file(
+            ${CMAKE_SOURCE_DIR}/misc/resources/marmalade.in.rc
+            ${CMAKE_CURRENT_BINARY_DIR}/marmalade.rc)
+
+    configure_file(
+            ${CMAKE_SOURCE_DIR}/misc/resources/marmalade.exe.manifest
+            ${CMAKE_CURRENT_BINARY_DIR}/marmalade.exe.manifest
+    )
+
+    set_target_properties(marmalade PROPERTIES
+            VS_MANIFEST_FILE "${CMAKE_CURRENT_BINARY_DIR}/marmalade.exe.manifest"
+    )
+endif()
+
 add_dependencies(marmalade po-compile)
 
 if (NOT WIN32)

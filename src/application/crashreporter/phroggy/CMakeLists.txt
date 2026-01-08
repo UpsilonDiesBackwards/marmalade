@@ -45,6 +45,19 @@ set_target_properties(marmalade_phroggy PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 if (MSVC)
+    configure_file(
+            ${CMAKE_SOURCE_DIR}/misc/resources/marmalade_phroggy.in.rc
+            ${CMAKE_CURRENT_BINARY_DIR}/phroggy.rc)
+
+    configure_file(
+            ${CMAKE_SOURCE_DIR}/misc/resources/marmalade_phroggy.exe.manifest
+            ${CMAKE_CURRENT_BINARY_DIR}/phroggy.exe.manifest
+    )
+
+    set_target_properties(marmalade_phroggy PROPERTIES
+            VS_MANIFEST_FILE "${CMAKE_CURRENT_BINARY_DIR}/phroggy.exe.manifest"
+    )
+
     target_sources(marmalade_phroggy PRIVATE
             ${CMAKE_SOURCE_DIR}/misc/resources/marmalade_phroggy.exe.manifest
             ${CMAKE_CURRENT_BINARY_DIR}/phroggy.rc)
