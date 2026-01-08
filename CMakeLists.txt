@@ -282,7 +282,7 @@ if (APPLE)
             ${RESOURCE_DEST}
     )
 
-    compile_icon(marmalade "${CMAKE_SOURCE_DIR}/misc/resources/marmalade.icon" "${CMAKE_BINARY_DIR}/marmalade.app")
+    compile_icon(marmalade marmalade_nativeui "${CMAKE_SOURCE_DIR}/misc/resources/marmalade.icon" "${CMAKE_BINARY_DIR}/marmalade.app")
 endif ()
 
 if(NOT DEFINED COMMIT_HASH)

@@ -38,7 +38,7 @@ elseif (UNIX AND NOT APPLE)
 elseif (APPLE)
     target_sources(marmalade_phroggy PRIVATE main_darwin.swift)
 
-    compile_icon(marmalade_phroggy "${CMAKE_SOURCE_DIR}/misc/resources/marmalade.icon" "${CMAKE_BINARY_DIR}/marmalade_phroggy.app")
+    compile_icon(marmalade_phroggy phroggy_nativeui "${CMAKE_SOURCE_DIR}/misc/resources/marmalade.icon" "${CMAKE_BINARY_DIR}/marmalade_phroggy.app")
 endif ()
 
 set_target_properties(marmalade_phroggy PROPERTIES

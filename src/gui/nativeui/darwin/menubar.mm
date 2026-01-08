@@ -30,6 +30,8 @@
 
 #include "../../../application/config/engineconfig.h"
 
+#include <iconmapping.h>
+
 using namespace Marmalade::GUI::NativeUI;
 
 @interface MenuCallbackTarget : NSObject
@@ -43,15 +45,38 @@ using namespace Marmalade::GUI::NativeUI;
     }
 @end
 
+struct IconResult {
+    std::string cleanLabel;
+    std::string assetName;
+};
+
+IconResult resolveIconAndCleanLabel(const std::string& input, const std::map<std::string, std::string>& mapping) {
+    NSMutableString *nsLabel = [NSMutableString stringWithUTF8String:input.c_str()];
+    std::string foundAssetName = "";
+
+    for (auto const& [iconBytes, name] : mapping) {
+        NSString *iconStr = [NSString stringWithUTF8String:iconBytes.c_str()];
+        NSRange range = [nsLabel rangeOfString:iconStr];
+
+        if (range.location != NSNotFound) {
+            foundAssetName = name;
+            [nsLabel deleteCharactersInRange:range];
+            break;
+        }
+    }
+
+    NSString *finalNSStr = [nsLabel stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+
+    return {
+        .cleanLabel = std::string([finalNSStr UTF8String]),
+        .assetName = foundAssetName
+    };
+}
+
 std::stack<void*> MenuBar::_menuStack{};
 std::map<std::string, bool> MenuBar::_clickStates{};
 std::map<std::string, void*> MenuBar::_nativeItems{};
 std::vector<void*> MenuBar::_menuTargets{};
-
-static std::map<std::string, std::string> s_IconToSFSymbol = {
-    {ICON_CI_ADD, "doc.badge.plus"},
-    {ICON_CI_BLANK, ""}
-};
 
 bool MenuBar::BeginMainMenuBar() {
     return ImGui::BeginMainMenuBar();
@@ -67,14 +92,22 @@ bool MenuBar::BeginMenu(const char* label) {
     }
 
     NSMenu *currentParent = MenuBar::_menuStack.empty() ? [NSApp mainMenu] : (NSMenu*)_menuStack.top();
-    NSString *title = [NSString stringWithUTF8String:label];
+    auto iconResult = resolveIconAndCleanLabel(label, s_IconToAssetName);
 
-    NSMenuItem *item = [currentParent itemWithTitle:title];
+    NSMenuItem *item = [currentParent itemWithTitle:[NSString stringWithUTF8String:iconResult.cleanLabel.c_str()]];
     if (!item) {
-        item = [currentParent addItemWithTitle:title action:nil keyEquivalent:@""];
-        NSMenu *newSubmenu = [[NSMenu alloc] initWithTitle:title];
+        item = [currentParent addItemWithTitle:[NSString stringWithUTF8String:iconResult.cleanLabel.c_str()] action:nil keyEquivalent:@""];
+        NSMenu *newSubmenu = [[NSMenu alloc] initWithTitle:[NSString stringWithUTF8String:iconResult.cleanLabel.c_str()]];
         [newSubmenu setAutoenablesItems:NO];
         [item setSubmenu:newSubmenu];
+
+        if (!iconResult.assetName.empty()) {
+            NSImage *image = [NSImage imageNamed:[NSString stringWithUTF8String:iconResult.assetName.c_str()]];
+            if (image) {
+                [image setSize:NSMakeSize(16, 16)];
+                item.image = image;
+            }
+        }
     }
 
     MenuBar::_menuStack.push((__bridge void*)[item submenu]);
@@ -99,32 +132,10 @@ bool MenuBar::MenuItem(const char *label, const char* shortcut, bool* p_selected
     }
 
     std::string key = label;
-    NSMutableString* nsLabel = [NSMutableString stringWithUTF8String:label];
-
-    // Replace unicode font symbols with SF symbols
-    NSString* symbolName = nil;
-    for (auto const& [icon, symbol] : s_IconToSFSymbol) {
-        NSRange range = [nsLabel rangeOfString:[NSString stringWithUTF8String:icon.c_str()]];
-        if (range.location != NSNotFound) {
-            symbolName = [NSString stringWithUTF8String:symbol.c_str()];
-            [nsLabel deleteCharactersInRange:range];
-            break;
-        }
-    }
-
-    // Remove unknown unicode font symbols
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"[\\uE000-\\uF8FF]"
-                                                                           options:0
-                                                                             error:nil];
-    [regex replaceMatchesInString:nsLabel
-                          options:0
-                            range:NSMakeRange(0, [nsLabel length])
-                     withTemplate:@""];
-
-    NSString* cleanTitle = [nsLabel stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    auto iconResult = resolveIconAndCleanLabel(label, s_IconToAssetName);
 
     NSMenu *currentParent = (NSMenu*)MenuBar::_menuStack.top();
-    NSMenuItem *item = [currentParent itemWithTitle:cleanTitle];
+    NSMenuItem *item = [currentParent itemWithTitle:[NSString stringWithUTF8String:iconResult.cleanLabel.c_str()]];
     if (!item) {
         MenuCallbackTarget *target = [[MenuCallbackTarget alloc] init];
         target.callback = ^() {
@@ -135,16 +146,17 @@ bool MenuBar::MenuItem(const char *label, const char* shortcut, bool* p_selected
         };
         MenuBar::_menuTargets.push_back((__bridge_retained void*)target);
 
-        NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:cleanTitle
+        NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:[NSString stringWithUTF8String:iconResult.cleanLabel.c_str()]
         action:@selector(onMenuClick:)
         keyEquivalent:@""];
 
         [item setTarget:target];
 
-        if (symbolName) {
-            if (@available(macOS 11.0, *)) {
-                item.image = [NSImage imageWithSystemSymbolName:symbolName
-                                         accessibilityDescription:nil];
+        if (!iconResult.assetName.empty()) {
+            NSImage *image = [NSImage imageNamed:[NSString stringWithUTF8String:iconResult.assetName.c_str()]];
+            if (image) {
+                [image setSize:NSMakeSize(16, 16)];
+                item.image = image;
             }
         }
 
