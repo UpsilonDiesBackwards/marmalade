@@ -33,12 +33,38 @@
 
 #include <fstream>
 
+
+void Marmalade::GUI::AboutLicensesSplitter::DrawLeftPane() {
+    try {
+        _packages = loadPackages("res/packages.json");
+        for (const auto& key: _packages | std::views::keys) {
+            if (ImGui::Selectable(key.c_str(), _selectedItem == key)) {
+                _selectedItem = key;
+            }
+        }
+    } catch (const std::exception& ex) {
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s", ex.what());
+    }
+}
+
+void Marmalade::GUI::AboutLicensesSplitter::DrawRightPane() {
+    if (_selectedItem.empty()) {
+        ImGui::Text("Select an item on the left");
+    } else {
+        if (const auto pkg = _packages.find(_selectedItem); pkg != _packages.end()) {
+            ImGui::Text("%s", pkg->second.license.c_str());
+        } else {
+            ImGui::Text("License text does not exist");
+        }
+    }
+}
+
 /**
  * \brief Loads the information about packages included in the current project
  * \param filename File path of the packages.json file
- * \return std::vector<Marmalade::GUI::About::Package> Vector of packages included in the current project
+ * \return std::map<std::string, Marmalade::GUI::AboutLicensesSplitter::Package> Map of packages included in the current project
  */
-std::vector<Marmalade::GUI::About::Package> Marmalade::GUI::About::loadPackages(const std::string& filename) {
+std::map<std::string, Marmalade::GUI::AboutLicensesSplitter::Package> Marmalade::GUI::AboutLicensesSplitter::loadPackages(const std::string& filename) {
     std::ifstream file(filename);
     if (!file) {
         throw std::runtime_error("Failed to read licenses");
@@ -47,9 +73,9 @@ std::vector<Marmalade::GUI::About::Package> Marmalade::GUI::About::loadPackages(
     nlohmann::json package_json;
     file >> package_json;
 
-    std::vector<Package> packages;
+    std::map<std::string, Package> packages;
     for (const auto& pkg: package_json["packages"]) {
-        packages.push_back({pkg["name"], pkg["license"]});
+        packages.insert({pkg["name"], {pkg["name"], pkg["license"]}});
     }
 
     return packages;
@@ -90,21 +116,7 @@ void Marmalade::GUI::About::Draw() {
         if (ImGui::BeginTabItem("3rd Party Licenses")) {
             ImGui::Text("Marmalade Engine would not be possible without the following libraries:");
 
-            if (ImGui::BeginTabBar("AboutPackagesTabs")) {
-                try {
-                    static std::vector<Package> packages = loadPackages("res/packages.json");
-                    for (const auto& pkg: packages) {
-                        if (ImGui::BeginTabItem(pkg.name.c_str())) {
-                            ImGui::Text("%s", pkg.license.c_str());
-
-                            ImGui::EndTabItem();
-                        }
-                    }
-                } catch (const std::exception& ex) {
-                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s", ex.what());
-                }
-                ImGui::EndTabBar();
-            }
+            _splitter.Draw();
 
             ImGui::EndTabItem();
         }

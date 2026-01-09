@@ -21,26 +21,42 @@
 #define MARMALADE_GUI_ABOUT_H
 
 #include "../window.h"
+#include "../components/splitter.h"
 
+#include <map>
 #include <string>
-#include <vector>
 
 namespace Marmalade::GUI {
-    /**
-     * \brief Code for the 'About' GUI window
-     * \brief Shows the engine information, license information for packages and contributor names 
-     */
-    class About : public Window {
+    class AboutLicensesSplitter : public Components::Splitter {
     public:
         struct Package {
             std::string name;
             std::string license;
         };
 
+        explicit AboutLicensesSplitter() : Splitter("AboutLicenses") {}
+
+        void DrawLeftPane() override;
+        void DrawRightPane() override;
+
+    private:
+        std::map<std::string, Package> _packages{};
+        std::string _selectedItem{};
+
+        std::map<std::string, Package> loadPackages(const std::string& filename);
+    };
+
+    /**
+     * \brief Code for the 'About' GUI window
+     * \brief Shows the engine information, license information for packages and contributor names 
+     */
+    class About : public Window {
+    public:
         void Draw() override;
 
     private:
-        std::vector<Package> loadPackages(const std::string& filename);
+        AboutLicensesSplitter _splitter{};
+
     };
 }
 
