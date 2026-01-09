@@ -30,43 +30,12 @@
 #include "../components/form.h"
 
 #include <imgui.h>
-#include <imgui_internal.h>
 
 #include <IconsCodicons.h>
 
 #include <spdlog/spdlog.h>
 
-Marmalade::GUI::Preferences::Preferences() : Window() {
-    _panes = {
-            {"logging", PreferencesPane(drawGeneralLoggingPane)},
-            {"projects", PreferencesPane(drawGeneralProjectsPane)},
-            {"systemIntegration", PreferencesPane(drawGeneralSystemIntegrationPane)},
-            {"appearance", PreferencesPane(drawUIAppearancePane)},
-            {"workspaces", PreferencesPane(drawUIWorkspacesPane)},
-            {"projectBrowser", PreferencesPane(drawUIProjectBrowserPane)},
-            {"localization", PreferencesPane(drawUILocalizationPane)},
-            {"plugins", PreferencesPane(drawGeneralPluginsPane)},
-            {"input/output", PreferencesPane(drawAudioInputOutputPane)},
-            {"graphics", PreferencesPane(drawAdvancedGraphicsPane)}};
-}
-
-void Marmalade::GUI::Preferences::Draw() {
-    ImGui::SetNextWindowSize(ImVec2(800, 500), ImGuiCond_FirstUseEver);
-
-    WINDOW_BEGIN(ICON_WITH_TEXT(ICON_CI_SETTINGS_GEAR, _("Preferences")), ImGuiWindowFlags_NoDocking)
-
-    drawSplit();
-
-    WINDOW_END()
-}
-
-void Marmalade::GUI::Preferences::selectableTreeNode(const char* title, const char* id) {
-    if (ImGui::Selectable(title, _selectedItem == id)) {
-        _selectedItem = id;
-    }
-}
-
-void Marmalade::GUI::Preferences::drawLeftPane() {
+void Marmalade::GUI::PreferencesSplitter::DrawLeftPane() {
     if (ImGui::TreeNodeEx(pgettext("Preferences|", "General"), ImGuiTreeNodeFlags_DefaultOpen)) {
         selectableTreeNode(pgettext("Preferences|General|", "Logging"), "logging");
         selectableTreeNode(pgettext("Preferences|General|", "Projects"), "projects");
@@ -98,9 +67,9 @@ void Marmalade::GUI::Preferences::drawLeftPane() {
     }
 }
 
-void Marmalade::GUI::Preferences::drawRightPane() {
-    if (_panes.contains(_selectedItem)) {
-        _panes[_selectedItem].DrawFunc();
+void Marmalade::GUI::PreferencesSplitter::DrawRightPane() {
+    if (panes.contains(selectedItem)) {
+        panes[selectedItem].DrawFunc();
     }
 
     // Position Save button at bottom right
@@ -110,7 +79,7 @@ void Marmalade::GUI::Preferences::drawRightPane() {
     if (ImGui::Button(_("Save"))) {
         Marmalade::EngineConfig::GetInstance().SaveConfig();
 
-        for (auto& pane: _panes) {
+        for (auto& pane: panes) {
             if (pane.second.SaveFunc) {
                 pane.second.SaveFunc();
             }
@@ -118,39 +87,34 @@ void Marmalade::GUI::Preferences::drawRightPane() {
     }
 }
 
-void Marmalade::GUI::Preferences::drawSplit() {
-    ImVec2 area = ImGui::GetContentRegionAvail();
-
-    static float split_ratio = 0.3f;
-    static float min_size = 50.0f;
-
-    float left_width = area.x * split_ratio;
-    float right_width = area.x - left_width - 4.0f;
-
-    left_width = ImMax(left_width, min_size);
-    right_width = ImMax(right_width, min_size);
-
-    ImGui::BeginChild("PreferencesLeftPane", ImVec2(left_width, area.y), true);
-    drawLeftPane();
-    ImGui::EndChild();
-
-    ImGui::SameLine(0.0f, 0.0f);
-    ImGui::InvisibleButton("##PreferencesSplitter", ImVec2(8.0f, area.y), ImGuiButtonFlags_None);
-
-    if (ImGui::IsItemHovered()) {
-        ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
+void Marmalade::GUI::PreferencesSplitter::selectableTreeNode(const char* title, const char* id) {
+    if (ImGui::Selectable(title, selectedItem == id)) {
+        selectedItem = id;
     }
+}
 
-    if (ImGui::IsItemActive()) {
-        ImGuiIO& io = ImGui::GetIO();
-        split_ratio += io.MouseDelta.x / area.x;
-        split_ratio = ImClamp(split_ratio, min_size / area.x, 1.0f - min_size / area.x);
-    }
+Marmalade::GUI::Preferences::Preferences() : Window() {
+    _splitter.panes = {
+            {"logging", PreferencesPane(drawGeneralLoggingPane)},
+            {"projects", PreferencesPane(drawGeneralProjectsPane)},
+            {"systemIntegration", PreferencesPane(drawGeneralSystemIntegrationPane)},
+            {"appearance", PreferencesPane(drawUIAppearancePane)},
+            {"workspaces", PreferencesPane(drawUIWorkspacesPane)},
+            {"projectBrowser", PreferencesPane(drawUIProjectBrowserPane)},
+            {"localization", PreferencesPane(drawUILocalizationPane)},
+            {"plugins", PreferencesPane(drawGeneralPluginsPane)},
+            {"input/output", PreferencesPane(drawAudioInputOutputPane)},
+            {"graphics", PreferencesPane(drawAdvancedGraphicsPane)}};
+}
 
-    ImGui::SameLine(0.0f, 0.0f);
-    ImGui::BeginChild("PreferencesRightPane", ImVec2(right_width, area.y), true);
-    drawRightPane();
-    ImGui::EndChild();
+void Marmalade::GUI::Preferences::Draw() {
+    ImGui::SetNextWindowSize(ImVec2(800, 500), ImGuiCond_FirstUseEver);
+
+    WINDOW_BEGIN(ICON_WITH_TEXT(ICON_CI_SETTINGS_GEAR, _("Preferences")), ImGuiWindowFlags_NoDocking)
+
+    _splitter.Draw();
+
+    WINDOW_END()
 }
 
 #pragma region General
@@ -299,7 +263,7 @@ void Marmalade::GUI::Preferences::drawUILocalizationPane() {
     Components::Form form;
 
     form.AddEntry(Components::FormEntry(_("Language"), &EngineConfig::GetStoredConfig().appearance.language)
-        .SetRequiresRestartWarning(true));
+                          .SetRequiresRestartWarning(true));
 
     form.DrawForm();
 }

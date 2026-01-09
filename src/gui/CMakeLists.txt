@@ -10,6 +10,8 @@ list(APPEND ENGINE_SRC_GUI
         components/markdownparser.cpp
         components/markdownparser.h
         components/form.h
+        components/splitter.cpp
+        components/splitter.h
 
         dialogs/about.cpp
         dialogs/about.h

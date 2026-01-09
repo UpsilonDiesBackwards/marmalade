@@ -21,21 +21,38 @@
 #define MARMALADE_GUI_SETTINGS_H
 
 #include "../window.h"
+#include "../components/splitter.h"
 
 #include <string>
 #include <unordered_map>
 #include <functional>
 
 namespace Marmalade::GUI {
+    struct PreferencesPane {
+        std::function<void()> DrawFunc{};
+        std::function<void()> SaveFunc{};
+
+        PreferencesPane() = default;
+
+        explicit PreferencesPane(const std::function<void()>& drawFunc) : DrawFunc(drawFunc) {}
+    };
+
+    class PreferencesSplitter : public Components::Splitter {
+    public:
+        explicit PreferencesSplitter() : Splitter("Preferences") {}
+
+        void DrawLeftPane() override;
+        void DrawRightPane() override;
+
+        std::string selectedItem{};
+        std::unordered_map<std::string, PreferencesPane> panes{};
+
+    private:
+        void selectableTreeNode(const char* title, const char* id);
+    };
+
     class Preferences : public Window {
-        struct PreferencesPane {
-            std::function<void()> DrawFunc{};
-            std::function<void()> SaveFunc{};
 
-            PreferencesPane() {};
-
-            explicit PreferencesPane(const std::function<void()>& drawFunc) : DrawFunc(drawFunc) {}
-        };
 
     public:
         explicit Preferences();
@@ -43,14 +60,7 @@ namespace Marmalade::GUI {
         void Draw() override;
 
     private:
-        std::string _selectedItem{};
-
-        std::unordered_map<std::string, PreferencesPane> _panes{};
-
-        void selectableTreeNode(const char* title, const char* id);
-        void drawLeftPane();
-        void drawRightPane();
-        void drawSplit();
+        PreferencesSplitter _splitter{};
 
         static void drawGeneralLoggingPane();
         static void drawGeneralProjectsPane();
