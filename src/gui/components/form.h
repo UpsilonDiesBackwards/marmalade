@@ -24,6 +24,8 @@
 
 #include <IconsCodicons.h>
 
+#include <ImGuiFileDialog.h>
+
 #include <string>
 #include <variant>
 #include <vector>
@@ -45,6 +47,8 @@ namespace Marmalade::GUI::Components {
         ControlType_XY,
         ControlType_Multiline,
         ControlType_DROPDOWN,
+        ControlType_FILE_PICKER,
+        ControlType_DIR_PICKER,
     };
 
     using EntryValuePtr = std::variant<bool*, int*, float*, ImVec4*, std::string*, CustomEntry*>;
@@ -82,6 +86,9 @@ namespace Marmalade::GUI::Components {
         float stepFast = 0;
         float speed = 1;
         float maxWidth = -FLT_MIN;
+        std::string fileDialogTitle;
+        std::string fileDialogFilter;
+
         std::vector<std::string> dropdownOptions;
 
         std::function<void()> valueChangeCallback = nullptr;
@@ -128,6 +135,12 @@ namespace Marmalade::GUI::Components {
 
         FormEntry& SetMaxWidth(const float maxWidth) {
             this->maxWidth = maxWidth;
+            return *this;
+        }
+
+        FormEntry& SetFileDialogOptions(const std::string& title, const std::string& filter) {
+            this->fileDialogTitle = title;
+            this->fileDialogFilter = filter;
             return *this;
         }
 
@@ -345,6 +358,9 @@ namespace Marmalade::GUI::Components {
         }
 
         static bool Draw(const std::string& id, std::string* value, const FormEntry& entry) {
+            float availableWidth = ImGui::GetContentRegionAvail().x;
+            auto isFilePathControl = entry.control == ControlType::ControlType_FILE_PICKER || entry.control == ControlType::ControlType_DIR_PICKER;
+
             ImGuiInputTextFlags flags = ImGuiInputTextFlags_CallbackResize;
 
             auto buf = value->data();
@@ -354,7 +370,30 @@ namespace Marmalade::GUI::Components {
                 return ImGui::InputTextMultiline(id.c_str(), buf, buf_size, ImVec2(0, 0), flags, TextInputCallback, value);
             }
 
-            return ImGui::InputText(id.c_str(), buf, buf_size, flags, TextInputCallback, value);
+            if (isFilePathControl) {
+                ImGui::SetNextItemWidth(availableWidth - (125 + ImGui::GetStyle().ItemSpacing.x));
+            }
+
+            bool textChanged = ImGui::InputText(id.c_str(), buf, buf_size, flags, TextInputCallback, value);
+
+            if (isFilePathControl) {
+                IGFD::FileDialogConfig config = WindowManager::PrepareFileDialogConfig();
+                auto dialog = WindowManager::GetInstance().RegisterFileDialog(id + "FileDialog", [value](bool result, void* data) {
+                    if (result == true) {
+                        const auto* fileResult = static_cast<WindowManager::FileDialogResult*>(data);
+                        if (value != nullptr) {
+                            *value = fileResult->FilePath;
+                        }
+                    }
+                });
+
+                ImGui::SameLine();
+                if (ImGui::Button(("Browse...##" + id + "BrowseBtn").c_str(), ImVec2(125, 0))) {
+                    ImGuiFileDialog::Instance()->OpenDialog(dialog.Name, entry.fileDialogTitle, entry.fileDialogFilter.c_str(), config);
+                }
+            }
+
+            return textChanged;
         }
     };
 
