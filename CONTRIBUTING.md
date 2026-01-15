@@ -40,6 +40,63 @@ class SomeClass {
 };
 ```
 
+## Project Structure
+
+The project uses the following directories:
+
+- `.github`: GitHub CI workflows.
+- `.idea`: Shared IntelliJ settings.
+- `cmake`: CMake extensions.
+- `include`: Marmalade Engine API headers. These must be C headers.
+- `misc`: Miscellaneous (docs, compilation resources).
+- `packages`: Built-in Marmalade Engine packages.
+- `patches`: Patches for vendored submodules.
+- `plugins`: Built-in Marmalade Engine plugins.
+- `po`: Localisation files.
+- `res`: Runtime resources. This whole directory will be copied to build directory.
+- `src`: Marmalade Engine sources. Each directory is typically its own subsystem:
+  - `animation`: Animations.
+  - `application`: Core application code, e.g. logging, config, init, utilities
+  - `audio`: Marmalade Engine audio subsystem.
+  - `ecs`: Entity component system.
+  - `graphics`: Marmalade Engine graphics subsystem.
+  - `gui`: Marmalade Engine GUI.
+  - `io`: [subject to change] Input code.
+  - `mathematics`: Marmalade Engine mathematics library (MEGA branch).
+  - `packages`: Package manager
+  - `physics`
+  - `project`: Project management
+  - `scene`: Scene management
+- `toolchains`: CMake toolchain definitions.
+- `tools`: Various development utilities for Marmalade Engine.
+- `vendor`: Vendored submodules.
+
+## Commit Messages
+
+Commit messages should use the following format:
+
+```
+<type>(<scope>): <summary>
+
+[description]
+```
+
+The scope is typically the directory or system affected in the commit.
+
+### Commit Types
+
+| Type       | Description                                                                |
+|------------|----------------------------------------------------------------------------|
+| `feat`     | A new feature, or modification to an existing feature                      |
+| `fix`      | A bug fix                                                                  |
+| `refactor` | Code refactoring that doesn’t change behavior (e.g., structure or cleanup) |
+| `chore`    | Non-code changes (e.g., updating README, versioning, or metadata)          |
+| `docs`     | Documentation-only changes                                                 |
+| `style`    | Code style or formatting changes (no logic changes)                        |
+| `test`     | Adding or updating tests                                                   |
+| `perf`     | Performance improvements                                                   |
+| `build`    | Changes to build scripts or dependencies                                   |
+
 # Localisation
 
 Any string displayed in the UI must be translatable. Make sure to include the `application/i18n.h` header.
@@ -63,7 +120,8 @@ pgettext("File|", "Print")
 
 Include the trailing `|` if the context is a menu.
 
-Finally, you can include messages for translators at any time, by appending `Translators: ` to be the beginning of your comment:
+Finally, you can include messages for translators at any time, by appending `Translators: ` to be the beginning of your
+comment:
 
 ```c++
 /* Translators: This is the verb, not the noun */
