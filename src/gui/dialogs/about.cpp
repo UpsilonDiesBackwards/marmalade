@@ -74,8 +74,11 @@ std::map<std::string, Marmalade::GUI::AboutLicensesSplitter::Package> Marmalade:
     file >> package_json;
 
     std::map<std::string, Package> packages;
-    for (const auto& pkg: package_json["packages"]) {
-        packages.insert({pkg["name"], {pkg["name"], pkg["license"]}});
+    for (const auto& pkg : package_json["packages"]) {
+        packages.insert({
+            pkg["name"].get<std::string>(),
+            { pkg["name"].get<std::string>(), pkg["license"].get<std::string>() }
+        });
     }
 
     return packages;
