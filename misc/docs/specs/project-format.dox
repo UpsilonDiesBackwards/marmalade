@@ -1,0 +1,347 @@
+/** \page spec-project-format Project Format
+
+A Marmalade Project by definition is a directory containing a `project.marmalade` file. The general file tree is as follows:
+
+Directories are specified with `[d]`. Hidden files and directories are prefixed with `.`.
+
+```
+[d] Project Directory
+|-- [d] .marm
+|   |-- .gitignore
+|   |-- assets.marm
+|   |-- packages.marm
+|   |-- settings.marm
+|   |-- toolchains.marm
+|   |-- user.marm
+|   |-- [other settings].marm
+|   |-- index.marmdb
+|-- [d] assets
+|-- [d] data
+|-- [d] logs
+|-- [d] packages
+|-- [d] src
+|-- project.marmalade
+```
+
+\section conventions Conventions
+
+JSON property keys are in `lowerCamelCase`, to match Marmalade's C++ naming conventions.
+
+JSON files should contain the following properties as a minimum:
+
+<table>
+<tr>
+<th>Key</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>`type`</td>
+<td>The namespaced type of the file schema. E.g. `Marmalade::Project::Settings`.</td>
+</tr>
+<tr>
+<td>`version`</td>
+<td>The version of the file schema. Allows automatic migrations when using the `Marmalade::Config` class.</td>
+</tr>
+</table>
+
+\section marm-dir The .marm Directory
+
+The `.marm` directory contains internal settings for the project. Each .marm file is a JSON file, with the usual `type` and `version` properties.
+
+The name of each file in this directory is specified in the `project.marmalade` file.
+
+\subsection marm-gitignore .gitignore
+
+Contains files that should not be tracked in VCS.
+
+File contents should be:
+```
+user.marm
+index.marmdb
+```
+
+\subsection marm-assets assets.marm
+
+Storage of asset UUIDs to their locations. Locations could be on the local file system, or virtual such as when using Marmalade Collaboration services.
+
+When an asset is added to the project, a UUID is assigned and added to this file. That UUID is used wherever this asset is needed to be referenced.
+
+An index is generated in the index.marmdb file automatically.
+
+An example is below. Note that other than the `filesystem` driver, other driver names are not finalised, nor are yet implemented.
+```json
+{
+    "version": 1,
+    "type": "Marmalade::Project::Assets",
+    "assets": [
+        {
+            "uuid": "0169a235-dc55-42ba-985f-5a3bf5908f5c",
+            "description": "Texture of a teapot",
+            "path": "textures/teapot.png"
+            "location": {
+                "driver": "filesystem",
+                "path": "textures/teapot.png"
+            }
+        },
+        {
+            "uuid": "3bd00901-035e-487a-96b1-4a5d00c39649",
+            "description": "Model for a monkey.",
+            "path": "models/monkey.obj"
+            "location": {
+                "driver": "remote",
+                "path": "ftp://myserver/monkey.obj"
+            }
+        }
+    ]
+}
+
+Path relative to assets
+```
+
+<table>
+<tr>
+<th>Key</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>`assets`</td>
+<td>An array of assets in the project. Each object contains the following properties:</br>
+    <table>
+    <tr>
+    <th>Key</th>
+    <th>Description</th>
+    </tr>
+    <tr>
+    <td>`uuid`</td>
+    <td>The unique UUID identifying the asset.</td>
+    </tr>
+    <tr>
+    <td>`description`</td>
+    <td>The description of the asset.</td>
+    </tr>
+    <tr>
+    <td>`path`</td>
+    <td>The path the asset is 'mounted', relative to the project `assets` directory.</td>
+    </tr>
+    <tr>
+    <td>`location`</td>
+    <td>Location object, containing the driver name and where to find the file.</td>
+    </tr>
+    </table>
+</td>
+</tr>
+</table>
+
+\subsection marm-packages packages.marm
+
+The schema of this file is not yet planned, but will most likely contain the list of packages, required plugins, and/or bundles, and their required versions.
+
+It will also contain the version of the installed packages, similar to a .lock file used in other package managers.
+
+\subsection marm-settings settings.marm
+
+The schema of this file is most likely to change.
+
+Example:
+
+```json
+{
+    "version": 1,
+    "type": "Marmalade::Project::Settings",
+    "productName": "My Project",
+    "companyName": "Example Company",
+    "description": "A Marmalade project"
+}
+```
+
+<table>
+<tr>
+<th>Key</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>`productName`</td>
+<td>The name of the finished product. As opposed to `name` in `project.marmalade`, this is the name given to built binaries.</td>
+</tr>
+<tr>
+<td>`companyName`</td>
+<td>The company that owns the project.</td>
+</tr>
+<tr>
+<td>`description`</td>
+<td>The description of the project.</td>
+</tr>
+</table>
+
+\subsection marm-toolchains toolchains.marm
+
+The schema of this file is not yet planned.
+
+\subsection marm-user user.marm
+
+Contains local user settings. This is not tracked in VCS.
+
+The schema is not yet planned, but will be of type `Marmalade::Project::UserSettings` and contain properties such as `openTabs`, `currentScene` etc.
+
+\subsection marm-index index.marmdb
+
+A SQLite database for enabling fast lookups. This is not tracked in VCS, and instead generated locally.
+
+There will be an option in the Marmalade UI to regenerate the indices, this will delete this file and generate it again.
+
+The tables and columns of this file are not finalised.
+
+Contains the following tables and columns:
+
+<table>
+<tr>
+<th>Table</th>
+<th>Description</th>
+<th>Column Name</th>
+<th>Column Description</th>
+</tr>
+<tr>
+<td rowspan="2">`assets`</td>
+<td rowspan="2">Index of assets, generated from the `assets.marm` file.</td>
+<td>`uuid`</td>
+<td>PK. UUID of the asset.</td>
+</tr>
+<tr>
+<td>`path`</td>
+<td>Virtual 'mounted' path to the asset.</td>
+<tr>
+<td rowspan="2">`scenes`</td>
+<td rowspan="2">Index of scenes, generated by scanning the `data` directory.</td>
+<td>`uuid`</td>
+<td>PK. UUID of the scene.</td>
+</tr>
+<tr>
+<td>`name`</td>
+<td>Name of the scene.</td>
+</tr>
+<tr>
+<td rowspan="2">`entities`</td>
+<td rowspan="2">Index of entities, generated by scanning the `data` directory.</td>
+<td>`uuid`</td>
+<td>PK. UUID of the entity.</td>
+</tr>
+<tr>
+<td>`name`</td>
+<td>Name of the entity.</td>
+</tr>
+</table>
+
+\section assets-dir The assets Directory
+
+Contains assets imported into the project, externally edited.
+
+Textures, models, fonts, sounds, videos, etc.
+
+A lot of the files in this directory will be tracked with Git LFS; if they are on the file system at all.
+
+Typically these will be stored in the cloud, and a 'virtual item' will be displayed ('mounted') in the Marmalade project
+browser at the `path` in `assets.marm`. The actual file will be managed by Marmalade Collaboration services, allowing
+real-time development with artists and programmers.
+
+\section data-dir The data Directory
+
+Objects created inside Marmalade, stored as JSON files, with the filename being the UUID.
+
+These are not designed to be edited outside Marmalade.
+
+Scenes, entities, animation drivers, etc.
+
+\section logs-dir The logs Directory
+
+Logs from running the project. Engine logs are stored globally.
+
+\section packages-dir The packages Directory
+
+Packages vendored into the project directory. This should not be tracked in VCS.
+
+\section src-dir The src Directory
+
+Source code and scripts for the project.
+
+\section project-marmalade .gitignore
+
+Global project gitignore.
+
+File contents should be:
+
+```
+packages/
+```
+
+\section project-marmalade project.marmalade
+
+This is the file users selected when opening a project. It encapsulates everything to do with the project.
+
+```json
+{
+    "version": 1,
+    "type": "Marmalade::Project",
+    "name": "My Project",
+    "paths": {
+        "assets": ".marm/assets.marm",
+        "packages": ".marm/packages.marm",
+        "settings": ".marm/settings.marm"
+        "toolchains": ".marm/toolchains.marm",
+        "user": ".marm/user.marm",
+        "index": ".marm/index.marmdb"
+    },
+    "uuid": "f87f279c-fa5c-4736-b320-000050ff3692",
+}
+```
+
+<table>
+<tr>
+<th>Key</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>`name`</td>
+<td>The name of the project. As opposed to `productName` in `settings.marm`, this is the developer's name of the project, and is never seen by end users.</td>
+</tr>
+<tr>
+<td>`paths`</td>
+<td>A list of paths to the settings files.<br/>
+    <table>
+    <tr>
+    <th>Key</th>
+    <th>Description</th>
+    </tr>
+    <tr>
+    <td>`assets`</td>
+    <td>Path to the assets.marm file.</td>
+    </tr>
+    <tr>
+    <td>`packages`</td>
+    <td>Path to the packages.marm file.</td>
+    </tr>
+    <tr>
+    <td>`settings`</td>
+    <td>Path to the settings.marm file.</td>
+    </tr>
+    <tr>
+    <td>`toolchains`</td>
+    <td>Path to the toolchains.marm file.</td>
+    </tr>
+    <tr>
+    <td>`user`</td>
+    <td>Path to the user.marm file.</td>
+    </tr>
+    <tr>
+    <td>`index`</td>
+    <td>Path to the index.marmdb file.</td>
+    </tr>
+    </table>
+</td>
+</tr>
+<tr>
+<td>`uuid`</td>
+<td>A unique UUID identifying the project. This is generated on project creation and never changed.</td>
+</tr>
+</table>
+
+*/
