@@ -101,6 +101,11 @@ bool MenuBar::BeginMenu(const char* label) {
         [newSubmenu setAutoenablesItems:NO];
         [item setSubmenu:newSubmenu];
 
+        if (currentParent == [NSApp mainMenu] && iconResult.cleanLabel == "Window") {
+            // Set system window menu
+            [NSApp setWindowsMenu:newSubmenu];
+        }
+
         if (!iconResult.assetName.empty()) {
             NSImage *image = [NSImage imageNamed:[NSString stringWithUTF8String:iconResult.assetName.c_str()]];
             if (image) {
