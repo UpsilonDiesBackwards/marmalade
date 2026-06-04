@@ -31,6 +31,7 @@ namespace Marmalade::Project {
             P project(name, filePath);
             project.CreateEmptyProject(creationOptions);
             project.SaveProjectSettings();
+            project.CloseDatabase();
             return project;
         }
 
@@ -39,6 +40,7 @@ namespace Marmalade::Project {
             project.projectMarmalade->LoadConfig(&GUI::WindowManager::GetInstance().configErrorDlg);
             project.LoadProjectSettings(&GUI::WindowManager::GetInstance().configErrorDlg);
             project.LoadProjectPackages();
+            project.InitDatabase();
             return project;
         }
 

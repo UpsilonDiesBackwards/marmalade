@@ -80,6 +80,8 @@ list(APPEND ENGINE_SRC
         project/projectmanager.h
         project/projectscenes.cpp
         project/projectscenes.h
+        project/index.h
+        project/index.cpp
 
         physics/2d/physicsengine2d.cpp
         physics/2d/collisionevent2d.cpp

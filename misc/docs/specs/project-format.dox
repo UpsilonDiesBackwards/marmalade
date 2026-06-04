@@ -11,7 +11,7 @@ Directories are specified with `[d]`. Hidden files and directories are prefixed 
 |   |-- assets.marm
 |   |-- packages.marm
 |   |-- settings.marm
-|   |-- toolchains.marm
+|   |-- schemes.marm
 |   |-- user.marm
 |   |-- [other settings].marm
 |   |-- index.marmdb
@@ -173,7 +173,7 @@ Example:
 </tr>
 </table>
 
-\subsection marm-toolchains toolchains.marm
+\subsection marm-schemes schemes.marm
 
 The schema of this file is not yet planned.
 
@@ -285,8 +285,8 @@ This is the file users selected when opening a project. It encapsulates everythi
     "paths": {
         "assets": ".marm/assets.marm",
         "packages": ".marm/packages.marm",
+        "schemes": ".marm/schemes.marm",
         "settings": ".marm/settings.marm"
-        "toolchains": ".marm/toolchains.marm",
         "user": ".marm/user.marm",
         "index": ".marm/index.marmdb"
     },
@@ -320,12 +320,12 @@ This is the file users selected when opening a project. It encapsulates everythi
     <td>Path to the packages.marm file.</td>
     </tr>
     <tr>
-    <td>`settings`</td>
-    <td>Path to the settings.marm file.</td>
+    <td>`schemes`</td>
+    <td>Path to the schemes.marm file.</td>
     </tr>
     <tr>
-    <td>`toolchains`</td>
-    <td>Path to the toolchains.marm file.</td>
+    <td>`settings`</td>
+    <td>Path to the settings.marm file.</td>
     </tr>
     <tr>
     <td>`user`</td>

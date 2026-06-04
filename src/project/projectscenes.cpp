@@ -171,15 +171,12 @@ std::shared_ptr<Entity> Marmalade::Project::ProjectScenes::deserializeEntity(con
 
 std::vector<Scene> Marmalade::Project::ProjectScenes::GetScenes() {
     auto project = Application::GetInstance().GetCurrentProject();
-    // TODO: Retrieve from scene index
 
+    std::vector<Index::Scene> indexScenes = project->projectIndex->GetScenesRows();
     std::vector<Scene> scenes{};
-    for (const auto& item: std::filesystem::directory_iterator(project->basePath / "data")) {
-        try {
-            scenes.push_back(LoadScene(item.path(), true));
-        } catch (const std::runtime_error&) {
-            // File is not Marmalade::Scene, ignore
-        }
+    scenes.reserve(indexScenes.size());
+    for (const auto [uuid, name]: indexScenes) {
+        scenes.emplace_back(name, uuid);
     }
 
     return scenes;

@@ -20,6 +20,7 @@
 #ifndef MARMALADE_PROJECT_PROJECT_H
 #define MARMALADE_PROJECT_PROJECT_H
 
+#include "index.h"
 #include "projectfile.h"
 #include "projectscenes.h"
 
@@ -48,6 +49,8 @@ namespace Marmalade::Project {
          */
         std::shared_ptr<SettingsContainer> projectSettings;
 
+        std::shared_ptr<Index> projectIndex;
+
         ProjectScenes scenes;
 
         explicit Project(const std::filesystem::path& filePath);
@@ -59,6 +62,9 @@ namespace Marmalade::Project {
         void SaveProjectSettings() const;
 
         void LoadProjectPackages();
+
+        void InitDatabase();
+        void CloseDatabase();
 
         bool CheckIfGitRepository() const;
 

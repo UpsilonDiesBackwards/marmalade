@@ -118,6 +118,15 @@ void Marmalade::Project::Project::LoadProjectPackages() {
     // TODO: Initialise project packages
 }
 
+void Marmalade::Project::Project::InitDatabase() {
+    projectIndex = std::make_shared<Index>(*this, basePath / projectMarmalade->GetPathOrDefault("index", std::string(MARM_DIR) + "/" + "index.marmdb"));
+    projectIndex->Open();
+}
+
+void Marmalade::Project::Project::CloseDatabase() {
+    projectIndex->Close();
+}
+
 bool Marmalade::Project::Project::CheckIfGitRepository() const {
     static bool libGit2_init = false;
     if (!libGit2_init) {
