@@ -17,30 +17,19 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_PROJECT_PROJECTFILE_H
-#define MARMALADE_PROJECT_PROJECTFILE_H
+#ifndef MARMALADE_PROJECT_PROJECTASSETS_H
+#define MARMALADE_PROJECT_PROJECTASSETS_H
 
-#include "../application/config/config.h"
+#include <nlohmann/json.hpp>
 
-#define PROJECT_FILE_VERSION 1
+#include <string>
 
 namespace Marmalade::Project {
-    struct ProjectMarmalade {
-        int version{PROJECT_FILE_VERSION};
-        std::string type{"Marmalade::Project"};
-        std::string name{"A Marmalade Project"};
-        std::string uuid{};
-        std::map<std::string, std::string> paths{};
+    struct ProjectAssets {
+        std::string type{"Marmalade::Project::Assets"};
     };
 
-    class ProjectFile : public Config<ProjectMarmalade> {
-    public:
-        explicit ProjectFile(const std::filesystem::path& filePath);
-
-        const std::string& GetPathOrDefault(const std::string& key, const std::string &def);
-    };
-
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectMarmalade, version, type, name, uuid, paths)
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::Project::ProjectAssets, type);
 }
 
 #endif

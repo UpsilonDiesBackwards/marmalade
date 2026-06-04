@@ -21,11 +21,10 @@
 #define MARMALADE_PROJECT_PROJECT_H
 
 #include "projectfile.h"
-#include "projectsettings.h"
 #include "projectscenes.h"
-#include "projectpackages.h"
 
 #include "../gui/wizards/projectwizard.h"
+#include "settings/settingscontainer.h"
 
 #include <string>
 
@@ -33,13 +32,21 @@ namespace Marmalade::Project {
 
     class Project {
     public:
-        std::string name;
-        std::filesystem::path basePath; // Project base directory
-        std::filesystem::path filePath; // Where the project is stored / project.marmalade file path
+        static const char* MARM_DIR;
 
-        ProjectSettings settings;
+        std::string name;
+        std::filesystem::path basePath;// Project base directory
+        std::filesystem::path filePath;// Where the project is stored / project.marmalade file path
+
+        /**
+         * Stores the deserialized contents of the project.marmalade file.
+         */
         std::shared_ptr<ProjectFile> projectMarmalade;
-        ProjectPackages packages;
+
+        /**
+         * Stores the deserialized contents of the settings files in the .marm directory. Each of these is known as a "settings object".
+         */
+        std::shared_ptr<SettingsContainer> projectSettings;
 
         ProjectScenes scenes;
 
@@ -48,31 +55,37 @@ namespace Marmalade::Project {
 
         void CreateEmptyProject(ProjectCreationOptions creationOptions);
 
-        void LoadProjectSettings();
-        void SaveProjectSettings();
+        void LoadProjectSettings(GUI::ConfigErrorDialog* errorDlg = nullptr);
+        void SaveProjectSettings() const;
 
         void LoadProjectPackages();
-        void SaveProjectPackages();
 
-        bool CheckIfGitRepository();
+        bool CheckIfGitRepository() const;
 
     private:
-        std::vector<std::string> baseDirectories = { // Directories auto-created when the project is made
+        std::vector<std::string> baseDirectories = {// Directories auto-created when the project is made
+                MARM_DIR,
                 "assets",
-                "windows",
-                "logs"
-                "_build"
-        };
+                "data",
+                "logs",
+                "packages",
+                "src"};
 
-        std::vector<std::string> baseFiles = { // Files auto-created when the project is made
-                "project.marmalade",
-                "settings.marm",
-                "package-settings.marm",
-                "user.marm",
-                ".assetreg",
-                ".gitignore",
-                "README.md",
-        };
+        template<typename T>
+        bool initSettingsObject(SettingsObject<T>& object) {
+            object.config.filePath = basePath / projectMarmalade->GetPathOrDefault(object.name, std::string(MARM_DIR) + "/" + object.name + ".marm");
+
+            return true;
+        }
+
+        template<typename T>
+        bool loadSettingsObject(SettingsObject<T>& object, GUI::ConfigErrorDialog* errorDlg) {
+            initSettingsObject(object);
+            object.config.useGui = true;
+            object.config.LoadConfig(errorDlg);
+
+            return true;
+        }
     };
 }
 

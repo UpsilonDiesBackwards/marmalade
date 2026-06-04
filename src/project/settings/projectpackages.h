@@ -20,7 +20,7 @@
 #ifndef MARMALADE_PROJECT_PROJECTPACKAGES_H
 #define MARMALADE_PROJECT_PROJECTPACKAGES_H
 
-#include "../packages/package.h"
+#include "../../packages/package.h"
 
 #include <nlohmann/json.hpp>
 

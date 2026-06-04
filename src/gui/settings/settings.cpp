@@ -74,31 +74,31 @@ void Marmalade::GUI::ProjectSettings::drawProjectSettings() {
     auto currentProject = app.GetCurrentProject();
 
     char projectNameC[64];
-    std::strcpy(projectNameC, currentProject->settings.productName.c_str());
+    std::strcpy(projectNameC, currentProject->projectSettings->settings->productName.c_str());
 
     char companyNameC[64];
-    std::strcpy(companyNameC, currentProject->settings.companyName.c_str());
+    std::strcpy(companyNameC, currentProject->projectSettings->settings->companyName.c_str());
 
     char projectDescriptionC[1024];
-    std::strcpy(projectDescriptionC, currentProject->settings.description.c_str());
+    std::strcpy(projectDescriptionC, currentProject->projectSettings->settings->description.c_str());
 
     char projectVersionC[32];
-    std::strcpy(projectVersionC, currentProject->settings.version.c_str());
+    std::strcpy(projectVersionC, currentProject->projectSettings->settings->version.c_str());
 
     if (ImGui::InputText("Project Name", projectNameC, IM_ARRAYSIZE(projectNameC))) {
-        currentProject->settings.productName = projectNameC;
+        currentProject->projectSettings->settings->productName = projectNameC;
     }
 
     if (ImGui::InputText("Company Name", companyNameC, IM_ARRAYSIZE(companyNameC))) {
-        currentProject->settings.companyName = companyNameC;
+        currentProject->projectSettings->settings->companyName = companyNameC;
     }
 
     if (ImGui::InputText("Description", projectDescriptionC, IM_ARRAYSIZE(projectDescriptionC))) {
-        currentProject->settings.description = projectDescriptionC;
+        currentProject->projectSettings->settings->description = projectDescriptionC;
     }
 
     if (ImGui::InputText("Version", projectVersionC, IM_ARRAYSIZE(projectVersionC))) {
-        currentProject->settings.version = projectVersionC;
+        currentProject->projectSettings->settings->version = projectVersionC;
     }
 }
 
@@ -106,14 +106,14 @@ void Marmalade::GUI::ProjectSettings::drawGraphicsSettings() {
     Application& app = Application::GetInstance();
     auto currentProject = app.GetCurrentProject();
 
-    ImGui::Checkbox("Enable MSAA", &currentProject->settings.msaaEnabled);
+    ImGui::Checkbox("Enable MSAA", &currentProject->projectSettings->settings->msaaEnabled);
 
-    if (!currentProject->settings.msaaEnabled) {
-        currentProject->settings.msaaSampleCount = 0;
+    if (!currentProject->projectSettings->settings->msaaEnabled) {
+        currentProject->projectSettings->settings->msaaSampleCount = 0;
         app.framebuffer->Refresh();
     }
 
-    if (currentProject->settings.msaaEnabled) {
+    if (currentProject->projectSettings->settings->msaaEnabled) {
         static int sampleValues[] = {2, 4, 8};
         static int sampleIndex = 1;
 
@@ -121,7 +121,7 @@ void Marmalade::GUI::ProjectSettings::drawGraphicsSettings() {
         sprintf(label, "Samples: %d", sampleValues[sampleIndex]);
 
         if (ImGui::SliderInt("MSAA Sample Count", &sampleIndex, 0, IM_ARRAYSIZE(sampleValues) - 1, label)) {
-            currentProject->settings.msaaSampleCount = sampleValues[sampleIndex];
+            currentProject->projectSettings->settings->msaaSampleCount = sampleValues[sampleIndex];
             app.framebuffer->Refresh();
         }
 

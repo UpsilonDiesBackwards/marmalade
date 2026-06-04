@@ -141,7 +141,7 @@ void MultiSampledFramebuffer::Refresh() {
     if (sampleCount > 0) glDeleteTextures(1, &resolvedTexture);
     glDeleteRenderbuffers(1, &rbo);
 
-    sampleCount = Application::GetInstance().GetCurrentProject()->settings.msaaSampleCount;
+    sampleCount = Application::GetInstance().GetCurrentProject()->projectSettings->settings->msaaSampleCount;
 
     Initialize();
 }

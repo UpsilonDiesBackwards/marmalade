@@ -28,7 +28,10 @@
 #include <filesystem>
 #include <utility>
 
-Marmalade::Project::Project::Project(const std::filesystem::path& filePath) : filePath(filePath), projectMarmalade(std::make_shared<ProjectFile>(filePath)) {
+const char* Marmalade::Project::Project::MARM_DIR = ".marm";
+
+Marmalade::Project::Project::Project(const std::filesystem::path& filePath) : filePath(filePath),
+                                                                              projectMarmalade(std::make_shared<ProjectFile>(filePath)) {
     if (!filePath.filename().string().ends_with("project.marmalade")) {
         throw std::runtime_error("File path must be path to project.marmalade");
     }
@@ -55,90 +58,81 @@ void Marmalade::Project::Project::CreateEmptyProject(ProjectCreationOptions crea
         }
     }
 
-    for (const auto& file: baseFiles) {// Create Files
-        std::filesystem::path path = basePath / file;
+    projectSettings = std::make_shared<SettingsContainer>(
+            SettingsObject("assets", Config<ProjectAssets>("")),
+            SettingsObject("packages", Config<ProjectPackages>("")),
+            SettingsObject("settings", Config<ProjectSettings>("")),
+            SettingsObject("user", Config<ProjectUser>("")));
 
-        if (path == basePath / ".gitignore" && !creationOptions.initGitRepository) {// Create / Skip .gitignore
-            LOG_WARN("Project created with Git disabled, skipping '.gitignore' creation");
-            continue; // Git has not been enabled, skipping .gitignore
-        }
+    initSettingsObject(projectSettings->assets);
+    initSettingsObject(projectSettings->packages);
+    initSettingsObject(projectSettings->settings);
+    initSettingsObject(projectSettings->user);
 
-        if (path == basePath / "README.md" && !creationOptions.createREADME) {// Create / Skip README.md
-            LOG_WARN("Project created without README.md");
-            continue; // README.md creation has not been enabled, skipping README.md
-        }
+    std::ofstream marmGitignore(basePath / MARM_DIR / ".gitignore");
+    marmGitignore << "user.marm" << std::endl
+                  << "index.marmdb" << std::endl;
+    marmGitignore.close();
 
-        try {
-            std::ofstream createdFile(path);
-            if (!createdFile) {
-                LOG_ERROR("Error creating file: '{}'", file);
-            }
-        } catch (const std::exception& e) {
-            LOG_ERROR("Error creating file '{}'", e.what());
-        }
+    std::ofstream gitignore(basePath / ".gitignore");
+    gitignore << "packages/" << std::endl;
+    gitignore.close();
+
+    if (creationOptions.createREADME) {
+        std::ofstream readme(basePath / "README.md");
+        readme << creationOptions.readmeText << std::endl;
+        readme.close();
+    }
+
+    if (creationOptions.initGitRepository) {
+        // TODO: Initialise git repo with libgit
     }
 
     // Generate UUID
-    projectMarmalade->storedConfig.uuid = Marmalade::Util::GenerateUUIDv4();
+    projectMarmalade->storedConfig.uuid = Util::GenerateUUIDv4();
 
     projectMarmalade->SaveConfig();
 }
 
-void Marmalade::Project::Project::LoadProjectSettings() {
-    std::ifstream i(basePath / projectMarmalade->storedConfig.paths.settings);
-    if (i.fail()) {
-        // File doesn't exist!
-        LOG_ERROR("Failed to load project settings, file does not exist!");
-        return;
-    }
+void Marmalade::Project::Project::LoadProjectSettings(GUI::ConfigErrorDialog* errorDlg) {
+    projectSettings = std::make_shared<SettingsContainer>(
+            SettingsObject("assets", Config<ProjectAssets>("")),
+            SettingsObject("packages", Config<ProjectPackages>("")),
+            SettingsObject("settings", Config<ProjectSettings>("")),
+            SettingsObject("user", Config<ProjectUser>("")));
 
-    auto data = nlohmann::json::parse(i);
-    settings = data.template get<ProjectSettings>();
-    i.close();
+    loadSettingsObject(projectSettings->assets, errorDlg);
+    loadSettingsObject(projectSettings->packages, errorDlg);
+    loadSettingsObject(projectSettings->settings, errorDlg);
+    loadSettingsObject(projectSettings->user, errorDlg);
 }
 
-void Marmalade::Project::Project::SaveProjectSettings() {
-    std::ofstream o(basePath / projectMarmalade->storedConfig.paths.settings);
-    nlohmann::json new_settings = settings;
-    o << new_settings.dump(2);
-    o.close();
+void Marmalade::Project::Project::SaveProjectSettings() const {
+    projectSettings->assets.config.SaveConfig();
+    projectSettings->packages.config.SaveConfig();
+    projectSettings->settings.config.SaveConfig();
+    projectSettings->user.config.SaveConfig();
 }
 
 void Marmalade::Project::Project::LoadProjectPackages() {
-    std::ifstream i(basePath / projectMarmalade->storedConfig.paths.packages);
-    if (i.fail()) {
-        // File doesn't exist!
-        LOG_ERROR("Failed to load project packages, file does not exist!");
-        return;
-    }
-
-    auto data = nlohmann::json::parse(i);
-    packages = data.template get<ProjectPackages>();
-    i.close();
+    // TODO: Initialise project packages
 }
 
-void Marmalade::Project::Project::SaveProjectPackages() {
-    std::ofstream o(basePath / projectMarmalade->storedConfig.paths.packages);
-    nlohmann::json new_packages = packages;
-    o << new_packages.dump(2);
-    o.close();
-}
-
-bool Marmalade::Project::Project::CheckIfGitRepository() {
+bool Marmalade::Project::Project::CheckIfGitRepository() const {
     static bool libGit2_init = false;
     if (!libGit2_init) {
         git_libgit2_init();
         libGit2_init = true;
     }
 
-    git_repository *repo = nullptr;
+    git_repository* repo = nullptr;
 
-    int err = git_repository_open(&repo, basePath.string().c_str()); // Attempt to open the git repository at the base path of the project...
-    if (err == 0) { //... if no error is returned then the repository exists, return true
+    int err = git_repository_open(&repo, basePath.string().c_str());// Attempt to open the git repository at the base path of the project...
+    if (err == 0) {                                                 //... if no error is returned then the repository exists, return true
         git_repository_free(repo);
         return true;
     }
 
     git_libgit2_shutdown();
-    return false; // No repository exists :'(
+    return false;// No repository exists :'(
 }

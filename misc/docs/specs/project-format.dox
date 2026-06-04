@@ -263,7 +263,7 @@ Packages vendored into the project directory. This should not be tracked in VCS.
 
 Source code and scripts for the project.
 
-\section project-marmalade .gitignore
+\section global-gitignore .gitignore
 
 Global project gitignore.
 

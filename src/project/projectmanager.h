@@ -31,14 +31,13 @@ namespace Marmalade::Project {
             P project(name, filePath);
             project.CreateEmptyProject(creationOptions);
             project.SaveProjectSettings();
-            project.SaveProjectPackages();
             return project;
         }
 
         static P OpenProject(const std::filesystem::path& filePath) {
             P project(filePath);
             project.projectMarmalade->LoadConfig(&GUI::WindowManager::GetInstance().configErrorDlg);
-            project.LoadProjectSettings();
+            project.LoadProjectSettings(&GUI::WindowManager::GetInstance().configErrorDlg);
             project.LoadProjectPackages();
             return project;
         }
@@ -46,7 +45,6 @@ namespace Marmalade::Project {
         static void SaveProject(P* project) {
             project->projectMarmalade->SaveConfig();
             project->SaveProjectSettings();
-            project->SaveProjectPackages();
         }
     };
 }

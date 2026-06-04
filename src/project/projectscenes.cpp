@@ -39,12 +39,7 @@ std::filesystem::path Marmalade::Project::ProjectScenes::GetEntityDirectory() {
 }
 
 void Marmalade::Project::ProjectScenes::RegisterScene(const std::string& fileName) {
-    auto project = Application::GetInstance().GetCurrentProject();
-    auto& scenes = project->projectMarmalade->storedConfig.paths.scenes;
-
-    if (std::find(scenes.begin(), scenes.end(), fileName) == scenes.end()) {
-        scenes.push_back(fileName);
-    }
+    // TODO: Add to scene index
 }
 
 void Marmalade::Project::ProjectScenes::SaveScene(const std::string& fileName, Scene* scene) {
@@ -84,11 +79,13 @@ Scene Marmalade::Project::ProjectScenes::LoadScene(const std::string& fileName, 
         file >> j;
         file.close();
 
+        if (j["type"] != "Marmalade::Scene") throw std::runtime_error("File is not a scene");
+
         auto scene = Scene(j["name"], j["uuid"]);
         if (infoOnly) return scene;
 
         for (const auto& entityFileName: j["entities"]) {
-            std::ifstream entityFile(GetEntityDirectory() / entityFileName);
+            std::ifstream entityFile(GetEntityDirectory() / entityFileName.get<std::string>());
             if (entityFile.is_open()) {
                 nlohmann::json entityJson;
                 entityFile >> entityJson;
@@ -105,15 +102,7 @@ Scene Marmalade::Project::ProjectScenes::LoadScene(const std::string& fileName, 
 }
 
 void Marmalade::Project::ProjectScenes::UnregisterScene(const std::string& fileName) {
-    auto project = Application::GetInstance().GetCurrentProject();
-
-    auto& scenes = project->projectMarmalade->storedConfig.paths.scenes;
-
-    scenes.erase(std::remove_if(scenes.begin(), scenes.end(),
-                                [&fileName](const std::string& filePath) {
-                                    return filePath == fileName;
-                                }),
-                 scenes.end());
+    // TODO: Remove from scene index
 }
 
 nlohmann::json Marmalade::Project::ProjectScenes::serializeEntity(const Entity* entity) {
@@ -182,11 +171,15 @@ std::shared_ptr<Entity> Marmalade::Project::ProjectScenes::deserializeEntity(con
 
 std::vector<Scene> Marmalade::Project::ProjectScenes::GetScenes() {
     auto project = Application::GetInstance().GetCurrentProject();
-    auto& scenePaths = project->projectMarmalade->storedConfig.paths.scenes;
+    // TODO: Retrieve from scene index
 
     std::vector<Scene> scenes{};
-    for (const auto& path: scenePaths) {
-        scenes.push_back(LoadScene(path, true));
+    for (const auto& item: std::filesystem::directory_iterator(project->basePath / "data")) {
+        try {
+            scenes.push_back(LoadScene(item.path(), true));
+        } catch (const std::runtime_error&) {
+            // File is not Marmalade::Scene, ignore
+        }
     }
 
     return scenes;

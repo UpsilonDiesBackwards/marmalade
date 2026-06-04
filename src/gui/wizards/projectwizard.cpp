@@ -193,38 +193,6 @@ void Marmalade::GUI::ProjectWizard::InitialiseGitRepository(const char* repoPath
         LOG_ERROR("Failed to initialise git repository: {}", git_error_last()->message);
     }
 
-    if (creationOptions.useDefaultGitIgnore) {// Use .gitignore template or not
-        std::filesystem::path targetIgnorePath = std::filesystem::path(projectFilePath) / projectName / ".gitignore";
-
-        std::ifstream templIgnore("res/templates/gitignore");// Template ignore
-        std::ofstream targetIgnore(targetIgnorePath);
-
-        if (templIgnore.is_open() && targetIgnore.is_open()) {// If both files are open ...
-            std::string line;
-
-            while (std::getline(templIgnore, line)) {// ... copy each line to the target .gitignore
-                targetIgnore << line << "\n";
-            }
-
-            templIgnore.close();
-            targetIgnore.close();
-        } else {
-            LOG_ERROR("Failed copying .gitignore contents!");
-        }
-    }
-
-    if (creationOptions.createREADME) {                                                                             // If README.md creation is enabled ...
-        std::filesystem::path targetREADMEPath = std::filesystem::path(projectFilePath) / projectName / "README.md";// ... get it ...
-
-        std::ofstream targetREADME(targetREADMEPath);
-
-        if (targetREADME.is_open()) {// ... then write in the contents
-            targetREADME << creationOptions.readmeText;
-
-            targetREADME.close();
-        }
-    }
-
     if (!creationOptions.remoteURL.length() == 0) {
         SetGitRemoteURL(creationOptions);
     }

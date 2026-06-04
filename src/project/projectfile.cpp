@@ -23,3 +23,12 @@ Marmalade::Project::ProjectFile::ProjectFile(const std::filesystem::path& filePa
     version = PROJECT_FILE_VERSION;
     useGui = true;
 }
+
+const std::string& Marmalade::Project::ProjectFile::GetPathOrDefault(const std::string& key, const std::string& def) {
+    if (!storedConfig.paths.contains(key)) {
+        storedConfig.paths[key] = def;
+        return def;
+    }
+
+    return storedConfig.paths[key];
+}

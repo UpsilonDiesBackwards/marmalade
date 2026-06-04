@@ -64,6 +64,11 @@ list(APPEND ENGINE_SRC
         packages/package.cpp
         packages/package.h
 
+        project/settings/settingscontainer.h
+        project/settings/projectassets.h
+        project/settings/projectpackages.h
+        project/settings/projectsettings.h
+        project/settings/projectuser.h
         project/assetmetadata.h
         project/assetregistry.cpp
         project/assetregistry.h
@@ -72,11 +77,9 @@ list(APPEND ENGINE_SRC
         project/project.h
         project/projectfile.cpp
         project/projectfile.h
-        project/projectsettings.h
         project/projectmanager.h
         project/projectscenes.cpp
         project/projectscenes.h
-        project/projectpackages.h
 
         physics/2d/physicsengine2d.cpp
         physics/2d/collisionevent2d.cpp

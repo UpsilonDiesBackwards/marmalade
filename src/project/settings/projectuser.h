@@ -17,31 +17,19 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_PROJECT_PROJECTSETTINGS_H
-#define MARMALADE_PROJECT_PROJECTSETTINGS_H
+#ifndef MARMALADE_PROJECT_PROJECTUSER_H
+#define MARMALADE_PROJECT_PROJECTUSER_H
 
 #include <nlohmann/json.hpp>
 
 #include <string>
 
 namespace Marmalade::Project {
-    struct ProjectSettings {
-        std::string type{"Marmalade::Project"};
-
-        // Project
-        std::string productName{"Marmalade Project"};
-        std::string companyName{"Example Company"};
-        std::string description{"A Marmalade Project"};
-        std::string version{"v0.0.1"};
-
-        // Graphics
-        bool msaaEnabled = true;
-        int msaaSampleCount = 8;
+    struct ProjectUser {
+        std::string type{"Marmalade::Project::UserSettings"};
     };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ProjectSettings,
-                                       type, productName, companyName, description, version,
-                                       msaaEnabled, msaaSampleCount)
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::Project::ProjectUser, type);
 }
 
 #endif
