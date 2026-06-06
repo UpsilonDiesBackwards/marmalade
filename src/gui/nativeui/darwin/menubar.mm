@@ -75,15 +75,34 @@ IconResult resolveIconAndCleanLabel(const std::string& input, const std::map<std
 
 std::stack<void*> MenuBar::_menuStack{};
 std::map<std::string, bool> MenuBar::_clickStates{};
-std::map<std::string, void*> MenuBar::_nativeItems{};
 std::vector<void*> MenuBar::_menuTargets{};
 
+std::map<std::string, void*> MenuBar::_allMenuItems{};
+std::unordered_set<std::string> MenuBar::_itemsSeenThisFrame{};
+
 bool MenuBar::BeginMainMenuBar() {
+    _itemsSeenThisFrame.clear();
     return ImGui::BeginMainMenuBar();
 }
 
 void MenuBar::EndMainMenuBar() {
     ImGui::EndMainMenuBar();
+
+    // Check for removed items
+    auto it = _allMenuItems.begin();
+    while (it != _allMenuItems.end()) {
+        if (_itemsSeenThisFrame.find(it->first) == _itemsSeenThisFrame.end()) {
+            // Menu item no longer exists, remove it
+            NSMenuItem* nativeItem = (NSMenuItem*)it->second;
+            NSMenu* menu = [nativeItem menu];
+            if (menu != nil) {
+                [menu removeItem:nativeItem];
+            }
+            it = _allMenuItems.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 bool MenuBar::BeginMenu(const char* label) {
@@ -114,6 +133,10 @@ bool MenuBar::BeginMenu(const char* label) {
             }
         }
     }
+
+    std::string hierKey = buildHierarchyKey(iconResult.cleanLabel);
+    _allMenuItems[hierKey] = item;
+    _itemsSeenThisFrame.insert(hierKey);
 
     MenuBar::_menuStack.push((__bridge void*)[item submenu]);
     return true;
@@ -173,6 +196,10 @@ bool MenuBar::MenuItem(const char *label, const char* shortcut, bool* p_selected
         [item setState:(*p_selected) ? NSControlStateValueOn : NSControlStateValueOff];
     }
 
+    std::string hierKey = buildHierarchyKey(iconResult.cleanLabel);
+    _allMenuItems[hierKey] = item;
+    _itemsSeenThisFrame.insert(hierKey);
+
     if (MenuBar::_clickStates[key]) {
         MenuBar::_clickStates[key] = false;
         return true;
@@ -198,6 +225,35 @@ void MenuBar::Separator() {
     }
 
     [currentParent addItem:[NSMenuItem separatorItem]];
+}
+
+std::string MenuBar::buildHierarchyKey(std::string currentItem) {
+    std::stack<void*> tempStack = _menuStack;
+    std::vector<std::string> pathParts{};
+
+    while (!tempStack.empty()) {
+        NSMenu *m = (NSMenu*)tempStack.top();
+        if (m != nullptr) {
+            NSString *titleStr = [m title];
+            if (titleStr != nil) {
+                pathParts.push_back(std::string([titleStr UTF8String]));
+            }
+        }
+
+        tempStack.pop();
+    }
+
+    std::string finalKey = "";
+    for (auto it = pathParts.rbegin(); it != pathParts.rend(); ++it) {
+        if (!finalKey.empty()) {
+            finalKey += "//";
+        }
+        finalKey += *it;
+    }
+
+    finalKey += "//" + currentItem;
+
+    return finalKey;
 }
 
 #endif

@@ -24,16 +24,17 @@
 #include <functional>
 #include <map>
 #include <stack>
+#include <unordered_set>
 
 namespace Marmalade::GUI::NativeUI {
     class MenuBar {
     public:
         static bool BeginMainMenuBar();
         static void EndMainMenuBar();
-        static bool BeginMenu(const char *label);
+        static bool BeginMenu(const char* label);
         static void EndMenu();
-        static bool MenuItem(const char *label);
-        static bool MenuItem(const char *label, const char* shortcut, bool* p_selected, bool enabled = true);
+        static bool MenuItem(const char* label);
+        static bool MenuItem(const char* label, const char* shortcut, bool* p_selected, bool enabled = true);
         static void Separator();
 
     private:
@@ -41,6 +42,11 @@ namespace Marmalade::GUI::NativeUI {
         static std::map<std::string, bool> _clickStates;
         static std::map<std::string, void*> _nativeItems;
         static std::vector<void*> _menuTargets;
+
+        static std::map<std::string, void*> _allMenuItems;
+        static std::unordered_set<std::string> _itemsSeenThisFrame;
+
+        static std::string buildHierarchyKey(std::string currentItem);
     };
 }
 
