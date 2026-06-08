@@ -167,7 +167,9 @@ void Application::InitialiseWindow() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
 
-
+    frameCapturer.Initialize();
+    frameCapturer.Resize(GetFramebufferWidth(), GetFramebufferHeight());
+    glfwSetFramebufferSizeCallback(window, &framebufferSizeCallback);
 
     gameView = new GameView(width, height);
     editView = new EditView(width, height);
@@ -276,6 +278,8 @@ void Application::Run() {
 
         glfwMakeContextCurrent(backupContext);
     }
+
+    frameCapturer.CaptureFrame();
 
     glfwSwapBuffers(window);
 
@@ -394,6 +398,7 @@ bool Application::OpenProject(const std::filesystem::path& path) {
         }
     } catch (const std::exception& ex) {
         LOG_ERROR("Failed to open project: {}", ex.what());
+        Marmalade::GUI::MsgBox::ShowMsgBox("Error", "Failed to open the project. Check the logs for details.");
         return false;
     }
 
@@ -461,12 +466,28 @@ void Application::getGraphicsVersion() {
     _graphicsVersionMinor = minor;
 }
 
+void Application::framebufferSizeCallback(GLFWwindow* window, int width, int height) {
+    GET_APP.frameCapturer.Resize(width, height);
+}
+
 void Application::ChangeWorkspace() {
     _requestWorkspaceChange = true;
 }
 
 bool Application::NeedsImGuiRestart() {
     return _requestWorkspaceChange;
+}
+
+int Application::GetFramebufferWidth() const {
+    int width = 0;
+    glfwGetFramebufferSize(window, &width, nullptr);
+    return width;
+}
+
+int Application::GetFramebufferHeight() const {
+    int height = 0;
+    glfwGetFramebufferSize(window, nullptr, &height);
+    return height;
 }
 
 #if DEBUG

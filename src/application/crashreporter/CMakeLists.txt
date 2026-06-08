@@ -1,7 +1,7 @@
 add_subdirectory(phroggy)
 
 list(APPEND ENGINE_SRC_CRASHREPORTER
-    crashreporter.h
+    crashreporter.h framecapturer.h
 )
 
 if (UNIX AND NOT APPLE)

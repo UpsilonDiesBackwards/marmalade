@@ -231,6 +231,12 @@ void Marmalade::GUI::TopBar::Show() {
                 NativeUI::MenuBar::EndMenu();
             }
 
+            NativeUI::MenuBar::Separator();
+
+            if (NativeUI::MenuBar::MenuItem(ICON_WITH_TEXT(ICON_CI_DEVICE_CAMERA, pgettext("Menu|Window|", "Save Screenshot")))) {
+                GET_APP.frameCapturer.SaveScreenshot();
+            }
+
             NativeUI::MenuBar::EndMenu();
         }
 

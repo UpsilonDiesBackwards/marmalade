@@ -44,6 +44,8 @@
 #include <graphics/multisampledframebuffer.h>
 #include "io/audiomanager.h"
 #include "autosave.h"
+#include "crashreporter/framecapturer.h"
+
 #include <io/inputmanager.h>
 #include <io/input.h>
 #include <graphics/viewport.h>
@@ -186,6 +188,8 @@ public:
 
     const char* COMMIT = COMMIT_HASH;
 
+    Marmalade::FrameCapturer frameCapturer{};
+
     /**
      * \brief Opens a marmalade project and sets it as the current application project
      */
@@ -211,6 +215,9 @@ public:
 #if DEBUG
     ImGuiTestEngine* GetImGuiTestEngine() { return _imguiTestEngine; }
 #endif
+
+    int GetFramebufferWidth() const;
+    int GetFramebufferHeight() const;
 
 private:
     Marmalade::Physics::PhysicsEngine2D physicsEngine2D;
@@ -246,6 +253,8 @@ private:
      * \brief Gets the graphics version from the engine config. Ambiguous name, should be changed
      */
     void getGraphicsVersion();
+
+    static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 };
 
 #define GET_APP Application::GetInstance()
