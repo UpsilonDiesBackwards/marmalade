@@ -211,7 +211,7 @@ endif()
 
 include(ImGuiHooks/HookImGui)
 
-file(GLOB IMGUIZMO_SRC "vendor/imguizmo/*.h" "vendor/imguizmo/*.cpp")
+file(GLOB IMGUIZMO_SRC "vendor/imguizmo/src/*.h" "vendor/imguizmo/src/*.cpp")
 file (GLOB IMPLOT_SRC "vendor/implot/.*" "vendor/implot/*.cpp")
 
 # We can't do add_subdirectory, since the imgui header is undefined
@@ -227,6 +227,7 @@ endif ()
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
 
 # ZIP importer causes compilation errors on linux smh
 set(ASSIMP_BUILD_ZIP_IMPORTER OFF CACHE BOOL "" FORCE)
@@ -339,7 +340,7 @@ target_include_directories(marmalade PRIVATE
         vendor/imgui
         vendor/imguifiledialog
         vendor/imgui_markdown
-        vendor/imguizmo
+        vendor/imguizmo/src
         vendor/implot
         vendor/glm/glm
         ${LUA_INCLUDE_DIR}
