@@ -1,6 +1,6 @@
 // Marmalade - Lightweight Game Engine
-// Copyright (C) 2025 Tayler Parsons
-// Copyright (C) 2025 Ryan Bester
+// Copyright (C) 2026 Tayler Parsons
+// Copyright (C) 2026 Ryan Bester
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #ifndef MARMALADE_MODELRENDERER_H
 #define MARMALADE_MODELRENDERER_H
 
-#include "ecs/component.h"
+#include "../../component.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>

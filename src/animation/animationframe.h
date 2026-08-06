@@ -1,4 +1,3 @@
-
 /*
  Marmalade - Lightweight Game Engine
  Copyright (C) 2025 Tayler Parsons
@@ -18,20 +17,27 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "sequence.h"
+#ifndef MARMALADE_ANIMATIONFRAME_H
+#define MARMALADE_ANIMATIONFRAME_H
 
-Marmalade::Animation::AnimationSequence::AnimationSequence(std::filesystem::path filePath, const std::string& name)
-    : Marmalade::Project::Assets::Asset(uuid, name,
-                                        filePath, "Marmalade::Animation::Sequence", ANIMATION_VERSION),
-      Config(filePath), name(name), filePath(std::move(filePath)) {
+#include <string>
+#include "nlohmann/json.hpp"
 
-    useGui = true;
+#define FRAME_VERSION 1
+
+namespace Marmalade::Animation {
+    struct Frame {
+        int version{ FRAME_VERSION };
+
+        std::string type{"Marmalade::Animation::Frame"};
+
+        std::string sprite;
+        float speed;
+        float offset[2];
+
+        // TODO: Animation events
+    };
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::Animation::Frame, sprite, speed, offset)
 }
-
-void Marmalade::Animation::AnimationSequence::Play() { }
-
-void Marmalade::Animation::AnimationSequence::Stop() { }
-
-void Marmalade::Animation::AnimationSequence::PrepareNewConfig() {
-    Config::PrepareNewConfig();
-}
+#endif//MARMALADE_ANIMATIONFRAME_H

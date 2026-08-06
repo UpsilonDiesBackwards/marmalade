@@ -1,4 +1,3 @@
-
 /*
  Marmalade - Lightweight Game Engine
  Copyright (C) 2025 Tayler Parsons
@@ -18,44 +17,41 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_AUDIOPLAYER_H
-#define MARMALADE_AUDIOPLAYER_H
+#ifndef MARMALADE_ECS_MATERIALRENDER_H
+#define MARMALADE_ECS_MATERIALRENDER_H
 
-#include "ecs/component.h"
+#include "../../component.h"
 
-#include <AL/al.h>
+#include "../../../graphics/renderable.h"
+
+#include <nlohmann/json.hpp>
 
 namespace Marmalade::ECS {
-    class AudioPlayer : public Component {
+    class MaterialRenderer : public Component {
     public:
+        std::filesystem::path materialPath;
+
         void Display(Entity* entity) override;
         void Apply(Entity* entity) override;
         void Setup(Entity* entity) override;
+
         nlohmann::json Serialize(const Entity* entity) override;
         void Deserialize(nlohmann::json json, Entity* entity) override;
-        ~AudioPlayer() override;
 
+        nlohmann::json SerializeTexture(const Marmalade::Material::Texture& texture);
+        void DeserializeTexture(const nlohmann::json& textureJson, Marmalade::Material::Texture& texture);
 
-        void LoadAudio(const std::string& path);
-
-        void Play();
-        void Stop();
-
-        AudioPlayer() {
-            name = "Audio Player";
+        MaterialRenderer() {
+            name = "Material Renderer";
             allowMultiple = false;
-            categories = {"General", "Audio"};
+            categories = {"General"};
             description =
-                "Creates an audio player that can load audio files and play them";
+                    "Adds a material renderer component\n"
+                    "Allows the assignment of albedo, normal, and other types of texture maps to an entity.";
         }
-
-    private:
-        std::filesystem::path _audioFilePath;
-        ALuint _alBuffer = 0;
-        ALuint _alSource = 0;
     };
 
-    REGISTER_COMPONENT(AudioPlayer);
+    REGISTER_COMPONENT(MaterialRenderer);
 }
 
-#endif//MARMALADE_AUDIOPLAYER_H
+#endif

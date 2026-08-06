@@ -22,7 +22,7 @@
 #define ENGINE_GAMEVIEW_H
 
 
-#include "graphics/multisampledframebuffer.h"
+#include "../../graphics/multisampledframebuffer.h"
 #include "imgui.h"
 
 class GameView {

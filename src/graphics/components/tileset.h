@@ -1,3 +1,4 @@
+
 // Marmalade - Lightweight Game Engine
 // Copyright (C) 2025 Tayler Parsons
 // Copyright (C) 2025 Ryan Bester
@@ -15,30 +16,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef MARMALADE_BILLBOARDTEXTURE_H
-#define MARMALADE_BILLBOARDTEXTURE_H
+#ifndef TILESET_H
+#define TILESET_H
 
-#include "graphics/shader.h"
+#include "../../application/config/config.h"
+#include "../../ecs/components/rendering/tiledata.h"
+#include "../../ecs/components/rendering/tilemap.h"
 
-#include <glm/glm.hpp>
-#include <string>
+namespace Marmalade::Graphics {
+    class TileSet : public Marmalade::Config<TileSetData> {
+    public:
+        TileSet();
+        explicit TileSet(const std::filesystem::path& path, const std::string& name);
 
-class BillboardTexture {
-public:
-    BillboardTexture(const std::string& filePath, Shader* shader);
+        void PrepareNewConfig() override;
 
-    void SetPosition(const glm::vec3& pos);
-    void Draw(const glm::mat4& view, const glm::mat4& projection);
+        unsigned int texture = 0;
+        std::vector<Tile> tiles;
 
-private:
-    unsigned int _VAO = 0, _VBO = 0, _texture = 0;
-    glm::vec3 _position;
-    Shader* _shader;
+        void AddTile(const Tile& tile) { tiles.push_back(tile); }
+    };
+}
 
-    void loadTexture(const std::string& filePath);
-    void setupMesh();
-};
-
-
-
-#endif //MARMALADE_BILLBOARDTEXTURE_H
+#endif //TILESET_H

@@ -1,4 +1,3 @@
-
 /*
  Marmalade - Lightweight Game Engine
  Copyright (C) 2025 Tayler Parsons
@@ -18,7 +17,7 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <../../../include/ecs/components/animation/animator.h>
+#include "animator.h"
 
 #include "../../../application/config/engineconfig.h"
 #include "../../../application/util.h"

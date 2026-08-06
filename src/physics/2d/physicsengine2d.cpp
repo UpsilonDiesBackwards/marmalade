@@ -17,7 +17,7 @@
 
 #include "physicsengine2d.h"
 
-#include "ecs/components/physics/2d/rigidbody2d.h"
+#include "../../ecs/components/physics/2d/rigidbody2d.h"
 
 #include "../../application/application.h"
 

@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <graphics/texture.h>
+#include "texture.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 

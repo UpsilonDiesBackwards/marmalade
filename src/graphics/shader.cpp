@@ -21,7 +21,7 @@
 #include <iostream>
 #include <sstream>
 #include <glm/fwd.hpp>
-#include "../../include/graphics/shader.h"
+#include "shader.h"
 #include "glad/glad.h"
 #include <glm/gtc/type_ptr.hpp>
 

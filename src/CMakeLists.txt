@@ -39,15 +39,25 @@ list(APPEND ENGINE_SRC
         application/plugins/versioncontrolimpl.cpp
         application/plugins/versioncontrolimpl.h
 
+        graphics/meshdata.h
+        graphics/viewport.h
         graphics/viewport.cpp
+        graphics/renderable.h
         graphics/renderable.cpp
+        graphics/shader.h
         graphics/shader.cpp
+        graphics/texture.h
         graphics/texture.cpp
+        graphics/framebuffer.h
         graphics/framebuffer.cpp
+        graphics/multisampledframebuffer.h
         graphics/multisampledframebuffer.cpp
+        graphics/material.h
         graphics/material.cpp
 
+        graphics/components/billboardtexture.h
         graphics/components/billboardtexture.cpp
+        graphics/components/tileset.h
         graphics/components/tileset.cpp
 
         io/audiomanager.h
@@ -64,8 +74,11 @@ list(APPEND ENGINE_SRC
         scene/scenemanager.h
         scene/scenemanager.cpp
 
+        animation/sequence.h
         animation/sequence.cpp
+        animation/animationdriver.h
         animation/animationdriver.cpp
+        animation/animationframe.h
 
         packages/package.cpp
         packages/package.h
@@ -100,21 +113,36 @@ list(APPEND ENGINE_SRC
 )
 
 list(APPEND ENGINE_SRC # ECS
+        ecs/component.h
+        ecs/componentmanager.h
         ecs/componentmanager.cpp
+
+        ecs/components/transform.h
         ecs/components/transform.cpp
 
+        ecs/components/rendering/materialrenderer.h
         ecs/components/rendering/materialrenderer.cpp
+        ecs/components/rendering/modelrenderer.h
         ecs/components/rendering/modelrenderer.cpp
+        ecs/components/rendering/tiledata.h
+        ecs/components/rendering/tilemap.h
         ecs/components/rendering/tilemap.cpp
 
+        ecs/components/audio/audioplayer.h
         ecs/components/audio/audioplayer.cpp
 
+        ecs/components/light2d/light2d.h
         ecs/components/light2d/light2d.cpp
 
+        ecs/components/animation/animator.h
         ecs/components/animation/animator.cpp
 
+        ecs/components/physics/rigidbody.h
+        ecs/components/physics/2d/rigidbody2d.h
         ecs/components/physics/2d/rigidbody2d.cpp
+        ecs/components/physics/2d/boxcollider2d.h
         ecs/components/physics/2d/boxcollider2d.cpp
+        ecs/components/physics/2d/circlecollider2d.h
         ecs/components/physics/2d/circlecollider2d.cpp
 )
 

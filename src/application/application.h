@@ -41,7 +41,7 @@
 #endif
 
 #include "../scene/entity.h"
-#include <graphics/multisampledframebuffer.h>
+#include "../graphics/multisampledframebuffer.h"
 #include "../io/audiomanager.h"
 #include "autosave.h"
 #include "crashreporter/framecapturer.h"
@@ -49,6 +49,7 @@
 #include "../io/inputmanager.h"
 #include "../io/input.h"
 #include <graphics/viewport.h>
+#include "../graphics/viewport.h"
 
 #include "../scene/scenemanager.h"
 

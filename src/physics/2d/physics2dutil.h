@@ -20,10 +20,10 @@
 
 #include <glm/vec2.hpp>
 
-#include "../../../include/ecs/components/physics/2d/boxcollider2d.h"
-#include "../../../include/ecs/components/physics/2d/rigidbody2d.h"
-#include "ecs/components/transform.h"
-#include "ecs/components/physics/2d/circlecollider2d.h"
+#include "../../ecs/components/physics/2d/boxcollider2d.h"
+#include "../../ecs/components/physics/2d/rigidbody2d.h"
+#include "../../ecs/components/transform.h"
+#include "../../ecs/components/physics/2d/circlecollider2d.h"
 #include "collider2d.h"
 
 namespace Marmalade::ECS {

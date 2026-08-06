@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "../../../include/graphics/components/tileset.h"
+#include "tileset.h"
 
 Marmalade::Graphics::TileSet::TileSet(const std::filesystem::path& path, const std::string& name) : Marmalade::Config<TileSetData>(path) {
     storedConfig.name = name;

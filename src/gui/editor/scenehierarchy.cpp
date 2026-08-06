@@ -20,7 +20,7 @@
 #include "scenehierarchy.h"
 
 #include "../../application/application.h"
-#include <../../../include/ecs/components/animation/animator.h>
+#include "../../ecs/components/animation/animator.h"
 #include "../windowmanager.h"
 
 #define GLM_ENABLE_EXPERIMENTAL

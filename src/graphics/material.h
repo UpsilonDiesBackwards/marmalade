@@ -1,4 +1,3 @@
-
 /*
  Marmalade - Lightweight Game Engine
  Copyright (C) 2025 Tayler Parsons
@@ -21,8 +20,8 @@
 #ifndef MARMALADE_MATERIAL_H
 #define MARMALADE_MATERIAL_H
 
-#include "../../src/application/config/config.h"
-#include "../../src/project/assetregistry.h"
+#include "../application/config/config.h"
+#include "../project/assetregistry.h"
 
 #include <glm/glm.hpp>
 

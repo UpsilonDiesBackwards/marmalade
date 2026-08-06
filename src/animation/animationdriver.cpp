@@ -1,4 +1,3 @@
-
 /*
  Marmalade - Lightweight Game Engine
  Copyright (C) 2025 Tayler Parsons
@@ -18,7 +17,7 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "animation/animationdriver.h"
+#include "animationdriver.h"
 
 Marmalade::Animation::AnimationDriver::AnimationDriver(std::filesystem::path filePath, const std::string& name)
     : Config(filePath), name(name) {

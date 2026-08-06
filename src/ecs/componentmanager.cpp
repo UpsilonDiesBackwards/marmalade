@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <ecs/componentmanager.h>
+#include "componentmanager.h"
 
 #include "../application/util.h"
 #include "../application/logger.h"

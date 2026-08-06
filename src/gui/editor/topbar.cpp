@@ -34,7 +34,7 @@
 #include "../remember.h"
 #include "../nativeui/menubar.h"
 
-#include <ecs/component.h>
+#include "../../ecs/component.h"
 
 #include <imgui.h>
 

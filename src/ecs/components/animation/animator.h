@@ -1,4 +1,3 @@
-
 /*
  Marmalade - Lightweight Game Engine
  Copyright (C) 2025 Tayler Parsons
@@ -21,10 +20,10 @@
 #ifndef MARMALADE_ANIMATOR_H
 #define MARMALADE_ANIMATOR_H
 
-#include "ecs/component.h"
+#include "../../component.h"
 
-#include "animation/sequence.h"
-#include "animation/animationdriver.h"
+#include "../../../animation/sequence.h"
+#include "../../../animation/animationdriver.h"
 
 class Entity;
 

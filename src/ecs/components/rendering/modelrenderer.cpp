@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "../../../../include/ecs/components/rendering/modelrenderer.h"
+#include "modelrenderer.h"
 
 #include <imgui.h>
 
@@ -23,7 +23,7 @@
 #include "../../../application/logger.h"
 #include <assimp/postprocess.h>
 #include <glad/glad.h>
-#include "graphics/renderable.h"
+#include "../../../graphics/renderable.h"
 #include "../../../scene/entity.h"
 
 #include "../../../application/application.h"

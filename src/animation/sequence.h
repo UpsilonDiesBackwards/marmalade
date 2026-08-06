@@ -20,9 +20,9 @@
 #ifndef MARMALADE_SEQUENCE_H
 #define MARMALADE_SEQUENCE_H
 
-#include "graphics/texture.h"
+#include "../graphics/texture.h"
 
-#include "../../src/application/config/config.h"
+#include "../application/config/config.h"
 #include "animationframe.h"
 
 #include <vector>

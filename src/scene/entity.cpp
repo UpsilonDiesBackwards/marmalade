@@ -23,7 +23,7 @@
 #include "../application/logger.h"
 #include "../application/application.h"
 
-#include <graphics/texture.h>
+#include "../graphics/texture.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext/matrix_transform.hpp>

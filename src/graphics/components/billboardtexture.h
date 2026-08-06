@@ -1,4 +1,3 @@
-
 /*
  Marmalade - Lightweight Game Engine
  Copyright (C) 2025 Tayler Parsons
@@ -18,27 +17,30 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MARMALADE_ANIMATIONFRAME_H
-#define MARMALADE_ANIMATIONFRAME_H
+#ifndef MARMALADE_BILLBOARDTEXTURE_H
+#define MARMALADE_BILLBOARDTEXTURE_H
 
+#include "../shader.h"
+
+#include <glm/glm.hpp>
 #include <string>
-#include "nlohmann/json.hpp"
 
-#define FRAME_VERSION 1
+class BillboardTexture {
+public:
+    BillboardTexture(const std::string& filePath, Shader* shader);
 
-namespace Marmalade::Animation {
-    struct Frame {
-        int version{ FRAME_VERSION };
+    void SetPosition(const glm::vec3& pos);
+    void Draw(const glm::mat4& view, const glm::mat4& projection);
 
-        std::string type{"Marmalade::Animation::Frame"};
+private:
+    unsigned int _VAO = 0, _VBO = 0, _texture = 0;
+    glm::vec3 _position;
+    Shader* _shader;
 
-        std::string sprite;
-        float speed;
-        float offset[2];
+    void loadTexture(const std::string& filePath);
+    void setupMesh();
+};
 
-        // TODO: Animation events
-    };
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Marmalade::Animation::Frame, sprite, speed, offset)
-}
-#endif//MARMALADE_ANIMATIONFRAME_H
+
+#endif //MARMALADE_BILLBOARDTEXTURE_H

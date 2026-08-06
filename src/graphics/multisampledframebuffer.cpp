@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <graphics/multisampledframebuffer.h>
+#include "multisampledframebuffer.h"
 
 #include "../application/application.h"
 

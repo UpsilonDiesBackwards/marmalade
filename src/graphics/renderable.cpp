@@ -17,12 +17,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <graphics/renderable.h>
+#include "renderable.h"
 
 #include <glad/glad.h>
 
 #include "../application/application.h"
-#include "graphics/texture.h"
+#include "texture.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/type_ptr.hpp>

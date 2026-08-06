@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <../../../include/ecs/components/rendering/materialrenderer.h>
+#include "materialrenderer.h"
 
 #include "../../../application/config/config.h"
 #include "../../../application/application.h"

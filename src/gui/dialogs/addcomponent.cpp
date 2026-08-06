@@ -23,7 +23,7 @@
 #include "../../application/util.h"
 #include "../../application/plugins/interfaceimpl.h"
 
-#include <ecs/component.h>
+#include "../../ecs/component.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>

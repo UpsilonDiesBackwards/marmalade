@@ -1,4 +1,3 @@
-
 /*
  Marmalade - Lightweight Game Engine
  Copyright (C) 2025 Tayler Parsons
@@ -21,11 +20,11 @@
 #ifndef MARMALADE_LIGHT2D_H
 #define MARMALADE_LIGHT2D_H
 
-#include "ecs/component.h"
+#include "../../component.h"
 #include "glad/glad.h"
-#include "graphics/material.h"
-#include "graphics/shader.h"
-#include "graphics/components/billboardtexture.h"
+#include "../../../graphics/material.h"
+#include "../../../graphics/shader.h"
+#include "../../../graphics/components/billboardtexture.h"
 
 #include <glm/vec3.hpp>
 #include <glm/glm.hpp>

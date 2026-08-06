@@ -20,7 +20,7 @@
 #ifndef ENGINE_EDITVIEW_H
 #define ENGINE_EDITVIEW_H
 
-#include "graphics/multisampledframebuffer.h"
+#include "../../graphics/multisampledframebuffer.h"
 #include "ImGuizmo.h"
 
 #include "../../scene/entity.h"

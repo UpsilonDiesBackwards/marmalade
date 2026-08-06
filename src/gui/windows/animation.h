@@ -22,8 +22,8 @@
 #define MARMALADE_ANIMATION_H
 
 #include "../window.h"
-#include "animation/animationdriver.h"
-#include "animation/sequence.h"
+#include "../../animation/animationdriver.h"
+#include "../../animation/sequence.h"
 
 #include <imgui.h>
 

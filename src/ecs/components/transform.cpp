@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <ecs/components/transform.h>
+#include "transform.h"
 
 #include "../../application/application.h"
 #include "../../gui/components/backgroundlabel.h"

@@ -18,7 +18,7 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "graphics/material.h"
+#include "material.h"
 #include "../application/util.h"
 
 Marmalade::Material::Material::Material(std::filesystem::path filePath, const std::string& name, const std::string& uuid)

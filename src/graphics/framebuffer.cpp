@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <graphics/framebuffer.h>
+#include "framebuffer.h"
 
 #include <glad/glad.h>
 

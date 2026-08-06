@@ -20,7 +20,7 @@
 #include "editorviewport.h"
 
 #include "../../application/application.h"
-#include "ecs/components/light2d/light2d.h"
+#include "../../ecs/components/light2d/light2d.h"
 
 //#include <ecs/components/physics2d/colliderbase.h>
 
@@ -32,8 +32,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "ecs/components/physics/2d/rigidbody2d.h"
-#include "ecs/components/rendering/tilemap.h"
+#include "../../ecs/components/physics/2d/rigidbody2d.h"
+#include "../../ecs/components/rendering/tilemap.h"
 
 int EditView::currentRenderMode = 1;
 
