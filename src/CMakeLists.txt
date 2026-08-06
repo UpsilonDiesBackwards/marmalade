@@ -50,12 +50,18 @@ list(APPEND ENGINE_SRC
         graphics/components/billboardtexture.cpp
         graphics/components/tileset.cpp
 
+        io/audiomanager.h
         io/audiomanager.cpp
+        io/input.h
         io/input.cpp
+        io/inputmanager.h
         io/inputmanager.cpp
 
+        scene/entity.h
         scene/entity.cpp
+        scene/scene.h
         scene/scene.cpp
+        scene/scenemanager.h
         scene/scenemanager.cpp
 
         animation/sequence.cpp
@@ -83,7 +89,13 @@ list(APPEND ENGINE_SRC
         project/index.h
         project/index.cpp
 
+        physics/physicsengine.h
+        physics/collisionevent.h
+        physics/2d/collider2d.h
+        physics/2d/physics2dutil.h
+        physics/2d/physicsengine2d.h
         physics/2d/physicsengine2d.cpp
+        physics/2d/collisionevent2d.h
         physics/2d/collisionevent2d.cpp
 )
 

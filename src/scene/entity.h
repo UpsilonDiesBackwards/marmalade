@@ -20,10 +20,10 @@
 #ifndef ENGINE_ENTITY_H
 #define ENGINE_ENTITY_H
 
-#include "../graphics/renderable.h"
-#include "../ecs/componentmanager.h"
-#include "../ecs/components/transform.h"
-#include "../ecs/components/rendering/materialrenderer.h"
+#include "../../include/graphics/renderable.h"
+#include "../../include/ecs/componentmanager.h"
+#include "../../include/ecs/components/transform.h"
+#include "../../include/ecs/components/rendering/materialrenderer.h"
 
 #include <glm/mat4x4.hpp>
 

@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <scene/scenemanager.h>
+#include "scenemanager.h"
 
 #include <iostream>
 #include "../application/logger.h"

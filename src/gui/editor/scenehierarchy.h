@@ -20,7 +20,7 @@
 #ifndef ENGINE_SCENEHIERARCHY_H
 #define ENGINE_SCENEHIERARCHY_H
 
-#include "scene/entity.h"
+#include "../../scene/entity.h"
 
 class SceneHierarchy {
 public:

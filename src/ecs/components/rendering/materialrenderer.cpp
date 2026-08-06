@@ -26,7 +26,7 @@
 
 #include <IconsCodicons.h>
 
-#include <scene/entity.h>
+#include <../../../scene/entity.h>
 
 #include <imgui.h>
 #include <ImGuiFileDialog.h>

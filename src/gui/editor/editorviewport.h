@@ -23,7 +23,7 @@
 #include "graphics/multisampledframebuffer.h"
 #include "ImGuizmo.h"
 
-#include <scene/entity.h>
+#include "../../scene/entity.h"
 
 #include <imgui.h>
 

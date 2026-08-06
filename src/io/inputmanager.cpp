@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <io/inputmanager.h>
+#include "inputmanager.h"
 
 InputManager::InputManager() {
     for (int i = 0; i < 512; i++) {

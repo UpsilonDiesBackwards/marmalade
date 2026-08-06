@@ -18,7 +18,7 @@
 #include "../include/ecs/components/physics/2d/circlecollider2d.h"
 
 #include "ecs/components/physics/2d/rigidbody2d.h"
-#include "scene/entity.h"
+#include "../../../../scene/entity.h"
 #include "../../../../gui/components/backgroundlabel.h"
 #include "../../../../gui/windows/stylemanager.h"
 

@@ -1,6 +1,6 @@
 // Marmalade - Lightweight Game Engine
-// Copyright (C) 2025 Tayler Parsons
-// Copyright (C) 2025 Ryan Bester
+// Copyright (C) 2026 Tayler Parsons
+// Copyright (C) 2026 Ryan Bester
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #define MARMALADE_COLLISIONEVENT_H
 
 #include <glm/vec3.hpp>
-#include "scene/entity.h"
+#include "../scene/entity.h"
 
 namespace Marmalade::Physics {
     /**

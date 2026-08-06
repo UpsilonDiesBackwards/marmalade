@@ -19,9 +19,9 @@
 #define PHYSICSENGINE2D_H
 
 #include "../physicsengine.h"
-#include "physics/collisionevent.h"
+#include "../collisionevent.h"
 
-#include "scene/entity.h"
+#include "../../scene/entity.h"
 
 namespace Marmalade::Physics {
     /**

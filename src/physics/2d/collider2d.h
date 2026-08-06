@@ -24,7 +24,7 @@
 
 #include <glm/gtc/quaternion.hpp>
 #include <imgui.h>
-#include "../../../src/gui/editor/editor.h"
+#include "../../gui/editor/editor.h"
 
 #include "../../../include/ecs/components/transform.h"
 

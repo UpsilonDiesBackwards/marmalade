@@ -20,7 +20,7 @@
 #ifndef ENGINE_PROFILER_H
 #define ENGINE_PROFILER_H
 
-#include "scene/entity.h"
+#include "../scene/entity.h"
 
 /*
  * \brief The "time" inside Marmalade. Handles deltaTime updates and the fixed time step used for physics

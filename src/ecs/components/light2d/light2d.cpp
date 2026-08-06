@@ -21,7 +21,7 @@
 #include "ecs/components/light2d/light2d.h"
 
 #include "ecs/components/transform.h"
-#include "scene/entity.h"
+#include "../../../scene/entity.h"
 #include "../../../application/application.h"
 #include "graphics/components/billboardtexture.h"
 

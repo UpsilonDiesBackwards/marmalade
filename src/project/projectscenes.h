@@ -20,7 +20,7 @@
 #ifndef MARMALADE_PROJECT_PROJECTSCENES_H
 #define MARMALADE_PROJECT_PROJECTSCENES_H
 
-#include <scene/scene.h>
+#include "../scene/scene.h"
 
 #include <nlohmann/json.hpp>
 

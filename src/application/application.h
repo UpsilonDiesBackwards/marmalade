@@ -40,21 +40,21 @@
 #include <imgui_te_context.h>
 #endif
 
-#include <scene/entity.h>
+#include "../scene/entity.h"
 #include <graphics/multisampledframebuffer.h>
-#include "io/audiomanager.h"
+#include "../io/audiomanager.h"
 #include "autosave.h"
 #include "crashreporter/framecapturer.h"
 
-#include <io/inputmanager.h>
-#include <io/input.h>
+#include "../io/inputmanager.h"
+#include "../io/input.h"
 #include <graphics/viewport.h>
 
-#include <scene/scenemanager.h>
+#include "../scene/scenemanager.h"
 
 #include <spdlog/spdlog.h>
 
-#include "physics/2d/physicsengine2d.h"
+#include "../physics/2d/physicsengine2d.h"
 
 enum PlayState {
     PlayState_PLAY,

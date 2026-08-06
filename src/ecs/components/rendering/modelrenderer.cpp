@@ -24,7 +24,7 @@
 #include <assimp/postprocess.h>
 #include <glad/glad.h>
 #include "graphics/renderable.h"
-#include "scene/entity.h"
+#include "../../../scene/entity.h"
 
 #include "../../../application/application.h"
 

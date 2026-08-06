@@ -11,14 +11,6 @@ list(APPEND ENGINE_API
         graphics/components/billboardtexture.h
         graphics/components/tileset.h
 
-        io/audiomanager.h
-        io/input.h
-        io/inputmanager.h
-
-        scene/entity.h
-        scene/scene.h
-        scene/scenemanager.h
-
         ecs/componentmanager.h
         ecs/components/transform.h
 
@@ -50,10 +42,6 @@ list(APPEND ENGINE_API
         imgui.inc
         interface.h
         wasm.h
-
-        physics/physicsengine.h
-        physics/2d/physicsengine2d.h
-        physics/2d/collisionevent2d.h
 )
 
 target_sources(marmalade PRIVATE ${ENGINE_API})

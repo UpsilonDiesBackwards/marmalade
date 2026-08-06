@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "../include/physics/2d/physicsengine2d.h"
+#include "physicsengine2d.h"
 
 #include "ecs/components/physics/2d/rigidbody2d.h"
 
 #include "../../application/application.h"
 
-#include "../../../include/physics/2d/physics2dutil.h"
-#include "physics/collisionevent.h"
-#include "physics/2d/collisionevent2d.h"
+#include "physics2dutil.h"
+#include "../collisionevent.h"
+#include "collisionevent2d.h"
 
 void Marmalade::Physics::PhysicsEngine2D::Update() {
     if (GET_APP.playState != PlayState_PLAY && GET_APP.playState != PlayState_STEP) { return; }

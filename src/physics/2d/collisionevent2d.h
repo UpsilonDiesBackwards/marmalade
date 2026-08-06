@@ -19,7 +19,7 @@
 #define COLLISIONEVENTS2D_H
 
 #include "ecs/components/physics/2d/rigidbody2d.h"
-#include "physics/collisionevent.h"
+#include "../collisionevent.h"
 
 namespace Marmalade::Physics {
     /**

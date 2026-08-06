@@ -20,7 +20,7 @@
 #include "../../../../application/application.h"
 
 #include "../src/gui/components/backgroundlabel.h"
-#include "physics/2d/physics2dutil.h"
+#include "../../../../physics/2d/physics2dutil.h"
 
 #ifdef _MSC_VER
 Marmalade::ECS::Rigidbody2D::Rigidbody2D() {

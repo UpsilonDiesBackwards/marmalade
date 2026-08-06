@@ -20,7 +20,7 @@
 
 #include <glm/vec2.hpp>
 #include "ecs/components/physics/rigidbody.h"
-#include "physics/2d/collider2d.h"
+#include "../../../../../src/physics/2d/collider2d.h"
 
 namespace Marmalade::ECS {
     /*!

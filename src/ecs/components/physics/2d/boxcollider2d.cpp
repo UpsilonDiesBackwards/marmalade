@@ -18,9 +18,9 @@
 #include "../include/ecs/components/physics/2d/boxcollider2d.h"
 
 #include "ecs/components/physics/2d/rigidbody2d.h"
-#include "scene/entity.h"
+#include "../../../../scene/entity.h"
 
-#include "physics/2d/collider2d.h"
+#include "../../../../physics/2d/collider2d.h"
 #include "../../../../gui/windows/stylemanager.h"
 #include "../../../../gui/components/backgroundlabel.h"
 

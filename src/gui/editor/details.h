@@ -24,7 +24,7 @@
 
 #include "../dialogs/addcomponent.h"
 
-#include "scene/entity.h"
+#include "../../scene/entity.h"
 
 namespace Marmalade::GUI {
     /**

@@ -21,7 +21,7 @@
 
 #include "../../application/application.h"
 #include "../../gui/components/backgroundlabel.h"
-#include <scene/entity.h>
+#include "../../scene/entity.h"
 
 #include <imgui.h>
 #include <glm/gtc/quaternion.hpp>

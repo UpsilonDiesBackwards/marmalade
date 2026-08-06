@@ -27,7 +27,7 @@
 #include "../../../gui/components/selectablelistview.h"
 #include  "../../../gui/components/backgroundlabel.h"
 #include "../../../gui/editor/editor.h"
-#include "scene/entity.h"
+#include "../../../scene/entity.h"
 
 #ifdef _MSC_VER
 Marmalade::ECS::Tilemap::Tilemap() {

@@ -18,7 +18,7 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "io/audiomanager.h"
+#include "audiomanager.h"
 
 #include "../application/logger.h"
 #include "../application/config/engineconfig.h"
